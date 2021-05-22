@@ -1,0 +1,33 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Pepper.Structures.Commands.Result;
+using Pepper.Structures.External.Osu;
+using Pepper.Utilities.Osu;
+using Qmmands;
+
+namespace Pepper.Commands.Osu
+{
+    public class Score : OsuScoreCommand
+    {
+        [Command("sc")]
+        [Description("View/list scores on a certain map")]
+        public async Task<EmbedResult> Exec(
+            [Description("A score URL or a beatmap ID.")] string link,
+            [Remainder] [Description("Username to check. Default to your username, if set. Ignored if a score link is passed.")] Username username = null!
+        )
+        {
+            var scoreParsingResult = URLParser.CheckScoreUrl(link, out var scoreLink);
+            if (!scoreParsingResult)
+                throw new ArgumentException("A valid score link must be passed!");
+            var (mode, id) = scoreLink;
+            var sc = await ApiService.GetScore(
+                id,
+                Rulesets
+                    .First(rulesetCheck => string.Equals(rulesetCheck.ShortName, mode, StringComparison.InvariantCultureIgnoreCase))
+                    .RulesetInfo
+                );
+            return await SingleScore(sc);
+        }
+    }
+}
