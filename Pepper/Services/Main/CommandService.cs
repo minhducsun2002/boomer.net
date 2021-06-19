@@ -183,8 +183,6 @@ namespace Pepper.Services.Main
             if (!(socketMessage is SocketUserMessage msg)) return;
             if (msg.Author.Id == client.CurrentUser.Id) return;
 
-            if (msg.Author.Id != 383990559070486529) return;
-
             var execTargetPosition = 0;
             var prefix = "";
             var validPrefix = CategoriesByAllowedPrefixes.FirstOrDefault(mapping =>
