@@ -166,21 +166,51 @@ namespace Pepper.Services.Main
             var context = (CommandContext) executionFailedEventArgs.Context;
             var result = executionFailedEventArgs.Result;
             log.Error(result.Exception, "");
-            await context.Channel.SendMessageAsync(
-                "",
-                true,
-                new EmbedBuilder
+            var stackTrace = result.Exception.StackTrace!.Split('\n');
+            var truncated = stackTrace.Length > 4;
+            
+            // using var stream = new MemoryStream(Encoding.UTF8.GetBytes(result.Exception.StackTrace));
+            var embed = new EmbedBuilder
+            {
+                Title = $"Apologize, there was an error trying to execute command `{result.Command.Name}` : ",
+                Description =
+                    $"```{result.FailureReason}```\n```{result.Exception.Message}\n{string.Join('\n', stackTrace.Take(4))}```",
+                Timestamp = DateTimeOffset.Now,
+                Fields =
                 {
-                    Title = $"Apologize, there was an error trying to execute command `{result.Command.Name}` : ",
-                    Description =
-                        $"```{result.FailureReason}```\n```{result.Exception.Message}\n{result.Exception.StackTrace}```",
-                    Timestamp = DateTimeOffset.Now
-                }.Build());
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Execution context",
+                        Value = string.Join('\n', new[]
+                        {
+                            $"Channel ID : {context.Channel.Id} (`{context.Channel.Name}`)",
+                            context.Channel is SocketTextChannel textChannel
+                                ? $"Guild ID : {textChannel.Guild.Id} (`{textChannel.Guild.Name}`)"
+                                : "",
+                            $"Author ID : {context.Author.Id} ({context.Author.Username}#{context.Author.Discriminator})",
+                            $"Command prefix : `{context.Prefix}`",
+                            $"Command : `{context.Command.Name}`"
+                        }.Where(s => !string.IsNullOrWhiteSpace(s)))
+                    }
+                },
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = truncated ? "Stack trace is truncated" : ""
+                }
+            }.Build();
+
+            await context.Channel.SendMessageAsync(embed: embed);
+
+            // await context.Channel.SendFileAsync(
+            //     filename: "stacktrace.txt",
+            //     stream: stream,
+            //     embed: embed
+            // );
         }
         
         private async Task HandleMessage(SocketMessage socketMessage)
         {
-            if (!(socketMessage is SocketUserMessage msg)) return;
+            if (socketMessage is not SocketUserMessage msg) return;
             if (msg.Author.Id == client.CurrentUser.Id) return;
 
             var execTargetPosition = 0;
