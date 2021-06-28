@@ -18,6 +18,8 @@ namespace Pepper
 {
     public partial class Pepper
     {
+        public static readonly Type[] AssemblyTypes = Assembly.GetEntryAssembly()!.GetTypes();
+        
         private static void PreInitialize()
         {
             Log.Logger = new LoggerConfiguration()
@@ -26,7 +28,7 @@ namespace Pepper
                 .Enrich.FromLogContext()
                 .WriteTo.Console(
                     new ExpressionTemplate(
-                        "[{@t:dd-MM-yy HH:mm:ss} {@l:u3}] [Thread {ThreadId}]{#if Contains(SourceContext, 'Service')} [{SourceContext}]{#end} {@m:lj}\n{@x}"
+                        "[{@t:dd-MM-yy HH:mm:ss} {@l:u3}] [Thread {ThreadId,2}]{#if Contains(SourceContext, 'Service')} [{Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}]{#end} {@m:lj}\n{@x}"
                     )
                 )
                 .CreateLogger();
@@ -57,9 +59,8 @@ namespace Pepper
                 .AddSingleton(Client)
                 .AddSingleton(configuration)
                 .AddSingleton(new InteractivityService(Client));
-            serviceTypes = Assembly.GetEntryAssembly()!.GetTypes()
-                .Where(type => typeof(Service).IsAssignableFrom(type) && !type.IsAbstract &&
-                               !type.ContainsGenericParameters).ToArray();
+            serviceTypes = AssemblyTypes
+                .Where(type => typeof(Service).IsAssignableFrom(type) && !type.IsAbstract).ToArray();
             foreach (var service in serviceTypes) services.AddSingleton(service);
             serviceProvider = services.BuildServiceProvider();
             
@@ -77,7 +78,7 @@ namespace Pepper
                 serviceTypes.Select(type =>
                 {
                     var service = serviceProvider.GetService(type) as Service;
-                    Log.Debug($"Initializing service {service!.GetType().FullName}...");
+                    Log.Debug($"Initializing service {service!.GetType().Name}...");
                     return service.Initialize();
                 })
             );

@@ -25,7 +25,7 @@ namespace Pepper.Services.Osu
         private readonly string databaseName;
         private readonly string serverUri;
         private readonly IAppCache usernameCache = new CachingService();
-        private readonly ILogger log = Log.Logger;
+        private readonly ILogger log = Log.Logger.ForContext<DiscordOsuUsernameLookupService>();
 
         public DiscordOsuUsernameLookupService(IServiceProvider serviceProvider)
         {

@@ -24,11 +24,11 @@ namespace Pepper
         public static async Task<int> Main(string[] args)
         {
             PreInitialize();
-
-            var initializeException = InitializeServices().Exception;
-            if (initializeException != null)
+            var init = InitializeServices();
+            await init;
+            if (init.Status == TaskStatus.Faulted)
             {
-                Log.Fatal(initializeException, "An exception occurred during services initialization.");
+                Log.Fatal(init.Exception, "An exception occurred during services initialization.");
                 Environment.Exit(1);
             }
             Log.Debug("We are done with all initializations. Connecting to Discord...");
