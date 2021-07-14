@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Discord;
+using Disqord;
 using FgoExportedConstants;
 using MongoDB.Driver;
 using Pepper.Services.FGO;
@@ -58,7 +58,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             );
         }
 
-        public EmbedBuilder[] Prepare()
+        public LocalEmbed[] Prepare()
         {
             var npGain = GetNPGain();
             var traits = new HashSet<int>(servantEntity.Traits);
@@ -71,39 +71,39 @@ namespace Pepper.Structures.External.FGO.Renderer
                 BaseEmbed()
                     .WithFooter("General info")
                     .WithFields(
-                        new EmbedFieldBuilder
+                        new LocalEmbedField
                         {
                             Name = "HP/ATK",
                             Value =
                                 $"Base : {svtLimits[0].HpBase}/{svtLimits[0].AtkBase}\nMaximum : {svtLimits[0].HpMax}/{svtLimits[0].AtkMax}",
                             IsInline = true
                         },
-                        new EmbedFieldBuilder
+                        new LocalEmbedField
                         {
                             Name = "NP generation",
                             Value = $"Per hit : **{(float) npGain.TdPoint / 100:F2}**%"
                                     + $"\nWhen attacked : **{(float) npGain.TdPointDef / 100:F2}**%",
                             IsInline = true
                         },
-                        new EmbedFieldBuilder
+                        new LocalEmbedField
                         {
                             Name = "Critical stars",
                             Value = $"Weight : **{svtLimits[0].CriticalWeight}**"
                                     + $"\nGeneration : **{(float) servantEntity.StarRate / 10:F1}**%",
                             IsInline = true
                         },
-                        new EmbedFieldBuilder
+                        new LocalEmbedField
                         {
                             Name = "Gender / Attribute",
                             Value = $"{TraitService.GetTrait(servantEntity.GenderType + 0)} / {TraitService.GetTrait(attribute)}",
                             IsInline = true
                         },
-                        new EmbedFieldBuilder
+                        new LocalEmbedField
                         {
                             Name = "Traits",
                             Value = string.Join(", ", GetTraits().Select(trait => TraitService.GetTrait(trait)))
                         },
-                        new EmbedFieldBuilder
+                        new LocalEmbedField
                         {
                             Name = "Cards / Damage distribution by %",
                             Value = string.Join('\n',
@@ -126,7 +126,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                 BaseEmbed()
                     .WithDescription(ascensions.Length == 0 ? "No materials needed." : "")
                     .WithFields(
-                        ascensions.Select((limit, index) => new EmbedFieldBuilder
+                        ascensions.Select((limit, index) => new LocalEmbedField
                         {
                             Name = $"Stage {index + 1} - {limit.Item1.ToString("n0", CultureInfo.InvariantCulture)} QP",
                             Value = string.Join('\n', limit.Item2)
@@ -135,7 +135,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                 BaseEmbed()
                     .WithDescription(ascensions.Length == 0 ? "No materials needed." : "")
                     .WithFields(
-                        skills.Select((limit, index) => new EmbedFieldBuilder
+                        skills.Select((limit, index) => new LocalEmbedField
                         {
                             Name = $"Level {index + 2} - {limit.Item1.ToString("n0", CultureInfo.InvariantCulture)} QP",
                             Value = string.Join('\n', limit.Item2)
@@ -206,7 +206,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             ).First()!;
         }
 
-        private EmbedBuilder BaseEmbed()
+        private LocalEmbed BaseEmbed()
         {
             if (string.IsNullOrEmpty(servantName))
             {
@@ -221,9 +221,9 @@ namespace Pepper.Structures.External.FGO.Renderer
                 }
             }
             
-            return new EmbedBuilder
+            return new LocalEmbed()
             {
-                Author = new EmbedAuthorBuilder
+                Author = new LocalEmbedAuthor
                 {
                     Name = $"{Limits.Select(limit => limit.Rarity).Max()}☆ {Class.Name}",
                     IconUrl =

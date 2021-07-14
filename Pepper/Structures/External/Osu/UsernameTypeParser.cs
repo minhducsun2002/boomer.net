@@ -1,5 +1,6 @@
-using System;
 using System.Threading.Tasks;
+using Disqord.Bot;
+using Microsoft.Extensions.DependencyInjection;
 using Pepper.Services.Osu;
 using Qmmands;
 
@@ -12,16 +13,14 @@ namespace Pepper.Structures.External.Osu
         public static explicit operator Username(string username) => new Username { Content = username };
     }
 
-    public class UsernameTypeParser : TypeParser<Username>
+    public class UsernameTypeParser : DiscordTypeParser<Username>
     {
-        private readonly DiscordOsuUsernameLookupService lookupService;
-        public UsernameTypeParser(DiscordOsuUsernameLookupService lookupService) { this.lookupService = lookupService; }
-        
-        public override async ValueTask<TypeParserResult<Username>> ParseAsync(Parameter parameter, string value, Qmmands.CommandContext context)
+        public override async ValueTask<TypeParserResult<Username>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
         {
             if (!string.IsNullOrWhiteSpace(value))
                 return TypeParserResult<Username>.Successful((Username) value);
-            var username = await lookupService.GetUser(((CommandContext) context).Author.Id);
+            var lookupService = context.Services.GetRequiredService<DiscordOsuUsernameLookupService>();
+            var username = await lookupService.GetUser(context.Author.Id);
             if (username != null) return TypeParserResult<Username>.Successful((Username) username);
             return !parameter.IsOptional
                 ? TypeParserResult<Username>.Failed($"{nameof(username)} must be specified and not be null")

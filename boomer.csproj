@@ -7,15 +7,17 @@
 
   <ItemGroup>
     <PackageReference Include="ChunkExtensionMethod" Version="1.0.2" />
-    <PackageReference Include="Discord.InteractivityAddon" Version="2.4.0" />
-    <PackageReference Include="Discord.NET" Version="2.3.1" />
+    <PackageReference Include="Disqord" Version="1.0.0-07052021-46" />
+    <PackageReference Include="Disqord.Bot" Version="1.0.0-07052021-46" />
     <PackageReference Include="dotenv.net" Version="3.0.0" />
     <PackageReference Include="fgo-enums" Version="2.31.1" />
     <PackageReference Include="FuzzySharp" Version="2.0.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.32" />
     <PackageReference Include="ISO3166-Mobile" Version="2.1.0" />
     <PackageReference Include="LazyCache" Version="2.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0-preview.5.21301.5" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.12.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="OsuSharp" Version="5.4.4" />
@@ -30,6 +32,8 @@
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
     <PackageReference Include="Serilog.Exceptions" Version="7.0.0" />
     <PackageReference Include="Serilog.Expressions" Version="2.0.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
   </ItemGroup>

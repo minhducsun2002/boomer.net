@@ -1,7 +1,10 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Disqord.Bot.Hosting;
 using LazyCache;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
@@ -27,19 +30,19 @@ namespace Pepper.Services.Osu
         private readonly IAppCache usernameCache = new CachingService();
         private readonly ILogger log = Log.Logger.ForContext<DiscordOsuUsernameLookupService>();
 
-        public DiscordOsuUsernameLookupService(IServiceProvider serviceProvider)
+        public DiscordOsuUsernameLookupService(IConfiguration configuration)
         {
-            var record = serviceProvider.GetRequiredService<Configuration>()["database:osu:usernames"];
+            var record = configuration.GetSection("database:osu:usernames").Get<string[]>();
             serverUri = record[0]; databaseName = record[1]; collectionName = record[2];
         }
 
-        public override Task Initialize()
+        public override Task StartAsync(CancellationToken cancellationToken)
         {
             client = new MongoClient(serverUri);
             log.Debug($@"Connecting to osu! username server at {
                 string.Join(", ", client.Settings.Servers.Select(s => s.Host + ":" + s.Port))
             }");
-            return base.Initialize();
+            return base.StartAsync(cancellationToken);
         }
 
         public async Task<string?> GetUser(ulong discordUserId)

@@ -1,12 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using Discord;
-using Pepper.Structures.Commands;
-using Pepper.Structures.Commands.Result;
+using Disqord;
+using Disqord.Bot;
 using Pepper.Utilities;
 using Qmmands;
-using Command = Pepper.Structures.Command;
 
 namespace Pepper.Commmands.General
 {
@@ -14,7 +12,7 @@ namespace Pepper.Commmands.General
     {
         [Command("uptime")]
         [Description("How long has I been running?")]
-        public EmbedResult Exec()
+        public DiscordCommandResult Exec()
         {
             var threads = Process.GetCurrentProcess().Threads.Cast<ProcessThread>().Select(thread =>
             {
@@ -66,21 +64,18 @@ namespace Pepper.Commmands.General
                     }).ToArray();
                 }).ToArray();
 
-            return new EmbedResult
+            return Reply(new LocalEmbed
             {
-                DefaultEmbed = new EmbedBuilder
-                    {
-                        Title = $"Process uptime : {ProcessUptime()}.",
-                        Description = 
-                            "```"
-                            + string.Join('\n',
-                                presentColumns[0].Zip(presentColumns[1], 
-                                    (_1, _2) => $"{_1.Item1} | {_1.Item2} | {_2.Item1} | {_2.Item2}"
-                                )
-                            )
-                            + "```"
-                    }.Build(),
-            };
+                Title = $"Process uptime : {ProcessUptime()}.",
+                Description =
+                    "```"
+                    + string.Join('\n',
+                        presentColumns[0].Zip(presentColumns[1],
+                            (_1, _2) => $"{_1.Item1} | {_1.Item2} | {_2.Item1} | {_2.Item2}"
+                        )
+                    )
+                    + "```"
+            });
         }
 
         private static string ProcessUptime()

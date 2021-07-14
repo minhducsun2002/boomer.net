@@ -1,11 +1,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BAMCIS.ChunkExtensionMethod;
-using Discord;
+using Disqord;
+using Disqord.Bot;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Structures.Commands;
-using Pepper.Structures.Commands.Result;
 using Pepper.Structures.External.Osu;
 using Qmmands;
 
@@ -15,7 +15,7 @@ namespace Pepper.Commands.Osu
     {
         [Command("recent", "recentplay", "rp")]
         [Description("Show recent plays of a player.")]
-        public async Task<EmbedResult> Recent(
+        public async Task<DiscordCommandResult> Recent(
             [Flag("/")] [Description("Game mode to check. Defaults to osu!.")] Ruleset ruleset,
             [Description("Username to check. Default to your username, if set.")] Username username
         )
@@ -25,24 +25,22 @@ namespace Pepper.Commands.Osu
 
             var scores = await ApiService.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo);
             var chunks = scores.Chunk(MaxScorePerPage).ToArray();
-            return new EmbedResult
-            {
-                Embeds = chunks.Select((embed, index) => SerializeScoreset(embed)
-                        .WithFooter($"Recent plays - Page {index + 1}/{chunks.Length}")
-                        .WithAuthor(SerializeAuthorBuilder(user))
-                        .Build())
-                    .ToArray(),
-                DefaultEmbed = new EmbedBuilder()
+
+            var embeds = chunks.Select((embed, index) => SerializeScoreset(embed)
+                .WithFooter($"Recent plays - Page {index + 1}/{chunks.Length}")
+                .WithAuthor(SerializeAuthorBuilder(user))).ToArray();
+
+            if (embeds.Length == 0)
+                return Reply(new LocalEmbed()
                     .WithDescription(
                         $@"No recent play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {rulesetInfo.Name}"
-                        )
-                    .Build()
-            };
+                    ));
+            return Reply(embeds);
         }
 
         [Command("rs")]
         [Description("Show the most recent play of a player.")]
-        public async Task<EmbedResult> MostRecent(
+        public async Task<DiscordCommandResult> MostRecent(
             [Flag("/")] [Description("Game mode to check. Defaults to osu!.")] Ruleset ruleset,
             [Description("Username to check. Default to your username, if set.")] Username username,
             [Flag("#")] [Description("Index from the latest play. 1 indicates the latest.")] int pos = 1)
@@ -52,14 +50,10 @@ namespace Pepper.Commands.Osu
             var scores = await ApiService.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo, 1, pos - 1);
             
             if (scores.Any()) return await SingleScore(scores.First());
-            return new EmbedResult
-            {
-                DefaultEmbed = new EmbedBuilder()
-                    .WithDescription(
-                        $"No recent play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {rulesetInfo.Name} at position #{pos}."
-                    )
-                    .Build()
-            };
+            return Reply(new LocalEmbed()
+                .WithDescription(
+                    $"No recent play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {rulesetInfo.Name} at position #{pos}."
+                ));
         }
     }
 }

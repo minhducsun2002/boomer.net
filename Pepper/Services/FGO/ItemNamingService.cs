@@ -2,7 +2,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Structures;
 using Serilog;
@@ -15,10 +17,9 @@ namespace Pepper.Services.FGO
         private readonly string url;
         private readonly ILogger log = Log.Logger.ForContext<ItemNamingService>();
         
-        public ItemNamingService(IServiceProvider services)
+        public ItemNamingService(IConfiguration config)
         {
-            var config = services.GetRequiredService<Configuration>();
-            var value = config["fgo:items:csv"];
+            var value = config.GetSection("fgo:items:csv").Get<string[]>();
             url = value[0];
         }
         
@@ -33,10 +34,11 @@ namespace Pepper.Services.FGO
             log.Information($"Processed {Namings.Count} entries.");
             return naming;
         }
-        
-        public override async Task Initialize()
+
+        public override async Task StartAsync(CancellationToken stoppingToken)
         {
             await Load();
+            await base.ExecuteAsync(stoppingToken);
         }
     }
 }

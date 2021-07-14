@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using AJ.Code;
-using Discord;
+using Disqord;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -77,8 +77,8 @@ namespace Pepper.Commands.Osu
         protected static string SerializeTimestamp(DateTimeOffset timestamp, bool UTCHint = true)
             => timestamp.ToUniversalTime().ToString($"HH:mm:ss, dd/MM/yyyy{(UTCHint ? " 'UTC'" : "")}", CultureInfo.InvariantCulture);
 
-        protected static EmbedAuthorBuilder SerializeAuthorBuilder(osu.Game.Users.User user)
-            => new EmbedAuthorBuilder
+        protected static LocalEmbedAuthor SerializeAuthorBuilder(osu.Game.Users.User user)
+            => new()
             {
                 IconUrl = user.AvatarUrl,
                 Name = user.Username,
@@ -104,8 +104,8 @@ namespace Pepper.Commands.Osu
             return modStrings
                 .Select(modString => 
                     allMods.FirstOrDefault(mod => string.Equals(mod.Acronym, modString, StringComparison.InvariantCultureIgnoreCase)))
-                .Where(mod => mod != default)
-                .ToArray();
+                .Where(mod => mod != null)
+                .ToArray()!;
         }
     }
 }

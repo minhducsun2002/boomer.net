@@ -1,6 +1,9 @@
+using System;
+
 namespace Pepper.Structures.Commands
 {
-    public class PrefixCategoryAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public class PrefixCategoryAttribute : Attribute
     {
         public string PrefixCategory { get; }
         public PrefixCategoryAttribute(string prefixCategory) => PrefixCategory = prefixCategory;

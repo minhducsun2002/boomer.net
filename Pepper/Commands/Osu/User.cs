@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Discord;
+using Disqord;
+using Disqord.Bot;
 using osu.Game.Rulesets;
 using Pepper.Structures.Commands;
-using Pepper.Structures.Commands.Result;
 using Pepper.Structures.External.Osu;
 using Qmmands;
 
@@ -14,7 +14,7 @@ namespace Pepper.Commands.Osu
     {
         [Command("user", "u")]
         [Description("Show statistics of an osu! player.")]
-        public async Task<EmbedResult> Exec(
+        public async Task<DiscordCommandResult> Exec(
             [Flag("/")] [Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
             [Remainder] [Description("Username to check. Default to your username, if set.")] Username username)
         {
@@ -25,7 +25,7 @@ namespace Pepper.Commands.Osu
             var countryCode = user.Country.FlagName;
             var earthEmoji = ResolveEarthEmoji(AJ.Code.Country.GetCountryInfoForAlpha2Code(countryCode)!.ContinentCode);
 
-            var embed = new EmbedBuilder
+            var embed = new LocalEmbed
             {
                 Title = user.Username,
                 Url = $"https://osu.ppy.sh/users/{user.Id}",
@@ -35,15 +35,15 @@ namespace Pepper.Commands.Osu
                         ? "Unranked"
                         : $"**{stats.PP}**pp ({earthEmoji} #**{stats.GlobalRank}** | :flag_{countryCode.ToLowerInvariant()}: #**{stats.CountryRank}**)"
                     ) + $".\n**{stats.Accuracy:F3}**% accuracy - **{stats.MaxCombo}**x max combo.",
-                Fields = new List<EmbedFieldBuilder>
+                Fields = new List<LocalEmbedField>
                 {
-                    new EmbedFieldBuilder
+                    new()
                     {
                         Name = $"Play ranks",
                         Value = $"**{grades.SSPlus}** XH | **{grades.SS}** X\n**{grades.SPlus}** SH | **{grades.S}** S\n**{grades.A}** A",
                         IsInline = true
                     },
-                    new EmbedFieldBuilder
+                    new()
                     {
                         Name = "Play count",
                         Value = $"{stats.PlayCount} times\n"
@@ -51,7 +51,7 @@ namespace Pepper.Commands.Osu
                         IsInline = true
                     },
                 },
-                Footer = new EmbedFooterBuilder { Text = $"Joined {SerializeTimestamp(user.JoinDate)}." },
+                Footer = new LocalEmbedFooter { Text = $"Joined {SerializeTimestamp(user.JoinDate)}." },
                 Color = new Color(color.R, color.G, color.B)
             };
 
@@ -60,7 +60,7 @@ namespace Pepper.Commands.Osu
                 var score = scores[0];
                 var map = score.Beatmap;
                 var mapset = map.Metadata;
-                embed.Fields.Add(new EmbedFieldBuilder
+                embed.Fields.Add(new LocalEmbedField
                 {
                     Name = "Best performance",
                     Value = $"[**{score.Rank}**] **{score.PP}**pp "
@@ -71,7 +71,7 @@ namespace Pepper.Commands.Osu
                 });
             }
 
-            return new EmbedResult {DefaultEmbed = embed.Build()};
+            return Reply(embed);
         }
     }
 }

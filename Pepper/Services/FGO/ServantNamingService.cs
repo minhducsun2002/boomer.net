@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Structures;
 using Serilog;
@@ -23,10 +25,9 @@ namespace Pepper.Services.FGO
         private readonly ILogger log = Log.Logger.ForContext<ServantNamingService>();
         public ConcurrentDictionary<long, ServantNaming> Namings { get; private set; } = new();
 
-        public ServantNamingService(IServiceProvider services)
+        public ServantNamingService(IConfiguration config)
         {
-            var config = services.GetRequiredService<Configuration>();
-            var value = config["fgo:aliases:csv"];
+            var value = config.GetSection("fgo:aliases:csv").Get<string[]>();
             url = value[0];
         }
 
@@ -45,10 +46,11 @@ namespace Pepper.Services.FGO
             log.Information($"Processed {Namings.Count} entries.");
             return naming;
         }
-        
-        public override async Task Initialize()
+
+        public override async Task StartAsync(CancellationToken stoppingToken)
         {
             await Load();
+            await base.ExecuteAsync(stoppingToken);
         }
     }
 }

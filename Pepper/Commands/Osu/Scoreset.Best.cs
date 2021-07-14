@@ -2,12 +2,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using BAMCIS.ChunkExtensionMethod;
-using Discord;
+using Disqord;
+using Disqord.Bot;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Mods;
 using Pepper.Structures.Commands;
-using Pepper.Structures.Commands.Result;
 using Pepper.Structures.External.Osu;
 using Qmmands;
 
@@ -17,7 +17,7 @@ namespace Pepper.Commands.Osu
     {
         [Command("top", "best")]
         [Description("Show top plays of a player.")]
-        public async Task<EmbedResult> Best(
+        public async Task<DiscordCommandResult> Best(
             [Flag("/")] [Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
             [Flag("/mod=", "/mod:")] [Description("Mods to filter top plays with.")] string mods,
             [Description("Username to check. Default to your username, if set.")] Username username,
@@ -30,13 +30,9 @@ namespace Pepper.Commands.Osu
             {
                 var score = await ApiService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, 1, pos - 1);
                 if (score.Length == 0)
-                    return new EmbedResult
-                    {
-                        DefaultEmbed = new EmbedBuilder()
-                            .WithDescription(
-                                $"No top play found for player [{user.Username}](https://osu.ppy.sh/users/{user.Id}) at position {pos}.")
-                            .Build()
-                    };
+                    return Reply(new LocalEmbed()
+                        .WithDescription(
+                            $"No top play found for player [{user.Username}](https://osu.ppy.sh/users/{user.Id}) at position {pos}."));
                 return await SingleScore(score[0]);
             }
 
@@ -57,18 +53,16 @@ namespace Pepper.Commands.Osu
                         checkedMods.Contains(mod.Acronym, StringComparer.InvariantCultureIgnoreCase));
                 })
                 .Chunk(MaxScorePerPage).ToArray();
-            return new EmbedResult
-            {
-                Embeds = chunks.Select((embed, index) => SerializeScoreset(embed)
-                        .WithFooter($"Top plays - page {index + 1}/{chunks.Length}")
-                        .WithAuthor(SerializeAuthorBuilder(user))
-                        .Build())
-                    .ToArray(),
-                DefaultEmbed = new EmbedBuilder()
+
+            var embeds = chunks.Select((embed, index) => SerializeScoreset(embed)
+                .WithFooter($"Top plays - page {index + 1}/{chunks.Length}")
+                .WithAuthor(SerializeAuthorBuilder(user))).ToArray();
+
+            if (embeds.Length == 0)
+                return Reply(new LocalEmbed()
                     .WithDescription(
-                        $"No top play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {ruleset.RulesetInfo.Name}")
-                    .Build()
-            };
+                        $"No top play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {ruleset.RulesetInfo.Name}"));
+            return Reply(embeds);
         }
     }
 }

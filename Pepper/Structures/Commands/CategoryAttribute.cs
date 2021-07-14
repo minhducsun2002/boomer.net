@@ -1,6 +1,9 @@
+using System;
+
 namespace Pepper.Structures.Commands
 {
-    public class CategoryAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public class CategoryAttribute : Attribute
     {
         public string Category { get; }
         public CategoryAttribute(string category) => Category = category;

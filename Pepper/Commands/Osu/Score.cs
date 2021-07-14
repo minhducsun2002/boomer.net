@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Pepper.Structures.Commands.Result;
+using Disqord.Bot;
 using Pepper.Structures.External.Osu;
 using Pepper.Utilities.Osu;
 using Qmmands;
@@ -12,7 +12,7 @@ namespace Pepper.Commands.Osu
     {
         [Command("sc")]
         [Description("View/list scores on a certain map")]
-        public async Task<EmbedResult> Exec(
+        public async Task<DiscordCommandResult> Exec(
             [Description("A score URL or a beatmap ID.")] string link,
             [Remainder] [Description("Username to check. Default to your username, if set. Ignored if a score link is passed.")] Username username = null!
         )

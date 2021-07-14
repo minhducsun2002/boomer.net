@@ -1,10 +1,10 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Disqord.Bot;
 using Qmmands;
 using MongoDB.Driver;
 using Pepper.Services.FGO;
 using Pepper.Structures.Commands;
-using Pepper.Structures.Commands.Result;
 using Pepper.Structures.External.FGO;
 using Pepper.Structures.External.FGO.MasterData;
 using Pepper.Structures.External.FGO.Renderer;
@@ -15,7 +15,7 @@ namespace Pepper.Commands.FGO
     {
         [Command("s")]
         [PrefixCategory("fgo")]
-        public async Task<EmbedResult> Exec(int id = 2)
+        public async Task<DiscordCommandResult> Exec(int id = 2)
         {
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP];
 
@@ -33,10 +33,7 @@ namespace Pepper.Commands.FGO
                 TraitService = TraitService,
                 ItemNamingService = ItemNamingService
             };
-            return new EmbedResult
-            {
-                Embeds = renderer.Prepare().Select(embed => embed.Build()).ToArray() 
-            };
+            return Reply(renderer.Prepare());
         }
     }
 }

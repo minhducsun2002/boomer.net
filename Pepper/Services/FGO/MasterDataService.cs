@@ -1,10 +1,10 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Pepper.Structures;
 using Pepper.Structures.External.FGO;
@@ -20,21 +20,21 @@ namespace Pepper.Services.FGO
 
     public class MasterDataService : Service
     {
-        public Dictionary<Region, MasterDataMongoDBConnection> Connections = new();
-        public Dictionary<Region, MongoClient> Clients { get; } = new();
+        public ConcurrentDictionary<Region, MasterDataMongoDBConnection> Connections = new();
+        public ConcurrentDictionary<Region, MongoClient> Clients { get; } = new();
 
-        private static readonly Dictionary<string, Type> MasterDataEntityTypes = Pepper.AssemblyTypes
+        private static readonly Dictionary<string, Type> MasterDataEntityTypes = typeof(Pepper)
+            .Assembly.GetTypes()
             .Where(type => typeof(MasterDataEntity).IsAssignableFrom(type) && !type.IsAbstract).ToDictionary(
                 type => type.Name,
                 type => type
             );
 
-        public MasterDataService(IServiceProvider services)
+        public MasterDataService(IConfiguration config)
         {
-            var config = services.GetRequiredService<Configuration>();
             foreach (var regionCode in Enum.GetNames<Region>())
             {
-                var cfg = config[$"database:fgo:master:{regionCode}"];
+                var cfg = config.GetSection($"database:fgo:master:{regionCode}").Get<string[]>();
                 var region = Enum.Parse<Region>(regionCode);
                 Clients[region] = new MongoClient(cfg[0]);
                 var db = Clients[region].GetDatabase(cfg[1]);
@@ -59,16 +59,6 @@ namespace Pepper.Services.FGO
 
                 Connections[region] = connectionObject;
             }
-        }
-        
-        public override Task Initialize()
-        {
-            ConventionRegistry.Register(
-                "IgnoreExtraElements",
-                new ConventionPack { new IgnoreExtraElementsConvention(true) },
-                type => true
-            );
-            return base.Initialize();
         }
     }
 }

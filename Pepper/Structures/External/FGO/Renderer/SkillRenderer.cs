@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Discord;
+using Disqord;
 using MongoDB.Driver;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO.MasterData;
@@ -41,7 +41,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             );
         }
 
-        public EmbedBuilder Prepare(TraitService trait)
+        public LocalEmbed Prepare(TraitService trait)
         {
             var multipleActSet = false;
             var effects = Functions
@@ -61,7 +61,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                         return invocationInformation;
                     }
                 );
-            return new EmbedBuilder
+            return new LocalEmbed
             {
                 Title = skillEntity.Name,
                 Description = multipleActSet ? "This skill contains multiple act set - only one will be executed." : "",
@@ -81,7 +81,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                         if (value > 0) limits.Add($"{value} {outputName}" + (value > 1 ? "s" : ""));
                     }
 
-                    return new EmbedFieldBuilder
+                    return new LocalEmbedField
                     {
                         Name = (actSetInformation != null ? $"[Set {actSetInformation.Value.ActSetID} - Weight {actSetInformation.Value.ActSetWeight}] " : "") 
                                + $"[{func.ID}]"
