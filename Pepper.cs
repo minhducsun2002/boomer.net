@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,8 +53,19 @@ await new HostBuilder()
             new ConventionPack { new IgnoreExtraElementsConvention(true) },
             _ => true
         );
-
-        app.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "config/config.json"));
+        
+        var configUrl = Environment.GetEnvironmentVariable("PEPPER_CONFIG_URL");
+        if (!string.IsNullOrWhiteSpace(configUrl))
+        {
+            var httpClient = new HttpClient();
+            Log.Information($"Downloading JSON configuration from {configUrl}...");
+            var config = httpClient.GetStreamAsync(configUrl).Result;
+            app.AddJsonStream(config);
+        }
+        else
+        {
+            app.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "config/config.json"));
+        }
     })
     .ConfigureDiscordBot<Pepper.Pepper>((context, bot) =>
     {
