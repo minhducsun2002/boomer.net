@@ -40,23 +40,35 @@
   
   
   
-  <Target Name="GetGitHash" BeforeTargets="WriteGitHash" Condition="'$(BuildHash)' == ''">
+  <Target Name="GetGitHashFromRepository" BeforeTargets="WriteGitHash" Condition="'$(BuildHash)' == ''">
     <PropertyGroup>
       <!-- temp file for the git version (lives in "obj" folder)-->
       <VerFile>$(IntermediateOutputPath)gitver</VerFile>
     </PropertyGroup>
 
     <!-- write the hash to the temp file.-->
-    <Exec Command="git -C $(ProjectDir) describe --long --always --dirty &gt; $(VerFile)" />
+    <Exec Command="git -C $(ProjectDir) describe --long --always --dirty &gt; $(VerFile)" ContinueOnError="true" />
 
     <!-- read the version into the GitVersion itemGroup-->
-    <ReadLinesFromFile File="$(VerFile)">
+    <ReadLinesFromFile File="$(VerFile)" ContinueOnError="true">
       <Output TaskParameter="Lines" ItemName="GitVersion" />
     </ReadLinesFromFile>
     <!-- Set the BuildHash property to contain the GitVersion, if it wasn't already set.-->
     <PropertyGroup>
       <BuildHash>@(GitVersion)</BuildHash>
     </PropertyGroup>
+  </Target>
+
+  <Target Name="GetGitHashFromEnvironment" BeforeTargets="WriteGitHash" Condition="'$(BuildHash)' == ''">
+    <!-- read the version into the GitVersion itemGroup-->
+    <ReadLinesFromFile File="$(VerFile)" ContinueOnError="true">
+      <Output TaskParameter="Lines" ItemName="GitVersion" />
+    </ReadLinesFromFile>
+    <!-- Set the BuildHash property to contain the GitVersion, if it wasn't already set.-->
+    <PropertyGroup>
+      <BuildHash>$(BUILD_HASH)</BuildHash>
+    </PropertyGroup>
+    <Message Text="Failed to detect git hash. Falling back to variable BUILD_HASH = $(BUILD_HASH)." Importance="high" />
   </Target>
 
   <Target Name="WriteGitHash" BeforeTargets="CoreCompile">
