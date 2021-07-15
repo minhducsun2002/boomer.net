@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Linq;
 using Disqord;
@@ -74,7 +75,12 @@ namespace Pepper.Commmands.General
                             (_1, _2) => $"{_1.Item1} | {_1.Item2} | {_2.Item1} | {_2.Item2}"
                         )
                     )
-                    + "```"
+                    + "```",
+                Footer = new LocalEmbedFooter
+                {
+                    Text = $"{RuntimeInformation.FrameworkDescription} ({RuntimeInformation.RuntimeIdentifier})"
+                },
+                Timestamp = DateTimeOffset.Now
             });
         }
 
