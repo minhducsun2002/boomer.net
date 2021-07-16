@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -125,6 +126,47 @@ namespace Pepper
             }
             
             base.MutateModule(moduleBuilder);
+        }
+
+        protected override LocalMessage FormatFailureMessage(DiscordCommandContext context, FailedResult result)
+        {
+            var content = "I'm sorry, an error occurred.";
+            var embed = new LocalEmbed
+            {
+                Fields = new List<LocalEmbedField>(),
+                Footer = new LocalEmbedFooter { Text = $"Command : {context.Command.Name} | Prefix : {context.Prefix}" },
+                Timestamp = DateTimeOffset.Now
+            };
+
+            switch (result)
+            {
+                case CommandExecutionFailedResult executionFailedResult:
+                    var exception = executionFailedResult.Exception;
+                    var stackTrace = exception.StackTrace!.Split('\n');
+                    
+                    content = "I'm sorry, an error occurred executing your command.";
+                    embed.Description = $"```{exception.Message}\n{string.Join('\n', stackTrace[..4])}```";
+                    break;
+                case TypeParseFailedResult typeParseFailedResult:
+                    var parameter = typeParseFailedResult.Parameter;
+                    
+                    content = "I'm sorry, an error occurred parsing your argument.";
+                    embed.Fields = new List<LocalEmbedField>
+                    {
+                        new() { Name = "Parameter", Value = $"Name : `{parameter.Name}`\nType : `{parameter.Type.Name}`" },
+                        new() { Name = "Parsing value", Value = $"`{typeParseFailedResult.Value}`" }
+                    };
+                    break;
+                default:
+                    embed.Description = result.FailureReason;
+                    break;
+            };
+
+            return new LocalMessage
+            {
+                Content = content,
+                Embeds = new List<LocalEmbed> { embed },
+            }.WithReply(context.Message.Id);
         }
 
         protected override ValueTask AddTypeParsersAsync(CancellationToken cancellationToken = default)
