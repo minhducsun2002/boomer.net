@@ -15,7 +15,7 @@ namespace Pepper.Structures.External.FGO.Renderer
         public Func<string[], (string, string)> Parser;
     }
 
-    public static class DataVal
+    public static class DataValParser
     {
         private static readonly FunctionType[] EventFunctions =
         {
@@ -151,7 +151,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             return @out.ToArray();
         }
         
-        public static Dictionary<string, string> Parse(string raw, int functionType)
+        public static Entities.DataVal Parse(string raw, int functionType)
         {
             try
             {
@@ -195,7 +195,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     }
                 }
 
-                return output;
+                return new Entities.DataVal(output);
             }
             catch (Exception e)
             {

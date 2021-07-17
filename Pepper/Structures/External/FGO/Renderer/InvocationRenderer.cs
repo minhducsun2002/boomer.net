@@ -20,6 +20,7 @@ namespace Pepper.Structures.External.FGO.Renderer
         public Dictionary<string, string[]> Statistics = new();
         public string[] ExtraInformation = Array.Empty<string>();
         public ActSetInformation? ActSetInformation;
+        public bool RequireOnField = false;
     }
     
     public partial class InvocationRenderer
@@ -55,6 +56,8 @@ namespace Pepper.Structures.External.FGO.Renderer
             if (!FunctionNames.TryGetValue(type, out var typeName)) typeName = "";
             if (string.IsNullOrWhiteSpace(typeName)) typeName = $"[functionType {type}]";
             var statistics = arguments;
+            var onField = false;
+            
             ActSetInformation? actSetInformation = null;
             if (statistics.ContainsKey("ActSet"))
             {
@@ -67,6 +70,11 @@ namespace Pepper.Structures.External.FGO.Renderer
                 statistics.Remove("ActSetWeight");
             }
 
+            if (statistics.ContainsKey("OnField"))
+            {
+                onField = true;
+                statistics.Remove("OnField");
+            }
 
             switch (type)
             {
@@ -82,7 +90,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                         RawFunction = function,
                         Statistics = stats,
                         ExtraInformation = extra,
-                        ActSetInformation = actSetInformation
+                        ActSetInformation = actSetInformation,
+                        RequireOnField = onField
                     };
                 default:
                 {
@@ -91,7 +100,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                         Effect = $"**{typeName}**".TrimEnd(),
                         RawFunction = function,
                         Statistics = statistics,
-                        ActSetInformation = actSetInformation
+                        ActSetInformation = actSetInformation,
+                        RequireOnField = onField
                     };
                 }
             }

@@ -154,9 +154,9 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
             }
 
-            var zippedOutput = $"{chance} **{baseAction}** {buffName} "
-                               + (string.IsNullOrWhiteSpace(amount) ? "" : "of " + amount)
-                               + (string.IsNullOrWhiteSpace(limits) ? "" : $"({limits})");
+            var zippedOutput = $"{chance} **{baseAction} [{buffName}]** "
+                               + (string.IsNullOrWhiteSpace(amount) ? "" : "of " + $"**{amount}**")
+                               + (string.IsNullOrWhiteSpace(limits) ? "" : $" ({limits})");
 
             if (function.Tvals.Length != 0)
                 extra.Add(

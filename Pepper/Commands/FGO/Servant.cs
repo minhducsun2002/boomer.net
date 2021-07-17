@@ -13,13 +13,13 @@ namespace Pepper.Commands.FGO
 {
     public class Servant : FGOCommand
     {
-        [Command("s")]
+        [Command("servant", "s")]
         [PrefixCategory("fgo")]
         public async Task<DiscordCommandResult> Exec(int id = 2)
         {
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP];
 
-                // data retrieval
+            // data retrievals
             var svt = (await jp.MstSvt.FindAsync(
                 Builders<MstSvt>.Filter.Or(
                     Builders<MstSvt>.Filter.Eq("collectionNo", id),

@@ -8,6 +8,7 @@ namespace Pepper.Structures.External.FGO
         // The field names must match the class names (i.e. a field named MstCollection1 must be of type IMongoCollection<MstCollection1>)
         public IMongoCollection<MstSvt> MstSvt = null!;
         public IMongoCollection<MstSvtLimit> MstSvtLimit = null!;
+        public IMongoCollection<MstSvtSkill> MstSvtSkill = null!;
         public IMongoCollection<MstClass> MstClass = null!;
         public IMongoCollection<MstSvtCard> MstSvtCard = null!;
         public IMongoCollection<MstSkill> MstSkill = null!;

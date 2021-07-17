@@ -4,58 +4,34 @@ using System.Linq;
 using Disqord;
 using MongoDB.Driver;
 using Pepper.Services.FGO;
+using Pepper.Structures.External.FGO.Entities;
 using Pepper.Structures.External.FGO.MasterData;
 
 namespace Pepper.Structures.External.FGO.Renderer
 {
     public class SkillRenderer : EntityRenderer<MstSkill>
     {
-        private readonly MstSkill skillEntity;
-        private readonly Lazy<MstSkillLv[]> lazyLevels;
-        private readonly Lazy<MstFunc[]> lazyFunc;
-        
-        private MstSkillLv[] Levels => lazyLevels.Value;
-        private MstFunc[] Functions => lazyFunc.Value;
-        private int SkillId => skillEntity.ID;
+        private readonly Skill skill;
 
-        public SkillRenderer(MstSkill skill, MasterDataMongoDBConnection connection) : base(skill, connection)
+        public SkillRenderer(MstSkill skill, MasterDataMongoDBConnection connection,  Skill? skillHint = null) : base(skill, connection)
         {
-            skillEntity = skill;
-
-            lazyLevels = new Lazy<MstSkillLv[]>(
-                () => Connection.MstSkillLv
-                    .FindSync(Builders<MstSkillLv>.Filter.Eq("skillId", SkillId))
-                    .ToList()
-                    .OrderBy(level => level.Level)
-                    .ToArray()
-            );
-            
-            lazyFunc = new Lazy<MstFunc[]>(
-                () => Connection.MstFunc
-                    .FindSync(Builders<MstFunc>.Filter.Or(
-                        Levels[0].FuncToSvals.Keys.Select(
-                            functionId => Builders<MstFunc>.Filter.Eq("id", functionId)
-                        )
-                    ))
-                    .ToList().ToArray()
-            );
+            this.skill = skillHint ?? connection.GetSkillById(skill.ID, skill);
         }
 
         public LocalEmbed Prepare(TraitService trait)
         {
             var multipleActSet = false;
-            var effects = Functions
+            var effects = skill.Invocations
                 .ToDictionary(
-                    function => function,
+                    function => function.Key,
                     function =>
                     {
-                        var statistics = Levels
-                            .Select(level => level.FuncToSvals[function.ID])
-                            .Select(raw => DataVal.Parse(raw, function.Type))
+                        var (mstFunc, dataVals) = function;
+                        var statistics = dataVals
                             .SelectMany(dict => dict)
                             .ToLookup(pair => pair.Key, pair => pair.Value)
                             .ToDictionary(group => group.Key, group => group.ToArray());
-                        var invocationInformation = new InvocationRenderer(function, statistics, Connection) { Trait = trait }
+                        var invocationInformation = new InvocationRenderer(mstFunc, statistics, Connection) { Trait = trait }
                             .Render();
                         if (invocationInformation.ActSetInformation != null) multipleActSet = true;
                         return invocationInformation;
@@ -63,7 +39,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                 );
             return new LocalEmbed
             {
-                Title = skillEntity.Name,
+                Title = skill.MstSkill.Name,
                 Description = multipleActSet ? "This skill contains multiple act set - only one will be executed." : "",
                 Fields = effects.Select(kv =>
                 {
@@ -86,7 +62,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                         Name = (actSetInformation != null ? $"[Set {actSetInformation.Value.ActSetID} - Weight {actSetInformation.Value.ActSetWeight}] " : "") 
                                + $"[{func.ID}]"
                                + (limits.Count != 0 ? $" ({string.Join(", ", limits)})" : ""),
-                        Value = $"{invocationInformation.Effect}"
+                        Value = $"{invocationInformation.Effect} to {TargetTypeText.ResolveText(invocationInformation.RawFunction.TargetType)}"
+                                + (invocationInformation.RequireOnField ? "\nWearer must be on field to take effect." : "")
                                 + "\n"
                                 + string.Join(
                                     '\n',
