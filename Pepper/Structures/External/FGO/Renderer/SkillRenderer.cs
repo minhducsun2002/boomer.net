@@ -64,7 +64,9 @@ namespace Pepper.Structures.External.FGO.Renderer
                                + (limits.Count != 0 ? $" ({string.Join(", ", limits)})" : ""),
                         Value = $"{invocationInformation.Effect} to {TargetTypeText.ResolveText(invocationInformation.RawFunction.TargetType)}"
                                 + (invocationInformation.RequireOnField ? "\nWearer must be on field to take effect." : "")
-                                + "\n"
+                                + (invocationInformation.ExtraInformation.Length != 0 
+                                    ? "\n" + string.Join('\n', invocationInformation.ExtraInformation) 
+                                    : "")
                                 + string.Join(
                                     '\n',
                                     stats.Select(entry => $"[**{entry.Key}**] : {string.Join(" / ", entry.Value.Distinct())}")

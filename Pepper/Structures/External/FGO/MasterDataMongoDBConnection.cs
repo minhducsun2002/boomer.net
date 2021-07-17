@@ -15,6 +15,7 @@ namespace Pepper.Structures.External.FGO
         public IMongoCollection<MstSvtTreasureDevice> MstSvtTreasureDevice = null!;
         public IMongoCollection<MstBuff> MstBuff = null!;
         public IMongoCollection<MstFunc> MstFunc = null!;
+        public IMongoCollection<MstEvent> MstEvent = null!;
         public IMongoCollection<MstTreasureDeviceLv> MstTreasureDeviceLv = null!;
         public IMongoCollection<MstAttriRelation> MstAttriRelation = null!;
         public IMongoCollection<MstCombineLimit> MstCombineLimit = null!;

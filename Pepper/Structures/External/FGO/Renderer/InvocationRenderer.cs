@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Driver;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO.MasterData;
 
@@ -80,6 +81,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             {
                 case FunctionType.AddState:
                 case FunctionType.AddStateShort:
+                {
                     // We are assuming AddState(Short) functions only refer to a single buff.
                     // I mean, there is only a single dataval tuple.
                     var buff = MasterData.ResolveBuff(function.Vals[0]);
@@ -93,6 +95,28 @@ namespace Pepper.Structures.External.FGO.Renderer
                         ActSetInformation = actSetInformation,
                         RequireOnField = onField
                     };
+                }
+
+                case FunctionType.EventDropUp:
+                {
+                    // We are assuming the individuality refers to only one item
+                    // We are also assuming that individuality does not change.
+                    int individualty = int.Parse(statistics["Individuality"][0]),
+                        eventId = int.Parse(statistics["EventId"][0]);
+                    var @event = MasterData.MstEvent.FindSync(Builders<MstEvent>.Filter.Eq("id", eventId)).First();
+                    var item = MasterData.MstItem.FindSync(Builders<MstItem>.Filter.Eq("individuality", individualty)).First();
+                    var (effect, stats, extra) =
+                        SpecializedInvocationParser.EventDropUp(function, @event, item, statistics);
+                    return new InvocationInformation
+                    {
+                        Effect = effect,
+                        RawFunction = function,
+                        Statistics = stats,
+                        ExtraInformation = new [] { extra },
+                        ActSetInformation = actSetInformation,
+                        RequireOnField = onField
+                    };
+                }
                 default:
                 {
                     return new InvocationInformation

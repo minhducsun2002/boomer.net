@@ -15,6 +15,8 @@ namespace Pepper.Structures.External.Osu
 
     public class UsernameTypeParser : DiscordTypeParser<Username>
     {
+        public static UsernameTypeParser Instance = new();
+        
         public override async ValueTask<TypeParserResult<Username>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
         {
             if (!string.IsNullOrWhiteSpace(value))

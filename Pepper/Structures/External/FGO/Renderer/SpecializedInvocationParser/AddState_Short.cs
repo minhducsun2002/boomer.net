@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Pepper.Structures.External.FGO.MasterData;
 using FgoExportedConstants;
 using Pepper.Services.FGO;
+using Pepper.Structures.External.FGO.MasterData;
 
 namespace Pepper.Structures.External.FGO.Renderer
 {
-    public class HumanizedEntry
+    internal class HumanizedEntry
     {
         public string[] Chance = Array.Empty<string>();
         public int[] Turn = Array.Empty<int>();
@@ -15,7 +15,7 @@ namespace Pepper.Structures.External.FGO.Renderer
         public string[] Amount = Array.Empty<string>();
     }
     
-    public static class SpecializedInvocationParser
+    public static partial class SpecializedInvocationParser
     {
         public static (string, Dictionary<string, string[]>, string[]) AddState_Short(
             MstFunc function, MstBuff buff, Dictionary<string, string[]> values,
