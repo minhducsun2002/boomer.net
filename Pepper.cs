@@ -130,6 +130,8 @@ namespace Pepper
 
         protected override LocalMessage FormatFailureMessage(DiscordCommandContext context, FailedResult result)
         {
+            if (result is CommandNotFoundResult) return null!;
+        
             var content = "I'm sorry, an error occurred.";
             var embed = new LocalEmbed
             {
