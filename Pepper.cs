@@ -172,6 +172,7 @@ namespace Pepper
         protected override ValueTask AddTypeParsersAsync(CancellationToken cancellationToken = default)
         {
             Commands.AddTypeParser(RulesetTypeParser.Instance);
+            Commands.AddTypeParser(UsernameTypeParser.Instance);
             return base.AddTypeParsersAsync(cancellationToken);
         }
     }
