@@ -145,7 +145,7 @@ namespace Pepper
                     var stackTrace = exception.StackTrace!.Split('\n');
                     
                     content = "I'm sorry, an error occurred executing your command.";
-                    embed.Description = $"```{exception.Message}\n{string.Join('\n', stackTrace[..4])}```";
+                    embed.Description = $"```{exception.Message}\n{string.Join('\n', stackTrace.Take(4))}```";
                     break;
                 case TypeParseFailedResult typeParseFailedResult:
                     var parameter = typeParseFailedResult.Parameter;
