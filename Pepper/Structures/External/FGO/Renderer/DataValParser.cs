@@ -21,6 +21,7 @@ namespace Pepper.Structures.External.FGO.Renderer
         {
             FunctionType.EventPointUp,
             FunctionType.EventPointRateUp,
+            FunctionType.EventDropUp,
             FunctionType.DropUp,
             FunctionType.EventDropRateUp,
             FunctionType.EnemyEncountCopyRateUp,
@@ -85,7 +86,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     {
                         ArgumentCount = 2,
                         Parser = DependentDatavalParsingDelegate.Delegate1
-                    }, 
+                    },
                     "EventId"
                 }
             },
