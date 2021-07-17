@@ -27,7 +27,7 @@ namespace Pepper.Commands.Osu
                                 + (score.Perfect ? " (FC)" : "")
                                 + $"\n{SerializeBeatmapStats(map, showLength: false, delimiter: '-')}"
                                 + $"\n[{SerializeHitStats(score.Statistics)}] @ **{SerializeTimestamp(score.Date, false)}** `UTC`"
-                                + $"\n[[**Beatmap**]](https://osu.ppy.sh/b/{map.ID})"
+                                + $"\n[[**Beatmap**]](https://osu.ppy.sh/b/{map.OnlineBeatmapID})"
                                 + $" [[**Score**]](https://osu.ppy.sh/scores/{Rulesets[score.OnlineRulesetID].ShortName}/{score.OnlineScoreID})"
                     };
                 }).ToList()

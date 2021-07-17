@@ -65,7 +65,7 @@ namespace Pepper.Commands.Osu
                     Name = "Best performance",
                     Value = $"[**{score.Rank}**] **{score.PP}**pp "
                             + $"(**{(score.Accuracy * 100):F3}**% | **{score.MaxCombo}**x)" + (score.Perfect ? " (FC)" : "") 
-                            + $"\n[{mapset.Artist} - {mapset.Title} [{map.Version}]](https://osu.ppy.sh/beatmaps/{map.ID})"
+                            + $"\n[{mapset.Artist} - {mapset.Title} [{map.Version}]](https://osu.ppy.sh/beatmaps/{map.OnlineBeatmapID})"
                             + (score.Mods.Length > 0 ? $"+{string.Join("", score.Mods)}" : "")
                             + $"\n{SerializeBeatmapStats(map)}"
                 });

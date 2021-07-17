@@ -64,6 +64,7 @@ namespace Pepper.Services.Osu.API
                             DrainRate = jsonBeatmapInfo["drain"]!.ToObject<float>(),
                             OverallDifficulty = jsonBeatmapInfo["accuracy"]!.ToObject<float>()
                         };
+                        legacyScoreInfo!.Beatmap.Length = jsonBeatmapInfo["hit_length"]!.ToObject<int>() * 1000;
                         return legacyScoreInfo;
                     }).ToArray();
                 Log.Debug($"Caching records for user {SerializeUserInLog(user)} for {UserCachingDurationSeconds}s.");
