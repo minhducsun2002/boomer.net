@@ -22,10 +22,10 @@ namespace Pepper.Commands.FGO
             {
                 var button = new ButtonViewComponent(e =>
                 {
+                    isMLBPage = !isMLBPage;
                     e.Button.Label = isMLBPage ? "Switch to base effect" : "Switch to MLB effects";
                     TemplateMessage.Embeds = new List<LocalEmbed> {embeds[isMLBPage ? 1 : 0]};
                     ReportChanges();
-                    isMLBPage = !isMLBPage;
                     return default;
                 })
                 {
