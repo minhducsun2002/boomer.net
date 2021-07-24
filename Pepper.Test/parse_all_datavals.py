@@ -151,8 +151,7 @@ def parse_dataVals(
             text = ""
             value = initial_value
             try:
-                # value = int(arrayi)
-                value = arrayi
+                value = int(arrayi)
                 if functype in {
                     FuncType.DAMAGE_NP_INDIVIDUAL,
                     FuncType.DAMAGE_NP_STATE_INDIVIDUAL,
@@ -237,29 +236,29 @@ def parse_dataVals(
                         text = "Target"
 
             except ValueError as e:
-                array2 = re.split(r":\s*(?![^\[\]]*])", arrayi)
-                if len(array2) > 1:
-                    if array2[0] == "DependFuncId1":
-                        output["DependFuncId"] = int(remove_brackets(array2[1]))
-                    elif array2[0] == "DependFuncVals1":
-                        output["DependFuncVals"] = array2[1]
-                    elif array2[0] in LIST_DATAVALS:
-                        try:
-                            output[array2[0]] = [int(i) for i in array2[1].split("/")]
-                        except ValueError as ve:
-                            raise Exception(error_message) from ve
-                    else:
-                        try:
-                            text = array2[0]
-                            # value = int(array2[1])
-                            value = array2[1]
-                        except ValueError as ve:
-                            raise Exception(error_message) from ve
-                else:
-                    raise Exception(error_message) from e
-
+                value = str(arrayi)
+                # array2 = re.split(r":\s*(?![^\[\]]*])", arrayi)
+                # if len(array2) > 1:
+                #     if array2[0] == "DependFuncId1":
+                #         output["DependFuncId"] = int(remove_brackets(array2[1]))
+                #     elif array2[0] == "DependFuncVals1":
+                #         output["DependFuncVals"] = array2[1]
+                #     elif array2[0] in LIST_DATAVALS:
+                #         try:
+                #             output[array2[0]] = [int(i) for i in array2[1].split("/")]
+                #         except ValueError as ve:
+                #             raise Exception(error_message) from ve
+                #     else:
+                #         try:
+                #             text = array2[0]
+                #             # value = int(array2[1])
+                #             value = array2[1]
+                #         except ValueError as ve:
+                #             raise Exception(error_message) from ve
+                # else:
+                #     raise Exception(error_message) from e
             if text:
-                output[text] = value
+                output[text] = str(value)
 
         # if not any(key.startswith(prefix) for key in output):
             # if len(array) != len(output) and functype != FuncType.NONE:
@@ -279,7 +278,7 @@ def parse_dataVals(
         elif output[f"{prefix}0"] == 2:
             output["RateCount"] = output[f"{prefix}1"]
 
-    return output
+    return dict({(key, str(value)) for key, value in output.items() if not key.startswith(prefix)})
 
 
 def main(master_path: str, output: str) -> None:
@@ -291,7 +290,8 @@ def main(master_path: str, output: str) -> None:
     mstFunc = json.loads((master / "mstFunc.json").read_text(encoding="utf-8"))
     mstFuncId = {func["id"]: func for func in mstFunc}
 
-    if not Path(skill_lv_path).exists():
+    # if not Path(skill_lv_path).exists():
+    if True:
         mstSkillLv = json.loads((master / "mstSkillLv.json").read_text(encoding="utf-8"))
         for skillLv in mstSkillLv:
             svalsParsed = []
@@ -307,7 +307,8 @@ def main(master_path: str, output: str) -> None:
         with open(skill_lv_path, "w", encoding="utf-8") as fp:
             json.dump(mstSkillLv, fp)
 
-    if not Path(treasure_device_lv_path).exists():
+    # if not Path(treasure_device_lv_path).exists():
+    if True:
         mstTreasureDeviceLv = json.loads(
             (master / "mstTreasureDeviceLv.json").read_text(encoding="utf-8")
         )

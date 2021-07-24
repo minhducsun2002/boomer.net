@@ -49,12 +49,13 @@ namespace Pepper.Test
                             skillLv.FuncId.Zip(skillLv.Svals).Zip(skillLv.Parsed)
                                 .Where(zip => mstFunc.ContainsKey(zip.First.First))     // filter for existent function IDs
                                 // ((funcId, sval), parsed)
-                                .Select(zip => (mstFunc[zip.First.First], zip.First.Second, zip.Second, skillLv))
+                                .Select(zip => 
+                                    (mstFunc[zip.First.First].Type, zip.First.First, skillLv.SkillId, skillLv.Level, zip.First.Second, zip.Second))
                                 // (funcType, sval, parsed)
                     );
                     return _;
                 })
-                .Select(testCase => new object[] {testCase.Item1, testCase.Item2, testCase.Item3, testCase.Item4});
+                .Select(testCase => new object[] {testCase.Item1, testCase.Item2, testCase.Item3, testCase.Item4, testCase.Item5, testCase.Item6});
             return @out;
         }
     }
