@@ -170,9 +170,10 @@ namespace Pepper.Structures.External.FGO.Renderer
                     .Where(value => !long.TryParse(value, out _))
                     .Where(value => value.Contains(':'))
                     .Select(value => value.Split(':'))
+                    .GroupBy(value => value[0])
                     .ToDictionary(
-                        value => value[0],
-                        value => value[1]
+                        value => value.Key,
+                        value => value.First()[1]
                     );
 
                 if (!Enum.IsDefined(typeof(FunctionType), functionType))
