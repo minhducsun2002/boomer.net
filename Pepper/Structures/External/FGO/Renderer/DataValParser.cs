@@ -125,6 +125,14 @@ namespace Pepper.Structures.External.FGO.Renderer
                     },
                     "Individuality"
                 }
+            },
+            new()
+            {
+                Conditions = new []
+                {
+                    FunctionType.TransformServant,
+                },
+                Guides = new object[] { "Rate", "Value", "Target", "SetLimitCount" }
             }
         };
         
