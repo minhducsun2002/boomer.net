@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0.301-alpine3.13 as build
 WORKDIR /app
 
 COPY Pepper .
+COPY nuget.config .
 RUN echo $BUILD_HASH
 RUN dotnet publish -c release --runtime linux-musl-x64 --self-contained -o dist/ 
 
