@@ -67,10 +67,12 @@ namespace Pepper.Structures.External.FGO.Renderer
                                 + (invocationInformation.ExtraInformation.Length != 0 
                                     ? "\n" + string.Join('\n', invocationInformation.ExtraInformation) 
                                     : "")
-                                + string.Join(
-                                    '\n',
-                                    stats.Select(entry => $"[**{entry.Key}**] : {string.Join(" / ", entry.Value.Distinct())}")
-                                )
+                                + (stats.Count != 0
+                                    ? "\n" + string.Join(
+                                        '\n',
+                                        stats.Select(entry => $"[**{entry.Key}**] : {string.Join(" / ", entry.Value.Distinct())}")
+                                    )
+                                    : "")
                     };
                 }).ToList()
             };
