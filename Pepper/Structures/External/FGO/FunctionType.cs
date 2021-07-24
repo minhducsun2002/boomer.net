@@ -45,6 +45,7 @@ namespace Pepper.Structures.External.FGO
         ExtendBuffcount = 40,
         ChangeBgm = 41,
         DisplayBuffstring = 42,
+        Resurrect = 43,
         GainNpBuffIndividualSum = 44,
         SetSystemAliveFlag = 45,
         ForceInstantDeath = 46,
