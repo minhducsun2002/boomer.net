@@ -50,7 +50,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             {FgoExportedConstants.BuffList.TYPE.GUTS_FUNCTION, "Trigger skill on Guts"},
             {FgoExportedConstants.BuffList.TYPE.GUTS_RATIO, "Guts"},
             {FgoExportedConstants.BuffList.TYPE.INVINCIBLE, "Invincible"},
-            {FgoExportedConstants.BuffList.TYPE.MULTIATTACK, "Multiple hits"},
+            {FgoExportedConstants.BuffList.TYPE.MULTIATTACK, "Multiply hits"},
             {FgoExportedConstants.BuffList.TYPE.NONE, "None"},
             {FgoExportedConstants.BuffList.TYPE.NPATTACK_PREV_BUFF, "Bonus effect on NPs"},
             {FgoExportedConstants.BuffList.TYPE.OVERWRITE_BATTLECLASS, "Overwrite Class in Battle"},

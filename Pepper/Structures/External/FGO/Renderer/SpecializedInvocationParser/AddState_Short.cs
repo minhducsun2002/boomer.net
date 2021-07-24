@@ -4,6 +4,7 @@ using System.Linq;
 using FgoExportedConstants;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO.MasterData;
+using Pepper.Utilities;
 
 namespace Pepper.Structures.External.FGO.Renderer
 {
@@ -26,7 +27,8 @@ namespace Pepper.Structures.External.FGO.Renderer
             var output = new HumanizedEntry();
             var extra = new List<string>();
             var extraStats = new Dictionary<string, string[]>();
-            
+            var amountPreposition = "of";
+
             var baseAction = funcType switch
             {
                 (int) FunctionType.AddState => InvocationRenderer.FunctionNames[FunctionType.AddState],
@@ -93,6 +95,10 @@ namespace Pepper.Structures.External.FGO.Renderer
                     case BuffList.TYPE.SUB_SELFDAMAGE:
                         output.Amount = values["Value"].Select(value => $"{int.Parse(value)}").ToArray();
                         break;
+                    case BuffList.TYPE.MULTIATTACK:
+                        amountPreposition = "by ";
+                        output.Amount = values["Value"].Select(value => $"{int.Parse(value)}").ToArray();
+                        break;
                     case BuffList.TYPE.COMMANDATTACK_FUNCTION:
                     case BuffList.TYPE.DEAD_FUNCTION:
                     case BuffList.TYPE.DELAY_FUNCTION:
@@ -155,9 +161,16 @@ namespace Pepper.Structures.External.FGO.Renderer
             }
 
             var zippedOutput = $"{chance} **{baseAction} [{buffName}]** "
-                               + (string.IsNullOrWhiteSpace(amount) ? "" : "of " + $"**{amount}**")
+                               + (string.IsNullOrWhiteSpace(amount) ? "" : $"{amountPreposition} " + $"**{amount}**")
                                + (string.IsNullOrWhiteSpace(limits) ? "" : $" ({limits})");
 
+            if (buff.CkSelfIndv.Length != 0)
+                extra.Add(
+                    "Require self to possess "
+                        + string.Join(", ", buff.CkSelfIndv.Select(trait => $"[{traitService.GetTrait(trait)}]"))
+                        + " trait" + StringUtilities.Plural(buff.CkSelfIndv.Length)
+                    );
+            
             if (function.Tvals.Length != 0)
                 extra.Add(
                     "Only applies for "
