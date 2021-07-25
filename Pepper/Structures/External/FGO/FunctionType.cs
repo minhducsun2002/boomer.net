@@ -88,6 +88,8 @@ namespace Pepper.Structures.External.FGO
         DamageValueSafe = 122,
         FriendPointUpDuplicate = 123,
         MoveState = 124,
-        ChangeBgmCostume = 125
+        ChangeBgmCostume = 125,
+        // skill ID 966392
+        SubCommandSpell = 126
     }
 }
