@@ -37,15 +37,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                     $"{nameof(funcType)} must be either AddState or AddStateShort. Received {funcType}")
             };
             
-            foreach (var key in new[] {"Rate", "UseRate"})
-            {
-                if (!values.ContainsKey(key)) continue;
-                output.Chance = values[key].Distinct().Select(value => $"{float.Parse(value) / 10}%").ToArray();
-                values.Remove(key);
-                break;
-            }
+            
             if (values.ContainsKey("Turn")) output.Turn = values["Turn"].Distinct().Select(int.Parse).ToArray();
-            if (values.ContainsKey("OnField")) extra.Add("Only activate if wearer is on the field.");
 
             if (Enum.IsDefined(typeof(BuffList.TYPE), buff.Type))
                 switch ((BuffList.TYPE) buff.Type)
@@ -126,7 +119,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             output.Count = output.Count.Distinct().ToArray();
 
             string? buffName = default;
-            string chance = "", amount = "", limits = "";
+            string amount = "", limits = "";
             
             if (Enum.IsDefined(typeof(BuffList.TYPE), buff.Type))
                 if (!InvocationRenderer.BuffNames.TryGetValue((BuffList.TYPE) buff.Type, out buffName))
@@ -136,7 +129,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             {
                 if (data.Length != 1) continue;
                 if (data[0] == -1) continue;
-                limits += $"{data[0]} {limitType}{(data[0] > 1 ? "s" : "")}";
+                limits += $"**{data[0]}** {limitType}{(data[0] > 1 ? "s" : "")}";
             }
             
             switch (output.Amount.Length)
@@ -150,17 +143,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
             }
 
-            switch (output.Chance.Length)
-            {
-                case 1 when output.Chance[0] != "100%":
-                    chance = $"{output.Chance[0]} chance to";
-                    break;
-                case > 1:
-                    extraStats["Chance to activate"] = output.Chance;
-                    break;
-            }
-
-            var zippedOutput = $"{chance} **{baseAction} [{buffName}]** "
+            var zippedOutput = $"**{baseAction} [{buffName}]** "
                                + (string.IsNullOrWhiteSpace(amount) ? "" : $"{amountPreposition} " + $"**{amount}**")
                                + (string.IsNullOrWhiteSpace(limits) ? "" : $" ({limits})");
 

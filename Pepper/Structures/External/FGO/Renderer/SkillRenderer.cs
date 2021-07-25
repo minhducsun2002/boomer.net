@@ -39,6 +39,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                 );
             return new LocalEmbed
             {
+                Url = $"https://apps.atlasacademy.io/db/JP/skill/{skill.MstSkill.ID}",
                 Title = skill.MstSkill.Name,
                 Description = multipleActSet ? "This skill contains multiple act set - only one will be executed." : "",
                 Fields = effects.Select(kv =>

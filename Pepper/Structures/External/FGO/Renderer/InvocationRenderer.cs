@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FFmpeg.AutoGen;
 using MongoDB.Driver;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO.MasterData;
@@ -20,8 +21,8 @@ namespace Pepper.Structures.External.FGO.Renderer
         public string Effect = "";
         public Dictionary<string, string[]> Statistics = new();
         public string[] ExtraInformation = Array.Empty<string>();
-        public ActSetInformation? ActSetInformation;
-        public bool RequireOnField = false;
+        public ActSetInformation? ActSetInformation = null;
+        public bool RequireOnField;
     }
     
     public partial class InvocationRenderer
@@ -39,6 +40,8 @@ namespace Pepper.Structures.External.FGO.Renderer
             MasterData = connection;
             single = false;
         }
+        
+        
 
         public InvocationInformation Render()
         {
@@ -61,22 +64,24 @@ namespace Pepper.Structures.External.FGO.Renderer
             
             ActSetInformation? actSetInformation = null;
             if (statistics.ContainsKey("ActSet"))
-            {
                 actSetInformation = new ActSetInformation
                 {
-                    ActSetID = int.Parse(statistics["ActSet"].Distinct().First()),
-                    ActSetWeight = int.Parse(statistics["ActSetWeight"].Distinct().First())
+                    ActSetID = int.Parse(statistics.Consume("ActSet").Distinct().First()),
+                    ActSetWeight = int.Parse(statistics.Consume("ActSetWeight").Distinct().First())
                 };
-                statistics.Remove("ActSet");
-                statistics.Remove("ActSetWeight");
-            }
+            
+            if (statistics.Remove("OnField")) onField = true;
 
-            if (statistics.ContainsKey("OnField"))
+            statistics.TryGetValue("Count", out var count);
+            var output = new InvocationInformation
             {
-                onField = true;
-                statistics.Remove("OnField");
-            }
-
+                Effect = $"**{typeName}** {(count == default ? "" : "of")} {string.Join(" / ", count ?? Array.Empty<string>())}".TrimEnd(),
+                RawFunction = function,
+                Statistics = statistics,
+                ActSetInformation = actSetInformation,
+                RequireOnField = onField
+            };
+            
             switch (type)
             {
                 case FunctionType.AddState:
@@ -86,15 +91,10 @@ namespace Pepper.Structures.External.FGO.Renderer
                     // I mean, there is only a single dataval tuple.
                     var buff = MasterData.ResolveBuff(function.Vals[0]);
                     var (effect, stats, extra) = SpecializedInvocationParser.AddState_Short(function, buff!, statistics, Trait);
-                    return new InvocationInformation
-                    {
-                        Effect = effect,
-                        RawFunction = function,
-                        Statistics = stats,
-                        ExtraInformation = extra,
-                        ActSetInformation = actSetInformation,
-                        RequireOnField = onField
-                    };
+                    output.Effect = effect;
+                    output.Statistics = stats;
+                    output.ExtraInformation = extra;
+                    break;
                 }
 
                 case FunctionType.EventDropUp:
@@ -105,30 +105,68 @@ namespace Pepper.Structures.External.FGO.Renderer
                         eventId = int.Parse(statistics["EventId"][0]);
                     var @event = MasterData.MstEvent.FindSync(Builders<MstEvent>.Filter.Eq("id", eventId)).First();
                     var item = MasterData.MstItem.FindSync(Builders<MstItem>.Filter.Eq("individuality", individualty)).First();
-                    var (effect, stats, extra) =
-                        SpecializedInvocationParser.EventDropUp(function, @event, item, statistics);
-                    return new InvocationInformation
-                    {
-                        Effect = effect,
-                        RawFunction = function,
-                        Statistics = stats,
-                        ExtraInformation = new [] { extra },
-                        ActSetInformation = actSetInformation,
-                        RequireOnField = onField
-                    };
+                    var (effect, stats, extra) = SpecializedInvocationParser.EventDropUp(function, @event, item, statistics);
+                    output.Effect = effect;
+                    output.Statistics = stats;
+                    output.ExtraInformation = new [] { extra };
+                    break;
                 }
-                default:
+
+                case FunctionType.GainNp:
+                case FunctionType.LossNp:
                 {
-                    return new InvocationInformation
-                    {
-                        Effect = $"**{typeName}**".TrimEnd(),
-                        RawFunction = function,
-                        Statistics = statistics,
-                        ActSetInformation = actSetInformation,
-                        RequireOnField = onField
-                    };
+                    var values = statistics.Consume("Value").Select(value => $"**{int.Parse(value) / 100}**%").ToArray();
+                    output.Effect = $"**{typeName}** by {string.Join(" / ", values)}";
+                    output.Statistics = statistics;
+                    break;
+                }
+
+                case FunctionType.GainHp:
+                case FunctionType.LossHp:
+                case FunctionType.LossHpSafe:
+                case FunctionType.HastenNpturn:
+                {
+                    var values = statistics.Consume("Value").Select(value => $"**{value}**");
+                    output.Effect = $"**{typeName}** by {string.Join(" / ", values)}";
+                    break;
+                }
+
+                case FunctionType.ShortenSkill:
+                {
+                    var values = statistics.Consume("Value").ToArray();
+                    var turnText = values.Length > 1
+                        ? "turn" + (values.Contains("1") ? "(s)" : "")
+                        : "turn" + (values[0] == "1" ? "" : "s");
+                    output.Effect = $"**{typeName}** by {string.Join(" / ", values.Select(value => $"**{value}**"))} {turnText}";
+                    break;
+                }
+
+                case FunctionType.DamageNP:
+                case FunctionType.DamageNPPierce:
+                {
+                    var values = statistics.Consume("Value").Select(value => $"**{int.Parse(value) / 10}**%").ToList();
+                    output.Effect = $"**{typeName}** of {string.Join(" / ", values)}";
+                    break;
                 }
             }
+
+            foreach (var key in new[] {"Rate"})
+            {
+                if (!statistics.ContainsKey(key)) continue;
+                var chance = statistics.Consume(key).Distinct().Select(value => $"{float.Parse(value) / 10}%").ToArray();
+                switch (chance.Length)
+                {
+                    case 1 when chance[0] != "100%":
+                        output.Effect = $"{chance[0]} chance to {output.Effect}";
+                        break;
+                    case > 1:
+                        output.Statistics["Chance to activate"] = chance;
+                        break;
+                }
+                break;
+            }
+
+            return output;
         }
     }
 }
