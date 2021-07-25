@@ -129,7 +129,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             {
                 if (data.Length != 1) continue;
                 if (data[0] == -1) continue;
-                limits += $"**{data[0]}** {limitType}{(data[0] > 1 ? "s" : "")}";
+                limits += (string.IsNullOrEmpty(limits) ? "" : ", ") + $"**{data[0]}** {limitType}{(data[0] > 1 ? "s" : "")}";
             }
             
             switch (output.Amount.Length)
@@ -143,17 +143,14 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
             }
 
-            var zippedOutput = $"**{baseAction} [{buffName}]** "
+            string ckSelfIndv = "";
+            if (buff.CkSelfIndv.Length != 0)
+                ckSelfIndv = $" for {string.Join(" & ", buff.CkSelfIndv.Select(trait => $"{traitService.GetTrait(trait)}"))}";
+            
+            var zippedOutput = $"**{baseAction} [{buffName}{ckSelfIndv}]** "
                                + (string.IsNullOrWhiteSpace(amount) ? "" : $"{amountPreposition} " + $"**{amount}**")
                                + (string.IsNullOrWhiteSpace(limits) ? "" : $" ({limits})");
 
-            if (buff.CkSelfIndv.Length != 0)
-                extra.Add(
-                    "Require self to possess "
-                        + string.Join(", ", buff.CkSelfIndv.Select(trait => $"[{traitService.GetTrait(trait)}]"))
-                        + " trait" + StringUtilities.Plural(buff.CkSelfIndv.Length)
-                    );
-            
             if (function.Tvals.Length != 0)
                 extra.Add(
                     "Only applies for "
