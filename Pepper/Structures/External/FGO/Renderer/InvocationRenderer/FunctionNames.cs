@@ -34,6 +34,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             {FunctionType.DamageNPStateIndividualFix, "Deal NP damage & Special Attack NP damage"},
             // deal a static value of damage?
             {FunctionType.DamageValue, "Deal damage"},
+            {FunctionType.DamageValueSafe, "Deal damage without killing"},
             {FunctionType.DelayNpturn, "Drain enemy charge"},
             {FunctionType.DisplayBuffstring, ""},
             {FunctionType.DropUp, ""},

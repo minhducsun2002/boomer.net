@@ -85,6 +85,7 @@ namespace Pepper.Structures.External.FGO
         MovePosition = 119,
         Revival = 120,
         DamageNPIndividualSum = 121,
+        DamageValueSafe = 122,
         FriendPointUpDuplicate = 123,
         MoveState = 124,
         ChangeBgmCostume = 125
