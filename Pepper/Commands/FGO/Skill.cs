@@ -9,6 +9,11 @@ namespace Pepper.Commands.FGO
 {
     public class Skill : FGOCommand
     {
+        public Skill(
+            MasterDataService masterDataService, 
+            ServantNamingService servantNamingService, TraitService traitService, ItemNamingService itemNamingService
+        ) : base(masterDataService, servantNamingService, traitService, itemNamingService) {}
+
         [Command("skill")]
         public DiscordCommandResult Exec(int id = 5450)
         {

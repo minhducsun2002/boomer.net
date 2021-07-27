@@ -1,0 +1,151 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using Disqord;
+using Disqord.Extensions.Interactivity.Menus;
+using FgoExportedConstants;
+using Pepper.Services.FGO;
+using Pepper.Structures.External.FGO;
+using Pepper.Structures.External.FGO.MasterData;
+
+namespace Pepper.Commands.FGO
+{
+    internal partial class ServantView : ViewBase
+    {
+        private readonly LocalEmbed general;
+        private LocalEmbed Passive;
+        private LocalEmbed ascItem;
+        private LocalEmbed skillItem;
+        
+        public ServantView(
+            (MstSvt, MstSvtLimit[], MstClass) servant,
+            MstTreasureDeviceLv npGain,
+            IReadOnlyList<MstSvtCard> cards,
+            IReadOnlyList<MstCombineLimit> ascensionLimits, IReadOnlyList<MstCombineSkill> skillLimits,
+            TraitService traitService,
+            IReadOnlyList<int> attributes,
+            IReadOnlyDictionary<int, string> itemNames
+        )
+        {
+            var (svt, svtLimits, _) = servant;
+            general = servant.BaseEmbed()
+                .WithFooter("General info")
+                .WithFields(
+                    new LocalEmbedField
+                    {
+                        Name = "HP/ATK",
+                        Value = $"Base : {svtLimits[0].HpBase}/{svtLimits[0].AtkBase}\nMaximum : {svtLimits[0].HpMax}/{svtLimits[0].AtkMax}",
+                        IsInline = true
+                    },
+                    new LocalEmbedField
+                    {
+                        Name = "NP generation",
+                        Value = $"Per hit : **{(float) npGain.TdPoint / 100:F2}**%\nWhen attacked : **{(float) npGain.TdPointDef / 100:F2}**%",
+                        IsInline = true
+                    },
+                    new LocalEmbedField
+                    {
+                        Name = "Critical stars",
+                        Value = $"Weight : **{svtLimits[0].CriticalWeight}**\nGeneration : **{(float) svt.StarRate / 10:F1}**%",
+                        IsInline = true
+                    },
+                    new LocalEmbedField
+                    {
+                        Name = "Gender / Attribute",
+                        Value = $@"{traitService.GetTrait(svt.GenderType + 0)} / {traitService.GetTrait(svt.Traits.First(attributes.Contains))}",
+                        IsInline = true
+                    },
+                    new LocalEmbedField
+                    {
+                        Name = "Traits",
+                        Value = string.Join(", ", GetTraits(svt, attributes).Select(trait => traitService.GetTrait(trait)))
+                    },
+                    new LocalEmbedField
+                    {
+                        Name = "Cards / Damage distribution by %",
+                        Value = string.Join('\n',
+                            "```",
+                            "   Card   | Hit counts",
+                            string.Join(
+                                '\n',
+                                GetCardStatistics(cards).Select(
+                                    card =>
+                                    {
+                                        var (count, damage, name) = card.Value;
+                                        return $"{count}x {name} | {damage.Length} ({string.Join('-', damage)})";
+                                    }
+                                )
+                            ),
+                            "```"
+                        )
+                    }
+                );
+
+            ascItem = servant.BaseEmbed()
+                .WithDescription(ascensionLimits.Count == 0 ? "No materials needed." : "")
+                .WithFields(
+                    ascensionLimits.Select((limit, index) => new LocalEmbedField
+                    {
+                        Name = $"Stage {index + 1} - {limit.QP.ToString("n0", CultureInfo.InvariantCulture)} QP",
+                        Value = string.Join(
+                            '\n',
+                            limit.ItemIds.Zip(limit.ItemNums)
+                                .Select(tuple => $"- **{tuple.Second}**x **{itemNames[tuple.First]}**")
+                        )
+                    }))
+                .WithFooter("Ascension materials");
+            
+            skillItem = servant.BaseEmbed()
+                .WithDescription(skillLimits.Count == 0 ? "No materials needed." : "")
+                .WithFields(
+                    skillLimits.Select((limit, index) => new LocalEmbedField
+                    {
+                        Name = $"Stage {index + 2} - {limit.QP.ToString("n0", CultureInfo.InvariantCulture)} QP",
+                        Value = string.Join(
+                            '\n',
+                            limit.ItemIds.Zip(limit.ItemNums)
+                                .Select(tuple => $"- **{tuple.Second}**x **{itemNames[tuple.First]}**")
+                        )
+                    }))
+                .WithFooter("Skill materials");
+
+            TemplateMessage = new LocalMessage().WithEmbeds(general);
+        }
+
+        private void EnableAllButtons()
+        {
+            foreach (var component in EnumerateComponents())
+                if (component is ButtonViewComponent button)
+                    button.IsDisabled = false;
+        }
+
+        [Button(Label = "General info", Position = 0, IsDisabled = true)]
+        public ValueTask SwitchToGeneral(ButtonEventArgs e)
+        {
+            EnableAllButtons();
+            e.Button.IsDisabled = true;
+            TemplateMessage.Embeds = new List<LocalEmbed> {general};
+            return default;
+        }
+        
+        [Button(Label = "Ascension materials", Position = 1, IsDisabled = false)]
+        public ValueTask SwitchToAscItem(ButtonEventArgs e)
+        {
+            EnableAllButtons();
+            e.Button.IsDisabled = true;
+            TemplateMessage.Embeds = new List<LocalEmbed> {ascItem};
+            return default;
+        }
+        
+        [Button(Label = "Skill materials", Position = 2, IsDisabled = false)]
+        public ValueTask SwitchToSkillItem(ButtonEventArgs e)
+        {
+            EnableAllButtons();
+            e.Button.IsDisabled = true;
+            TemplateMessage.Embeds = new List<LocalEmbed> {skillItem};
+            return default;
+        }
+    }
+}

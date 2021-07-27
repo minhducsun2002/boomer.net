@@ -12,8 +12,7 @@ namespace Pepper.Structures.External.FGO
         {
             if (!reload && itemNamesCache.ContainsKey(itemId)) return itemNamesCache[itemId];
             
-            var record = MstItem.FindSync(Builders<MstItem>.Filter.Eq("id", itemId)).ToList();
-            var item = record.FirstOrDefault();
+            var item = MstItem.FindSync(Builders<MstItem>.Filter.Eq("id", itemId)).FirstOrDefault();
             if (item != default) itemNamesCache[itemId] = item.Name;
             return item?.Name;
 

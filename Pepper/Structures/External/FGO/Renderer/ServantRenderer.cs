@@ -65,7 +65,6 @@ namespace Pepper.Structures.External.FGO.Renderer
             var attribute = AttributeList.First(attrib => traits.Contains(attrib));
             var svtLimits = Limits;
             (int, string[])[] ascensions = GetCombineLimits(), skills = GetCombineSkills();
-            
             return new[]
             {
                 BaseEmbed()
