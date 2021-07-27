@@ -26,7 +26,8 @@ namespace Pepper.Commands.FGO
             IReadOnlyList<MstCombineLimit> ascensionLimits, IReadOnlyList<MstCombineSkill> skillLimits,
             TraitService traitService,
             IReadOnlyList<int> attributes,
-            IReadOnlyDictionary<int, string> itemNames
+            IReadOnlyDictionary<int, string> itemNames,
+            Snowflake? replyingTo = null
         )
         {
             var (svt, svtLimits, _) = servant;
@@ -112,6 +113,7 @@ namespace Pepper.Commands.FGO
                 .WithFooter("Skill materials");
 
             TemplateMessage = new LocalMessage().WithEmbeds(general);
+            if (replyingTo != null) TemplateMessage = TemplateMessage.WithReply(replyingTo.Value);
             
             foreach (var (embed, label, index) in new[]
             {
@@ -134,40 +136,6 @@ namespace Pepper.Commands.FGO
                     IsDisabled = index == 0
                 });
             }
-        }
-
-        private void EnableAllButtons()
-        {
-            foreach (var component in EnumerateComponents())
-                if (component is ButtonViewComponent button)
-                    button.IsDisabled = false;
-        }
-
-        [Button(Label = "General info", Position = 0, IsDisabled = true)]
-        public ValueTask SwitchToGeneral(ButtonEventArgs e)
-        {
-            EnableAllButtons();
-            e.Button.IsDisabled = true;
-            TemplateMessage.Embeds = new List<LocalEmbed> {general};
-            return default;
-        }
-        
-        [Button(Label = "Ascension materials", Position = 1, IsDisabled = false)]
-        public ValueTask SwitchToAscItem(ButtonEventArgs e)
-        {
-            EnableAllButtons();
-            e.Button.IsDisabled = true;
-            TemplateMessage.Embeds = new List<LocalEmbed> {ascItem};
-            return default;
-        }
-        
-        [Button(Label = "Skill materials", Position = 2, IsDisabled = false)]
-        public ValueTask SwitchToSkillItem(ButtonEventArgs e)
-        {
-            EnableAllButtons();
-            e.Button.IsDisabled = true;
-            TemplateMessage.Embeds = new List<LocalEmbed> {skillItem};
-            return default;
         }
     }
 }

@@ -75,7 +75,8 @@ namespace Pepper.Commands.FGO
                     skillLimits,
                     TraitService,
                     jp.GetAttributeLists(),
-                    itemNames
+                    itemNames,
+                    Context.Message.Id
                 )
             );
         }

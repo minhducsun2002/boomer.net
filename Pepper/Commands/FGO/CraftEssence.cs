@@ -16,8 +16,11 @@ namespace Pepper.Commands.FGO
         private bool isMLBPage;
         private IList<LocalEmbed> embeds;
 
-        public CEView(IList<LocalEmbed> embeds) : base(new LocalMessage { Embeds = new List<LocalEmbed> { embeds[0] } })
+        public CEView(
+            IList<LocalEmbed> embeds, Snowflake? messageId = null
+        ) : base(new LocalMessage { Embeds = new List<LocalEmbed> { embeds[0] } })
         {
+            if (messageId != null) TemplateMessage = TemplateMessage.WithReply(messageId.Value);
             if (embeds.Count > 1)
             {
                 var button = new ButtonViewComponent(e =>
@@ -76,7 +79,7 @@ namespace Pepper.Commands.FGO
                             .ToList()
                     });
 
-            return View(new CEView(embeds));
+            return View(new CEView(embeds, Context.Message.Id));
         }
     }
 }
