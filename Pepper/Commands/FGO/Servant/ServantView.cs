@@ -112,6 +112,28 @@ namespace Pepper.Commands.FGO
                 .WithFooter("Skill materials");
 
             TemplateMessage = new LocalMessage().WithEmbeds(general);
+            
+            foreach (var (embed, label, index) in new[]
+            {
+                (general, "General info", 0), (ascItem, "Ascension materials", 1), (skillItem, "Skill materials", 2)
+            })
+            {
+                AddComponent(new ButtonViewComponent(e =>
+                {
+                    foreach (var component in EnumerateComponents())
+                        if (component is ButtonViewComponent button)
+                            button.IsDisabled = false;
+                    e.Button.IsDisabled = true;
+                    TemplateMessage.Embeds = new List<LocalEmbed> {embed};
+                    return default;
+                })
+                {
+                    Label = label,
+                    Position = index,
+                    // initial state
+                    IsDisabled = index == 0
+                });
+            }
         }
 
         private void EnableAllButtons()
