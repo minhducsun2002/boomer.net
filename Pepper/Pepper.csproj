@@ -7,8 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="ChunkExtensionMethod" Version="1.0.2" />
-    <PackageReference Include="Disqord" Version="1.0.0-07052021-46" />
-    <PackageReference Include="Disqord.Bot" Version="1.0.0-07052021-46" />
+    <PackageReference Include="Disqord.Bot" Version="1.0.0-07272021-86" />
     <PackageReference Include="dotenv.net" Version="3.0.0" />
     <PackageReference Include="fgo-enums" Version="2.31.1" />
     <PackageReference Include="FuzzySharp" Version="2.0.2" />

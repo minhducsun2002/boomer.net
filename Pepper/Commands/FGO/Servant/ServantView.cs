@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
-using FgoExportedConstants;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO;
 using Pepper.Structures.External.FGO.MasterData;
@@ -29,7 +27,7 @@ namespace Pepper.Commands.FGO
             IReadOnlyDictionary<int, string> itemNames,
             (string, int, int, IEnumerable<string>)? bondCE = null,
             Snowflake? replyingTo = null
-        )
+        ) : base(new LocalMessage())
         {
             var (svt, svtLimits, _) = servant;
             general = servant.BaseEmbed()
