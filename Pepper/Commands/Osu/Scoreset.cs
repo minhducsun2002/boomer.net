@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Disqord;
+using Pepper.Services.Osu;
 using Pepper.Services.Osu.API;
 
 namespace Pepper.Commands.Osu
@@ -8,7 +9,8 @@ namespace Pepper.Commands.Osu
     public partial class Scoreset : OsuScoreCommand
     {
         private const int MaxScorePerPage = 5;
-        
+        public Scoreset(ApiService service) : base(service) {}
+
         private static LocalEmbed SerializeScoreset(IEnumerable<APILegacyScoreInfo> scores)
             => new()
             {

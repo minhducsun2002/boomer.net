@@ -21,9 +21,9 @@ namespace Pepper.Commands.Osu
         )
         {
             var rulesetInfo = ruleset.RulesetInfo;
-            var (user, _, _) = await ApiService.GetUser(username, rulesetInfo);
+            var (user, _, _) = await APIService.GetUser(username, rulesetInfo);
 
-            var scores = await ApiService.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo);
+            var scores = await APIService.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo);
             var chunks = scores.Chunk(MaxScorePerPage).ToArray();
 
             var embeds = chunks.Select((embed, index) => SerializeScoreset(embed)
@@ -46,8 +46,8 @@ namespace Pepper.Commands.Osu
             [Flag("#")] [Description("Index from the latest play. 1 indicates the latest.")] int pos = 1)
         {
             var rulesetInfo = ruleset.RulesetInfo;
-            var (user, _, _) = await ApiService.GetUser(username, rulesetInfo);
-            var scores = await ApiService.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo, 1, pos - 1);
+            var (user, _, _) = await APIService.GetUser(username, rulesetInfo);
+            var scores = await APIService.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo, 1, pos - 1);
             
             if (scores.Any()) return await SingleScore(scores.First());
             return Reply(new LocalEmbed()

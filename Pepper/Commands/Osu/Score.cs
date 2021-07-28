@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Disqord.Bot;
+using Pepper.Services.Osu;
 using Pepper.Structures.External.Osu;
 using Pepper.Utilities.Osu;
 using Qmmands;
@@ -10,6 +11,8 @@ namespace Pepper.Commands.Osu
 {
     public class Score : OsuScoreCommand
     {
+        public Score(ApiService service) : base(service) {}
+
         [Command("sc")]
         [Description("View/list scores on a certain map")]
         public async Task<DiscordCommandResult> Exec(
@@ -21,7 +24,7 @@ namespace Pepper.Commands.Osu
             if (!scoreParsingResult)
                 throw new ArgumentException("A valid score link must be passed!");
             var (mode, id) = scoreLink;
-            var sc = await ApiService.GetScore(
+            var sc = await APIService.GetScore(
                 id,
                 Rulesets
                     .First(rulesetCheck => string.Equals(rulesetCheck.ShortName, mode, StringComparison.InvariantCultureIgnoreCase))

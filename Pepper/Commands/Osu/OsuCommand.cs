@@ -27,7 +27,8 @@ namespace Pepper.Commands.Osu
     [Category("osu!")]
     public abstract class OsuCommand : Command
     {
-        public ApiService ApiService { get; set; }
+        public OsuCommand(ApiService service) => APIService = service;
+        protected readonly ApiService APIService;
         protected static readonly Ruleset[] Rulesets = { new OsuRuleset(), new TaikoRuleset(), new CatchRuleset(), new ManiaRuleset() };
         
         

@@ -5,6 +5,7 @@ using Disqord;
 using Disqord.Bot;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
+using Pepper.Services.Osu;
 using Pepper.Services.Osu.API;
 using Pepper.Structures.External.Osu.Extensions;
 
@@ -12,10 +13,12 @@ namespace Pepper.Commands.Osu
 {
     public abstract class OsuScoreCommand : OsuCommand
     {
+        protected OsuScoreCommand(ApiService service) : base(service) {}
+
         public async Task<DiscordCommandResult> SingleScore(APILegacyScoreInfo sc)
         {
             var b = sc.Beatmap!;
-            var workingBeatmap = await ApiService.GetBeatmap(b.OnlineBeatmapID!.Value);
+            var workingBeatmap = await APIService.GetBeatmap(b.OnlineBeatmapID!.Value);
             var s = workingBeatmap.BeatmapInfo.BeatmapSet!;
             var ruleset = Rulesets[sc.OnlineRulesetID];
 

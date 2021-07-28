@@ -24,11 +24,11 @@ namespace Pepper.Commands.Osu
             [Flag("#")] [Description("Index from the best play. 1 indicates the best play.")] int pos = -1
         )
         {
-            var (user, _, _) = await ApiService.GetUser(username, ruleset.RulesetInfo);
+            var (user, _, _) = await APIService.GetUser(username, ruleset.RulesetInfo);
 
             if (pos > 0)
             {
-                var score = await ApiService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, 1, pos - 1);
+                var score = await APIService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, 1, pos - 1);
                 if (score.Length == 0)
                     return Reply(new LocalEmbed()
                         .WithDescription(
@@ -41,7 +41,7 @@ namespace Pepper.Commands.Osu
                 mods.Chunk(2).Select(chunk => new string(chunk.ToArray())).ToArray()
             );
             
-            var scores = await ApiService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
+            var scores = await APIService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
             var chunks = scores
                 .Where(score =>
                 {
