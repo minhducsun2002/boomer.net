@@ -38,6 +38,7 @@ namespace Pepper.Commands.FGO
             );
             var (svt, limits, _) = servantTuple;
             
+            // overwriting servant name
             if (ServantNamingService.Namings.ContainsKey(svt.ID))
                 svt.Name = ServantNamingService.Namings[svt.ID].Name;
             else
@@ -53,6 +54,8 @@ namespace Pepper.Commands.FGO
                 Builders<MstCombineSkill>.Filter.Eq("id", svt.ID),
                 new FindOptions<MstCombineSkill> { Sort = Builders<MstCombineSkill>.Sort.Ascending("qp") }
             ).ToList();
+            
+            // overwriting item names
             var itemNames = ascensionLimits
                 .SelectMany(record => record.ItemIds)
                 .Concat(skillLimits.SelectMany(record => record.ItemIds))
@@ -66,6 +69,24 @@ namespace Pepper.Commands.FGO
                     }
                 );
             
+            // preparing the CE
+            (string, int, int, IEnumerable<string>)? ceDetails = null;
+            var bondCESkill = jp.MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("actIndividuality", svt.ID)).FirstOrDefault();
+            if (bondCESkill != default)
+            {
+                var skillId = bondCESkill.ID;
+                var skillMapping = jp.MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("skillId", skillId)).FirstOrDefault();
+                if (skillMapping != default)
+                {
+                    var svtQuery = Builders<MstSvt>.Filter.Eq("id", skillMapping.SvtId);
+                    var ceSvt = jp.MstSvt.FindSync(svtQuery).First();
+                    var naName = na.MstSvt.FindSync(svtQuery).FirstOrDefault()?.Name;
+                    var mstSkill = jp.MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("id", skillId)).First();
+                    var skill = new SkillRenderer(mstSkill, jp).Prepare(TraitService).Fields.Select(field => field.Value);
+                    ceDetails = (naName ?? ceSvt.Name, ceSvt.CollectionNo, ceSvt.ID, skill);
+                }
+            }
+
             return View(
                 new ServantView(
                     (svt, limits, na.ResolveClass(svt.ClassId)!),
@@ -76,6 +97,7 @@ namespace Pepper.Commands.FGO
                     TraitService,
                     jp.GetAttributeLists(),
                     itemNames,
+                    ceDetails,
                     Context.Message.Id
                 )
             );

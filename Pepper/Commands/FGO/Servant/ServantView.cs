@@ -27,6 +27,7 @@ namespace Pepper.Commands.FGO
             TraitService traitService,
             IReadOnlyList<int> attributes,
             IReadOnlyDictionary<int, string> itemNames,
+            (string, int, int, IEnumerable<string>)? bondCE = null,
             Snowflake? replyingTo = null
         )
         {
@@ -84,6 +85,16 @@ namespace Pepper.Commands.FGO
                     }
                 );
 
+            if (bondCE != null)
+            {
+                var (name, collectionNo, id, skill) = bondCE.Value;
+                general.Fields.Add(new LocalEmbedField
+                {
+                    Name = "Bond CE",
+                    Value = $"[[**{collectionNo}**. **{name}**]](https://apps.atlasacademy.io/db/JP/craft-essence/{id})\n" + string.Join("\n\n", skill)
+                });
+            }
+            
             ascItem = servant.BaseEmbed()
                 .WithDescription(ascensionLimits.Count == 0 ? "No materials needed." : "")
                 .WithFields(
