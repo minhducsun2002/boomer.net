@@ -102,7 +102,7 @@ namespace Pepper.Commmands.General
 
             return timeComponents.Length == 1
                 ? timeComponents[0]
-                : string.Join(',', new ArraySegment<string>(timeComponents, 0, timeComponents.Length - 1))
+                : string.Join(", ", new ArraySegment<string>(timeComponents, 0, timeComponents.Length - 1))
                   + $" and {timeComponents[^1]}";
         }
     }
