@@ -10,7 +10,7 @@ using Pepper.Structures.External.Osu;
 
 namespace Pepper.Services.Osu
 {
-    public partial class ApiService
+    public partial class APIService
     {
         private readonly BeatmapCache beatmapCache = new BeatmapCache();
         public async Task<WorkingBeatmap> GetBeatmap(int beatmapId) => await beatmapCache.GetBeatmap(beatmapId);

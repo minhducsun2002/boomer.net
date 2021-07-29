@@ -13,7 +13,7 @@ namespace Pepper.Commands.Osu
 {
     public abstract class OsuScoreCommand : OsuCommand
     {
-        protected OsuScoreCommand(ApiService service) : base(service) {}
+        protected OsuScoreCommand(APIService service) : base(service) {}
 
         public async Task<DiscordCommandResult> SingleScore(APILegacyScoreInfo sc)
         {
@@ -71,6 +71,7 @@ namespace Pepper.Commands.Osu
                             $"**{sc.MaxCombo}**x/**{maxCombo}**x • [{SerializeHitStats(sc.Statistics)}] • **{sc.Accuracy * 100:F3}**%"
                             + $"\n**{pp:F2}**pp {(calculated ? " (?)" : "")}"
                             + (sc.Perfect ? "" : $" / **{fullComboPP:F3}**pp (?)")
+                            + $" • **`{sc.TotalScore:n0}`**"
                             + (sc.OnlineBestScoreID == null
                                 ? ""
                                 : $" • [[**Score**]](https://osu.ppy.sh/scores/{ruleset.ShortName}/{sc.OnlineBestScoreID})")

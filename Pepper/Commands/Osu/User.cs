@@ -13,7 +13,7 @@ namespace Pepper.Commands.Osu
 {
     public class User : OsuCommand
     {
-        public User(ApiService service) : base(service) {}
+        public User(APIService service) : base(service) {}
 
         [Command("user", "u")]
         [Description("Show statistics of an osu! player.")]

@@ -14,7 +14,7 @@ using User = osu.Game.Users.User;
 
 namespace Pepper.Services.Osu
 {
-    public partial class ApiService
+    public partial class APIService
     {
         public async Task<APILegacyScoreInfo[]> GetUserScores(int userId, ScoreType scoreType, RulesetInfo rulesetInfo, int count = 100, int offset = 0)
         {

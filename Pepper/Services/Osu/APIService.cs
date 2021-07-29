@@ -7,9 +7,9 @@ using Pepper.Structures;
 
 namespace Pepper.Services.Osu
 {
-    public partial class ApiService : Service
+    public partial class APIService : Service
     {
-        public ApiService(IConfiguration configuration)
+        public APIService(IConfiguration configuration)
         {
             legacyApiClient = new OsuClient(new OsuSharpConfiguration
             {

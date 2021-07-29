@@ -25,7 +25,10 @@ namespace Pepper.Services.Osu.API
             {
                 await using var stream = await httpClient.GetStreamAsync($"https://osu.ppy.sh/osu/{beatmapId}");
                 using var streamReader = new LineBufferedReader(stream);
-                return new WorkingBeatmap(Decoder.GetDecoder<Beatmap>(streamReader).Decode(streamReader));
+                var workingBeatmap = new WorkingBeatmap(Decoder.GetDecoder<Beatmap>(streamReader).Decode(streamReader));
+                if (workingBeatmap.BeatmapInfo.Length.Equals(default))
+                    workingBeatmap.BeatmapInfo.Length = workingBeatmap.Beatmap.HitObjects[^1].StartTime;
+                return workingBeatmap;
             }
 
             return await beatmapCache.GetOrAddAsync($"beatmap-{beatmapId}", BeatmapGetter, new MemoryCacheEntryOptions

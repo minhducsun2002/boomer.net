@@ -6,7 +6,7 @@ using Pepper.Services.Osu.API;
 
 namespace Pepper.Services.Osu
 {
-    public partial class ApiService
+    public partial class APIService
     {
         private readonly UserCache userCache = new UserCache();
 

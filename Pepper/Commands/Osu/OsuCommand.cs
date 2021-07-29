@@ -5,6 +5,7 @@ using System.Linq;
 using AJ.Code;
 using Disqord;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.Difficulty;
@@ -27,8 +28,8 @@ namespace Pepper.Commands.Osu
     [Category("osu!")]
     public abstract class OsuCommand : Command
     {
-        public OsuCommand(ApiService service) => APIService = service;
-        protected readonly ApiService APIService;
+        public OsuCommand(APIService service) => APIService = service;
+        protected readonly APIService APIService;
         protected static readonly Ruleset[] Rulesets = { new OsuRuleset(), new TaikoRuleset(), new CatchRuleset(), new ManiaRuleset() };
         
         
@@ -44,6 +45,7 @@ namespace Pepper.Commands.Osu
 
         protected static string SerializeBeatmapStats(
             BeatmapInfo map, DifficultyAttributes? difficultyOverwrite = null,
+            ControlPointInfo? controlPointInfo = null,
             bool showLength = true, char delimiter = '•')
         {
             var diff = map.BaseDifficulty;
@@ -60,11 +62,18 @@ namespace Pepper.Commands.Osu
                     diff.ApproachRate = (float) Math.Round(catchDifficulty.ApproachRate, 2);
                     break;
             }
+
+            var bpm = $"**{map.BPM}**";
+            if (controlPointInfo != null)
+            {
+                double min = controlPointInfo.BPMMinimum, max = controlPointInfo.BPMMaximum;
+                bpm = max - min < 2.0 ? $"**{min:0.##}**" : $"**{min:0.##}**-**{max:0.##}**";
+            }
             
             return
-                $"{map.StarDifficulty:F2} :star: "
+                $"{difficultyOverwrite?.StarRating ?? map.StarDifficulty:F2} :star: "
                 + $" {delimiter} `AR`**{diff.ApproachRate}** `CS`**{diff.CircleSize}** `OD`**{diff.OverallDifficulty}** `HP`**{diff.DrainRate}**"
-                + $" {delimiter} **{map.BPM}** BPM"
+                + $" {delimiter} {bpm} BPM"
                 + (showLength 
                     ? $@" {delimiter} :clock3: {
                         Math.Floor(map.Length / 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
@@ -75,8 +84,8 @@ namespace Pepper.Commands.Osu
         protected static string SerializeHitStats(Dictionary<string, int> statistics)
             => $"**{statistics["count_300"]}**/**{statistics["count_100"]}**/**{statistics["count_50"]}**/**{statistics["count_miss"]}**";
 
-        protected static string SerializeTimestamp(DateTimeOffset timestamp, bool UTCHint = true)
-            => timestamp.ToUniversalTime().ToString($"HH:mm:ss, dd/MM/yyyy{(UTCHint ? " 'UTC'" : "")}", CultureInfo.InvariantCulture);
+        protected static string SerializeTimestamp(DateTimeOffset timestamp, bool utcHint = true)
+            => timestamp.ToUniversalTime().ToString($"HH:mm:ss, dd/MM/yyyy{(utcHint ? " 'UTC'" : "")}", CultureInfo.InvariantCulture);
 
         protected static LocalEmbedAuthor SerializeAuthorBuilder(osu.Game.Users.User user)
             => new()

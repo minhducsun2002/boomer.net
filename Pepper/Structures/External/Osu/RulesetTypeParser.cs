@@ -14,7 +14,7 @@ namespace Pepper.Structures.External.Osu
     {
         public static readonly RulesetTypeParser Instance = new RulesetTypeParser();
 
-        private static readonly Ruleset[] SupportedRulesets = 
+        public static readonly Ruleset[] SupportedRulesets = 
         {
             new OsuRuleset(),
             new TaikoRuleset(),
