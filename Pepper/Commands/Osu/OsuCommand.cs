@@ -72,7 +72,7 @@ namespace Pepper.Commands.Osu
             
             return
                 $"{difficultyOverwrite?.StarRating ?? map.StarDifficulty:F2} :star: "
-                + $" {delimiter} `AR`**{diff.ApproachRate}** `CS`**{diff.CircleSize}** `OD`**{diff.OverallDifficulty}** `HP`**{diff.DrainRate}**"
+                + $" {delimiter} `CS`**{diff.CircleSize}** `AR`**{diff.ApproachRate}** `OD`**{diff.OverallDifficulty}** `HP`**{diff.DrainRate}**"
                 + $" {delimiter} {bpm} BPM"
                 + (showLength 
                     ? $@" {delimiter} :clock3: {

@@ -22,7 +22,7 @@ namespace Pepper.Commands.Osu
         [Command("sc")]
         [Description("View/list scores on a certain map")]
         public async Task<DiscordCommandResult> Exec(
-            [Description("A score URL or a beatmap ID.")] string link,
+            [Description("A score URL, a beatmap URL, or a beatmap ID.")] string link,
             [Remainder] [Description("Username to check. Default to your username, if set. Ignored if a score link is passed.")] Username? username = null
         )
         {
@@ -39,7 +39,14 @@ namespace Pepper.Commands.Osu
                 return await SingleScore(sc);
             }
 
-            if (URLParser.CheckMapUrl(link, out var gameMode, out var mapId, out _) && mapId.HasValue && username != null)
+            int? mapId;
+            string? gameMode = null;
+            if (!int.TryParse(link, out var validMapId))
+                URLParser.CheckMapUrl(link, out gameMode, out mapId, out _);
+            else
+                mapId = validMapId;
+            
+            if (mapId.HasValue && username != null)
             {
                 var map = await APIService.GetBeatmap(mapId.Value);
                 var parsed = await Context.Command.Service.GetTypeParser<Ruleset>()!
@@ -61,6 +68,7 @@ namespace Pepper.Commands.Osu
                 {
                     Author = SerializeAuthorBuilder(user),
                     Title = $"**{map.Beatmap.Metadata.Artist}** - **{map.Beatmap.Metadata.Title}** [{map.BeatmapInfo.Version}]",
+                    Url = map.GetOnlineUrl(),
                     Description = $"{SerializeBeatmapStats(map.BeatmapInfo, difficulty, map.Beatmap.ControlPointInfo)}\n\n"
                         + string.Join("\n\n", scores.Select(score =>
                         {
