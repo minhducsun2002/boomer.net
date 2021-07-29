@@ -80,7 +80,7 @@ namespace Pepper.Commmands.General
                 .Where(param => param.Attributes.OfType<FlagAttribute>().Any())
                 .Select(param => (param, param.Attributes.OfType<FlagAttribute>().First()))
                 .ToList();
-            
+
             return new LocalEmbed
             {
                 Title = $"`{baseInvocation}`" + (
@@ -89,7 +89,7 @@ namespace Pepper.Commmands.General
                         : ""
                 ),
                 Description = string.IsNullOrWhiteSpace(command.Description) ? "No description." : command.Description,
-                Fields = new List<LocalEmbedField>
+                Fields = new List<LocalEmbedField?>
                 {
                     new()
                     {
@@ -127,14 +127,12 @@ namespace Pepper.Commmands.General
                                     })
                                 )
                         }
-                        : null)!
+                        : null)
                 }.Where(_ => _ != null).ToList(),
-                Footer = new LocalEmbedFooter
-                {
-                    Text = otherPrefixes.Length != 0
-                        ? $"Also callable under prefix {string.Join("/", otherPrefixes.Select(_ => $"\"{_}\""))}"
-                        : ""
-                }
+                Footer = otherPrefixes.Length != 0
+                    ? new LocalEmbedFooter().WithText($"Also callable under prefix {string.Join("/", otherPrefixes.Select(_ => $"\"{_}\""))}")
+                    : default
+                
             };
         }
         
