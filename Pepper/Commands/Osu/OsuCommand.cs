@@ -21,6 +21,7 @@ using osu.Game.Scoring;
 using Pepper.Services.Osu;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
+using Pepper.Structures.External.Osu;
 
 namespace Pepper.Commands.Osu
 {
@@ -30,7 +31,7 @@ namespace Pepper.Commands.Osu
     {
         public OsuCommand(APIService service) => APIService = service;
         protected readonly APIService APIService;
-        protected static readonly Ruleset[] Rulesets = { new OsuRuleset(), new TaikoRuleset(), new CatchRuleset(), new ManiaRuleset() };
+        protected static Ruleset[] Rulesets => RulesetTypeParser.SupportedRulesets;
         
         
         protected static string ResolveEarthEmoji(ContinentCode continent)

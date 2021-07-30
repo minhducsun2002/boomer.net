@@ -19,7 +19,7 @@ namespace Pepper.Commands.Osu
         {
             var b = sc.Beatmap!;
             var workingBeatmap = await APIService.GetBeatmap(b.OnlineBeatmapID!.Value);
-            var s = workingBeatmap.BeatmapInfo.BeatmapSet!;
+            var s = workingBeatmap.BeatmapInfo.BeatmapSet;
             var ruleset = Rulesets[sc.OnlineRulesetID];
 
             double? pp = sc.PP, fullComboPP = sc.PP;
