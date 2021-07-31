@@ -13,6 +13,6 @@ namespace Pepper.Services.Osu
     public partial class APIService
     {
         private readonly BeatmapCache beatmapCache = new BeatmapCache();
-        public async Task<WorkingBeatmap> GetBeatmap(int beatmapId) => await beatmapCache.GetBeatmap(beatmapId);
+        public async Task<WorkingBeatmap> GetBeatmap(long beatmapId) => await beatmapCache.GetBeatmap(beatmapId);
     }
 }

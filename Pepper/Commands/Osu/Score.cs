@@ -56,7 +56,7 @@ namespace Pepper.Commands.Osu
                 var scores = await APIService.GetLegacyBeatmapScores(
                     user.Id,
                     mapId.Value,
-                    (GameMode) ((ILegacyRuleset) parsed.Value).LegacyID
+                    parsed.Value.RulesetInfo
                 );
 
                 if (scores.Count == 0) return Reply($"No score found on that beatmap for user `{username.Content}`.");

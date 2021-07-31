@@ -47,9 +47,10 @@ namespace Pepper.Commands.Osu
         {
             var rulesetInfo = ruleset.RulesetInfo;
             var (user, _, _) = await APIService.GetUser(username, rulesetInfo);
-            var scores = await APIService.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo, 1, pos - 1);
             
-            if (scores.Any()) return await SingleScore(scores.First());
+            var scores = await APIService.GetLegacyUserRecentScores(user.Id, rulesetInfo, pos);
+            if (scores.ElementAtOrDefault(pos - 1) != default) return await SingleScore(user, scores[pos - 1]);
+            
             return Reply(new LocalEmbed()
                 .WithDescription(
                     $"No recent play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {rulesetInfo.Name} at position #{pos}."

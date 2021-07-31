@@ -43,9 +43,14 @@ namespace Pepper.Services.Osu
             return SerializeToAPILegacyScoreInfo(JObject.Parse(doc.GetElementbyId("json-show").InnerText));
         }
 
-        public async Task<IReadOnlyList<Score>> GetLegacyBeatmapScores(int userId, int beatmapId, GameMode gameMode)
+        public async Task<IReadOnlyList<Score>> GetLegacyBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo)
         {
-            return await legacyApiClient.GetScoresByBeatmapIdAndUserIdAsync(beatmapId, userId, gameMode);
+            return await legacyApiClient.GetScoresByBeatmapIdAndUserIdAsync(beatmapId, userId, (GameMode) rulesetInfo.ID!);
+        }
+
+        public async Task<IReadOnlyList<Score>> GetLegacyUserRecentScores(int userId, RulesetInfo rulesetInfo, int limit = 50)
+        {
+            return await legacyApiClient.GetUserRecentsByUserIdAsync(userId, (GameMode) rulesetInfo.ID!, limit);
         }
 
         private static APILegacyScoreInfo SerializeToAPILegacyScoreInfo(JToken scoreObject)

@@ -19,7 +19,7 @@ namespace Pepper.Services.Osu.API
             new MemoryCacheProvider(new MemoryCache(new MemoryCacheOptions { SizeLimit = 50 }))
         );
 
-        public async Task<WorkingBeatmap> GetBeatmap(int beatmapId)
+        public async Task<WorkingBeatmap> GetBeatmap(long beatmapId)
         {
             async Task<WorkingBeatmap> BeatmapGetter()
             {
