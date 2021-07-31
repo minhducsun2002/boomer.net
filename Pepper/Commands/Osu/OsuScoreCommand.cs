@@ -82,7 +82,7 @@ namespace Pepper.Commands.Osu
             double? fullComboPP = pp;
             var calculated = false;
             var rulesetId = ruleset.RulesetInfo.ID!.Value;
-
+            
             if (!pp.HasValue || !perfect)
             {
                 if (!pp.HasValue)
@@ -103,6 +103,14 @@ namespace Pepper.Commands.Osu
                     var performanceCalculator = GetPerformanceCalculator(rulesetId, difficulty, fcScore);
                     fullComboPP = performanceCalculator.Calculate();
                 }
+            }
+
+            int hitCounts, totalHitCounts = workingBeatmap.Beatmap.HitObjects.Count;
+            {
+                var temporaryScore = new ScoreInfo();
+                temporaryScore.SetStatistics(statistics);
+                hitCounts = (temporaryScore.GetCount50() + temporaryScore.GetCount100() +
+                                  temporaryScore.GetCount300() + temporaryScore.GetCountMiss())!.Value;
             }
 
             return Reply(new LocalEmbed
@@ -133,7 +141,10 @@ namespace Pepper.Commands.Osu
                         Name = "Beatmap information",
                         Value = SerializeBeatmapStats(workingBeatmap.BeatmapInfo, difficulty, workingBeatmap.Beatmap.ControlPointInfo)
                     }
-                }
+                },
+                Footer = totalHitCounts > hitCounts
+                    ? new LocalEmbedFooter().WithText($"{hitCounts / (float) totalHitCounts * 100:F2}% completed")
+                    : null
             });
         }
     }
