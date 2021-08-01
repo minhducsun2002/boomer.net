@@ -6,6 +6,7 @@ using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO;
+
 using Pepper.Structures.External.FGO.MasterData;
 
 namespace Pepper.Commands.FGO
@@ -25,6 +26,7 @@ namespace Pepper.Commands.FGO
             TraitService traitService,
             IReadOnlyList<int> attributes,
             IReadOnlyDictionary<int, string> itemNames,
+            List<(Structures.External.FGO.Entities.Skill, List<string>)>? passives = null,
             (string, int, int, IEnumerable<string>)? bondCE = null,
             Snowflake? replyingTo = null
         ) : base(new LocalMessage())
@@ -121,30 +123,40 @@ namespace Pepper.Commands.FGO
                     }))
                 .WithFooter("Skill materials");
 
+            if (passives != null && passives.Count != 0)
+                Passive = servant.BaseEmbed()
+                    .WithFields(passives.Select(skill => new LocalEmbedField
+                    {
+                        Name = skill.Item1.MstSkill.Name,
+                        Value = string.Join('\n', skill.Item2)
+                    }));
+            
             TemplateMessage = new LocalMessage().WithEmbeds(general);
             if (replyingTo != null) TemplateMessage = TemplateMessage.WithReply(replyingTo.Value);
             
             foreach (var (embed, label, index) in new[]
             {
-                (general, "General info", 0), (ascItem, "Ascension materials", 1), (skillItem, "Skill materials", 2)
+                (general, "General info", 0),
+                (Passive, "Passive skills", 1),
+                (ascItem, "Ascension materials", 2),
+                (skillItem, "Skill materials", 3)
             })
-            {
-                AddComponent(new ButtonViewComponent(e =>
-                {
-                    foreach (var component in EnumerateComponents())
-                        if (component is ButtonViewComponent button)
-                            button.IsDisabled = false;
-                    e.Button.IsDisabled = true;
-                    TemplateMessage.Embeds = new List<LocalEmbed> {embed};
-                    return default;
-                })
-                {
-                    Label = label,
-                    Position = index,
-                    // initial state
-                    IsDisabled = index == 0
-                });
-            }
+                if (embed != null)
+                    AddComponent(new ButtonViewComponent(e =>
+                    {
+                        foreach (var component in EnumerateComponents())
+                            if (component is ButtonViewComponent button)
+                                button.IsDisabled = false;
+                        e.Button.IsDisabled = true;
+                        TemplateMessage.Embeds = new List<LocalEmbed> {embed};
+                        return default;
+                    })
+                    {
+                        Label = label,
+                        Position = index,
+                        // initial state
+                        IsDisabled = index == 0
+                    });
         }
     }
 }

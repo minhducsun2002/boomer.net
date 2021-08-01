@@ -86,6 +86,14 @@ namespace Pepper.Commands.FGO
                     ceDetails = (naName ?? ceSvt.Name, ceSvt.CollectionNo, ceSvt.ID, skill);
                 }
             }
+            
+            // preparing passive skills
+            var passives = svt.ClassPassive.Select(skillId => jp.GetSkillById(skillId))
+                .Select(skill =>
+                {
+                    var renderedSkill = new SkillRenderer(skill.MstSkill, jp, skill).Prepare(TraitService);
+                    return (skill, renderedSkill.Fields.Select(field => field.Value).ToList());
+                }).ToList()!;
 
             return View(
                 new ServantView(
@@ -97,6 +105,7 @@ namespace Pepper.Commands.FGO
                     TraitService,
                     jp.GetAttributeLists(),
                     itemNames,
+                    passives,
                     ceDetails,
                     Context.Message.Id
                 )
