@@ -64,11 +64,18 @@ namespace Pepper.Commands.Osu
                     break;
             }
 
-            var bpm = $"**{map.BPM}**";
+            var speedChange = 1.0;
+            if (difficultyOverwrite != null)
+                foreach (var mod in difficultyOverwrite.Mods)
+                    if (mod is ModRateAdjust rateAdjustment)
+                        speedChange *= rateAdjustment.SpeedChange.Value;
+            var mapLength = map.Length / speedChange;
+
+            var bpm = $"**{map.BPM * speedChange:0.##}**";
             if (controlPointInfo != null)
             {
                 double min = controlPointInfo.BPMMinimum, max = controlPointInfo.BPMMaximum;
-                bpm = max - min < 2.0 ? $"**{min:0.##}**" : $"**{min:0.##}**-**{max:0.##}**";
+                bpm = max - min < 2.0 ? $"**{min * speedChange:0.##}**" : $"**{min * speedChange:0.##}**-**{max * speedChange:0.##}**";
             }
             
             return
@@ -77,8 +84,8 @@ namespace Pepper.Commands.Osu
                 + $" {delimiter} {bpm} BPM"
                 + (showLength 
                     ? $@" {delimiter} :clock3: {
-                        Math.Floor(map.Length / 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                    }:{((long) map.Length % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}" 
+                        Math.Floor(mapLength / 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
+                    }:{((long) mapLength % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}" 
                     : "");
         }
 
