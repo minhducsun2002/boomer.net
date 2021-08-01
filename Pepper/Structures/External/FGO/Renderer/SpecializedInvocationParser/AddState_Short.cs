@@ -128,7 +128,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             foreach (var (limitType, data) in new[] {("turn", output.Turn), ("time", output.Count)})
             {
                 if (data.Length != 1) continue;
-                if (data[0] == -1) continue;
+                if (data[0] < 1) continue;
                 limits += (string.IsNullOrEmpty(limits) ? "" : ", ") + $"**{data[0]}** {limitType}{(data[0] > 1 ? "s" : "")}";
             }
             
