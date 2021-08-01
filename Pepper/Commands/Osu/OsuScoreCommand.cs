@@ -96,7 +96,7 @@ namespace Pepper.Commands.Osu
 
                 if (!perfect)
                 {
-                    var fcScore = new ScoreInfo {Mods = mods, MaxCombo = scoreMaxCombo, Accuracy = accuracy};
+                    var fcScore = new ScoreInfo {Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = accuracy};
                     fcScore.SetStatistics(statistics);
                     fcScore.SetCount300((int) (fcScore.GetCount300() + fcScore.GetCountMiss())!);
                     fcScore.SetCountMiss(0);
