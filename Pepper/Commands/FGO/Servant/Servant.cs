@@ -91,6 +91,9 @@ namespace Pepper.Commands.FGO
             var passives = svt.ClassPassive.Select(skillId => jp.GetSkillById(skillId))
                 .Select(skill =>
                 {
+                    // overwrite with NA name
+                    try { skill.MstSkill.Name = na.GetSkillById(skill.MstSkill.ID).MstSkill.Name; } catch { /* ignore */ }
+                    
                     var renderedSkill = new SkillRenderer(skill.MstSkill, jp, skill).Prepare(TraitService);
                     return (skill, renderedSkill.Fields.Select(field => field.Value).ToList());
                 }).ToList()!;
