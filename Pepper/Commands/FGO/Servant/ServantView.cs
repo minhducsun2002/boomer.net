@@ -6,18 +6,29 @@ using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO;
-
+using Pepper.Structures.External.FGO.Entities;
 using Pepper.Structures.External.FGO.MasterData;
 
 namespace Pepper.Commands.FGO
 {
     internal partial class ServantView : ViewBase
     {
-        private readonly LocalEmbed general;
-        private LocalEmbed Passive;
-        private LocalEmbed ascItem;
-        private LocalEmbed skillItem;
-        
+        private class ReferencedSkillEquality : IEqualityComparer<(Skill, List<string>)>
+        {
+            public bool Equals((Skill, List<string>) x, (Skill, List<string>) y)
+            {
+                return x.Item1.MstSkill.ID == y.Item1.MstSkill.ID;
+            }
+
+            public int GetHashCode((Skill, List<string>) obj)
+            {
+                return obj.GetHashCode();
+            }
+        }
+
+        private static IEqualityComparer<(Skill, List<string>)> referencedSkillComparer = new ReferencedSkillEquality();
+        private readonly LocalEmbed passive;
+
         public ServantView(
             (MstSvt, MstSvtLimit[], MstClass) servant,
             MstTreasureDeviceLv npGain,
@@ -26,13 +37,13 @@ namespace Pepper.Commands.FGO
             TraitService traitService,
             IReadOnlyList<int> attributes,
             IReadOnlyDictionary<int, string> itemNames,
-            List<(Structures.External.FGO.Entities.Skill, List<string>)>? passives = null,
+            IReadOnlyCollection<(Skill, List<string>, List<(Skill, List<string>)>)>? passives = null,
             (string, int, int, IEnumerable<string>)? bondCE = null,
             Snowflake? replyingTo = null
         ) : base(new LocalMessage())
         {
             var (svt, svtLimits, _) = servant;
-            general = servant.BaseEmbed()
+            LocalEmbed general = servant.BaseEmbed()
                 .WithFooter("General info")
                 .WithFields(
                     new LocalEmbedField
@@ -95,7 +106,7 @@ namespace Pepper.Commands.FGO
                 });
             }
             
-            ascItem = servant.BaseEmbed()
+            LocalEmbed ascItem = servant.BaseEmbed()
                 .WithDescription(ascensionLimits.Count == 0 ? "No materials needed." : "")
                 .WithFields(
                     ascensionLimits.Select((limit, index) => new LocalEmbedField
@@ -109,7 +120,7 @@ namespace Pepper.Commands.FGO
                     }))
                 .WithFooter("Ascension materials");
             
-            skillItem = servant.BaseEmbed()
+            LocalEmbed skillItem = servant.BaseEmbed()
                 .WithDescription(skillLimits.Count == 0 ? "No materials needed." : "")
                 .WithFields(
                     skillLimits.Select((limit, index) => new LocalEmbedField
@@ -124,12 +135,29 @@ namespace Pepper.Commands.FGO
                 .WithFooter("Skill materials");
 
             if (passives != null && passives.Count != 0)
-                Passive = servant.BaseEmbed()
+            {
+                passive = servant.BaseEmbed()
                     .WithFields(passives.Select(skill => new LocalEmbedField
                     {
                         Name = skill.Item1.MstSkill.Name,
                         Value = string.Join('\n', skill.Item2)
                     }));
+                    
+                var relatedSkills = passives
+                    .SelectMany(related => related.Item3).Distinct(referencedSkillComparer)
+                    .Select(skill => new LocalEmbedField
+                    {
+                        Name = $"[Skill {skill.Item1.MstSkill.ID}]",
+                        Value = string.Join("\n", skill.Item2)
+                    })
+                    .ToList();
+
+                if (relatedSkills.Count != 0)
+                {
+                    passive.AddBlankField();
+                    foreach (var relatedSkill in relatedSkills) passive.Fields.Add(relatedSkill);
+                }
+            }
             
             TemplateMessage = new LocalMessage().WithEmbeds(general);
             if (replyingTo != null) TemplateMessage = TemplateMessage.WithReply(replyingTo.Value);
@@ -137,7 +165,7 @@ namespace Pepper.Commands.FGO
             foreach (var (embed, label, index) in new[]
             {
                 (general, "General info", 0),
-                (Passive, "Passive skills", 1),
+                (passive, "Passive skills", 1),
                 (ascItem, "Ascension materials", 2),
                 (skillItem, "Skill materials", 3)
             })

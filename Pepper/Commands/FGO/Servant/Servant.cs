@@ -82,7 +82,7 @@ namespace Pepper.Commands.FGO
                     var ceSvt = jp.MstSvt.FindSync(svtQuery).First();
                     var naName = na.MstSvt.FindSync(svtQuery).FirstOrDefault()?.Name;
                     var mstSkill = jp.MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("id", skillId)).First();
-                    var skill = new SkillRenderer(mstSkill, jp).Prepare(TraitService).Fields.Select(field => field.Value);
+                    var (skill, referencedSkills) = new SkillRenderer(mstSkill, jp).Prepare(TraitService);
                     ceDetails = (naName ?? ceSvt.Name, ceSvt.CollectionNo, ceSvt.ID, skill);
                 }
             }
@@ -94,8 +94,8 @@ namespace Pepper.Commands.FGO
                     // overwrite with NA name
                     try { skill.MstSkill.Name = na.GetSkillById(skill.MstSkill.ID).MstSkill.Name; } catch { /* ignore */ }
                     
-                    var renderedSkill = new SkillRenderer(skill.MstSkill, jp, skill).Prepare(TraitService);
-                    return (skill, renderedSkill.Fields.Select(field => field.Value).ToList());
+                    var (baseSkill, referencedSkills) = new SkillRenderer(skill.MstSkill, jp, skill).Prepare(TraitService);
+                    return (skill, baseSkill, referencedSkills);
                 }).ToList()!;
 
             return View(

@@ -28,6 +28,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             var extra = new List<string>();
             var extraStats = new Dictionary<string, string[]>();
             var amountPreposition = "of";
+            string? buffName = default;
 
             var baseAction = funcType switch
             {
@@ -37,6 +38,9 @@ namespace Pepper.Structures.External.FGO.Renderer
                     $"{nameof(funcType)} must be either AddState or AddStateShort. Received {funcType}")
             };
             
+            if (Enum.IsDefined(typeof(BuffList.TYPE), buff.Type))
+                if (!InvocationRenderer.BuffNames.TryGetValue((BuffList.TYPE) buff.Type, out buffName))
+                    buffName = $"[buffType ${buff.Type}]";
             
             if (values.ContainsKey("Turn")) output.Turn = values["Turn"].Distinct().Select(int.Parse).ToArray();
 
@@ -93,6 +97,19 @@ namespace Pepper.Structures.External.FGO.Renderer
                         output.Amount = values["Value"].Select(value => $"{int.Parse(value)}").ToArray();
                         break;
                     case BuffList.TYPE.COMMANDATTACK_FUNCTION:
+                        // We are assuming these buffs only push a single skill
+                        buffName = $"Trigger skill {values["Value"].First()} on attacks";
+                        var triggerChances = values["UseRate"].Distinct().Select(chance => int.Parse(chance) / 10).ToList();
+                        switch (triggerChances.Count)
+                        {
+                            case 1:
+                                buffName = $"Trigger skill {values["Value"].First()} with {triggerChances[0]}% chance on attacks";
+                                break;
+                            case > 1:
+                                extraStats["Skill trigger chance"] = triggerChances.Select(chance => $"{chance}%").ToArray();
+                                break;
+                        }
+                        break;
                     case BuffList.TYPE.DEAD_FUNCTION:
                     case BuffList.TYPE.DELAY_FUNCTION:
                     case BuffList.TYPE.ENTRY_FUNCTION:
@@ -117,13 +134,8 @@ namespace Pepper.Structures.External.FGO.Renderer
             output.Chance = output.Chance.Distinct().ToArray();
             output.Turn = output.Turn.Distinct().ToArray();
             output.Count = output.Count.Distinct().ToArray();
-
-            string? buffName = default;
-            string amount = "", limits = "";
             
-            if (Enum.IsDefined(typeof(BuffList.TYPE), buff.Type))
-                if (!InvocationRenderer.BuffNames.TryGetValue((BuffList.TYPE) buff.Type, out buffName))
-                    buffName = $"[buffType ${buff.Type}]";
+            string amount = "", limits = "";
 
             foreach (var (limitType, data) in new[] {("turn", output.Turn), ("time", output.Count)})
             {

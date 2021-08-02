@@ -3,6 +3,7 @@ using System.Linq;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus;
+using Humanizer;
 using Pepper.Services.FGO;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.FGO;
@@ -51,35 +52,64 @@ namespace Pepper.Commands.FGO
 
         [Command("ce")]
         [PrefixCategory("fgo")]
-        public DiscordMenuCommandResult Exec(int id = 1)
+        public DiscordCommandResult Exec(int id = 1)
         {
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP];
             var ce = jp.GetCraftEssenceByCollectionNo(id);
             var title = $"{ce.MstSvt.CollectionNo}. {ce.MstSvt.Name} (`{ce.MstSvt.ID}`)";
-            var description = $"Cost : {ce.MstSvt.Cost}";
-            
-            var embeds = new List<LocalEmbed>
+            var author = $"Cost : {ce.MstSvt.Cost}";
+
+            var _ = new[] {ce.BaseSkills, ce.MLBSkills}
+                .Select(skills => skills.SelectMany(skill =>
+                        new SkillRenderer(skill.MstSkill, jp, skill).ResolveEffects(TraitService).Item1
+                            .Select(kv => kv.Serialize()))
+                    .ToList()).ToArray();
+            string baseEffects = string.Join("\n", _[0]), mlbEffects = string.Join("\n", _[1]);
+            if (baseEffects.Length > 1020 || mlbEffects.Length > 1020)
             {
-                new()
+                var embeds = new List<LocalEmbed>
                 {
-                    Title = title,
-                    Description = description,
-                    Fields = ce.BaseSkills.SelectMany(skill => new SkillRenderer(skill.MstSkill, jp, skill).Prepare(TraitService).Fields)
-                        .ToList()
-                }
-            };
-
-            if (ce.MLBSkills.Length != 0)
-                embeds.Add(
-                    new LocalEmbed
+                    new()
                     {
+                        Author = new LocalEmbedAuthor().WithName(author),
                         Title = title,
-                        Description = description,
-                        Fields = ce.MLBSkills.SelectMany(skill => new SkillRenderer(skill.MstSkill, jp, skill).Prepare(TraitService).Fields)
-                            .ToList()
-                    });
+                        Description = baseEffects,
+                        Footer = new LocalEmbedFooter { Text = $"Base {(ce.BaseSkills.Length > 1 ? "effect".Pluralize() : "effects")}" }
+                    }
+                };
+                if (ce.MLBSkills.Length != 0)
+                    embeds.Add(
+                        new LocalEmbed
+                        {
+                            Author = new LocalEmbedAuthor().WithName(author),
+                            Title = title,
+                            Description = mlbEffects,
+                            Footer = new LocalEmbedFooter { Text = $"MLB {(ce.MLBSkills.Length > 1 ? "effect".Pluralize() : "effects")}" }
+                        });
+                
+                return View(new CEView(embeds, Context.Message.Id));
+            }
 
-            return View(new CEView(embeds, Context.Message.Id));
+            return Reply(new LocalEmbed
+            {
+                Author = new LocalEmbedAuthor().WithName(author),
+                Title = title,
+                Fields = new List<LocalEmbedField?>
+                {
+                    new()
+                    {
+                        Name = $"Base {(ce.BaseSkills.Length > 1 ? "effect".Pluralize() : "effects")}",
+                        Value = baseEffects
+                    },
+                    (ce.MLBSkills.Length != 0
+                        ? new LocalEmbedField
+                        {
+                            Name = $"MLB {(ce.BaseSkills.Length > 1 ? "effect".Pluralize() : "effects")}",
+                            Value = mlbEffects
+                        } 
+                        : null)
+                }.Where(embed => embed != null).ToList()
+            });
         }
     }
 }

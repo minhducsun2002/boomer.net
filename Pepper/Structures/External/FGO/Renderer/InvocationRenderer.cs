@@ -71,6 +71,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                 };
             
             if (statistics.Remove("OnField")) onField = true;
+            statistics.Remove("HideMiss"); // 960407
 
             statistics.TryGetValue("Count", out var count);
             var output = new InvocationInformation
@@ -157,7 +158,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                 switch (chance.Length)
                 {
                     case 1 when chance[0] != "100%":
-                        output.Effect = $"{chance[0]} chance to {output.Effect}";
+                        output.Effect = $"{output.Effect} with **{chance[0]}** chance";
                         break;
                     case > 1:
                         output.Statistics["Chance to activate"] = chance;
