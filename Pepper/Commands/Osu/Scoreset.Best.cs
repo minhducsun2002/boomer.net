@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BAMCIS.ChunkExtensionMethod;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Mods;
@@ -13,14 +14,30 @@ using Qmmands;
 
 namespace Pepper.Commands.Osu
 {
+    internal class ScoresetPagedView : PagedView
+    {
+        public ScoresetPagedView(PageProvider pageProvider) : base(pageProvider)
+        {
+            RemoveComponent(StopButton);
+            FirstPageButton.Label = "First page"; 
+            FirstPageButton.Emoji = null;
+            PreviousPageButton.Label = "Previous page";
+            PreviousPageButton.Emoji = null;
+            NextPageButton.Label = "Next page";
+            NextPageButton.Emoji = null;
+            LastPageButton.Label = "Last page"; 
+            LastPageButton.Emoji = null;
+        }
+    }
+    
     public partial class Scoreset
     {
         [Command("top", "best")]
         [Description("Show top plays of a player.")]
         public async Task<DiscordCommandResult> Best(
             [Flag("/")] [Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
-            [Flag("/mod=", "/mod:")] [Description("Mods to filter top plays with.")] string mods,
             [Description("Username to check. Default to your username, if set.")] Username username,
+            [Flag("/mod=", "/mod:")] [Description("Mods to filter top plays with.")] string mods = "",
             [Flag("#")] [Description("Index from the best play. 1 indicates the best play.")] int pos = -1
         )
         {
@@ -54,15 +71,17 @@ namespace Pepper.Commands.Osu
                 })
                 .Chunk(MaxScorePerPage).ToArray();
 
-            var embeds = chunks.Select((embed, index) => SerializeScoreset(embed)
-                .WithFooter($"Top plays - page {index + 1}/{chunks.Length}")
-                .WithAuthor(SerializeAuthorBuilder(user))).ToArray();
+            var embeds = chunks.Select((scoreChunk, index) => SerializeScoreset(scoreChunk, false)
+                .WithFooter($"Top plays (all times are UTC)")
+                .WithAuthor(SerializeAuthorBuilder(user))).ToList();
 
-            if (embeds.Length == 0)
+            if (embeds.Count == 0)
                 return Reply(new LocalEmbed()
                     .WithDescription(
                         $"No top play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {ruleset.RulesetInfo.Name}"));
-            return Reply(embeds);
+            return View(
+                new ScoresetPagedView(new ListPageProvider(embeds.Select(embed => new Page().WithEmbeds(embed))))
+            );
         }
     }
 }
