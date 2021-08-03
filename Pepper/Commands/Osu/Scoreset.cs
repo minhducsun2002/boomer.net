@@ -11,7 +11,7 @@ namespace Pepper.Commands.Osu
         private const int MaxScorePerPage = 5;
         public Scoreset(APIService service) : base(service) {}
 
-        private static LocalEmbed SerializeScoreset(IEnumerable<APILegacyScoreInfo> scores, bool utcHint = true)
+        private static LocalEmbed SerializeScoreset(IEnumerable<APILegacyScoreInfo> scores, bool utcHint = false)
             => new()
             {
                 Fields = scores.Select(score =>

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BAMCIS.ChunkExtensionMethod;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Structures.Commands;
@@ -27,7 +28,7 @@ namespace Pepper.Commands.Osu
             var chunks = scores.Chunk(MaxScorePerPage).ToArray();
 
             var embeds = chunks.Select((embed, index) => SerializeScoreset(embed)
-                .WithFooter($"Recent plays - Page {index + 1}/{chunks.Length}")
+                .WithFooter($"Recent plays (all times are UTC)")
                 .WithAuthor(SerializeAuthorBuilder(user))).ToArray();
 
             if (embeds.Length == 0)
@@ -35,7 +36,9 @@ namespace Pepper.Commands.Osu
                     .WithDescription(
                         $@"No recent play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {rulesetInfo.Name}"
                     ));
-            return Reply(embeds);
+            return View(
+                new ScoresetPagedView(new ListPageProvider(embeds.Select(embed => new Page().WithEmbeds(embed))))
+            );
         }
 
         [Command("rs")]

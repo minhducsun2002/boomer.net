@@ -71,7 +71,7 @@ namespace Pepper.Commands.Osu
                 })
                 .Chunk(MaxScorePerPage).ToArray();
 
-            var embeds = chunks.Select((scoreChunk, index) => SerializeScoreset(scoreChunk, false)
+            var embeds = chunks.Select((scoreChunk, index) => SerializeScoreset(scoreChunk)
                 .WithFooter($"Top plays (all times are UTC)")
                 .WithAuthor(SerializeAuthorBuilder(user))).ToList();
 
