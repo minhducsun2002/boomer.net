@@ -24,7 +24,7 @@ namespace Pepper.Services.Osu.API
         private const int UserAvatarMainColorCachingDurationSeconds = 30 * 60;
 
         private readonly IAppCache userObjectCache, userAvatarCache;
-        private readonly HttpClient httpClient = new HttpClient();
+        private static readonly HttpClient HttpClient = new ();
         private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
 
         internal UserCache(
@@ -49,7 +49,7 @@ namespace Pepper.Services.Osu.API
 
             async Task<(User, APILegacyScoreInfo[])> UserGetter()
             {
-                var _ = await httpClient.GetStringAsync($"https://osu.ppy.sh/users/{HttpUtility.UrlPathEncode(username)}/{rulesetName}");
+                var _ = await HttpClient.GetStringAsync($"https://osu.ppy.sh/users/{HttpUtility.UrlPathEncode(username)}/{rulesetName}");
                 var doc = new HtmlDocument(); doc.LoadHtml(_);
                 var user = JsonConvert.DeserializeObject<User>(doc.GetElementbyId("json-user").InnerText, SerializerSettings)!;
                 var scores = JObject.Parse(doc.GetElementbyId("json-extras").InnerText)["scoresBest"]!
@@ -81,7 +81,7 @@ namespace Pepper.Services.Osu.API
         {
             async Task<Color> UserAvatarGetter()
             {
-                var avatar = await httpClient.GetByteArrayAsync(user.AvatarUrl);
+                var avatar = await HttpClient.GetByteArrayAsync(user.AvatarUrl);
                 var image = Image.Load(avatar);
                 image.Mutate(img => img.Quantize(new OctreeQuantizer(new QuantizerOptions { MaxColors = 2 }))
                     .Resize(1, 1, KnownResamplers.Bicubic));

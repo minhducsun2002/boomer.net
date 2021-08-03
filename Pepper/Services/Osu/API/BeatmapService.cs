@@ -13,7 +13,7 @@ namespace Pepper.Services.Osu.API
 {
     internal class BeatmapCache
     {
-        private readonly HttpClient httpClient = new HttpClient();
+        private static readonly HttpClient HttpClient = new();
         private readonly IAppCache beatmapCache = new CachingService
         (
             new MemoryCacheProvider(new MemoryCache(new MemoryCacheOptions { SizeLimit = 50 }))
@@ -23,7 +23,7 @@ namespace Pepper.Services.Osu.API
         {
             async Task<WorkingBeatmap> BeatmapGetter()
             {
-                await using var stream = await httpClient.GetStreamAsync($"https://osu.ppy.sh/osu/{beatmapId}");
+                await using var stream = await HttpClient.GetStreamAsync($"https://osu.ppy.sh/osu/{beatmapId}");
                 using var streamReader = new LineBufferedReader(stream);
                 var workingBeatmap = new WorkingBeatmap(Decoder.GetDecoder<Beatmap>(streamReader).Decode(streamReader));
                 if (workingBeatmap.BeatmapInfo.Length.Equals(default))
