@@ -27,9 +27,11 @@ namespace Pepper.Commands.Osu
             var scores = await APIService.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo);
             var chunks = scores.Chunk(MaxScorePerPage).ToArray();
 
-            var embeds = chunks.Select((embed, index) => SerializeScoreset(embed)
-                .WithFooter($"Recent plays (all times are UTC)")
-                .WithAuthor(SerializeAuthorBuilder(user))).ToArray();
+            var embeds = chunks.Select(
+                embed => SerializeScoreset(embed, scoreLink: false)
+                    .WithFooter($"Recent plays (all times are UTC)")
+                    .WithAuthor(SerializeAuthorBuilder(user))
+            ).ToArray();
 
             if (embeds.Length == 0)
                 return Reply(new LocalEmbed()

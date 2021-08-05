@@ -11,7 +11,7 @@ namespace Pepper.Commands.Osu
         private const int MaxScorePerPage = 5;
         public Scoreset(APIService service) : base(service) {}
 
-        private static LocalEmbed SerializeScoreset(IEnumerable<APILegacyScoreInfo> scores, bool utcHint = false)
+        private static LocalEmbed SerializeScoreset(IEnumerable<APILegacyScoreInfo> scores, bool utcHint = false, bool scoreLink = true)
             => new()
             {
                 Fields = scores.Select(score =>
@@ -30,7 +30,7 @@ namespace Pepper.Commands.Osu
                                 + $"\n{SerializeBeatmapStats(map, showLength: false, delimiter: '-')}"
                                 + $"\n[{SerializeHitStats(score.Statistics)}] @ **{SerializeTimestamp(score.Date, false)}**{(utcHint ? " `UTC`" : "")}"
                                 + $"\n[[**Beatmap**]](https://osu.ppy.sh/b/{map.OnlineBeatmapID})"
-                                + $" [[**Score**]](https://osu.ppy.sh/scores/{Rulesets[score.OnlineRulesetID].ShortName}/{score.OnlineScoreID})"
+                                + (scoreLink ? $" [[**Score**]](https://osu.ppy.sh/scores/{Rulesets[score.OnlineRulesetID].ShortName}/{score.OnlineScoreID})" : "")
                     };
                 }).ToList()
             };
