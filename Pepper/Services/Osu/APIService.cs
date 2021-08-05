@@ -20,7 +20,7 @@ namespace Pepper.Services.Osu
         {
             NullValueHandling = NullValueHandling.Ignore
         };
-        private readonly HttpClient httpClient = new()
+        private static readonly HttpClient httpClient = new()
         {
             DefaultRequestHeaders =
             { UserAgent = { new ProductInfoHeaderValue("Pepper", Pepper.VersionHash) } }

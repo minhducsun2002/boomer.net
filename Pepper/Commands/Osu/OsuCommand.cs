@@ -92,7 +92,7 @@ namespace Pepper.Commands.Osu
         protected static string SerializeHitStats(Dictionary<string, int> statistics)
             => $"**{statistics["count_300"]}**/**{statistics["count_100"]}**/**{statistics["count_50"]}**/**{statistics["count_miss"]}**";
 
-        protected static string SerializeTimestamp(DateTimeOffset timestamp, bool utcHint = true)
+        public static string SerializeTimestamp(DateTimeOffset timestamp, bool utcHint = true)
             => timestamp.ToUniversalTime().ToString($"HH:mm:ss, dd/MM/yyyy{(utcHint ? " 'UTC'" : "")}", CultureInfo.InvariantCulture);
 
         protected static LocalEmbedAuthor SerializeAuthorBuilder(osu.Game.Users.User user)
