@@ -6,7 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
-using Pepper.Structures;
+using Pepper.Structures.External.Osu;
 using WorkingBeatmap = Pepper.Structures.External.Osu.WorkingBeatmap;
 
 namespace Pepper.Services.Osu.API
@@ -28,6 +28,8 @@ namespace Pepper.Services.Osu.API
                 var workingBeatmap = new WorkingBeatmap(Decoder.GetDecoder<Beatmap>(streamReader).Decode(streamReader));
                 if (workingBeatmap.BeatmapInfo.Length.Equals(default))
                     workingBeatmap.BeatmapInfo.Length = workingBeatmap.Beatmap.HitObjects[^1].StartTime;
+                workingBeatmap.BeatmapInfo.Ruleset =
+                    RulesetTypeParser.SupportedRulesets[workingBeatmap.BeatmapInfo.RulesetID].RulesetInfo;
                 return workingBeatmap;
             }
 
