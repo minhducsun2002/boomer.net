@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Scoring;
 using Pepper.Services.Osu;
+using Pepper.Services.Osu.API;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
@@ -44,7 +45,7 @@ namespace Pepper.Commands.Osu
                 _ => ":earth_asia:"
             };
 
-        protected static string SerializeBeatmapStats(
+        public static string SerializeBeatmapStats(
             BeatmapInfo map, DifficultyAttributes? difficultyOverwrite = null,
             ControlPointInfo? controlPointInfo = null,
             bool showLength = true, char delimiter = '•')
@@ -89,13 +90,23 @@ namespace Pepper.Commands.Osu
                     : "");
         }
 
+        public static string SerializeBeatmapStats(APIBeatmapSet set, APIBeatmap diff, bool showLength = true, bool showBPM = true, char delimiter = '•')
+            => $"{diff.StarDifficulty:F2}⭐ "
+               + $" {delimiter} CS{diff.CircleSize} AR{diff.ApproachRate} OD{diff.OverallDifficulty} HP{diff.DrainRate}"
+               + (showBPM ? $" {delimiter} {set.Bpm} BPM" : "")
+               + (showLength 
+                   ? $@" {delimiter} :clock3: {
+                       (diff.TotalLengthInSeconds / 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
+                   }:{(diff.TotalLengthInSeconds % 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}" 
+                   : "");
+
         protected static string SerializeHitStats(Dictionary<string, int> statistics)
             => $"**{statistics["count_300"]}**/**{statistics["count_100"]}**/**{statistics["count_50"]}**/**{statistics["count_miss"]}**";
 
         public static string SerializeTimestamp(DateTimeOffset timestamp, bool utcHint = true)
             => timestamp.ToUniversalTime().ToString($"HH:mm:ss, dd/MM/yyyy{(utcHint ? " 'UTC'" : "")}", CultureInfo.InvariantCulture);
 
-        protected static LocalEmbedAuthor SerializeAuthorBuilder(osu.Game.Users.User user)
+        public static LocalEmbedAuthor SerializeAuthorBuilder(osu.Game.Users.User user)
             => new()
             {
                 IconUrl = user.AvatarUrl,

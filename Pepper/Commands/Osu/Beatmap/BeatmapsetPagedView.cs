@@ -17,6 +17,7 @@ namespace Pepper.Commands.Osu
     {
         private readonly Dictionary<int, ButtonViewComponent> pageJumps;
         private const int CustomRow = 1;
+
         public BeatmapsetPagedView(APIBeatmapSet beatmapset) : base(new ListPageProvider(PreparePages(beatmapset, out var jumps)))
         {
             RemoveComponent(StopButton);
@@ -79,16 +80,13 @@ namespace Pepper.Commands.Osu
                 .Where(group => group.Any())
                 .SelectMany(grouping =>
                 {
-                    var modeEmbeds = grouping.OrderBy(map => map.StarDifficulty)
-                        .Chunk(MaxDiffPerPage).Select(mapChunk => new LocalEmbed
+                    var chunked = grouping.OrderBy(map => map.StarDifficulty)
+                        .Chunk(MaxDiffPerPage).ToList();
+                    var index = 1;
+                    var modeEmbeds = chunked.Select(mapChunk => new LocalEmbed
                         {
                             Title = $"{beatmapset.Artist} - {beatmapset.Title}",
-                            Author = new LocalEmbedAuthor
-                            {
-                                IconUrl = $"https://a.ppy.sh/{beatmapset.Author.Id}",
-                                Name = beatmapset.Author.Username,
-                                Url = $"https://osu.ppy.sh/users/{beatmapset.Author.Id}"
-                            },
+                            Author = OsuCommand.SerializeAuthorBuilder(beatmapset.Author),
                             Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.OnlineBeatmapSetID}",
                             Description = (int) beatmapset.Status < 0
                                 ? (beatmapset.Status == BeatmapSetOnlineStatus.WIP ? "WIP." : $"{beatmapset.Status}.")
@@ -107,7 +105,7 @@ namespace Pepper.Commands.Osu
                             }).ToList(),
                             Footer = new LocalEmbedFooter
                             {
-                                Text = $"Mode : {RulesetTypeParser.SupportedRulesets[grouping.Key].RulesetInfo.Name}"
+                                Text = $"Mode : {RulesetTypeParser.SupportedRulesets[grouping.Key].RulesetInfo.Name} | Page {index++}/{chunked.Count}"
                             }
                         })
                         .Select(embed => (grouping.Key, embed));

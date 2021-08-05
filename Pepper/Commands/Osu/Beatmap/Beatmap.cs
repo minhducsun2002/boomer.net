@@ -1,20 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
-using BAMCIS.ChunkExtensionMethod;
-using Disqord;
 using Disqord.Bot;
-using Disqord.Extensions.Interactivity.Menus;
-using Disqord.Extensions.Interactivity.Menus.Paged;
-using osu.Game.Beatmaps;
 using Pepper.Services.Osu;
 using Pepper.Structures.Commands;
 using Pepper.Utilities.Osu;
 using Qmmands;
 using Pepper.Services.Osu.API;
-using Pepper.Structures.External.Osu;
 
 namespace Pepper.Commands.Osu
 {
@@ -30,13 +21,18 @@ namespace Pepper.Commands.Osu
         {
             if (URLParser.CheckMapUrl(beatmapResolvable, out _, out var id, out var setId))
             {
-                if (id != null) return Beatmapset(await APIService.GetBeatmapsetInfo((int) id, false));
+                if (id != null) return await BeatmapSingle(await APIService.GetBeatmapsetInfo((int) id, false), (int) id);
                 if (setId != null) return Beatmapset(await APIService.GetBeatmapsetInfo((int) setId, true));
             }
 
             throw new ArgumentException("A valid URL is not provided!");
         }
 
-        private DiscordCommandResult Beatmapset(APIBeatmapSet beatmapSet) => View(new BeatmapsetPagedView(beatmapSet));
+        private DiscordCommandResult Beatmapset(APIBeatmapSet beatmapset) => View(new BeatmapsetPagedView(beatmapset));
+        private async Task<DiscordCommandResult> BeatmapSingle(APIBeatmapSet beatmapset, int beatmapId)
+        {
+            var embed = await BeatmapSingleView.PrepareEmbed(beatmapset, APIService, beatmapId);
+            return View(new BeatmapSingleView(beatmapset, APIService, embed, beatmapId));
+        }
     }
 }
