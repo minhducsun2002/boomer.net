@@ -67,7 +67,7 @@ namespace Pepper.Commands.Osu
             UpdateButtonStates();
             return base.OnNextPageButtonAsync(e);
         }
-
+    
         protected override ValueTask OnLastPageButtonAsync(ButtonEventArgs e)
         {
             UpdateButtonStates();
