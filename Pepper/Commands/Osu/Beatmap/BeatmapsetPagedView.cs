@@ -5,24 +5,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using BAMCIS.ChunkExtensionMethod;
 using Disqord;
-using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Beatmaps;
-using Pepper.Services.Osu;
-using Pepper.Structures.Commands;
-using Pepper.Utilities.Osu;
-using Qmmands;
 using Pepper.Services.Osu.API;
 using Pepper.Structures.External.Osu;
 
 namespace Pepper.Commands.Osu
 {
-    internal class BeatmapPagedView : PagedView
+    internal class BeatmapsetPagedView : PagedView
     {
         private readonly Dictionary<int, ButtonViewComponent> pageJumps;
         private const int CustomRow = 1;
-        public BeatmapPagedView(APIBeatmapSet beatmapset) : base(new ListPageProvider(PreparePages(beatmapset, out var jumps)))
+        public BeatmapsetPagedView(APIBeatmapSet beatmapset) : base(new ListPageProvider(PreparePages(beatmapset, out var jumps)))
         {
             RemoveComponent(StopButton);
             RemoveComponent(FirstPageButton);
@@ -94,7 +89,7 @@ namespace Pepper.Commands.Osu
                                 Name = beatmapset.Author.Username,
                                 Url = $"https://osu.ppy.sh/users/{beatmapset.Author.Id}"
                             },
-                            Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.ID}",
+                            Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.OnlineBeatmapSetID}",
                             Description = (int) beatmapset.Status < 0
                                 ? (beatmapset.Status == BeatmapSetOnlineStatus.WIP ? "WIP." : $"{beatmapset.Status}.")
                                   + $" Last updated **{OsuCommand.SerializeTimestamp(beatmapset.LastUpdated)}**."
@@ -131,27 +126,5 @@ namespace Pepper.Commands.Osu
             jumps = outputJumps;
             return embeds.Select(embed => new Page().AddEmbed(embed.embed));
         }
-    }
-    
-    public class Beatmap : OsuCommand
-    {
-        public Beatmap(APIService service) : base(service) {}
-
-        [Command("map", "beatmap")]
-        public async Task<DiscordCommandResult> Exec(
-            [Description("Beatmap(set) ID, or an URL.")] string beatmapResolvable,
-            [Flag("/")] bool set = false
-        )
-        {
-            if (URLParser.CheckMapUrl(beatmapResolvable, out _, out var id, out var setId))
-            {
-                if (id != null) return Beatmapset(await APIService.GetBeatmapsetInfo((int) id, false));
-                if (setId != null) return Beatmapset(await APIService.GetBeatmapsetInfo((int) setId, true));
-            }
-
-            throw new ArgumentException("A valid URL is not provided!");
-        }
-
-        public DiscordCommandResult Beatmapset(APIBeatmapSet beatmapSet) => View(new BeatmapPagedView(beatmapSet));
     }
 }
