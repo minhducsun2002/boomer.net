@@ -100,8 +100,8 @@ namespace Pepper.Commands.Osu
                             Fields = mapChunk.Select(map => new LocalEmbedField
                             {
                                 Name = $"[{map.StarDifficulty:F2}⭐] {map.Version}",
-                                Value = (map.MaxCombo != null ? $"**{map.MaxCombo}**x" : "")
-                                        + $" • `CS`**{map.CircleSize}** `AR`**{map.ApproachRate}** `OD`**{map.OverallDifficulty}** `HP`**{map.DrainRate}**"
+                                Value = (map.MaxCombo != null ? $"**{map.MaxCombo}**x • " : "")
+                                        + $"`CS`**{map.CircleSize}** `AR`**{map.ApproachRate}** `OD`**{map.OverallDifficulty}** `HP`**{map.DrainRate}**"
                                         + $" • **{beatmapset.Bpm:0.}** BPM"
                                         + $@" • :clock3: {
                                             (map.TotalLengthInSeconds / 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
