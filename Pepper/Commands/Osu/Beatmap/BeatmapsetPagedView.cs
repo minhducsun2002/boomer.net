@@ -121,8 +121,7 @@ namespace Pepper.Commands.Osu
             for (var i = 0; i < embeds.Count; i++)
             {
                 var (rulesetId, _) = embeds[i];
-                var ruleset = RulesetTypeParser.SupportedRulesets[rulesetId];
-                outputJumps[ruleset.RulesetInfo.Name] = i;
+                outputJumps.TryAdd(RulesetTypeParser.SupportedRulesets[rulesetId].RulesetInfo.Name, i);
             }
             
             jumps = outputJumps;
