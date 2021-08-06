@@ -62,14 +62,16 @@ namespace Pepper.Commands.Osu
 
         protected override ValueTask OnNextPageButtonAsync(ButtonEventArgs e)
         {
+            var result = base.OnNextPageButtonAsync(e);
             UpdateButtonStates();
-            return base.OnNextPageButtonAsync(e);
+            return result;
         }
     
         protected override ValueTask OnLastPageButtonAsync(ButtonEventArgs e)
         {
+            var result = base.OnLastPageButtonAsync(e);
             UpdateButtonStates();
-            return base.OnLastPageButtonAsync(e);
+            return result;
         }
 
         private const int MaxDiffPerPage = 7;
