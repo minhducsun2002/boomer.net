@@ -25,6 +25,13 @@ namespace Pepper.Commands.Osu
                 if (setId != null) return Beatmapset(await APIService.GetBeatmapsetInfo((int) setId, true));
             }
 
+            if (int.TryParse(beatmapResolvable, out var targetId))
+                return set switch
+                {
+                    true => Beatmapset(await APIService.GetBeatmapsetInfo(targetId, set)),
+                    false => await BeatmapSingle(await APIService.GetBeatmapsetInfo(targetId, set), targetId)
+                };
+
             throw new ArgumentException("A valid URL is not provided!");
         }
 
