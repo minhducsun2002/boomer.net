@@ -109,7 +109,7 @@ namespace Pepper.Commands.Osu
         public static LocalEmbedAuthor SerializeAuthorBuilder(osu.Game.Users.User user)
             => new()
             {
-                IconUrl = user.AvatarUrl,
+                IconUrl = string.IsNullOrWhiteSpace(user.AvatarUrl) ? $"https://a.ppy.sh/{user.Id}" : user.AvatarUrl,
                 Name = user.Username,
                 Url = $"https://osu.ppy.sh/users/{user.Id}"
             };
