@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
+using Disqord.Rest;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using Pepper.Services.Osu;
 using Pepper.Services.Osu.API;
 using Pepper.Structures.External.Osu;
@@ -17,7 +21,7 @@ namespace Pepper.Commands.Osu
         private readonly Dictionary<int, LocalEmbed> beatmapEmbeds = new();
         private int currentBeatmapId;
         private readonly APIBeatmapSet beatmapset;
-        
+
         public BeatmapSingleView(APIBeatmapSet beatmapset, APIService service, LocalEmbed initialEmbed, int initialBeatmapId) 
             : base(new LocalMessage { Embeds = new List<LocalEmbed> { initialEmbed } })
         {
@@ -32,8 +36,8 @@ namespace Pepper.Commands.Osu
                     embed = beatmapEmbeds[beatmapId] = await PrepareEmbed(beatmapset, service, beatmapId);
 
                 currentBeatmapId = beatmapId;
-
-                    TemplateMessage.Embeds = new List<LocalEmbed> {embed};
+                await e.Interaction.Response().DeferAsync();
+                TemplateMessage.Embeds = new List<LocalEmbed> { embed };
                 e.Selection.Options = GetCurrentOptionList();
             })
             {
@@ -59,13 +63,43 @@ namespace Pepper.Commands.Osu
                 .ToList();
         }
 
+        private const double AccStart = 93, AccEnd = 100, AccStep = 0.5;
+
         public static async Task<LocalEmbed> PrepareEmbed(APIBeatmapSet beatmapset, APIService service, int beatmapId, Mod[]? mods = null)
         {
             var beatmap = beatmapset.Beatmaps.First(beatmap => beatmap.OnlineBeatmapID == beatmapId);
             var ruleset = RulesetTypeParser.SupportedRulesets[beatmap.Ruleset];
             var workingBeatmap = await service.GetBeatmap(beatmapId);
             var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(mods ?? Array.Empty<Mod>());
-            
+
+            var data = new List<(double, double)>();
+            for (var current = AccStart; current <= AccEnd; current += AccStep)
+            {
+                var fcScore = new ScoreInfo {MaxCombo = difficulty.MaxCombo, Accuracy = current / 100};
+                fcScore.SetCountMiss(0);
+                var pp = OsuCommand.GetPerformanceCalculator(beatmap.Ruleset, difficulty, fcScore).Calculate();
+                data.Add((current, pp));
+            }
+
+            var chart = new QuickChart.Chart
+            {
+                Height = 300, Width = 500,
+                Config = $@"{{
+                    type: 'line',
+                    data: {{
+                        labels: [{string.Join(", ", data.Select(pair => $"\"{pair.Item1}%\""))}],
+                        datasets: [{{
+                            label: '{beatmapset.Artist} - {beatmapset.Title} [{beatmap.Version}]',
+                            data: [{string.Join(", ", data.Select(pair => $"{pair.Item2:F2}"))}],
+                            borderColor: '#42adf5',
+                            backgroundColor: 'black'
+                        }}],
+                        options: {{ scales: {{ y: {{ min: {data.Min(pair => pair.Item2)} }} }} }}
+                    }}      
+                }}",
+                BackgroundColor = "white"
+            };
+
             return new LocalEmbed
             {
                 Title = $"{beatmapset.Artist} - {beatmapset.Title} [{beatmap.Version}]",
@@ -81,14 +115,10 @@ namespace Pepper.Commands.Osu
                     {
                         Name = "Difficulty",
                         Value = OsuCommand.SerializeBeatmapStats(workingBeatmap.BeatmapInfo, difficulty, workingBeatmap.Beatmap.ControlPointInfo, false)
-                    },
-                    new()
-                    {
-                        Name = "Game mode",
-                        Value = ruleset.RulesetInfo.Name,
-                        IsInline = true
                     }
-                }
+                },
+                Footer = new LocalEmbedFooter().WithText(ruleset.RulesetInfo.Name),
+                ImageUrl = chart.GetUrl() + "&version=3"
             };
         }
     }

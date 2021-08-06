@@ -114,7 +114,7 @@ namespace Pepper.Commands.Osu
                 Url = $"https://osu.ppy.sh/users/{user.Id}"
             };
 
-        protected static PerformanceCalculator GetPerformanceCalculator(int rulesetId, DifficultyAttributes beatmapAttributes, ScoreInfo score)
+        public static PerformanceCalculator GetPerformanceCalculator(int rulesetId, DifficultyAttributes beatmapAttributes, ScoreInfo score)
         {
             var ruleset = Rulesets[rulesetId];
             return rulesetId switch
