@@ -58,6 +58,8 @@ namespace Pepper.Commands.Osu
             pageJumps[index].IsDisabled = true;
         }
 
+        protected override void ApplyPageIndex(Page page) {}
+
         protected override ValueTask OnNextPageButtonAsync(ButtonEventArgs e)
         {
             UpdateButtonStates();
