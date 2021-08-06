@@ -91,7 +91,7 @@ namespace Pepper.Commands.Osu
                     data: {{
                         labels: [{string.Join(", ", data.Select(pair => $"\"{pair.Item1}%\""))}],
                         datasets: [{{
-                            label: '{beatmapset.Artist} - {beatmapset.Title} [{beatmap.Version}]',
+                            label: '{beatmapset.Artist} - {beatmapset.Title}',
                             data: [{string.Join(", ", data.Select(pair => $"{pair.Item2:F2}"))}],
                             borderColor: '#42adf5',
                             backgroundColor: 'black'
