@@ -15,7 +15,6 @@ namespace Pepper.Commands.FGO
     internal class CEView : ViewBase
     {
         private bool isMLBPage;
-        private IList<LocalEmbed> embeds;
 
         public CEView(
             IList<LocalEmbed> embeds, Snowflake? messageId = null
@@ -54,9 +53,11 @@ namespace Pepper.Commands.FGO
         [PrefixCategory("fgo")]
         public DiscordCommandResult Exec(int id = 1)
         {
-            MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP];
-            var ce = jp.GetCraftEssenceByCollectionNo(id);
-            var title = $"{ce.MstSvt.CollectionNo}. {ce.MstSvt.Name} (`{ce.MstSvt.ID}`)";
+            MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
+            var ce = jp.GetCraftEssenceByCollectionNo(id)!;
+            var localizedName = na.GetCraftEssenceByCollectionNo(id)?.MstSvt.Name;
+            
+            var title = $"{ce.MstSvt.CollectionNo}. {localizedName ?? ce.MstSvt.Name} (`{ce.MstSvt.ID}`)";
             var author = $"Cost : {ce.MstSvt.Cost}";
 
             var _ = new[] {ce.BaseSkills, ce.MLBSkills}
