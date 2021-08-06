@@ -15,7 +15,7 @@ namespace Pepper.Commands.Osu
 {
     internal class BeatmapsetPagedView : PagedView
     {
-        private readonly Dictionary<int, ButtonViewComponent> pageJumps;
+        private readonly Dictionary<int, ButtonViewComponent> pageJumps = new();
         private const int CustomRow = 1;
 
         public BeatmapsetPagedView(APIBeatmapSet beatmapset) : base(new ListPageProvider(PreparePages(beatmapset, out var jumps)))
@@ -29,8 +29,7 @@ namespace Pepper.Commands.Osu
             
             NextPageButton.Label = "Next page";
             NextPageButton.Emoji = null;
-
-            pageJumps = new Dictionary<int, ButtonViewComponent>();
+            
             foreach (var (text, index) in jumps)
                 AddComponent(pageJumps[index] = new ButtonViewComponent(e =>
                 {
@@ -43,6 +42,7 @@ namespace Pepper.Commands.Osu
                     Row = CustomRow,
                 });
             
+            UpdateButtonStates();
         }
 
         private void UpdateButtonStates()
