@@ -55,7 +55,9 @@ namespace Pepper.Commands.Osu
                 .OrderBy(beatmap => beatmap.StarDifficulty)
                 .Select(beatmap => new LocalSelectionComponentOption
                 {
-                    Label = $"{beatmap.Version}",
+                    Label = beatmap.Version.Length < LocalSelectionComponentOption.MaxLabelLength
+                        ? beatmap.Version
+                        : beatmap.Version[..22] + "...",
                     Description = OsuCommand.SerializeBeatmapStats(beatmapset, beatmap, false, false),
                     Value = $"{beatmap.OnlineBeatmapID}",
                     IsDefault = currentBeatmapId == beatmap.OnlineBeatmapID
