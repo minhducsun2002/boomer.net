@@ -26,8 +26,8 @@ namespace Pepper.Commands.FGO
             }
         }
 
-        private static IEqualityComparer<(Skill, List<string>)> referencedSkillComparer = new ReferencedSkillEquality();
-        private readonly LocalEmbed passive;
+        private static readonly IEqualityComparer<(Skill, List<string>)> ReferencedSkillComparer = new ReferencedSkillEquality();
+        private readonly LocalEmbed? passive;
 
         public ServantView(
             (MstSvt, MstSvtLimit[], MstClass) servant,
@@ -144,7 +144,7 @@ namespace Pepper.Commands.FGO
                     }));
                     
                 var relatedSkills = passives
-                    .SelectMany(related => related.Item3).Distinct(referencedSkillComparer)
+                    .SelectMany(related => related.Item3).Distinct(ReferencedSkillComparer)
                     .Select(skill => new LocalEmbedField
                     {
                         Name = $"[Skill {skill.Item1.MstSkill.ID}]",

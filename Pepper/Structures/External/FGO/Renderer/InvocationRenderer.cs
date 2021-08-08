@@ -122,12 +122,13 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
                 }
 
+                case FunctionType.GainStar:
                 case FunctionType.GainHp:
                 case FunctionType.LossHp:
                 case FunctionType.LossHpSafe:
                 case FunctionType.HastenNpturn:
                 {
-                    var values = statistics.Consume("Value").Select(value => $"**{value}**");
+                    var values = statistics.Consume("Value").Distinct().Select(value => $"**{value}**");
                     output.Effect = $"**{typeName}** by {string.Join(" / ", values)}";
                     break;
                 }

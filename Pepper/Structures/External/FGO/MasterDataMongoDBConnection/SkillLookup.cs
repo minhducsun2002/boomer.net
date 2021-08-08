@@ -7,9 +7,10 @@ namespace Pepper.Structures.External.FGO
 {
     public partial class MasterDataMongoDBConnection
     {
-        public Skill GetSkillById(int id, MstSkill? mstSkillHint = null)
+        public Skill? GetSkillById(int id, MstSkill? mstSkillHint = null)
         {
-            var mstSkill = mstSkillHint ?? MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("id", id)).First();
+            var mstSkill = mstSkillHint ?? MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("id", id)).FirstOrDefault();
+            if (mstSkill == null) return null;
             var levels = MstSkillLv
                 .FindSync(Builders<MstSkillLv>.Filter.Eq("skillId", id))
                 .ToList()
@@ -17,7 +18,7 @@ namespace Pepper.Structures.External.FGO
                 .ToArray();
             var functions = levels[0].FuncId.Select(func => ResolveFunc(func)!);
 
-            return new Skill(mstSkill)
+            return new Skill(mstSkill, levels)
             {
                 Invocations = functions.ToDictionary(
                     function => function,

@@ -50,10 +50,10 @@ namespace Pepper.Structures.External.FGO.Renderer
 
         public SkillRenderer(MstSkill skill, MasterDataMongoDBConnection connection,  Skill? skillHint = null) : base(skill, connection)
         {
-            this.skill = skillHint ?? connection.GetSkillById(skill.ID, skill);
+            this.skill = skillHint ?? connection.GetSkillById(skill.ID, skill)!;
         }
 
-        public (List<string>, List<(Skill, List<string>)>) Prepare(TraitService trait)
+        public (List<string>, List<(Skill, List<string>)>) Prepare(TraitService trait, bool hideEnemy = false)
         {
             var (effects, multipleActSet) = ResolveEffects(trait);
 
@@ -63,12 +63,16 @@ namespace Pepper.Structures.External.FGO.Renderer
             var skills = referencedSkillIds.Select(referencedSkillId =>
             {
                 var referencedSkill = Connection.GetSkillById(referencedSkillId);
-                var serializedReferencedEffects = new SkillRenderer(referencedSkill.MstSkill, Connection, referencedSkill)
-                    .ResolveEffects(trait).Item1.Select(kv => kv.Serialize());
+                var serializedReferencedEffects = new SkillRenderer(referencedSkill!.MstSkill, Connection, referencedSkill)
+                    .ResolveEffects(trait).Item1
+                    .Where(kv => !hideEnemy || EnemyActionFilter.IsPlayerAction(kv.Key))
+                    .Select(kv => kv.Serialize());
                 return (referencedSkill, serializedReferencedEffects.ToList());
             }).ToList();
 
-            var serializedEffects = effects.Select(kv => kv.Serialize()).ToList();
+            var serializedEffects = effects
+                .Where(kv => !hideEnemy || EnemyActionFilter.IsPlayerAction(kv.Key))
+                .Select(kv => kv.Serialize()).ToList();
             return (serializedEffects, skills);
         }
         

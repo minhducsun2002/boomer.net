@@ -2,7 +2,14 @@ namespace Pepper.Structures.External.FGO.Renderer
 {
     internal static class TargetTypeText
     {
-        private enum TargetType
+        public enum ApplyTarget
+        {
+            Player = 1,
+            Enemy,
+            PlayerAndEnemy
+        }
+        
+        public enum TargetType
         {
             Self = 0,
             PtOne = 1,
