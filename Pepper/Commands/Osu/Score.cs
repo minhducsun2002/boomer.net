@@ -19,7 +19,7 @@ namespace Pepper.Commands.Osu
     {
         public Score(APIService service) : base(service) {}
 
-        [Command("sc")]
+        [Command("sc", "score", "scores")]
         [Description("View/list scores on a certain map")]
         public async Task<DiscordCommandResult> Exec(
             [Description("A score URL, a beatmap URL, or a beatmap ID.")] string link,
