@@ -11,28 +11,22 @@ using Qmmands;
 
 namespace Pepper.Commands.FGO
 {
-    public class ServantSkill : FGOCommand
+    public class ServantSkill : ServantCommand
     {
-        public ServantSkill(MasterDataService m, ServantNamingService s, TraitService t, ItemNamingService i) : base(m, s, t, i) {}
         private static readonly LocalEmbedField Blank = new();
-        
-        
+
+        public ServantSkill(MasterDataService m, TraitService t, ItemNamingService i, ServantNamingService n) : base(m, t, i, n) {}
+
         [Command("skill")]
         [Description("Show skills of a servant")]
-        public DiscordCommandResult Exec(int id = 2)
+        public DiscordCommandResult Exec([Remainder] ServantIdentity servantIdentity)
         {
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP],
                                         na = MasterDataService.Connections[Region.NA];
-            var svt = jp.MstSvt.FindSync(
-                Builders<MstSvt>.Filter.Or(
-                    Builders<MstSvt>.Filter.Eq("collectionNo", id),
-                    Builders<MstSvt>.Filter.Eq("baseSvtId", id)
-                )
-            ).First();
 
-            var servantTuple = jp.GetServant(svt);
+            var servantTuple = jp.GetServant(servantIdentity.ServantId);
             
-            var records = jp.MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("svtId", svt.ID)).ToList()
+            var records = jp.MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("svtId", servantTuple.Item1.ID)).ToList()
                 .OrderBy(skillMapping => skillMapping.Priority)
                 .GroupBy(skillMapping => skillMapping.Num)
                 .OrderBy(skillGrouping => skillGrouping.First().Num)

@@ -15,27 +15,17 @@ using Pepper.Structures.External.FGO.Renderer;
 
 namespace Pepper.Commands.FGO
 {
-    public class Servant : FGOCommand
+    public class Servant : ServantCommand
     {
-        public Servant(
-            MasterDataService masterDataService, ServantNamingService servantNamingService, TraitService traitService,
-            ItemNamingService itemNamingService
-        ) : base(masterDataService, servantNamingService, traitService, itemNamingService) {}
-
+        public Servant(MasterDataService m, TraitService t, ItemNamingService i, ServantNamingService n) : base(m, t, i, n) {}
+        
         [Command("servant", "s")]
         [PrefixCategory("fgo")]
-        public DiscordCommandResult Exec(int id = 2)
+        public DiscordCommandResult Exec([Remainder] ServantIdentity servantIdentity)
         {
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
             
-            var servantTuple = jp.GetServant(
-                jp.MstSvt.FindSync(
-                    Builders<MstSvt>.Filter.Or(
-                        Builders<MstSvt>.Filter.Eq("collectionNo", id),
-                        Builders<MstSvt>.Filter.Eq("baseSvtId", id)
-                    )
-                ).First()
-            );
+            var servantTuple = jp.GetServant(servantIdentity.ServantId);
             var (svt, limits, _) = servantTuple;
             
             // overwriting servant name
@@ -64,7 +54,7 @@ namespace Pepper.Commands.FGO
                     itemId => itemId,
                     itemId =>
                     {
-                        if (ItemNamingService.Namings.TryGetValue(id, out var name)) return name;
+                        if (ItemNamingService.Namings.TryGetValue(itemId, out var name)) return name;
                         return na.GetItemName(itemId) ?? jp.GetItemName(itemId)!;
                     }
                 );

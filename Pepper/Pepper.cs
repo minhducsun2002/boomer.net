@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
+using Pepper.Structures.External.FGO;
 using Pepper.Structures.External.Osu;
 using Qmmands;
 using Serilog;
@@ -175,6 +176,7 @@ namespace Pepper
         {
             Commands.AddTypeParser(RulesetTypeParser.Instance);
             Commands.AddTypeParser(UsernameTypeParser.Instance);
+            Commands.AddTypeParser(ServantIdentityTypeParser.Instance);
             return base.AddTypeParsersAsync(cancellationToken);
         }
     }

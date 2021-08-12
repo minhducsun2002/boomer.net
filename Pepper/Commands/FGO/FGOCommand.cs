@@ -10,22 +10,19 @@ namespace Pepper.Commands.FGO
     public abstract class FGOCommand : Command
     {
         protected readonly MasterDataService MasterDataService;
-        protected readonly ServantNamingService ServantNamingService;
-        protected TraitService TraitService;
-        protected ItemNamingService ItemNamingService;
+        protected readonly TraitService TraitService;
+        protected readonly ItemNamingService ItemNamingService;
 
         public FGOCommand(
-            MasterDataService masterDataService, ServantNamingService servantNamingService, TraitService traitService,
+            MasterDataService masterDataService,
+            TraitService traitService,
             ItemNamingService itemNamingService)
         {
             MasterDataService = masterDataService;
-            ServantNamingService = servantNamingService;
             TraitService = traitService;
             ItemNamingService = itemNamingService;
         }
         
-        public int[] AttributeList => MasterDataService.Connections[Region.JP].GetAttributeLists();
-        public ConcurrentDictionary<long, ServantNaming> ServantNamings => ServantNamingService.Namings;
         public ConcurrentDictionary<long, string> ItemNamings => ItemNamingService.Namings;
     }
 }
