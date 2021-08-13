@@ -28,7 +28,11 @@ namespace Pepper.Commands.FGO
 
         private static readonly IEqualityComparer<(Skill, List<string>)> ReferencedSkillComparer = new ReferencedSkillEquality();
         private readonly LocalEmbed? passive;
-
+        private readonly LocalEmbed general;
+        private readonly LocalEmbed ascItem;
+        private readonly LocalEmbed skillItem;
+        private int currentIndex;
+        
         public ServantView(
             (MstSvt, MstSvtLimit[], MstClass) servant,
             MstTreasureDeviceLv npGain,
@@ -43,8 +47,7 @@ namespace Pepper.Commands.FGO
         ) : base(new LocalMessage())
         {
             var (svt, svtLimits, _) = servant;
-            LocalEmbed general = servant.BaseEmbed()
-                .WithFooter("General info")
+            general = servant.BaseEmbed()
                 .WithFields(
                     new LocalEmbedField
                     {
@@ -105,8 +108,8 @@ namespace Pepper.Commands.FGO
                     Value = $"[[**{collectionNo}**. **{name}**]](https://apps.atlasacademy.io/db/JP/craft-essence/{id})\n" + string.Join("\n\n", skill)
                 });
             }
-            
-            LocalEmbed ascItem = servant.BaseEmbed()
+
+            ascItem = servant.BaseEmbed()
                 .WithDescription(ascensionLimits.Count == 0 ? "No materials needed." : "")
                 .WithFields(
                     ascensionLimits.Select((limit, index) => new LocalEmbedField
@@ -117,10 +120,9 @@ namespace Pepper.Commands.FGO
                             limit.ItemIds.Zip(limit.ItemNums)
                                 .Select(tuple => $"- **{tuple.Second}**x **{itemNames[tuple.First]}**")
                         )
-                    }))
-                .WithFooter("Ascension materials");
-            
-            LocalEmbed skillItem = servant.BaseEmbed()
+                    }));
+
+            skillItem = servant.BaseEmbed()
                 .WithDescription(skillLimits.Count == 0 ? "No materials needed." : "")
                 .WithFields(
                     skillLimits.Select((limit, index) => new LocalEmbedField
@@ -131,8 +133,7 @@ namespace Pepper.Commands.FGO
                             limit.ItemIds.Zip(limit.ItemNums)
                                 .Select(tuple => $"- **{tuple.Second}**x **{itemNames[tuple.First]}**")
                         )
-                    }))
-                .WithFooter("Skill materials");
+                    }));
 
             if (passives != null && passives.Count != 0)
             {
@@ -162,29 +163,40 @@ namespace Pepper.Commands.FGO
             TemplateMessage = new LocalMessage().WithEmbeds(general);
             if (replyingTo != null) TemplateMessage = TemplateMessage.WithReply(replyingTo.Value);
             
-            foreach (var (embed, label, index) in new[]
+            var pages = new[]
             {
                 (general, "General info", 0),
                 (passive, "Passive skills", 1),
                 (ascItem, "Ascension materials", 2),
                 (skillItem, "Skill materials", 3)
+            };
+            
+            AddComponent(new SelectionViewComponent(e =>
+            {
+                TemplateMessage = TemplateMessage.WithEmbeds(pages[currentIndex = int.Parse(e.SelectedOptions[0].Value)].Item1);
+                e.Selection.Options = GetCurrentOptionList(pages);
+                return default;
             })
+            {
+                MaximumSelectedOptions = 1,
+                MinimumSelectedOptions = 1,
+                Options = GetCurrentOptionList(pages)
+            });
+        }
+
+        private List<LocalSelectionComponentOption> GetCurrentOptionList(IEnumerable<(LocalEmbed?, string, int)> pages)
+        {
+            var selections = new List<LocalSelectionComponentOption>();
+            
+            foreach (var (embed, label, index) in pages)
                 if (embed != null)
-                    AddComponent(new ButtonViewComponent(e =>
-                    {
-                        foreach (var component in EnumerateComponents())
-                            if (component is ButtonViewComponent button)
-                                button.IsDisabled = false;
-                        e.Button.IsDisabled = true;
-                        TemplateMessage.Embeds = new List<LocalEmbed> {embed};
-                        return default;
-                    })
+                    selections.Add(new LocalSelectionComponentOption
                     {
                         Label = label,
-                        Position = index,
-                        // initial state
-                        IsDisabled = index == 0
+                        Value = $"{index}",
+                        IsDefault = currentIndex == index
                     });
+            return selections;
         }
     }
 }
