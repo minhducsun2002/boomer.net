@@ -27,8 +27,15 @@ namespace Pepper.Services.FGO
 
         public string GetTrait(long traitId, bool fallbackToEmpty = false)
         {
+            string reverse = "";
+            if (traitId < 0)
+            {
+                traitId = -traitId;
+                reverse = "not-";
+            }
+            
             if (traits.TryGetValue(traitId, out var traitName))
-                return traitName;
+                return reverse + traitName;
             
             // tries to resolve to servant names
             foreach (var region in masterDataService.Regions)
@@ -36,10 +43,10 @@ namespace Pepper.Services.FGO
                 var connection = masterDataService.Connections[region];
                 var result = connection.MstSvt.Find(Builders<MstSvt>.Filter.Eq("id", traitId)).Limit(1)
                     .FirstOrDefault();
-                if (result != default) return result.Name;
+                if (result != default) return reverse + result.Name;
             }
 
-            return (fallbackToEmpty ? "" : $"{traitId}");
+            return (fallbackToEmpty ? "" : $"{reverse}{traitId}");
         }
         
         public async Task<Dictionary<long, string>> Load()

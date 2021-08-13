@@ -158,8 +158,12 @@ namespace Pepper.Structures.External.FGO.Renderer
             string ckSelfIndv = "";
             if (buff.CkSelfIndv.Length != 0)
                 ckSelfIndv = $" for {string.Join(" & ", buff.CkSelfIndv.Select(trait => $"{traitService.GetTrait(trait)}"))}";
+
+            string ckOpIndv = "";
+            if (buff.CkOpIndv.Length != 0)
+                ckOpIndv = $" against {string.Join(" & ", buff.CkOpIndv.Select(t => traitService.GetTrait(t)))}";
             
-            var zippedOutput = $"**{baseAction} [{buffName}{ckSelfIndv}]** "
+            var zippedOutput = $"**{baseAction} [{buffName}{ckSelfIndv}{ckOpIndv}]** "
                                + (string.IsNullOrWhiteSpace(amount) ? "" : $"{amountPreposition} " + $"**{amount}**")
                                + (string.IsNullOrWhiteSpace(limits) ? "" : $" ({limits})");
 
@@ -167,14 +171,14 @@ namespace Pepper.Structures.External.FGO.Renderer
                 extra.Add(
                     "Only applies for "
                     + string.Join(" & ", function.Tvals.Select(tvals => traitService.GetTrait(tvals)))
-                    + " targets"
+                    + " targets."
                 );
             
             if (function.QuestTvals.Length != 0)
                 extra.Add(
                     "Only applies on "
                       + string.Join(" & ", function.QuestTvals.Select(questTvals => traitService.GetTrait(questTvals)))
-                      + " field"
+                      + " field."
                 );
 
             return (zippedOutput.Trim(), extraStats, extra.ToArray());
