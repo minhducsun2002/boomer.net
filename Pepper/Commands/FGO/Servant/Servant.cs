@@ -26,7 +26,7 @@ namespace Pepper.Commands.FGO
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
             
             var servantTuple = jp.GetServant(servantIdentity.ServantId);
-            var (svt, limits, _) = servantTuple;
+            var (svt, limits, originalClass) = servantTuple;
             
             // overwriting servant name
             if (ServantNamingService.Namings.ContainsKey(svt.ID))
@@ -90,7 +90,7 @@ namespace Pepper.Commands.FGO
 
             return View(
                 new ServantView(
-                    (svt, limits, na.ResolveClass(svt.ClassId)!),
+                    (svt, limits, na.ResolveClass(svt.ClassId) ?? originalClass),
                     GetNPGain(servantTuple.Item1.ID),
                     jp.MstSvtCard.FindSync(Builders<MstSvtCard>.Filter.Eq("svtId", svt.ID)).ToList(),
                     ascensionLimits,
