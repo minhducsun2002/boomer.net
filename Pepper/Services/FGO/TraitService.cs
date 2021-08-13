@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
+using Pepper.Structures.External.FGO.MasterData;
 using Serilog;
 
 namespace Pepper.Services.FGO
@@ -14,18 +16,30 @@ namespace Pepper.Services.FGO
         private readonly string url;
         private readonly ILogger log = Log.Logger.ForContext<TraitService>();
         private ConcurrentDictionary<long, string> traits = new();
+        private readonly MasterDataService masterDataService;
         
-        public TraitService(IConfiguration config)
+        public TraitService(IConfiguration config, MasterDataService masterDataService)
         {
             var value = config.GetSection("fgo:traits:csv").Get<string[]>();
             url = value[0];
+            this.masterDataService = masterDataService;
         }
 
         public string GetTrait(long traitId, bool fallbackToEmpty = false)
         {
-            return traits.TryGetValue(traitId, out var traitName)
-                ? traitName
-                : (fallbackToEmpty ? "" : $"{traitId}");
+            if (traits.TryGetValue(traitId, out var traitName))
+                return traitName;
+            
+            // tries to resolve to servant names
+            foreach (var region in masterDataService.Regions)
+            {
+                var connection = masterDataService.Connections[region];
+                var result = connection.MstSvt.Find(Builders<MstSvt>.Filter.Eq("id", traitId)).Limit(1)
+                    .FirstOrDefault();
+                if (result != default) return result.Name;
+            }
+
+            return (fallbackToEmpty ? "" : $"{traitId}");
         }
         
         public async Task<Dictionary<long, string>> Load()

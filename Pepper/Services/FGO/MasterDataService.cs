@@ -14,14 +14,15 @@ namespace Pepper.Services.FGO
 {
     public enum Region
     {
-        JP = 1 << 1,
-        NA = 1 << 2
+        NA = 1 << 1,
+        JP = 1 << 2
     }
 
     public class MasterDataService : Service
     {
         public ConcurrentDictionary<Region, MasterDataMongoDBConnection> Connections = new();
         public ConcurrentDictionary<Region, MongoClient> Clients { get; } = new();
+        public readonly List<Region> Regions;
 
         private static readonly Dictionary<string, Type> MasterDataEntityTypes = typeof(Pepper)
             .Assembly.GetTypes()
@@ -32,6 +33,7 @@ namespace Pepper.Services.FGO
 
         public MasterDataService(IConfiguration config)
         {
+            var regions = new List<Region>();
             foreach (var regionCode in Enum.GetNames<Region>())
             {
                 var cfg = config.GetSection($"database:fgo:master:{regionCode}").Get<string[]>();
@@ -58,7 +60,10 @@ namespace Pepper.Services.FGO
                     }
 
                 Connections[region] = connectionObject;
+                regions.Add(region);
             }
+
+            Regions = regions;
         }
     }
 }
