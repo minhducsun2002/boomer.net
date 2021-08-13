@@ -5,7 +5,6 @@ using System.Linq;
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Pepper.Services.FGO;
-using Pepper.Structures.External.FGO;
 using Pepper.Structures.External.FGO.Entities;
 using Pepper.Structures.External.FGO.MasterData;
 
@@ -34,19 +33,19 @@ namespace Pepper.Commands.FGO
         private int currentIndex;
         
         public ServantView(
-            (MstSvt, MstSvtLimit[], MstClass) servant,
+            BaseServant servant,
             MstTreasureDeviceLv npGain,
             IReadOnlyList<MstSvtCard> cards,
-            IReadOnlyList<MstCombineLimit> ascensionLimits, IReadOnlyList<MstCombineSkill> skillLimits,
+            ServantLimits limits,
             TraitService traitService,
-            IReadOnlyList<int> attributes,
             IReadOnlyDictionary<int, string> itemNames,
             IReadOnlyCollection<(Skill, List<string>, List<(Skill, List<string>)>)>? passives = null,
             (string, int, int, IEnumerable<string>)? bondCE = null,
             Snowflake? replyingTo = null
         ) : base(new LocalMessage())
         {
-            var (svt, svtLimits, _) = servant;
+            var svtLimits = servant.Limits;
+            var svt = servant.ServantEntity;
             general = servant.BaseEmbed()
                 .WithFields(
                     new LocalEmbedField
@@ -70,13 +69,13 @@ namespace Pepper.Commands.FGO
                     new LocalEmbedField
                     {
                         Name = "Gender / Attribute",
-                        Value = $@"{traitService.GetTrait(svt.GenderType + 0)} / {traitService.GetTrait(svt.Traits.First(attributes.Contains))}",
+                        Value = $@"{traitService.GetTrait(svt.GenderType + 0)} / {traitService.GetTrait(servant.Attribute)}",
                         IsInline = true
                     },
                     new LocalEmbedField
                     {
                         Name = "Traits",
-                        Value = string.Join(", ", GetTraits(svt, attributes).Select(trait => traitService.GetTrait(trait)))
+                        Value = string.Join(", ", servant.Traits.Select(trait => traitService.GetTrait(trait)))
                     },
                     new LocalEmbedField
                     {
@@ -110,9 +109,9 @@ namespace Pepper.Commands.FGO
             }
 
             ascItem = servant.BaseEmbed()
-                .WithDescription(ascensionLimits.Count == 0 ? "No materials needed." : "")
+                .WithDescription(limits.AscensionCombine.Length == 0 ? "No materials needed." : "")
                 .WithFields(
-                    ascensionLimits.Select((limit, index) => new LocalEmbedField
+                    limits.AscensionCombine.Select((limit, index) => new LocalEmbedField
                     {
                         Name = $"Stage {index + 1} - {limit.QP.ToString("n0", CultureInfo.InvariantCulture)} QP",
                         Value = string.Join(
@@ -123,9 +122,9 @@ namespace Pepper.Commands.FGO
                     }));
 
             skillItem = servant.BaseEmbed()
-                .WithDescription(skillLimits.Count == 0 ? "No materials needed." : "")
+                .WithDescription(limits.SkillCombine.Length == 0 ? "No materials needed." : "")
                 .WithFields(
-                    skillLimits.Select((limit, index) => new LocalEmbedField
+                    limits.SkillCombine.Select((limit, index) => new LocalEmbedField
                     {
                         Name = $"Stage {index + 2} - {limit.QP.ToString("n0", CultureInfo.InvariantCulture)} QP",
                         Value = string.Join(

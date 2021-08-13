@@ -24,9 +24,9 @@ namespace Pepper.Commands.FGO
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP],
                                         na = MasterDataService.Connections[Region.NA];
 
-            var servantTuple = jp.GetServant(servantIdentity.ServantId);
+            var servant = jp.GetServant(servantIdentity.ServantId);
             
-            var records = jp.MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("svtId", servantTuple.Item1.ID)).ToList()
+            var records = jp.MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("svtId", servant.ID)).ToList()
                 .OrderBy(skillMapping => skillMapping.Priority)
                 .GroupBy(skillMapping => skillMapping.Num)
                 .OrderBy(skillGrouping => skillGrouping.First().Num)
@@ -58,7 +58,7 @@ namespace Pepper.Commands.FGO
                 outputFields.AddRange(skills);
             }
 
-            return Reply(servantTuple.BaseEmbed().WithFields(outputFields));
+            return Reply(servant.BaseEmbed().WithFields(outputFields));
         }
     }
 }

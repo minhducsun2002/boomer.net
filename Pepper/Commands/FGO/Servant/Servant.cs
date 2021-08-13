@@ -25,30 +25,24 @@ namespace Pepper.Commands.FGO
         {
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
             
-            var servantTuple = jp.GetServant(servantIdentity.ServantId);
-            var (svt, limits, originalClass) = servantTuple;
-            
-            // overwriting servant name
-            if (ServantNamingService.Namings.ContainsKey(svt.ID))
-                svt.Name = ServantNamingService.Namings[svt.ID].Name;
-            else
-                svt.Name = na
-                    .MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", svt.ID))
-                    .FirstOrDefault()?.Name ?? svt.Name;
+            var servant = jp.GetServant(servantIdentity.ServantId);
 
-            var ascensionLimits = jp.MstCombineLimit.FindSync(
-                Builders<MstCombineLimit>.Filter.Eq("id", svt.ID),
-                new FindOptions<MstCombineLimit> { Limit = 4, Sort = Builders<MstCombineLimit>.Sort.Ascending("qp") }
-            ).ToList();
-            var skillLimits = jp.MstCombineSkill.FindSync(
-                Builders<MstCombineSkill>.Filter.Eq("id", svt.ID),
-                new FindOptions<MstCombineSkill> { Sort = Builders<MstCombineSkill>.Sort.Ascending("qp") }
-            ).ToList();
+            // overwriting servant name
+            if (ServantNamingService.Namings.ContainsKey(servant.ID))
+                servant.Name = ServantNamingService.Namings[servant.ID].Name;
+            else
+                servant.Name = na
+                    .MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", servant.ID))
+                    .FirstOrDefault()?.Name ?? servant.Name;
+            
+            // overwriting class
+            servant.Class = na.ResolveClass(servant.Class.ID) ?? servant.Class;
             
             // overwriting item names
-            var itemNames = ascensionLimits
+            var limits = jp.GetServantLimits(servant.ID);
+            var itemNames = limits.AscensionCombine
                 .SelectMany(record => record.ItemIds)
-                .Concat(skillLimits.SelectMany(record => record.ItemIds))
+                .Concat(limits.SkillCombine.SelectMany(record => record.ItemIds))
                 .Distinct()
                 .ToDictionary(
                     itemId => itemId,
@@ -61,7 +55,7 @@ namespace Pepper.Commands.FGO
             
             // preparing the CE
             (string, int, int, IEnumerable<string>)? ceDetails = null;
-            var bondCESkill = jp.MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("actIndividuality", svt.ID)).FirstOrDefault();
+            var bondCESkill = jp.MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("actIndividuality", servant.ID)).FirstOrDefault();
             if (bondCESkill != default)
             {
                 var skillId = bondCESkill.ID;
@@ -78,7 +72,7 @@ namespace Pepper.Commands.FGO
             }
             
             // preparing passive skills
-            var passives = svt.ClassPassive.Select(skillId => jp.GetSkillById(skillId))
+            var passives = servant.ServantEntity.ClassPassive.Select(skillId => jp.GetSkillById(skillId))
                 .Select(skill =>
                 {
                     // overwrite with NA name
@@ -90,13 +84,11 @@ namespace Pepper.Commands.FGO
 
             return View(
                 new ServantView(
-                    (svt, limits, na.ResolveClass(svt.ClassId) ?? originalClass),
-                    GetNPGain(servantTuple.Item1.ID),
-                    jp.MstSvtCard.FindSync(Builders<MstSvtCard>.Filter.Eq("svtId", svt.ID)).ToList(),
-                    ascensionLimits,
-                    skillLimits,
+                    servant,
+                    GetNPGain(servant.ID),
+                    jp.MstSvtCard.FindSync(Builders<MstSvtCard>.Filter.Eq("svtId", servant.ID)).ToList(),
+                    limits,
                     TraitService,
-                    jp.GetAttributeLists(),
                     itemNames,
                     passives,
                     ceDetails,

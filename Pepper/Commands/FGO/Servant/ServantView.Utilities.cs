@@ -8,16 +8,6 @@ namespace Pepper.Commands.FGO
 {
     internal partial class ServantView
     {
-        private static IEnumerable<int> GetTraits(MstSvt servantEntity, IEnumerable<int> attributeList)
-        {
-            var traits = new HashSet<int>(servantEntity.Traits);
-            traits.Remove(servantEntity.ID);
-            traits.Remove(servantEntity.GenderType);
-            traits.Remove(servantEntity.ClassId + 99);
-            foreach (var attrib in attributeList) traits.Remove(attrib);
-            return traits;
-        }
-        
         private static readonly Dictionary<BattleCommand.TYPE, Tuple<int, int[], string>> DefaultCardTypes = new()
         {
             { BattleCommand.TYPE.ARTS, new Tuple<int, int[], string>(0, Array.Empty<int>(), "Arts  ") },
