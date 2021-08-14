@@ -14,8 +14,7 @@ using Serilog;
 
 namespace Pepper.Services.Osu
 {
-    [BsonNoId]
-    internal class DiscordOsuUsernameRecord : Document
+    public class DiscordOsuUsernameRecord
     {
         [BsonElement("discordUserId")] public string DiscordUserId;
         [BsonElement("osuUsername")] public string OsuUsername;
@@ -29,6 +28,9 @@ namespace Pepper.Services.Osu
         private readonly string serverUri;
         private readonly IAppCache usernameCache = new CachingService();
         private readonly ILogger log = Log.Logger.ForContext<DiscordOsuUsernameLookupService>();
+
+        private IMongoCollection<DiscordOsuUsernameRecord> Collection => client.GetDatabase(databaseName)
+            .GetCollection<DiscordOsuUsernameRecord>(collectionName);
 
         public DiscordOsuUsernameLookupService(IConfiguration configuration)
         {
@@ -45,14 +47,31 @@ namespace Pepper.Services.Osu
             return base.StartAsync(cancellationToken);
         }
 
+        public DiscordOsuUsernameRecord? StoreUser(ulong discordUserId, string username)
+        {
+            var uid = discordUserId.ToString();
+            var filter = Builders<DiscordOsuUsernameRecord>.Filter.Eq(record => record.DiscordUserId, uid);
+            var results = Collection.FindOneAndReplace(filter, new DiscordOsuUsernameRecord
+            {
+                DiscordUserId = uid,
+                OsuUsername = username,
+            }, new FindOneAndReplaceOptions<DiscordOsuUsernameRecord>
+            {
+                IsUpsert = true,
+                ReturnDocument = ReturnDocument.After
+            });
+            usernameCache.Remove(uid);
+            usernameCache.Add(uid, results?.OsuUsername);
+            return results;
+        }
+        
         public async Task<string?> GetUser(ulong discordUserId)
         {
             var userId = discordUserId.ToString();
             async Task<string?> UserGetter()
             {
                 var filter = Builders<DiscordOsuUsernameRecord>.Filter.Eq(record => record.DiscordUserId, userId);
-                var results = client.GetDatabase(databaseName)
-                    .GetCollection<DiscordOsuUsernameRecord>(collectionName).Find(filter);
+                var results = Collection.Find(filter);
                 var count = await results.CountDocumentsAsync();
                 if (count == 0)
                 {
