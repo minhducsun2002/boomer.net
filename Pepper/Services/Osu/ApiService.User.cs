@@ -8,7 +8,7 @@ namespace Pepper.Services.Osu
 {
     public partial class APIService
     {
-        private readonly UserCache userCache = new UserCache();
+        private readonly OsuUserCache userCache = new();
 
         public async Task<(User, APILegacyScoreInfo[], Color)> GetUser(string username, RulesetInfo rulesetInfo)
         {

@@ -18,7 +18,7 @@ using Color = System.Drawing.Color;
 
 namespace Pepper.Services.Osu.API
 {
-    internal class UserCache
+    internal class OsuUserCache
     {
         private const int UserCachingDurationSeconds = 15;
         private const int UserAvatarMainColorCachingDurationSeconds = 30 * 60;
@@ -26,8 +26,9 @@ namespace Pepper.Services.Osu.API
         private readonly IAppCache userObjectCache, userAvatarCache;
         private static readonly HttpClient HttpClient = new ();
         private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+        private static readonly ILogger Log = Serilog.Log.Logger.ForContext<OsuUserCache>();
 
-        internal UserCache(
+        internal OsuUserCache(
             int userCachingDurationSeconds = UserCachingDurationSeconds,
             int userAvatarMainColorCachingDurationSeconds = UserAvatarMainColorCachingDurationSeconds)
         {
