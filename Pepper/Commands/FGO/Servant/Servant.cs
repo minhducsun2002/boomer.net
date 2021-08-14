@@ -10,6 +10,7 @@ using MongoDB.Driver;
 using Pepper.Services.FGO;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.FGO;
+using Pepper.Structures.External.FGO.Entities;
 using Pepper.Structures.External.FGO.MasterData;
 using Pepper.Structures.External.FGO.Renderer;
 
@@ -28,12 +29,7 @@ namespace Pepper.Commands.FGO
             var servant = jp.GetServant(servantIdentity.ServantId);
 
             // overwriting servant name
-            if (ServantNamingService.Namings.ContainsKey(servant.ID))
-                servant.Name = ServantNamingService.Namings[servant.ID].Name;
-            else
-                servant.Name = na
-                    .MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", servant.ID))
-                    .FirstOrDefault()?.Name ?? servant.Name;
+            servant.Name = ResolveServantName(servant);
             
             // overwriting class
             servant.Class = na.ResolveClass(servant.Class.ID) ?? servant.Class;
@@ -95,6 +91,17 @@ namespace Pepper.Commands.FGO
                     Context.Message.Id
                 )
             );
+        }
+        
+        private string ResolveServantName(BaseServant servant)
+        {
+            var mstSvt = servant.ServantEntity;
+            if (ServantNamingService.Namings.ContainsKey(mstSvt.ID))
+                return ServantNamingService.Namings[mstSvt.ID].Name;
+
+            var na = MasterDataService.Connections[Region.NA];
+            return na.MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", mstSvt.ID))
+                .FirstOrDefault()?.Name ?? mstSvt.Name;
         }
 
         private MstTreasureDeviceLv GetNPGain(int svtId)
