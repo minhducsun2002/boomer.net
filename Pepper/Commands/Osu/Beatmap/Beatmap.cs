@@ -9,16 +9,19 @@ using Pepper.Services.Osu.API;
 
 namespace Pepper.Commands.Osu
 {
-    public class Beatmap : OsuCommand
+    public class Beatmap : BeatmapContextCommand
     {
-        public Beatmap(APIService service) : base(service) {}
+        public Beatmap(APIService service, BeatmapContextProviderService b) : base(service, b) {}
 
         [Command("map", "beatmap")]
         public async Task<DiscordCommandResult> Exec(
-            [Description("Beatmap(set) ID, or an URL.")] string beatmapResolvable,
+            [Description("Beatmap(set) ID, or an URL.")] string beatmapResolvable = "",
             [Flag("/")] bool set = false
         )
         {
+            if (string.IsNullOrWhiteSpace(beatmapResolvable))
+                beatmapResolvable = GetBeatmapContext()?.ToString() ?? "";
+            
             if (URLParser.CheckMapUrl(beatmapResolvable, out _, out var id, out var setId))
             {
                 if (id != null) return await BeatmapSingle(await APIService.GetBeatmapsetInfo((int) id, false), (int) id);
@@ -39,6 +42,7 @@ namespace Pepper.Commands.Osu
         private async Task<DiscordCommandResult> BeatmapSingle(APIBeatmapSet beatmapset, int beatmapId)
         {
             var embed = await BeatmapSingleView.PrepareEmbed(beatmapset, APIService, beatmapId);
+            SetBeatmapContext(beatmapId);
             return View(new BeatmapSingleView(beatmapset, APIService, embed, beatmapId));
         }
     }

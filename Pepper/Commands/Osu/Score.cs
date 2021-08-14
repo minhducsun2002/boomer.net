@@ -17,15 +17,17 @@ namespace Pepper.Commands.Osu
 {
     public class Score : OsuScoreCommand
     {
-        public Score(APIService service) : base(service) {}
+        public Score(APIService s, BeatmapContextProviderService b) : base(s, b) {}
 
         [Command("sc", "score", "scores")]
         [Description("View/list scores on a certain map")]
         public async Task<DiscordCommandResult> Exec(
-            [Description("A score URL, a beatmap URL, or a beatmap ID.")] string link,
+            [Description("A score URL, a beatmap URL, or a beatmap ID.")] string link = "",
             [Remainder] [Description("Username to check. Default to your username, if set. Ignored if a score link is passed.")] Username? username = null
         )
         {
+            if (string.IsNullOrWhiteSpace(link)) link = GetBeatmapContext()?.ToString() ?? "";
+            
             if (URLParser.CheckScoreUrl(link, out var scoreLink))
             {
                 var (mode, id) = scoreLink;
@@ -49,6 +51,8 @@ namespace Pepper.Commands.Osu
             if (mapId.HasValue && username != null)
             {
                 var map = await APIService.GetBeatmap(mapId.Value);
+                SetBeatmapContext(mapId.Value);
+                
                 var parsed = await Context.Command.Service.GetTypeParser<Ruleset>()!
                     .ParseAsync(default, gameMode ?? RulesetTypeParser.SupportedRulesets[map.BeatmapInfo.RulesetID].ShortName, Context);
                 var ruleset = parsed.Value;

@@ -16,9 +16,9 @@ using WorkingBeatmap = Pepper.Structures.External.Osu.WorkingBeatmap;
 
 namespace Pepper.Commands.Osu
 {
-    public abstract class OsuScoreCommand : OsuCommand
+    public abstract class OsuScoreCommand : BeatmapContextCommand
     {
-        protected OsuScoreCommand(APIService service) : base(service) {}
+        protected OsuScoreCommand(APIService s, BeatmapContextProviderService b) : base(s, b) {}
 
         protected async Task<DiscordCommandResult> SingleScore(APILegacyScoreInfo sc)
         {
@@ -30,7 +30,7 @@ namespace Pepper.Commands.Osu
             var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(mods);
 
             b.StarDifficulty = difficulty.StarRating;
-
+            SetBeatmapContext(sc.Beatmap.OnlineBeatmapID!.Value);
             return SingleScoreOutput(
                 sc.User,
                 artist: b.Metadata.Artist, title: b.Metadata.Title, version: b.Version,

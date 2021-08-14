@@ -9,7 +9,7 @@ namespace Pepper.Commands.Osu
     public partial class Scoreset : OsuScoreCommand
     {
         private const int MaxScorePerPage = 5;
-        public Scoreset(APIService service) : base(service) {}
+        public Scoreset(APIService s, BeatmapContextProviderService b) : base(s, b) {}
 
         private static LocalEmbed SerializeScoreset(IEnumerable<APILegacyScoreInfo> scores, bool utcHint = false, bool scoreLink = true)
             => new()
