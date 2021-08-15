@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Disqord.Bot;
 using Pepper.Services.Osu;
 using Pepper.Structures.Commands;
-using Pepper.Utilities.Osu;
 using Qmmands;
 using Pepper.Services.Osu.API;
+using Pepper.Structures.External.Osu;
 
 namespace Pepper.Commands.Osu
 {
@@ -15,27 +15,25 @@ namespace Pepper.Commands.Osu
 
         [Command("map", "beatmap")]
         public async Task<DiscordCommandResult> Exec(
-            [Description("Beatmap(set) ID, or an URL.")] string beatmapResolvable = "",
+            [Description("Beatmap(set) ID, or an URL.")] IBeatmapOrSetResolvable beatmapResolvable,
             [Flag("/")] bool set = false
         )
         {
-            if (string.IsNullOrWhiteSpace(beatmapResolvable))
-                beatmapResolvable = GetBeatmapContext()?.ToString() ?? "";
-            
-            if (URLParser.CheckMapUrl(beatmapResolvable, out _, out var id, out var setId))
+            return beatmapResolvable switch
             {
-                if (id != null) return await BeatmapSingle(await APIService.GetBeatmapsetInfo((int) id, false), (int) id);
-                if (setId != null) return Beatmapset(await APIService.GetBeatmapsetInfo((int) setId, true));
-            }
-
-            if (int.TryParse(beatmapResolvable, out var targetId))
-                return set switch
-                {
-                    true => Beatmapset(await APIService.GetBeatmapsetInfo(targetId, set)),
-                    false => await BeatmapSingle(await APIService.GetBeatmapsetInfo(targetId, set), targetId)
-                };
-
-            throw new ArgumentException("A valid URL is not provided!");
+                BeatmapsetResolvable beatmapset => Beatmapset(
+                    await APIService.GetBeatmapsetInfo(beatmapset.BeatmapsetId, true)),
+                BeatmapResolvable beatmap => await BeatmapSingle(
+                    await APIService.GetBeatmapsetInfo(beatmap.BeatmapId, false), beatmap.BeatmapId),
+                BeatmapAndSetResolvable beatmapAndSet => await BeatmapSingle(
+                    await APIService.GetBeatmapsetInfo(beatmapAndSet.BeatmapsetId, true), beatmapAndSet.BeatmapId),
+                BeatmapOrSetResolvable beatmapOrSet =>  set switch
+                    {
+                        true => Beatmapset(await APIService.GetBeatmapsetInfo(beatmapOrSet.BeatmapOrSetId, true)),
+                        false => await BeatmapSingle(await APIService.GetBeatmapsetInfo(beatmapOrSet.BeatmapOrSetId, false), beatmapOrSet.BeatmapOrSetId)
+                    },
+                _ => throw new ArgumentException("A valid URL is not provided!")
+            };
         }
 
         private DiscordCommandResult Beatmapset(APIBeatmapSet beatmapset) => View(new BeatmapsetPagedView(beatmapset));

@@ -177,6 +177,8 @@ namespace Pepper
             Commands.AddTypeParser(RulesetTypeParser.Instance);
             Commands.AddTypeParser(UsernameTypeParser.Instance);
             Commands.AddTypeParser(ServantIdentityTypeParser.Instance);
+            Commands.AddTypeParser(BeatmapOrSetResolvableTypeParser.Instance);
+            Commands.AddTypeParser(BeatmapResolvableTypeParser.Instance);
             return base.AddTypeParsersAsync(cancellationToken);
         }
     }

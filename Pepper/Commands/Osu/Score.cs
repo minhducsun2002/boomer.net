@@ -9,6 +9,7 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using OsuSharp;
 using Pepper.Services.Osu;
+using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Pepper.Utilities.Osu;
 using Qmmands;
@@ -21,46 +22,25 @@ namespace Pepper.Commands.Osu
 
         [Command("sc", "score", "scores", "c", "check")]
         [Description("View/list scores on a certain map")]
-        public async Task<DiscordCommandResult> Exec(
-            [Description("A score URL, a beatmap URL, or a beatmap ID.")] string link = "",
+        [Priority(1)]
+        public async Task<DiscordCommandResult> BeatmapBased(
+            [Description("A score URL, a beatmap URL, or a beatmap ID.")] IBeatmapResolvable beatmapResolvable,
             [Remainder] [Description("Username to check. Default to your username, if set. Ignored if a score link is passed.")] Username? username = null
         )
         {
-            if (string.IsNullOrWhiteSpace(link)) link = GetBeatmapContext()?.ToString() ?? "";
-            
-            if (URLParser.CheckScoreUrl(link, out var scoreLink))
-            {
-                var (mode, id) = scoreLink;
-                var sc = await APIService.GetScore(
-                    id,
-                    Rulesets
-                        .First(rulesetCheck => string.Equals(rulesetCheck.ShortName, mode,
-                            StringComparison.InvariantCultureIgnoreCase))
-                        .RulesetInfo
-                );
-                return await SingleScore(sc);
-            }
 
-            int? mapId;
-            string? gameMode = null;
-            if (!int.TryParse(link, out var validMapId))
-                URLParser.CheckMapUrl(link, out gameMode, out mapId, out _);
-            else
-                mapId = validMapId;
-            
-            if (mapId.HasValue && username != null)
+            var mapId = beatmapResolvable.BeatmapId;
+            if (username != null)
             {
-                var map = await APIService.GetBeatmap(mapId.Value);
-                SetBeatmapContext(mapId.Value);
+                var map = await APIService.GetBeatmap(mapId);
+                var ruleset = RulesetTypeParser.SupportedRulesets[map.BeatmapInfo.RulesetID];
+                SetBeatmapContext(mapId);
                 
-                var parsed = await Context.Command.Service.GetTypeParser<Ruleset>()!
-                    .ParseAsync(default, gameMode ?? RulesetTypeParser.SupportedRulesets[map.BeatmapInfo.RulesetID].ShortName, Context);
-                var ruleset = parsed.Value;
                 var (user, _, _) = await APIService.GetUser(username, ruleset.RulesetInfo);
                 var scores = await APIService.GetLegacyBeatmapScores(
                     user.Id,
-                    mapId.Value,
-                    parsed.Value.RulesetInfo
+                    mapId,
+                    ruleset.RulesetInfo
                 );
 
                 if (scores.Count == 0) return Reply($"No score found on that beatmap for user `{username.Content}`.");
@@ -111,7 +91,28 @@ namespace Pepper.Commands.Osu
             }
             
             if (username == null) throw new ArgumentException("No username is passed!");
-            throw new ArgumentException("A valid score link must be passed!");
+            throw new ArgumentException("A valid beatmap-resolvable must be passed!");
+        }
+
+        [Command("sc", "score", "scores", "c", "check")]
+        [Description("View/list scores on a certain map")]
+        [Priority(0)]
+        public async Task<DiscordCommandResult> ScoreLink(string link)
+        {
+            if (URLParser.CheckScoreUrl(link, out var scoreLink))
+            {
+                var (mode, id) = scoreLink;
+                var sc = await APIService.GetScore(
+                    id,
+                    Rulesets
+                        .First(rulesetCheck => string.Equals(rulesetCheck.ShortName, mode,
+                            StringComparison.InvariantCultureIgnoreCase))
+                        .RulesetInfo
+                );
+                return await SingleScore(sc);
+            }
+
+            throw new ArgumentException("You have not passed a valid score link!");
         }
     }
 }

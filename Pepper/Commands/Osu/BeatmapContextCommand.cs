@@ -8,6 +8,5 @@ namespace Pepper.Commands.Osu
 
         private readonly BeatmapContextProviderService beatmapContext;
         protected void SetBeatmapContext(int beatmapId) => beatmapContext.SetBeatmap(Context.ChannelId.ToString(), beatmapId);
-        protected int? GetBeatmapContext() => beatmapContext.GetBeatmap(Context.ChannelId.ToString());
     }
 }
