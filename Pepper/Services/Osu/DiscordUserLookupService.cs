@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BAMCIS.ChunkExtensionMethod;
 using Disqord.Bot.Hosting;
 using LazyCache;
+using LazyCache.Providers;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson.Serialization.Attributes;
@@ -26,7 +30,10 @@ namespace Pepper.Services.Osu
         private readonly string collectionName;
         private readonly string databaseName;
         private readonly string serverUri;
-        private readonly IAppCache usernameCache = new CachingService();
+        private readonly IAppCache usernameCache = new CachingService(new MemoryCacheProvider(new MemoryCache(new MemoryCacheOptions
+        {
+            SizeLimit = 500
+        })));
         private readonly ILogger log = Log.Logger.ForContext<DiscordOsuUsernameLookupService>();
 
         private IMongoCollection<DiscordOsuUsernameRecord> Collection => client.GetDatabase(databaseName)
@@ -61,8 +68,37 @@ namespace Pepper.Services.Osu
                 ReturnDocument = ReturnDocument.After
             });
             usernameCache.Remove(uid);
-            usernameCache.Add(uid, results?.OsuUsername);
+            usernameCache.Add(uid, results?.OsuUsername, new MemoryCacheEntryOptions { Size = 1 });
             return results;
+        }
+
+        public async Task<Dictionary<ulong, string>> GetManyUsers(params ulong[] discordUserIds)
+        {
+            if (discordUserIds.Length == 0) return new Dictionary<ulong, string>();
+
+            var output = new Dictionary<ulong, string>(); 
+            var uncached = new List<ulong>();
+            
+            foreach (var uid in discordUserIds)
+                if (usernameCache.TryGetValue<string>(uid.ToString(), out var username) && username != null)
+                    output[uid] = (string) username;
+                else uncached.Add(uid);
+
+            var usernames = uncached
+                .Where(uid => !output.ContainsKey(uid))
+                .Chunk(100)
+                .Select(chunk => Builders<DiscordOsuUsernameRecord>.Filter.Or(
+                    chunk.Select(uid => Builders<DiscordOsuUsernameRecord>.Filter.Eq("discordUserId", uid.ToString()))
+                ))
+                .SelectMany(filterExpression => Collection.Find(filterExpression).ToList());
+
+            foreach (var record in usernames) output[ulong.Parse(record.DiscordUserId)] = record.OsuUsername;
+            foreach (var (uid, username) in output)
+            {
+                usernameCache.Remove(uid.ToString());
+                usernameCache.Add(uid.ToString(), username, new MemoryCacheEntryOptions { Size = 1 });
+            }                
+            return output;
         }
         
         public async Task<string?> GetUser(ulong discordUserId)
@@ -83,7 +119,7 @@ namespace Pepper.Services.Osu
                 Log.Debug($"Found username \"{username}\" bound to user ID \"{userId}\".");
                 return username;
             }
-            return await usernameCache.GetOrAddAsync(userId, UserGetter);
+            return await usernameCache.GetOrAddAsync(userId, UserGetter, new MemoryCacheEntryOptions { Size = 1 });
         }
     }
 }

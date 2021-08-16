@@ -11,23 +11,13 @@ using osu.Game.Rulesets.Osu.Mods;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
+using PagedView = Pepper.Structures.PagedView;
 
 namespace Pepper.Commands.Osu
 {
     internal class ScoresetPagedView : PagedView
     {
-        public ScoresetPagedView(PageProvider pageProvider) : base(pageProvider)
-        {
-            RemoveComponent(StopButton);
-            FirstPageButton.Label = "First page"; 
-            FirstPageButton.Emoji = null;
-            PreviousPageButton.Label = "Previous page";
-            PreviousPageButton.Emoji = null;
-            NextPageButton.Label = "Next page";
-            NextPageButton.Emoji = null;
-            LastPageButton.Label = "Last page"; 
-            LastPageButton.Emoji = null;
-        }
+        public ScoresetPagedView(PageProvider pageProvider) : base(pageProvider) {}
     }
     
     public partial class Scoreset

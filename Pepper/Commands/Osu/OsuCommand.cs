@@ -33,10 +33,11 @@ namespace Pepper.Commands.Osu
         public OsuCommand(APIService service) => APIService = service;
         protected readonly APIService APIService;
         protected static Ruleset[] Rulesets => RulesetTypeParser.SupportedRulesets;
-        
-        
-        protected static string ResolveEarthEmoji(ContinentCode continent)
-            => continent switch
+
+        protected static string ResolveEarthEmoji(string countryCode)
+        {
+            var continent = Country.GetCountryInfoForAlpha2Code(countryCode)?.ContinentCode;
+            return continent switch
             {
                 ContinentCode.AF => ":earth_africa:",
                 ContinentCode.EU => ":earth_africa:",
@@ -44,6 +45,7 @@ namespace Pepper.Commands.Osu
                 ContinentCode.SA => ":earth_americas:",
                 _ => ":earth_asia:"
             };
+        }
 
         public static string SerializeBeatmapStats(
             BeatmapInfo map, DifficultyAttributes? difficultyOverwrite = null,

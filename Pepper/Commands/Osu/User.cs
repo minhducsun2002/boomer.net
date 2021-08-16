@@ -25,8 +25,7 @@ namespace Pepper.Commands.Osu
             var stats = user.Statistics;
             var grades = stats.GradesCount;
             var playTime = new TimeSpan((stats.PlayTime ?? 0) * (long) 1e7);
-            var countryCode = user.Country.FlagName;
-            var earthEmoji = ResolveEarthEmoji(AJ.Code.Country.GetCountryInfoForAlpha2Code(countryCode)!.ContinentCode);
+            var earthEmoji = ResolveEarthEmoji(user.Country.FlagName);
 
             var embed = new LocalEmbed
             {
@@ -36,7 +35,7 @@ namespace Pepper.Commands.Osu
                 Description = (
                     stats.GlobalRank.Equals(default)
                         ? "Unranked"
-                        : $"**{stats.PP}**pp ({earthEmoji} #**{stats.GlobalRank}** | :flag_{countryCode.ToLowerInvariant()}: #**{stats.CountryRank}**)"
+                        : $"**{stats.PP}**pp ({earthEmoji} #**{stats.GlobalRank}** | :flag_{user.Country.FlagName.ToLowerInvariant()}: #**{stats.CountryRank}**)"
                     ) + $".\n**{stats.Accuracy:F3}**% accuracy - **{stats.MaxCombo}**x max combo.",
                 Fields = new List<LocalEmbedField>
                 {
