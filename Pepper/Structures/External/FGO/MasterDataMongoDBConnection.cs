@@ -22,5 +22,6 @@ namespace Pepper.Structures.External.FGO
         public IMongoCollection<MstCombineSkill> MstCombineSkill = null!;
         public IMongoCollection<MstItem> MstItem = null!;
         public IMongoCollection<MstSkillLv> MstSkillLv = null!;
+        public IMongoCollection<MstTreasureDevice> MstTreasureDevice = null!;
     }
 }
