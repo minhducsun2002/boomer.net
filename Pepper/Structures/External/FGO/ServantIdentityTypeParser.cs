@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Disqord.Bot;
+using FgoExportedConstants;
 using FuzzySharp;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -78,9 +79,16 @@ namespace Pepper.Structures.External.FGO
         {
             var jp = masterDataService.Connections[Region.JP];
             return (await jp.MstSvt.FindAsync(
-                Builders<MstSvt>.Filter.Or(
-                    Builders<MstSvt>.Filter.Eq("collectionNo", idOrCollectionNo),
-                    Builders<MstSvt>.Filter.Eq("baseSvtId", idOrCollectionNo)
+                Builders<MstSvt>.Filter.And(
+                    Builders<MstSvt>.Filter.Or(
+                        Builders<MstSvt>.Filter.Eq("collectionNo", idOrCollectionNo),
+                        Builders<MstSvt>.Filter.Eq("baseSvtId", idOrCollectionNo)
+                    ),
+                    Builders<MstSvt>.Filter.Or(
+                        Builders<MstSvt>.Filter.Eq("type", SvtType.Type.NORMAL),
+                        Builders<MstSvt>.Filter.Eq("type", SvtType.Type.HEROINE),
+                        Builders<MstSvt>.Filter.Eq("type", SvtType.Type.ENEMY_COLLECTION_DETAIL)
+                    )
                 )
             )).FirstOrDefault();
         }

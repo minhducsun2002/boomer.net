@@ -1,4 +1,5 @@
 using System;
+using FgoExportedConstants;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Pepper.Structures.External.FGO.MasterData
@@ -15,7 +16,7 @@ namespace Pepper.Structures.External.FGO.MasterData
         [BsonElement("ruby")] public string Ruby = "";
         [BsonElement("battleName")] public string BattleName = "";
         [BsonElement("classId")] public int ClassId;
-        [BsonElement("type")] public int Type;
+        [BsonElement("type")] public SvtType.Type Type;
         [BsonElement("limitMax")] public int LimitMax;
         [BsonElement("rewardLv")] public int RewardLv;
         [BsonElement("friendshipId")] public int FriendshipId;
