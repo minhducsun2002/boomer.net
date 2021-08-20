@@ -92,17 +92,6 @@ namespace Pepper.Commands.FGO
                 )
             );
         }
-        
-        private string ResolveServantName(BaseServant servant)
-        {
-            var mstSvt = servant.ServantEntity;
-            if (ServantNamingService.Namings.ContainsKey(mstSvt.ID))
-                return ServantNamingService.Namings[mstSvt.ID].Name;
-
-            var na = MasterDataService.Connections[Region.NA];
-            return na.MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", mstSvt.ID))
-                .FirstOrDefault()?.Name ?? mstSvt.Name;
-        }
 
         private MstTreasureDeviceLv GetNPGain(int svtId)
         {
@@ -120,7 +109,7 @@ namespace Pepper.Commands.FGO
             ).First()!;
         }
         
-        private static readonly Dictionary<BattleCommand.TYPE, Tuple<int, int[], string>> DefaultCardTypes = new()
+        public static readonly Dictionary<BattleCommand.TYPE, Tuple<int, int[], string>> DefaultCardTypes = new()
         {
             { BattleCommand.TYPE.ARTS, new Tuple<int, int[], string>(0, Array.Empty<int>(), "Arts  ") },
             { BattleCommand.TYPE.BUSTER, new Tuple<int, int[], string>(0, Array.Empty<int>(), "Buster") },

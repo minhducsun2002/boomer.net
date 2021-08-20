@@ -5,7 +5,6 @@ namespace Pepper.Structures.External.FGO.MasterData
 {
     public class MstTreasureDeviceLv : MasterDataEntity
     {
-
         [BsonElement("funcId")] public int[] FuncId = Array.Empty<int>();
         [BsonElement("svals")] public string[] Svals = Array.Empty<string>();
         [BsonElement("svals2")] public string[] Svals2 = Array.Empty<string>();
@@ -13,7 +12,7 @@ namespace Pepper.Structures.External.FGO.MasterData
         [BsonElement("svals4")] public string[] Svals4 = Array.Empty<string>();
         [BsonElement("svals5")] public string[] Svals5 = Array.Empty<string>();
         [BsonElement("treaureDeviceId")] public int TreaureDeviceId;
-        [BsonElement("lv")] public int Lv;
+        [BsonElement("lv")] public int Level;
         [BsonElement("gaugeCount")] public int GaugeCount;
         [BsonElement("detailId")] public int DetailId;
         [BsonElement("tdPoint")] public int TdPoint;

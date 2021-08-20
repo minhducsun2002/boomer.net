@@ -25,9 +25,10 @@ namespace Pepper.Structures
     public class SelectionPagedView : PagedViewBase
     {
         private readonly Dictionary<int, LocalSelectionComponentOption> details;
-        public SelectionPagedView(Dictionary<(int, LocalSelectionComponentOption), Page> pages, LocalMessage? templateMessage = null) 
-            : base(PreparePages(pages, out var pageDetails), templateMessage)
+        public SelectionPagedView(IEnumerable<(LocalSelectionComponentOption, Page)> pages, LocalMessage? templateMessage = null) 
+            : base(PreparePages(pages, out var pageDetails), templateMessage ?? new LocalMessage())
         {
+            details = pageDetails;
             var selection = new SelectionViewComponent(e =>
             {
                 var index = int.Parse(e.SelectedOptions[0].Value);
@@ -41,8 +42,6 @@ namespace Pepper.Structures
                 Options = GetCurrentOptions()
             };
 
-            details = pageDetails;
-            
             AddComponent(selection);
         }
 
@@ -62,12 +61,11 @@ namespace Pepper.Structures
                 })
                 .ToList();
 
-        private static ListPageProvider PreparePages(Dictionary<(int, LocalSelectionComponentOption), Page> pages, out Dictionary<int, LocalSelectionComponentOption> details)
+        private static ListPageProvider PreparePages(IEnumerable<(LocalSelectionComponentOption, Page)> pages, out Dictionary<int, LocalSelectionComponentOption> details)
         {
             var orderedPages = pages
-                .OrderBy(kv => kv.Key.Item1)
-                .Select((kv, index) => (kv.Key.Item2, kv.Value, index)).ToArray();
-            var pageProvider = new ListPageProvider(orderedPages.Select(tuple => tuple.Value));
+                .Select((pair, index) => (pair.Item1, pair.Item2, index)).ToArray();
+            var pageProvider = new ListPageProvider(orderedPages.Select(tuple => tuple.Item2));
             var indexedDetails = orderedPages.ToDictionary(
                 tuple => tuple.index,
                 tuple => tuple.Item1
