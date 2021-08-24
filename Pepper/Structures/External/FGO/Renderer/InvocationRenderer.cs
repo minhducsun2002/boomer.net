@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FFmpeg.AutoGen;
+using FgoExportedConstants;
 using MongoDB.Driver;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO.MasterData;
@@ -71,7 +71,7 @@ namespace Pepper.Structures.External.FGO.Renderer
         public InvocationInformation Render(Dictionary<string, TreasureDeviceMutationType>? mutationTypeHint = null)
         {
             mutationTypeHint ??= new(); 
-            if (!Enum.IsDefined(typeof(FunctionType), function.Type))
+            if (!Enum.IsDefined(typeof(FuncList.TYPE), function.Type))
                 return new InvocationInformation
                 {
                     Statistics = arguments,
@@ -81,7 +81,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     }
                 }.WithEffect($"Function ID {function.ID}, type {function.Type}");
 
-            var type = (FunctionType) function.Type;
+            var type = (FuncList.TYPE) function.Type;
             if (!FunctionNames.TryGetValue(type, out var typeName)) typeName = "";
             if (string.IsNullOrWhiteSpace(typeName)) typeName = $"[functionType {type}]";
             var statistics = arguments;
@@ -112,8 +112,8 @@ namespace Pepper.Structures.External.FGO.Renderer
             
             switch (type)
             {
-                case FunctionType.AddState:
-                case FunctionType.AddStateShort:
+                case FuncList.TYPE.ADD_STATE:
+                case FuncList.TYPE.ADD_STATE_SHORT:
                 {
                     // We are assuming AddState(Short) functions only refer to a single buff.
                     // I mean, there is only a single dataval tuple.
@@ -127,7 +127,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
                 }
 
-                case FunctionType.EventDropUp:
+                case FuncList.TYPE.EVENT_DROP_UP:
                 {
                     // We are assuming the individuality refers to only one item
                     // We are also assuming that individuality does not change.
@@ -143,8 +143,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
                 }
 
-                case FunctionType.GainNp:
-                case FunctionType.LossNp:
+                case FuncList.TYPE.GAIN_NP:
+                case FuncList.TYPE.LOSS_NP:
                 {
                     var values = statistics.Consume("Value").Select(value => $"**{int.Parse(value) / 100}**%").ToArray();
                     output = output.WithEffect($"**{typeName}** by {string.Join(" / ", values)}",
@@ -153,11 +153,11 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
                 }
 
-                case FunctionType.GainStar:
-                case FunctionType.GainHp:
-                case FunctionType.LossHp:
-                case FunctionType.LossHpSafe:
-                case FunctionType.HastenNpturn:
+                case FuncList.TYPE.GAIN_STAR:
+                case FuncList.TYPE.GAIN_HP:
+                case FuncList.TYPE.LOSS_HP:
+                case FuncList.TYPE.LOSS_HP_SAFE:
+                case FuncList.TYPE.HASTEN_NPTURN:
                 {
                     var values = statistics.Consume("Value").Distinct().Select(value => $"**{value}**");
                     output.WithEffect($"**{typeName}** by {string.Join(" / ", values)}",
@@ -165,7 +165,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
                 }
 
-                case FunctionType.ShortenSkill:
+                case FuncList.TYPE.SHORTEN_SKILL:
                 {
                     var values = statistics.Consume("Value").ToArray();
                     var turnText = values.Length > 1
@@ -178,8 +178,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
                 }
 
-                case FunctionType.DamageNP:
-                case FunctionType.DamageNPPierce:
+                case FuncList.TYPE.DAMAGE_NP:
+                case FuncList.TYPE.DAMAGE_NP_PIERCE:
                 {
                     var values = statistics.Consume("Value").Select(value => $"**{int.Parse(value) / 10}**%").ToList();
                     output = output.WithEffect(
@@ -189,8 +189,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
                 }
 
-                case FunctionType.DamageNPIndividual:
-                case FunctionType.DamageNPStateIndividualFix:
+                case FuncList.TYPE.DAMAGE_NP_INDIVIDUAL:
+                case FuncList.TYPE.DAMAGE_NP_STATE_INDIVIDUAL_FIX:
                 {
                     var values = statistics.Consume("Value").Select(value => $"**{int.Parse(value) / 10}**%").ToList();
                     output = output.WithEffect(

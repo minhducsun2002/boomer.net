@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FgoExportedConstants;
 using Humanizer;
 using Pepper.Structures.External.FGO.MasterData;
 
@@ -9,7 +10,7 @@ namespace Pepper.Structures.External.FGO.Renderer
     {
         public static (string, Dictionary<string, string[]>, string) EventDropUp(MstFunc function, MstEvent @event, MstItem item, Dictionary<string, string[]> stats)
         {
-            if (function.Type != (int) FunctionType.EventDropUp)
+            if (function.Type != (int) FuncList.TYPE.EVENT_DROP_UP)
                 throw new ArgumentException(
                     $"{nameof(function)} must be of type EventDropUp. Received type {function.Type}");
 

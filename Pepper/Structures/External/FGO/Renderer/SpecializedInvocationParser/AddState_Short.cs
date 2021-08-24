@@ -41,8 +41,8 @@ namespace Pepper.Structures.External.FGO.Renderer
 
             var baseAction = funcType switch
             {
-                (int) FunctionType.AddState => InvocationRenderer.FunctionNames[FunctionType.AddState],
-                (int) FunctionType.AddStateShort => InvocationRenderer.FunctionNames[FunctionType.AddStateShort],
+                (int) FuncList.TYPE.ADD_STATE => InvocationRenderer.FunctionNames[FuncList.TYPE.ADD_STATE],
+                (int) FuncList.TYPE.ADD_STATE_SHORT => InvocationRenderer.FunctionNames[FuncList.TYPE.ADD_STATE_SHORT],
                 _ => throw new ArgumentException(
                     $"{nameof(funcType)} must be either AddState or AddStateShort. Received {funcType}")
             };

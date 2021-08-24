@@ -22,10 +22,10 @@ namespace Pepper.Structures.External.FGO.Renderer
         {
             foreach (var (func, value) in skill.Invocations)
             {
-                switch ((FunctionType) func.Type)
+                switch ((FuncList.TYPE) func.Type)
                 {
-                    case FunctionType.AddState:
-                    case FunctionType.AddStateShort:
+                    case FuncList.TYPE.ADD_STATE:
+                    case FuncList.TYPE.ADD_STATE_SHORT:
                         break;
                     default:
                         continue;
