@@ -85,7 +85,7 @@ namespace Pepper.Commands.FGO
                     {
                         Label = label.Length > LocalSelectionComponentOption.MaxLabelLength
                             ? name[..(LocalSelectionComponentOption.MaxLabelLength - 3 - rank.Length)] + "..." + rank
-                            : name
+                            : label
                     };
 
                     return (selection, page);
