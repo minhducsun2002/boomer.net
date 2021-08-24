@@ -21,30 +21,9 @@ namespace Pepper.Structures.External.FGO
                 .SortBy(lv => lv.Level)
                 .ToList();
 
-            var invocations = levels.ToDictionary(
-                level => level,
-                level => level.FuncId
-                    .Select(function => ResolveFunc(function))
-                    .Select((function, index) =>
-                    {
-                        var overchargeDataVal = new List<string>
-                        {
-                            level.Svals[index],
-                            level.Svals2[index],
-                            level.Svals3[index],
-                            level.Svals4[index],
-                            level.Svals5[index],
-                        };
-
-                        var parsedAssociatedOvercharge = overchargeDataVal
-                            .Select(overcharge => DataValParser.Parse(overcharge, function!.Type));
-
-                        return (function!, parsedAssociatedOvercharge.ToArray());
-                    })
-                    .ToList()
-            );
+            var functions = levels[0].FuncId.Select(function => ResolveFunc(function)!);
             
-            return new TreasureDevice(mstTreasureDevice, levels.ToArray(), invocations);
+            return new TreasureDevice(mstTreasureDevice, levels.ToArray(), functions);
         }
 
 

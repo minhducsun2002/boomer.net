@@ -13,16 +13,41 @@ namespace Pepper.Structures.External.FGO.Renderer
         public int ActSetID;
         public int ActSetWeight;
     }
+
+    public enum TreasureDeviceMutationType
+    {
+        Level,
+        Overcharge
+    }
     
     public class InvocationInformation
     {
         internal InvocationInformation() {}
+
+        public string Effect { get; private set; } = "";
+        public TreasureDeviceMutationType? EffectMutationType { get; private set;  } = null;
+        public InvocationInformation WithEffect(string effect, TreasureDeviceMutationType? effectMutationType = null)
+        {
+            Effect = effect;
+            EffectMutationType = effectMutationType;
+            return this;
+        }
+        
         public MstFunc RawFunction;
-        public string Effect = "";
         public Dictionary<string, string[]> Statistics = new();
+        public Dictionary<string, TreasureDeviceMutationType> TreasureDeviceMutationTypeHint = new();
         public string[] ExtraInformation = Array.Empty<string>();
         public ActSetInformation? ActSetInformation = null;
         public bool RequireOnField;
+    }
+
+    internal static class MutationTypeHelperExtensions
+    {
+        internal static TreasureDeviceMutationType? ResolveMutationType(
+            this IReadOnlyDictionary<string, TreasureDeviceMutationType> mutationTypeHint,
+            string key
+        )
+            => mutationTypeHint.TryGetValue(key, out var mutationType) ? mutationType : null;
     }
     
     public partial class InvocationRenderer
@@ -41,20 +66,19 @@ namespace Pepper.Structures.External.FGO.Renderer
             single = false;
         }
         
-        
 
-        public InvocationInformation Render()
+        public InvocationInformation Render(Dictionary<string, TreasureDeviceMutationType>? mutationTypeHint = null)
         {
+            mutationTypeHint ??= new(); 
             if (!Enum.IsDefined(typeof(FunctionType), function.Type))
                 return new InvocationInformation
                 {
-                    Effect = $"Function ID {function.ID}, type {function.Type}",
                     Statistics = arguments,
                     ExtraInformation = new[]
                     {
                         "This function type is not defined. Contact my owner for this."
                     }
-                };
+                }.WithEffect($"Function ID {function.ID}, type {function.Type}");
 
             var type = (FunctionType) function.Type;
             if (!FunctionNames.TryGetValue(type, out var typeName)) typeName = "";
@@ -76,12 +100,14 @@ namespace Pepper.Structures.External.FGO.Renderer
             statistics.TryGetValue("Count", out var count);
             var output = new InvocationInformation
             {
-                Effect = $"**{typeName}** {(count == default ? "" : "of")} {string.Join(" / ", count ?? Array.Empty<string>())}".TrimEnd(),
                 RawFunction = function,
                 Statistics = statistics,
                 ActSetInformation = actSetInformation,
                 RequireOnField = onField
-            };
+            }.WithEffect(
+                $"**{typeName}** {(count == default ? "" : "of")} {string.Join(" / ", count ?? Array.Empty<string>())}".TrimEnd(),
+                mutationTypeHint.ResolveMutationType("Count")
+            );
             
             switch (type)
             {
@@ -91,9 +117,11 @@ namespace Pepper.Structures.External.FGO.Renderer
                     // We are assuming AddState(Short) functions only refer to a single buff.
                     // I mean, there is only a single dataval tuple.
                     var buff = MasterData.ResolveBuff(function.Vals[0]);
-                    var (effect, stats, extra) = SpecializedInvocationParser.AddState_Short(function, buff!, statistics, Trait);
-                    output.Effect = effect;
+                    var (effect, stats, extra, mutationTypes) = 
+                        SpecializedInvocationParser.AddState_Short(function, buff!, statistics, Trait, mutationTypeHint);
+                    output = output.WithEffect(effect, null);
                     output.Statistics = stats;
+                    output.TreasureDeviceMutationTypeHint = mutationTypes;
                     output.ExtraInformation = extra;
                     break;
                 }
@@ -107,7 +135,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                     var @event = MasterData.MstEvent.FindSync(Builders<MstEvent>.Filter.Eq("id", eventId)).First();
                     var item = MasterData.MstItem.FindSync(Builders<MstItem>.Filter.Eq("individuality", individualty)).First();
                     var (effect, stats, extra) = SpecializedInvocationParser.EventDropUp(function, @event, item, statistics);
-                    output.Effect = effect;
+                    // We are assuming a NP will not carry anything event-related,
+                    output = output.WithEffect(effect);
                     output.Statistics = stats;
                     output.ExtraInformation = new [] { extra };
                     break;
@@ -117,7 +146,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                 case FunctionType.LossNp:
                 {
                     var values = statistics.Consume("Value").Select(value => $"**{int.Parse(value) / 100}**%").ToArray();
-                    output.Effect = $"**{typeName}** by {string.Join(" / ", values)}";
+                    output = output.WithEffect($"**{typeName}** by {string.Join(" / ", values)}",
+                        mutationTypeHint.ResolveMutationType("Value"));
                     output.Statistics = statistics;
                     break;
                 }
@@ -129,7 +159,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                 case FunctionType.HastenNpturn:
                 {
                     var values = statistics.Consume("Value").Distinct().Select(value => $"**{value}**");
-                    output.Effect = $"**{typeName}** by {string.Join(" / ", values)}";
+                    output.WithEffect($"**{typeName}** by {string.Join(" / ", values)}",
+                        mutationTypeHint.ResolveMutationType("Value"));
                     break;
                 }
 
@@ -139,7 +170,10 @@ namespace Pepper.Structures.External.FGO.Renderer
                     var turnText = values.Length > 1
                         ? "turn" + (values.Contains("1") ? "(s)" : "")
                         : "turn" + (values[0] == "1" ? "" : "s");
-                    output.Effect = $"**{typeName}** by {string.Join(" / ", values.Select(value => $"**{value}**"))} {turnText}";
+                    output = output.WithEffect(
+                        $"**{typeName}** by {string.Join(" / ", values.Select(value => $"**{value}**"))} {turnText}",
+                        mutationTypeHint.ResolveMutationType("Value")
+                    );
                     break;
                 }
 
@@ -147,25 +181,29 @@ namespace Pepper.Structures.External.FGO.Renderer
                 case FunctionType.DamageNPPierce:
                 {
                     var values = statistics.Consume("Value").Select(value => $"**{int.Parse(value) / 10}**%").ToList();
-                    output.Effect = $"**{typeName}** of {string.Join(" / ", values)}";
+                    output = output.WithEffect(
+                        $"**{typeName}** of {string.Join(" / ", values)}",
+                        mutationTypeHint.ResolveMutationType("Value")
+                    );
                     break;
                 }
             }
 
-            foreach (var key in new[] {"Rate"})
+            if (statistics.ContainsKey("Rate"))
             {
-                if (!statistics.ContainsKey(key)) continue;
-                var chance = statistics.Consume(key).Distinct().Select(value => $"{float.Parse(value) / 10}%").ToArray();
+                var chance = statistics.Consume("Rate").Distinct().Select(value => $"{float.Parse(value) / 10}%").ToArray();
                 switch (chance.Length)
                 {
                     case 1 when chance[0] != "100%":
-                        output.Effect = $"{output.Effect} with **{chance[0]}** chance";
+                        output.WithEffect($"{output.Effect} with **{chance[0]}** chance", null);
                         break;
                     case > 1:
                         output.Statistics["Chance to activate"] = chance;
+                        var mutationType = mutationTypeHint.ResolveMutationType("Rate");
+                        if (mutationType != null)
+                            output.TreasureDeviceMutationTypeHint["Chance to activate"] = mutationType.Value;
                         break;
                 }
-                break;
             }
 
             return output;

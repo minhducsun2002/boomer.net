@@ -8,25 +8,34 @@ using Pepper.Utilities;
 
 namespace Pepper.Structures.External.FGO.Renderer
 {
-    internal class HumanizedEntry
-    {
-        public string[] Chance = Array.Empty<string>();
-        public int[] Turn = Array.Empty<int>();
-        public int[] Count = Array.Empty<int>();
-        public string[] Amount = Array.Empty<string>();
-    }
-    
     public static partial class SpecializedInvocationParser
     {
-        public static (string, Dictionary<string, string[]>, string[]) AddState_Short(
+        internal class HumanizedEntry
+        {
+            public string[] Chance = Array.Empty<string>();
+            public int[] Turn = Array.Empty<int>();
+            public int[] Count = Array.Empty<int>();
+            public string[] Amount = Array.Empty<string>();
+
+            public TreasureDeviceMutationType? ChanceMutationType;
+            public TreasureDeviceMutationType? TurnMutationType;
+            public TreasureDeviceMutationType? CountMutationType;
+            public TreasureDeviceMutationType? AmountMutationType;
+        }
+        
+        public static (string, Dictionary<string, string[]>, string[], Dictionary<string, TreasureDeviceMutationType>) AddState_Short(
             MstFunc function, MstBuff buff, Dictionary<string, string[]> values,
-            TraitService traitService
+            TraitService traitService,
+            Dictionary<string, TreasureDeviceMutationType>? mutationTypeHint = null
         )
         {
+            mutationTypeHint ??= new();
+            
             var funcType = function.Type;
             var output = new HumanizedEntry();
             var extra = new List<string>();
             var extraStats = new Dictionary<string, string[]>();
+            var extraStatsMutationTypeHint = new Dictionary<string, TreasureDeviceMutationType>();
             var amountPreposition = "of";
             string? buffName = default;
 
@@ -71,18 +80,24 @@ namespace Pepper.Structures.External.FGO.Renderer
                     case BuffList.TYPE.DOWN_DEFENCECOMMANDALL:
                         output.Count = values["Count"].Select(int.Parse).ToArray();
                         output.Amount = values["Value"].Select(value => $"{float.Parse(value) / 10}%").ToArray();
+                        output.CountMutationType = mutationTypeHint.ResolveMutationType("Count");
+                        output.AmountMutationType = mutationTypeHint.ResolveMutationType("Value");
                         break;
                     case BuffList.TYPE.REDUCE_HP:        case BuffList.TYPE.REGAIN_HP:
                     case BuffList.TYPE.GUTS:
                     case BuffList.TYPE.UP_CHAGETD:
                         output.Count = values["Count"].Select(int.Parse).ToArray();
                         output.Amount = values["Value"].Select(value => $"{int.Parse(value)}").ToArray();
+                        output.CountMutationType = mutationTypeHint.ResolveMutationType("Count");
+                        output.AmountMutationType = mutationTypeHint.ResolveMutationType("Value");
                         break;
                     case BuffList.TYPE.AVOID_INSTANTDEATH:
                         output.Count = values["Count"].Select(value => int.Parse(value) / 10).ToArray();
+                        output.CountMutationType = mutationTypeHint.ResolveMutationType("Count");
                         break;
                     case BuffList.TYPE.REGAIN_NP:
                         output.Amount = values["Value"].Select(value => $"{float.Parse(value) / 10}%").ToArray();
+                        output.AmountMutationType = mutationTypeHint.ResolveMutationType("Value");
                         break;
                     case BuffList.TYPE.ADD_DAMAGE:
                     case BuffList.TYPE.REGAIN_STAR:
@@ -91,10 +106,12 @@ namespace Pepper.Structures.External.FGO.Renderer
                     case BuffList.TYPE.OVERWRITE_CLASSRELATIO_ATK:
                     case BuffList.TYPE.SUB_SELFDAMAGE:
                         output.Amount = values["Value"].Select(value => $"{int.Parse(value)}").ToArray();
+                        output.AmountMutationType = mutationTypeHint.ResolveMutationType("Value");
                         break;
                     case BuffList.TYPE.MULTIATTACK:
                         amountPreposition = "by ";
                         output.Amount = values["Value"].Select(value => $"{int.Parse(value)}").ToArray();
+                        output.AmountMutationType = mutationTypeHint.ResolveMutationType("Value");
                         break;
                     case BuffList.TYPE.COMMANDATTACK_FUNCTION:
                         // We are assuming these buffs only push a single skill
@@ -107,6 +124,9 @@ namespace Pepper.Structures.External.FGO.Renderer
                                 break;
                             case > 1:
                                 extraStats["Skill trigger chance"] = triggerChances.Select(chance => $"{chance}%").ToArray();
+                                var useRateMutationType = mutationTypeHint.ResolveMutationType("UseRate");
+                                if (useRateMutationType.HasValue)
+                                    extraStatsMutationTypeHint["Skill trigger chance"] = useRateMutationType.Value;
                                 break;
                         }
                         break;
@@ -120,12 +140,13 @@ namespace Pepper.Structures.External.FGO.Renderer
                     case BuffList.TYPE.AVOIDANCE:
                     case BuffList.TYPE.INVINCIBLE:
                         output.Count = values["Count"].Select(int.Parse).ToArray();
+                        output.CountMutationType = mutationTypeHint.ResolveMutationType("Count");
                         break;
                     case BuffList.TYPE.CHANGE_COMMAND_CARD_TYPE:
                     case BuffList.TYPE.ADD_INDIVIDUALITY:
                         extra.Add(
                             "Change all Command Cards of the target to"
-                            + values["Value"].Select(card => traitService.GetTrait(int.Parse(card) + 4000))
+                            + values["Value"].Select(card => traitService.GetTrait(int.Parse(card) + 4000)).First()
                         );
                         break;
                 }
@@ -151,6 +172,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                     output.Amount = Array.Empty<string>();
                     break;
                 case > 1:
+                    if (output.AmountMutationType.HasValue)
+                        extraStatsMutationTypeHint[buffName!] = output.AmountMutationType.Value;
                     extraStats[buffName!] = output.Amount;
                     break;
             }
@@ -181,7 +204,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                       + " field."
                 );
 
-            return (zippedOutput.Trim(), extraStats, extra.ToArray());
+            return (zippedOutput.Trim(), extraStats, extra.ToArray(), extraStatsMutationTypeHint);
         }
     }
 }
