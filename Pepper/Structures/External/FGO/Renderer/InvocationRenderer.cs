@@ -56,12 +56,13 @@ namespace Pepper.Structures.External.FGO.Renderer
         private bool single;
         private MstFunc function;
         private MasterDataMongoDBConnection MasterData;
-        public TraitService Trait { get; set; }
+        private readonly TraitService traitService;
         
-        public InvocationRenderer(MstFunc function, Dictionary<string, string[]> arguments, MasterDataMongoDBConnection connection)
+        public InvocationRenderer(MstFunc function, Dictionary<string, string[]> arguments, MasterDataMongoDBConnection connection, TraitService traitService)
         {
             this.arguments = arguments;
             this.function = function;
+            this.traitService = traitService;
             MasterData = connection;
             single = false;
         }
@@ -118,7 +119,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     // I mean, there is only a single dataval tuple.
                     var buff = MasterData.ResolveBuff(function.Vals[0]);
                     var (effect, stats, extra, mutationTypes) = 
-                        SpecializedInvocationParser.AddState_Short(function, buff!, statistics, Trait, mutationTypeHint);
+                        SpecializedInvocationParser.AddState_Short(function, buff!, statistics, traitService, mutationTypeHint);
                     output = output.WithEffect(effect, null);
                     output.Statistics = stats;
                     output.TreasureDeviceMutationTypeHint = mutationTypes;
@@ -185,6 +186,26 @@ namespace Pepper.Structures.External.FGO.Renderer
                         $"**{typeName}** of {string.Join(" / ", values)}",
                         mutationTypeHint.ResolveMutationType("Value")
                     );
+                    break;
+                }
+
+                case FunctionType.DamageNPIndividual:
+                case FunctionType.DamageNPStateIndividualFix:
+                {
+                    var values = statistics.Consume("Value").Select(value => $"**{int.Parse(value) / 10}**%").ToList();
+                    output = output.WithEffect(
+                        $"**{typeName}** of {string.Join(" / ", values)}",
+                        mutationTypeHint.ResolveMutationType("Value")
+                    );
+
+                    var specialDamageValue = statistics.Consume("Correction")
+                        .Select(value => $"**{int.Parse(value) / 10}**%").ToArray();
+                    var trait = traitService.GetTrait(int.Parse(statistics.Consume("Target").First()));
+                    
+                    var mutationType = mutationTypeHint.ResolveMutationType("Correction");
+                    if (mutationType.HasValue) output.TreasureDeviceMutationTypeHint[$"Special damage for {trait}"] = mutationType.Value;
+                    
+                    output.Statistics[$"Special damage for {trait}"] = specialDamageValue;
                     break;
                 }
             }

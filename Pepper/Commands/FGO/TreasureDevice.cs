@@ -16,7 +16,7 @@ namespace Pepper.Commands.FGO
 {
     public class TreasureDevice : ServantCommand
     {
-        private static Dictionary<TreasureDeviceMutationType, string> hintPrefix = new()
+        private static readonly Dictionary<TreasureDeviceMutationType, string> HintPrefix = new()
         {
             { TreasureDeviceMutationType.Level, "<LVL>" },
             { TreasureDeviceMutationType.Overcharge, "<OC>" }
@@ -57,7 +57,7 @@ namespace Pepper.Commands.FGO
                         Fields = invocations.Select(invc =>
                         {
                             var effectPrefix = invc.EffectMutationType.HasValue
-                                ? hintPrefix[invc.EffectMutationType.Value] + " "
+                                ? HintPrefix[invc.EffectMutationType.Value] + " "
                                 : "";
                             var detail = string.Join(
                                 "\n",
@@ -65,7 +65,7 @@ namespace Pepper.Commands.FGO
                                 {
                                     var (key, values) = kv;
                                     return (invc.TreasureDeviceMutationTypeHint.TryGetValue(key, out var hint)
-                                               ? hintPrefix[hint] + " "
+                                               ? HintPrefix[hint] + " "
                                                : "")
                                            + $"[**{key}**] : {string.Join(" / ", values.Distinct())}";
                                 }).Concat(invc.ExtraInformation)
@@ -95,7 +95,7 @@ namespace Pepper.Commands.FGO
             return View(new SelectionPagedView(pages));
         }
 
-        private static List<InvocationInformation> RenderInvocations(Structures.External.FGO.Entities.TreasureDevice treasureDevice, MasterDataMongoDBConnection connection)
+        private List<InvocationInformation> RenderInvocations(Structures.External.FGO.Entities.TreasureDevice treasureDevice, MasterDataMongoDBConnection connection)
         {
             var functions = treasureDevice.functions;
             var _ = functions
@@ -126,7 +126,7 @@ namespace Pepper.Commands.FGO
                             _ => baseInvocationArguments[key]
                         };
     
-                    return new InvocationRenderer(function, baseInvocationArguments, connection).Render(mutationTypeHint);
+                    return new InvocationRenderer(function, baseInvocationArguments, connection, TraitService).Render(mutationTypeHint);
                 });
 
             return _.ToList();
