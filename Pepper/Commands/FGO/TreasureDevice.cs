@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus.Paged;
@@ -48,12 +49,33 @@ namespace Pepper.Commands.FGO
                     Servant.DefaultCardTypes.TryGetValue((BattleCommand.TYPE) mapping.CardId, out var data);
 
                     var invocations = RenderInvocations(treasureDevice, jp);
+                    
+                    var condition = new StringBuilder();
+                    {
+                        if (mapping.CondLv != default)
+                            condition.AppendLine($"Requires servant level to reach level {mapping.CondLv}");
+
+                        if (mapping.CondQuestId != default)
+                        {
+                            var quest = jp.MstQuest.FindSync(Builders<MstQuest>.Filter.Eq("id", mapping.CondQuestId))
+                                .FirstOrDefault();
+                            var naQuest = na.MstQuest.FindSync(Builders<MstQuest>.Filter.Eq("id", mapping.CondQuestId))
+                                .FirstOrDefault();
+                            var questType = InvocationRenderer.QuestTypeNames[(QuestEntity.enType) quest.Type];
+                            condition.AppendLine(
+                                $"Requires completion of quest [[__{questType}__] {naQuest?.Name ?? quest.Name}](https://apps.atlasacademy.io/db/JP/quest/{quest.IconId}/{mapping.CondQuestPhase})"
+                            );
+                        }
+                    }
+                    
                     var embed = new LocalEmbed
                     {
                         Author = new LocalEmbedAuthor().WithName(servantName),
                         Title = $"[{typeText}] {name} [__{mstTreasureDevice.Rank}__]",
                         Description = 
-                            $"Card : **{data?.Item3.Trim() ?? "Unknown"}** - Hit count : **{mapping.Damage.Length}** ({string.Join('-', mapping.Damage)})",
+                            $"Card : **{data?.Item3.Trim() ?? "Unknown"}** - Hit count : **{mapping.Damage.Length}** ({string.Join('-', mapping.Damage)})"
+                            + "\n"
+                            + condition,
                         Fields = invocations.Select(invc =>
                         {
                             var effectPrefix = invc.EffectMutationType.HasValue

@@ -9,7 +9,7 @@
     <PackageReference Include="ChunkExtensionMethod" Version="1.0.2" />
     <PackageReference Include="Disqord.Bot" Version="1.0.0-07272021-86" />
     <PackageReference Include="dotenv.net" Version="3.0.0" />
-    <PackageReference Include="fgo-enums" Version="2.31.1" />
+    <PackageReference Include="fgo-enums" Version="2.37.1" />
     <PackageReference Include="FuzzySharp" Version="2.0.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
     <PackageReference Include="ISO3166-Mobile" Version="2.1.0" />
