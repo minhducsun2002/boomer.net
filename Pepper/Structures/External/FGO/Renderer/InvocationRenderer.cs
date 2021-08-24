@@ -146,7 +146,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                 case FuncList.TYPE.GAIN_NP:
                 case FuncList.TYPE.LOSS_NP:
                 {
-                    var values = statistics.Consume("Value").Select(value => $"**{int.Parse(value) / 100}**%").ToArray();
+                    var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 100}**%").ToArray();
                     output = output.WithEffect($"**{typeName}** by {string.Join(" / ", values)}",
                         mutationTypeHint.ResolveMutationType("Value"));
                     output.Statistics = statistics;
@@ -162,6 +162,10 @@ namespace Pepper.Structures.External.FGO.Renderer
                     var values = statistics.Consume("Value").Distinct().Select(value => $"**{value}**");
                     output.WithEffect($"**{typeName}** by {string.Join(" / ", values)}",
                         mutationTypeHint.ResolveMutationType("Value"));
+
+                    if (statistics.ContainsKey("MultipleGainStar"))
+                        output.ExtraInformation = new[] { "Star is gained per target with matching traits." }; 
+                    
                     break;
                 }
 
@@ -181,7 +185,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                 case FuncList.TYPE.DAMAGE_NP:
                 case FuncList.TYPE.DAMAGE_NP_PIERCE:
                 {
-                    var values = statistics.Consume("Value").Select(value => $"**{int.Parse(value) / 10}**%").ToList();
+                    var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 10}**%").ToList();
                     output = output.WithEffect(
                         $"**{typeName}** of {string.Join(" / ", values)}",
                         mutationTypeHint.ResolveMutationType("Value")
@@ -192,20 +196,42 @@ namespace Pepper.Structures.External.FGO.Renderer
                 case FuncList.TYPE.DAMAGE_NP_INDIVIDUAL:
                 case FuncList.TYPE.DAMAGE_NP_STATE_INDIVIDUAL_FIX:
                 {
-                    var values = statistics.Consume("Value").Select(value => $"**{int.Parse(value) / 10}**%").ToList();
+                    var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 10}**%").ToList();
                     output = output.WithEffect(
                         $"**{typeName}** of {string.Join(" / ", values)}",
                         mutationTypeHint.ResolveMutationType("Value")
                     );
 
                     var specialDamageValue = statistics.Consume("Correction")
-                        .Select(value => $"**{int.Parse(value) / 10}**%").ToArray();
+                        .Select(value => $"**{float.Parse(value) / 10}**%").ToArray();
                     var trait = traitService.GetTrait(int.Parse(statistics.Consume("Target").First()));
                     
                     var mutationType = mutationTypeHint.ResolveMutationType("Correction");
                     if (mutationType.HasValue) output.TreasureDeviceMutationTypeHint[$"Special damage for {trait}"] = mutationType.Value;
                     
                     output.Statistics[$"Special damage for {trait}"] = specialDamageValue;
+                    break;
+                }
+
+                case FuncList.TYPE.DAMAGE_NP_RARE:
+                {
+                    var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 10}**%").ToList();
+                    var specialDamageValue = statistics.Consume("Correction")
+                        .Select(value => $"**{float.Parse(value) / 10}**%").ToArray();
+                    var rarities = statistics.Consume("TargetRarityList")[0].Split('/');
+                    
+                    var mutationType = mutationTypeHint.ResolveMutationType("Correction");
+                    
+                    output = output.WithEffect(
+                        $"**{typeName}** of {string.Join(" / ", values)}",
+                        mutationTypeHint.ResolveMutationType("Value")
+                    );
+
+
+                    var key = $"Special damage for {string.Join('/', rarities)}-star targets";
+                    if (mutationType.HasValue) output.TreasureDeviceMutationTypeHint[key] = mutationType.Value;
+                    output.Statistics[key] = specialDamageValue;
+
                     break;
                 }
             }
