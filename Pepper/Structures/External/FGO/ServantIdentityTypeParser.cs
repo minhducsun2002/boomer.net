@@ -97,7 +97,7 @@ namespace Pepper.Structures.External.FGO
         private static Dictionary<int, int> TokenSearch(string query, ServantSearchService searchService)
         {
             var split = Whitespaces.Replace(query, " ").Split(" ").Where(str => !string.IsNullOrWhiteSpace(str));
-            var validTokens = split.Where(token => !searchService.TokenTable.ContainsKey(token));
+            var validTokens = split.Where(token => searchService.TokenTable.ContainsKey(token));
             var tokenRelatedServants = validTokens.Select(token => (token, searchService.TokenTable[token])).ToList();
 
             var servantOccurences = tokenRelatedServants
