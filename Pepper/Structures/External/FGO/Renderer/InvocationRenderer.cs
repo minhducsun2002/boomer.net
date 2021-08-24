@@ -127,6 +127,19 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
                 }
 
+                case FuncList.TYPE.SUB_STATE:
+                {
+                    var buffTraits = function.Vals.Select(trait => traitService.GetTrait(trait)).ToArray();
+                    if (buffTraits.Length < 3)
+                        output.WithEffect($"Remove {string.Join('/', buffTraits)} effects");
+                    else
+                    {
+                        output = output.WithEffect("Remove effects with certain traits");
+                        output.Statistics["Affected traits"] = buffTraits;
+                    }
+                    break;
+                }
+
                 case FuncList.TYPE.EVENT_DROP_UP:
                 {
                     // We are assuming the individuality refers to only one item
