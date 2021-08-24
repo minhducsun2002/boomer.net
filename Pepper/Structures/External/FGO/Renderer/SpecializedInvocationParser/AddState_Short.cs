@@ -96,7 +96,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                         output.CountMutationType = mutationTypeHint.ResolveMutationType("Count");
                         break;
                     case BuffList.TYPE.REGAIN_NP:
-                        output.Amount = values["Value"].Select(value => $"{float.Parse(value) / 10}%").ToArray();
+                        output.Amount = values["Value"].Select(value => $"{float.Parse(value) / 100}%").ToArray();
                         output.AmountMutationType = mutationTypeHint.ResolveMutationType("Value");
                         break;
                     case BuffList.TYPE.ADD_DAMAGE:
