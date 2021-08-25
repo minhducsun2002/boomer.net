@@ -8,6 +8,7 @@ using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Mods;
+using Pepper.Services.Osu.API;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
@@ -49,7 +50,7 @@ namespace Pepper.Commands.Osu
             );
             
             var scores = await APIService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
-            var chunks = scores
+            var filtered = scores
                 .Where(score =>
                 {
                     if (modFilters.Length == 0) return true;
@@ -59,19 +60,23 @@ namespace Pepper.Commands.Osu
                     return modFilters.All(mod =>
                         checkedMods.Contains(mod.Acronym, StringComparer.InvariantCultureIgnoreCase));
                 })
-                .Chunk(MaxScorePerPage).ToArray();
+                .ToArray();
 
-            var embeds = chunks.Select((scoreChunk, index) => SerializeScoreset(scoreChunk)
-                .WithFooter($"Top plays (all times are UTC)")
-                .WithAuthor(SerializeAuthorBuilder(user))).ToList();
+            var pages = new ArrayPageProvider<APILegacyScoreInfo>(
+                filtered,
+                (_, chunk) => new Page().WithEmbeds(
+                    SerializeScoreset(chunk, scoreLink: false)
+                        .WithFooter($"Top plays (all times are UTC)")
+                        .WithAuthor(SerializeAuthorBuilder(user))    
+                ),
+                MaxScorePerPage
+            );
 
-            if (embeds.Count == 0)
+            if (pages.PageCount == 0)
                 return Reply(new LocalEmbed()
                     .WithDescription(
                         $"No top play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {ruleset.RulesetInfo.Name}"));
-            return View(
-                new ScoresetPagedView(new ListPageProvider(embeds.Select(embed => new Page().WithEmbeds(embed))))
-            );
+            return View(new ScoresetPagedView(pages));
         }
     }
 }

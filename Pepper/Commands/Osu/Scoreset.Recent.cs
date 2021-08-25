@@ -6,6 +6,7 @@ using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using Pepper.Services.Osu.API;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
@@ -25,22 +26,23 @@ namespace Pepper.Commands.Osu
             var (user, _, _) = await APIService.GetUser(username, rulesetInfo);
 
             var scores = await APIService.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo);
-            var chunks = scores.Chunk(MaxScorePerPage).ToArray();
+            
+            var pages = new ArrayPageProvider<APILegacyScoreInfo>(
+                scores,
+                (_, chunk) => new Page().WithEmbeds(
+                    SerializeScoreset(chunk, scoreLink: false)
+                        .WithFooter($"Recent plays (all times are UTC)")
+                        .WithAuthor(SerializeAuthorBuilder(user))    
+                ),
+                MaxScorePerPage
+            );
 
-            var embeds = chunks.Select(
-                embed => SerializeScoreset(embed, scoreLink: false)
-                    .WithFooter($"Recent plays (all times are UTC)")
-                    .WithAuthor(SerializeAuthorBuilder(user))
-            ).ToArray();
-
-            if (embeds.Length == 0)
+            if (pages.PageCount == 0)
                 return Reply(new LocalEmbed()
                     .WithDescription(
                         $@"No recent play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {rulesetInfo.Name}"
                     ));
-            return View(
-                new ScoresetPagedView(new ListPageProvider(embeds.Select(embed => new Page().WithEmbeds(embed))))
-            );
+            return View(new ScoresetPagedView(pages));
         }
 
         [Command("rs")]
