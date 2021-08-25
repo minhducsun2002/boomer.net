@@ -78,6 +78,7 @@ namespace Pepper.Commands.Osu
             long? scoreId = null, double? pp = null
         )
         {
+            SetBeatmapContext(workingBeatmap.BeatmapInfo.OnlineBeatmapID!.Value);
             var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(mods);
             double? fullComboPP = pp;
             var calculated = false;
