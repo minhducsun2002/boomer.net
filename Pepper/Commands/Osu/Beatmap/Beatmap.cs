@@ -23,25 +23,24 @@ namespace Pepper.Commands.Osu
             {
                 BeatmapsetResolvable beatmapset => Beatmapset(
                     await APIService.GetBeatmapsetInfo(beatmapset.BeatmapsetId, true)),
-                BeatmapResolvable beatmap => await BeatmapSingle(
+                BeatmapResolvable beatmap => BeatmapSingle(
                     await APIService.GetBeatmapsetInfo(beatmap.BeatmapId, false), beatmap.BeatmapId),
-                BeatmapAndSetResolvable beatmapAndSet => await BeatmapSingle(
+                BeatmapAndSetResolvable beatmapAndSet =>  BeatmapSingle(
                     await APIService.GetBeatmapsetInfo(beatmapAndSet.BeatmapsetId, true), beatmapAndSet.BeatmapId),
                 BeatmapOrSetResolvable beatmapOrSet =>  set switch
                     {
                         true => Beatmapset(await APIService.GetBeatmapsetInfo(beatmapOrSet.BeatmapOrSetId, true)),
-                        false => await BeatmapSingle(await APIService.GetBeatmapsetInfo(beatmapOrSet.BeatmapOrSetId, false), beatmapOrSet.BeatmapOrSetId)
+                        false => BeatmapSingle(await APIService.GetBeatmapsetInfo(beatmapOrSet.BeatmapOrSetId, false), beatmapOrSet.BeatmapOrSetId)
                     },
                 _ => throw new ArgumentException("A valid URL is not provided!")
             };
         }
 
         private DiscordCommandResult Beatmapset(APIBeatmapSet beatmapset) => View(new BeatmapsetPagedView(beatmapset));
-        private async Task<DiscordCommandResult> BeatmapSingle(APIBeatmapSet beatmapset, int beatmapId)
+        private DiscordCommandResult BeatmapSingle(APIBeatmapSet beatmapset, int beatmapId)
         {
-            var embed = await BeatmapSingleView.PrepareEmbed(beatmapset, APIService, beatmapId);
             SetBeatmapContext(beatmapId);
-            return View(new BeatmapSingleView(beatmapset, APIService, embed, beatmapId));
+            return View(new BeatmapSingleView(new BeatmapPageProvider(beatmapset, APIService), beatmapId));
         }
     }
 }

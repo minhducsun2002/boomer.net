@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
+using Disqord.Extensions.Interactivity.Menus.Paged;
 using Disqord.Rest;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -16,58 +16,30 @@ using Pepper.Structures.External.Osu;
 
 namespace Pepper.Commands.Osu
 {
-    internal class BeatmapSingleView : ViewBase
+    internal class BeatmapPageProvider : PageProvider
     {
+        public readonly APIBeatmapSet Beatmapset;
+        private readonly APIService apiService;
         private readonly Dictionary<int, LocalEmbed> beatmapEmbeds = new();
-        private int currentBeatmapId;
-        private readonly APIBeatmapSet beatmapset;
-
-        public BeatmapSingleView(APIBeatmapSet beatmapset, APIService service, LocalEmbed initialEmbed, int initialBeatmapId) 
-            : base(new LocalMessage { Embeds = new List<LocalEmbed> { initialEmbed } })
+        public BeatmapPageProvider(APIBeatmapSet beatmapSet, APIService apiService)
         {
-            beatmapEmbeds[initialBeatmapId] = initialEmbed;
-            currentBeatmapId = initialBeatmapId;
-            this.beatmapset = beatmapset;
+            Beatmapset = beatmapSet;
+            this.apiService = apiService;
+        }
+        
+        public override async ValueTask<Page> GetPageAsync(PagedViewBase view)
+        {
+            var currentIndex = view.CurrentPageIndex;
+            if (!beatmapEmbeds.TryGetValue(currentIndex, out var embed))
+                embed = beatmapEmbeds[currentIndex] = await PrepareEmbed(Beatmapset, apiService, Beatmapset.Beatmaps[currentIndex].OnlineBeatmapID);
 
-            var select = new SelectionViewComponent(async e =>
-            {
-                var beatmapId = int.Parse(e.SelectedOptions[0].Value);
-                if (!beatmapEmbeds.TryGetValue(beatmapId, out var embed))
-                    embed = beatmapEmbeds[beatmapId] = await PrepareEmbed(beatmapset, service, beatmapId);
-
-                currentBeatmapId = beatmapId;
-                await e.Interaction.Response().DeferAsync();
-                TemplateMessage.Embeds = new List<LocalEmbed> { embed };
-                e.Selection.Options = GetCurrentOptionList();
-            })
-            {
-                MaximumSelectedOptions = 1,
-                MinimumSelectedOptions = 1,
-                Placeholder = "Jump...",
-                Options = GetCurrentOptionList()
-            };
-            AddComponent(select);
+            return new Page().WithEmbeds(embed);
         }
 
-        private List<LocalSelectionComponentOption> GetCurrentOptionList()
-        {
-            return beatmapset.Beatmaps.Take(LocalSelectionComponent.MaxOptionsAmount)
-                .OrderBy(beatmap => beatmap.StarDifficulty)
-                .Select(beatmap => new LocalSelectionComponentOption
-                {
-                    Label = beatmap.Version.Length < LocalSelectionComponentOption.MaxLabelLength
-                        ? beatmap.Version
-                        : beatmap.Version[..22] + "...",
-                    Description = OsuCommand.SerializeBeatmapStats(beatmapset, beatmap, false, false),
-                    Value = $"{beatmap.OnlineBeatmapID}",
-                    IsDefault = currentBeatmapId == beatmap.OnlineBeatmapID
-                })
-                .ToList();
-        }
+        public override int PageCount => Beatmapset.Beatmaps.Count;
 
         private const double AccStart = 93, AccEnd = 100, AccStep = 0.5;
-
-        public static async Task<LocalEmbed> PrepareEmbed(APIBeatmapSet beatmapset, APIService service, int beatmapId, Mod[]? mods = null)
+        private static async Task<LocalEmbed> PrepareEmbed(APIBeatmapSet beatmapset, APIService service, int beatmapId, Mod[]? mods = null)
         {
             var beatmap = beatmapset.Beatmaps.First(beatmap => beatmap.OnlineBeatmapID == beatmapId);
             var ruleset = RulesetTypeParser.SupportedRulesets[beatmap.Ruleset];
@@ -122,6 +94,49 @@ namespace Pepper.Commands.Osu
                 Footer = new LocalEmbedFooter().WithText(ruleset.RulesetInfo.Name),
                 ImageUrl = chart.GetUrl() + "&version=3"
             };
+        }
+    }
+    
+    internal class BeatmapSingleView : PagedViewBase
+    {
+        private readonly APIBeatmapSet beatmapset;
+        private readonly Dictionary<int, int> beatmapIdToIndex;
+        public BeatmapSingleView(BeatmapPageProvider pageProvider, int initialBeatmapId) : base(pageProvider)
+        {
+            beatmapset = pageProvider.Beatmapset;
+            beatmapIdToIndex = beatmapset.Beatmaps.Select((beatmap, index) => (beatmap.OnlineBeatmapID, index))
+                .ToDictionary(pair => pair.OnlineBeatmapID, pair => pair.index);
+            
+            CurrentPageIndex = beatmapIdToIndex[initialBeatmapId];
+            var select = new SelectionViewComponent(async e =>
+            {
+                CurrentPageIndex = beatmapIdToIndex[int.Parse(e.SelectedOptions[0].Value)];
+                await e.Interaction.Response().DeferAsync();
+                e.Selection.Options = GetCurrentOptionList();
+            })
+            {
+                MaximumSelectedOptions = 1,
+                MinimumSelectedOptions = 1,
+                Placeholder = "Jump...",
+                Options = GetCurrentOptionList()
+            };
+            AddComponent(select);
+        }
+
+        private List<LocalSelectionComponentOption> GetCurrentOptionList()
+        {
+            return beatmapset.Beatmaps.Take(LocalSelectionComponent.MaxOptionsAmount)
+                .OrderBy(beatmap => beatmap.StarDifficulty)
+                .Select(beatmap => new LocalSelectionComponentOption
+                {
+                    Label = beatmap.Version.Length < LocalSelectionComponentOption.MaxLabelLength
+                        ? beatmap.Version
+                        : beatmap.Version[..22] + "...",
+                    Description = OsuCommand.SerializeBeatmapStats(beatmapset, beatmap, false, false),
+                    Value = $"{beatmap.OnlineBeatmapID}",
+                    IsDefault = CurrentPageIndex == beatmapIdToIndex[beatmap.OnlineBeatmapID]
+                })
+                .ToList();
         }
     }
 }
