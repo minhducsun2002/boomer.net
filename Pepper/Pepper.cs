@@ -159,6 +159,12 @@ namespace Pepper
                         new() { Name = "Parameter", Value = $"Name : `{parameter.Name}`\nType : `{parameter.Type.Name}`" },
                         new() { Name = "Parsing value", Value = $"`{typeParseFailedResult.Value}`" }
                     };
+                    if (!string.IsNullOrWhiteSpace(typeParseFailedResult.FailureReason))
+                        embed.Fields.Add(new LocalEmbedField
+                        {
+                            Name = "Failure reason",
+                            Value = typeParseFailedResult.FailureReason
+                        });
                     break;
                 case ChecksFailedResult checksFailedResult:
                 {
