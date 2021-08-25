@@ -160,6 +160,14 @@ namespace Pepper
                         new() { Name = "Parsing value", Value = $"`{typeParseFailedResult.Value}`" }
                     };
                     break;
+                case ChecksFailedResult checksFailedResult:
+                {
+                    if (checksFailedResult.FailedChecks.Count == 1)
+                        if (checksFailedResult.FailedChecks[0].Check is PrefixCheckAttribute)
+                            return null!;
+                    goto default;
+                    
+                }
                 default:
                     embed.Description = result.FailureReason;
                     break;
