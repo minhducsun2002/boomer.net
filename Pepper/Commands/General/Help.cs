@@ -36,7 +36,7 @@ namespace Pepper.Commmands.General
 
             var embedAuthor = new LocalEmbedAuthor
             {
-                Name = $"{self.Name}#{self.Tag}",
+                Name = $"{self.Tag}",
                 IconUrl = self.GetAvatarUrl(CdnAssetFormat.Png, 1024)
             };
             
