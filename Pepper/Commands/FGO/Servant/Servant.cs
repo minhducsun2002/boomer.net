@@ -22,7 +22,7 @@ namespace Pepper.Commands.FGO
     {
         public Servant(MasterDataService m, TraitService t, ItemNamingService i, ServantNamingService n) : base(m, t, i, n) {}
         
-        [Command("servant", "s")]
+        [Command("servant", "s", "servant-info")]
         [PrefixCategory("fgo")]
         public DiscordCommandResult Exec([Remainder] ServantIdentity servantIdentity)
         {

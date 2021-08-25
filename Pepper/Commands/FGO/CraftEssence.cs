@@ -46,7 +46,7 @@ namespace Pepper.Commands.FGO
     {
         public CraftEssence(MasterDataService m, TraitService t, ItemNamingService i) : base(m, t, i) {}
 
-        [Command("ce")]
+        [Command("ce", "show-craft-essence")]
         [PrefixCategory("fgo")]
         public DiscordCommandResult Exec(int id = 1)
         {

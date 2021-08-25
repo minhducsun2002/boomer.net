@@ -17,7 +17,7 @@ namespace Pepper.Commands.FGO
 
         public ServantSkill(MasterDataService m, TraitService t, ItemNamingService i, ServantNamingService n) : base(m, t, i, n) {}
 
-        [Command("skill")]
+        [Command("skill", "sk", "skills", "servant-skill", "servant-skills")]
         [Description("Show skills of a servant")]
         public DiscordCommandResult Exec([Remainder] ServantIdentity servantIdentity)
         {
