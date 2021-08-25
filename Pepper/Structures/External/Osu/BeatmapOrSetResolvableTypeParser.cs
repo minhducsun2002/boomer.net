@@ -46,7 +46,8 @@ namespace Pepper.Structures.External.Osu
         
         public override ValueTask<TypeParserResult<IBeatmapResolvable>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            var isEmpty = string.IsNullOrWhiteSpace(value);
+            if (isEmpty)
             {
                 var service = context.Services.GetRequiredService<BeatmapContextProviderService>();
                 var beatmapId = service.GetBeatmap(context.ChannelId.ToString());
@@ -58,7 +59,11 @@ namespace Pepper.Structures.External.Osu
             
             return int.TryParse(value, out var targetId)
                 ? Success(new BeatmapResolvable(targetId))
-                : Failure("Could not determine a beatmap ID from given input.");
+                : Failure(
+                    isEmpty
+                    ? "No beatmap is specified, and there was no previous beatmap/score viewed in this channel."
+                    : "Could not determine a beatmap ID from given input."
+                );
         }
     }
 
@@ -68,7 +73,8 @@ namespace Pepper.Structures.External.Osu
         
         public override ValueTask<TypeParserResult<IBeatmapOrSetResolvable>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            var isEmpty = string.IsNullOrWhiteSpace(value);
+            if (isEmpty)
             {
                 var service = context.Services.GetRequiredService<BeatmapContextProviderService>();
                 var beatmapId = service.GetBeatmap(context.ChannelId.ToString());
@@ -86,7 +92,9 @@ namespace Pepper.Structures.External.Osu
 
             return int.TryParse(value, out var ambiguousId)
                 ? Success(new BeatmapOrSetResolvable(ambiguousId))
-                : Failure("Could not determine if this is a beatmap or beatmapset link.");
+                : Failure(isEmpty 
+                    ? "No beatmap(set) is specified, and there was no previous beatmap/score viewed in this channel." 
+                    : "Could not determine if this is a beatmap or beatmapset link.");
         }
     }
 }
