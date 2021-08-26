@@ -112,7 +112,7 @@ namespace Pepper.Commands.Osu
             => new()
             {
                 IconUrl = string.IsNullOrWhiteSpace(user.AvatarUrl) ? $"https://a.ppy.sh/{user.Id}" : user.AvatarUrl,
-                Name = user.Username,
+                Name = $"{user.Username} ({user.Statistics.PP}pp)",
                 Url = $"https://osu.ppy.sh/users/{user.Id}"
             };
 
