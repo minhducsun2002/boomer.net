@@ -31,7 +31,7 @@ namespace Pepper.Commands.Osu
         [Command("whatif", "if", "netgain")]
         public async Task<DiscordCommandResult> Exec(
             [Flag("/")] [Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
-            int ppToCheck = 0,
+            int ppToCheck,
             [Description("Username to check. Default to your username, if set.")] Username username = null!
         )
         {
