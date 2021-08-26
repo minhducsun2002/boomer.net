@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus.Paged;
 using FuzzySharp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,13 +12,12 @@ using Pepper.Structures.Commands;
 using Pepper.Utilities;
 using Qmmands;
 using Command = Qmmands.Command;
+using PagedView = Pepper.Structures.PagedView;
 
 namespace Pepper.Commmands.General
 {
     public class Help : GeneralCommand
     {
-        
-        
         [Command("help")]
         [Description("Everything starts here.")]
         public DiscordCommandResult Exec(
@@ -43,7 +43,14 @@ namespace Pepper.Commmands.General
             if (!string.IsNullOrWhiteSpace(query))
             {
                 var commandMatches = service.FindCommands(query);
-                if (commandMatches.Count != 0) return Reply(HandleCommand(commandMatches[0].Command));
+                if (commandMatches.Count != 0)
+                {
+                    var pages = HandleCommand(commandMatches.Select(match => match.Command).ToArray()).ToList();
+                        
+                    if (pages.Count > 1)
+                        return View(new PagedView(new ListPageProvider(pages.Select(embed => new Page().WithEmbeds(embed)))));
+                    return Reply(pages[0]);
+                }
                 
                 var categoryMatches = Process.ExtractTop(
                     query.ToLowerInvariant(),
@@ -66,37 +73,33 @@ namespace Pepper.Commmands.General
                     + $"\nCall {SelfInvocation()} `<category>` for commands belonging to a certain category."));
         }
 
-        private LocalEmbed HandleCommand(Command command)
+        private List<LocalEmbed> HandleCommand(Command[] commands)
         {
-            var prefixCategory = command.Attributes.OfType<PrefixCategoryAttribute>().FirstOrDefault()?.PrefixCategory;
+            var prefixCategory = commands[0].Attributes.OfType<PrefixCategoryAttribute>().FirstOrDefault()?.PrefixCategory;
             var config = Context.Services.GetRequiredService<IConfiguration>();
             var prefixes = string.IsNullOrWhiteSpace(prefixCategory)
                 ? ((DefaultPrefixProvider) Context.Bot.Prefixes).Prefixes.Select(prefix => prefix.ToString()!).ToArray()
                 : config.GetCommandPrefixes(prefixCategory);
             
-            string basePrefix = prefixes[0], baseInvocation = $"{basePrefix}{command.Aliases[0]}";
+            string basePrefix = prefixes[0], baseInvocation = $"{basePrefix}{commands[0].Aliases[0]}";
             var otherPrefixes = prefixes.Length > 1 ? prefixes[1..] : System.Array.Empty<string>();
-            var flagParams = command.Parameters
-                .Where(param => param.Attributes.OfType<FlagAttribute>().Any())
-                .Select(param => (param, param.Attributes.OfType<FlagAttribute>().First()))
-                .ToList();
 
-            return new LocalEmbed
+            var embeds = commands.Select((command, index) =>
             {
-                Title = $"`{baseInvocation}`" + (
-                    command.Aliases.Count > 1
-                        ? $"({string.Join(", ", command.Aliases.Skip(1).Select(alias => $"`{basePrefix}{alias}`"))})"
-                        : ""
-                ),
-                Description = string.IsNullOrWhiteSpace(command.Description) ? "No description." : command.Description,
-                Fields = new List<LocalEmbedField?>
+                var overload = commands.Length > 1 ? $" (overload {index + 1})" : "";
+                var flagParams = command.Parameters
+                    .Where(param => param.Attributes.OfType<FlagAttribute>().Any())
+                    .Select(param => (param, param.Attributes.OfType<FlagAttribute>().First()))
+                    .ToList();
+
+                var fields = new List<LocalEmbedField>
                 {
                     new()
                     {
-                        Name = "Syntax",
+                        Name = "Syntax" + overload,
                         Value = $@"`{baseInvocation} {
                             string.Join(
-                                ' ', 
+                                ' ',
                                 command.Parameters.Select(param => {
                                     var flags = param.Attributes.OfType<FlagAttribute>().FirstOrDefault()?.Flags;
                                     // TODO we are assuming flag parameters are always optional
@@ -105,35 +108,53 @@ namespace Pepper.Commmands.General
                                         ? quotes[..^1] + param.Name + "1" + quotes[^1] + "..." + quotes[..^1] + param.Name + "N" + quotes[^1]
                                         : quotes[..^1] + param.Name + quotes[^1];
                                 }))
-                            }".TrimEnd()
-                            + "`"
-                            + "\n\n"
-                            + string.Join('\n', command.Parameters.Select(param => $"- `{param.Name}` {param.Description}"))
-                    },
-                    (flagParams.Count != 0
-                        ? new LocalEmbedField
+                        }".TrimEnd()
+                                + "`\n\n"
+                                + string.Join('\n',
+                                    command.Parameters.Select(param => $"- `{param.Name}` {param.Description}"))
+                    }
+                };
+
+                if (flagParams.Count != 0)
+                    fields.Add(
+                        new LocalEmbedField
                         {
-                            Name = "Flags",
+                            Name = "Flags" + overload,
                             Value = $@"The following parameter{
-                                    StringUtilities.Plural(flagParams.Count)
-                                } are flags & must be prefixed with certain strings, listed below."
-                                + "\n"
-                                + string.Join(
-                                    '\n',
-                                    flagParams.Select(pair =>
-                                    {
-                                        var (param, flagAttribute) = pair;
-                                        return $"`{param.Name}` **:** {string.Join(" | ", flagAttribute.Flags.Select(f => $"`{f}`"))}";
-                                    })
-                                )
-                        }
-                        : null)
-                }.Where(_ => _ != null).ToList(),
-                Footer = otherPrefixes.Length != 0
-                    ? new LocalEmbedFooter().WithText($"Also callable under prefix {string.Join("/", otherPrefixes.Select(_ => $"\"{_}\""))}")
-                    : default
-                
-            };
+                                StringUtilities.Plural(flagParams.Count)
+                            } are flags & must be prefixed with certain strings, listed below."
+                                    + "\n"
+                                    + string.Join(
+                                        '\n',
+                                        flagParams.Select(pair =>
+                                        {
+                                            var (param, flagAttribute) = pair;
+                                            return
+                                                $"`{param.Name}` **:** {string.Join(" | ", flagAttribute.Flags.Select(f => $"`{f}`"))}";
+                                        })
+                                    )
+                        });
+
+                var embed = new LocalEmbed
+                {
+                    Title = $"`{baseInvocation}`" + (
+                        commands[0].Aliases.Count > 1
+                            ? $"({string.Join(", ", commands[0].Aliases.Skip(1).Select(alias => $"`{basePrefix}{alias}`"))})"
+                            : ""
+                    ),
+                    Description = string.IsNullOrWhiteSpace(commands[0].Description) ? "No description." : commands[0].Description,
+                    Fields = fields,
+                    Footer = otherPrefixes.Length != 0
+                        ? new LocalEmbedFooter().WithText(
+                            $"Also callable under prefix {string.Join("/", otherPrefixes.Select(_ => $"\"{_}\""))}")
+                        : default
+                };
+
+                return embed;
+            });
+
+            
+            return embeds.ToList();
         }
         
         private LocalEmbed HandleCategory(string category, IReadOnlyCollection<Command> commands)
