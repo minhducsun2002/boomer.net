@@ -25,7 +25,7 @@ namespace Pepper.Commands.Osu
         [Priority(1)]
         public async Task<DiscordCommandResult> BeatmapBased(
             [Description("A score URL, a beatmap URL, or a beatmap ID.")] IBeatmapResolvable beatmapResolvable,
-            [Remainder] [Description("Username to check. Default to your username, if set. Ignored if a score link is passed.")] Username? username = null
+            [Remainder] [Description("Username to check. Default to your username, if set.")] Username? username = null
         )
         {
 
@@ -97,7 +97,7 @@ namespace Pepper.Commands.Osu
         [Command("sc", "score", "scores", "c", "check")]
         [Description("View/list scores on a certain map")]
         [Priority(0)]
-        public async Task<DiscordCommandResult> ScoreLink(string link)
+        public async Task<DiscordCommandResult> ScoreLink([Description("A link to a score.")] string link)
         {
             if (URLParser.CheckScoreUrl(link, out var scoreLink))
             {
