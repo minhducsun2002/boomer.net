@@ -27,7 +27,7 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Prepare test loader script
-      run: pip install -r Pepper.Test/requirements.txt
+      run: pip install -r Pepper.Test/FGO/requirements.txt
     - name: Test
       run: dotnet test --filter ${{ matrix.filters }}
       env:

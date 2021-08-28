@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <Target Name="LoadData" AfterTargets="AfterCompile">
-    <Exec Command="python load.py $(IntermediateOutputPath)" />
+    <Exec Command="python FGO/load.py $(IntermediateOutputPath)" />
     <ItemGroup>
       <MasterData Include="$(IntermediateOutputPath)\master\**\*.*" />
     </ItemGroup>

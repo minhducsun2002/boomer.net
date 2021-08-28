@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Pepper.Structures.External.FGO.Renderer;
 using Xunit;
 
-namespace Pepper.Test
+namespace Pepper.Test.FGO
 {
     public class DataValParserTest
     {
