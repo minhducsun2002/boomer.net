@@ -23,13 +23,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Pepper\Pepper.csproj" />
   </ItemGroup>
-
-  <Target Name="LoadData" AfterTargets="AfterCompile">
-    <Exec Command="python FGO/load.py $(IntermediateOutputPath)" />
-    <ItemGroup>
-      <MasterData Include="$(IntermediateOutputPath)\master\**\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(MasterData)" DestinationFolder="$(OutputPath)master\%(RecursiveDir)" SkipUnchangedFiles="true" />
-  </Target>
-
 </Project>

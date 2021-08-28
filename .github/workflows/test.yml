@@ -3,7 +3,7 @@ name: Run test
 on:
   push:
     paths:
-    - '**/FGO/**'
+    - 'Pepper/**'
     - '.github/workflows/test.yml'
     - 'Pepper.Test/**'
   repository_dispatch:
@@ -15,20 +15,13 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix: 
-        filters: ['ParseDataValFromMstSkillLv']
+        filters: ['AllCommandsFullyDescribed']
       fail-fast: false
     steps:
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.9.6'
     - uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
-    - name: Prepare test loader script
-      run: pip install -r Pepper.Test/FGO/requirements.txt
     - name: Test
-      run: dotnet test --filter ${{ matrix.filters }}
-      env:
-        TEST_LIST_URL: ${{ secrets.TEST_LIST_URL }}
+      run: dotnet test Pepper.Test --filter ${{ matrix.filters }}
