@@ -94,8 +94,9 @@ namespace Pepper
         ) : base(options, logger, services, client) {}
         
         private static readonly Type[] DownleveledAttributes = { typeof(CategoryAttribute), typeof(PrefixCategoryAttribute) };
-        
-        protected override void MutateModule(ModuleBuilder moduleBuilder)
+
+        // expose this for tests
+        public static void DownlevelAttributes(ModuleBuilder moduleBuilder)
         {
             foreach (var command in CommandUtilities.EnumerateAllCommands(moduleBuilder))
             {
@@ -111,10 +112,17 @@ namespace Pepper
                                 command.AddAttribute(category);
                                 break;
                             }
+
                             module = module.Parent;
                         }
                     }
-
+            }
+        }
+        protected override void MutateModule(ModuleBuilder moduleBuilder)
+        {
+            DownlevelAttributes(moduleBuilder);
+            foreach (var command in CommandUtilities.EnumerateAllCommands(moduleBuilder))
+            {
                 if (command.Parameters.Count == 0) continue;
                 
                 var lastNotFlag = command.Parameters
