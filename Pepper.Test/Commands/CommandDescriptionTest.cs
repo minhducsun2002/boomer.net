@@ -40,7 +40,7 @@ namespace Pepper.Test.Commands
                     testOutputHelper.WriteLine($"Command : {command.Name}" + (category == null ? "" : $", category : {category}"));
                     throw;
                 }
-
+                
                 foreach (var parameter in command.Parameters)
                     try
                     {
@@ -49,7 +49,7 @@ namespace Pepper.Test.Commands
                     }
                     catch (Exception e)
                     {
-                        testOutputHelper.WriteLine($"Parameter : {parameter.Name}, type : {parameter.Type.FullName}");
+                        testOutputHelper.WriteLine($"Command : {command.Name}, parameter : {parameter.Name}, type : {parameter.Type.FullName}");
                         throw;
                     }
                 
