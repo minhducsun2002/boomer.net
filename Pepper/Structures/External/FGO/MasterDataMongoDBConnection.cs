@@ -13,15 +13,15 @@ namespace Pepper.Structures.External.FGO
         public IMongoCollection<MstSvtCard> MstSvtCard = null!;
         public IMongoCollection<MstSkill> MstSkill = null!;
         public IMongoCollection<MstSvtTreasureDevice> MstSvtTreasureDevice = null!;
-        public IMongoCollection<MstBuff> MstBuff = null!;
-        public IMongoCollection<MstFunc> MstFunc = null!;
+        private IMongoCollection<MstBuff> MstBuff = null!;
+        private IMongoCollection<MstFunc> MstFunc = null!;
         public IMongoCollection<MstEvent> MstEvent = null!;
         public IMongoCollection<MstTreasureDeviceLv> MstTreasureDeviceLv = null!;
-        public IMongoCollection<MstAttriRelation> MstAttriRelation = null!;
+        private IMongoCollection<MstAttriRelation> MstAttriRelation = null!;
         public IMongoCollection<MstCombineLimit> MstCombineLimit = null!;
         public IMongoCollection<MstCombineSkill> MstCombineSkill = null!;
         public IMongoCollection<MstItem> MstItem = null!;
-        public IMongoCollection<MstSkillLv> MstSkillLv = null!;
+        private IMongoCollection<MstSkillLv> MstSkillLv = null!;
         public IMongoCollection<MstTreasureDevice> MstTreasureDevice = null!;
         public IMongoCollection<MstQuest> MstQuest = null!;
     }

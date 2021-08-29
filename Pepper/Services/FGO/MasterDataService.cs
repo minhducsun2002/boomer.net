@@ -43,7 +43,7 @@ namespace Pepper.Services.FGO
                 
                 // TODO : switch all of these to use code generation
                 var connectionObject = new MasterDataMongoDBConnection();
-                foreach (var field in connectionObject.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+                foreach (var field in connectionObject.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance))
                     if (MasterDataEntityTypes.ContainsKey(field.Name))
                     {
                         var method = db.GetType().GetMethod(nameof(db.GetCollection))!
