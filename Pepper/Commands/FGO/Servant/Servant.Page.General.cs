@@ -15,14 +15,12 @@ namespace Pepper.Commands.FGO
 {
     public partial class Servant
     {
-        private (LocalSelectionComponentOption, Page)? GeneralPage(
-            BaseServant servant,
-            IReadOnlyList<MstSvtCard> cards
-        )
+        private (LocalSelectionComponentOption, Page)? GeneralPage(BaseServant servant)
         {
             var svtLimits = servant.Limits;
             var svt = servant.ServantEntity;
             var npGain = GetNPGain(servant.ID);
+            var cards = servant.Cards;
             var general = servant.BaseEmbed()
                 .WithFields(
                     new LocalEmbedField
@@ -91,8 +89,8 @@ namespace Pepper.Commands.FGO
                 var skillMapping = jp.MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("skillId", skillId)).FirstOrDefault();
                 if (skillMapping != default)
                 {
-                    var ceSvt = jp.GetMstSvtById(skillMapping.SvtId);
-                    var naName = na.GetMstSvtById(skillMapping.SvtId)?.Name;
+                    var ceSvt = jp.GetServantEntityById(skillMapping.SvtId);
+                    var naName = na.GetServantEntityById(skillMapping.SvtId)?.Name;
                     var mstSkill = jp.MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("id", skillId)).First();
                     var (skill, referencedSkills) = new SkillRenderer(mstSkill, jp).Prepare(TraitService);
                     return new LocalEmbedField

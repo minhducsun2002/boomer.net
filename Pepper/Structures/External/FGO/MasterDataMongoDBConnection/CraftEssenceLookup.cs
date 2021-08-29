@@ -1,4 +1,5 @@
 using System.Linq;
+using FgoExportedConstants;
 using MongoDB.Driver;
 using Pepper.Structures.External.FGO.Entities;
 using Pepper.Structures.External.FGO.MasterData;
@@ -33,7 +34,7 @@ namespace Pepper.Structures.External.FGO
             => BuildCraftEssence(mstSvtHint ?? MstSvt.FindSync(
                 Builders<MstSvt>.Filter.And(
                     Builders<MstSvt>.Filter.Eq("collectionNo", collectionNo),
-                    Builders<MstSvt>.Filter.Eq("type", 6))
+                    Builders<MstSvt>.Filter.Eq("type", SvtType.Type.SERVANT_EQUIP))
                 ).FirstOrDefault());
     }
 }

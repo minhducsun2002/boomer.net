@@ -78,7 +78,7 @@ namespace Pepper.Structures.External.FGO
         private static MstSvt? ResolveNumericIdentifier(int idOrCollectionNo, MasterDataService masterDataService)
         {
             var jp = masterDataService.Connections[Region.JP];
-            return jp.GetMstSvtById(idOrCollectionNo) ?? jp.GetServantEntityByCollectionNo(idOrCollectionNo);
+            return jp.GetServantEntityById(idOrCollectionNo) ?? jp.GetServantEntityByCollectionNo(idOrCollectionNo);
         }
         
         private static readonly Regex Whitespaces = new(@"\s", RegexOptions.Compiled | RegexOptions.ECMAScript | RegexOptions.CultureInvariant);

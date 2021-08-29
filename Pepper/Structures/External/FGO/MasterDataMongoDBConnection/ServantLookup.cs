@@ -10,7 +10,6 @@ namespace Pepper.Structures.External.FGO
 {
     public partial class MasterDataMongoDBConnection
     {
-        
         public BaseServant GetServant(MstSvt svt) => GetServant(svt.ID, svt);
         public BaseServant GetServant(int id, MstSvt? hint = null)
         {
@@ -19,21 +18,20 @@ namespace Pepper.Structures.External.FGO
             var @class = MstClass.FindSync(Builders<MstClass>.Filter.Eq("id", svt.ClassId),
                 new FindOptions<MstClass> {Limit = 1}).First();
             var attributes = GetAttributeLists();
-            return new BaseServant(svt, limits, @class, svt.Traits.First(attributes.Contains));
+            var cards = MstSvtCard.FindSync(Builders<MstSvtCard>.Filter.Eq("svtId", id)).ToList().ToArray();
+            return new BaseServant(svt, limits, @class, svt.Traits.First(attributes.Contains), cards);
         }
-
-        public MstSvt? GetMstSvtById(int id) => MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", id)).FirstOrDefault();
-
-        private static readonly FilterDefinition<MstSvt> TypeQuery = Builders<MstSvt>.Filter.Or(
-            Builders<MstSvt>.Filter.Eq("type", SvtType.Type.NORMAL),
-            Builders<MstSvt>.Filter.Eq("type", SvtType.Type.HEROINE),
-            Builders<MstSvt>.Filter.Eq("type", SvtType.Type.ENEMY_COLLECTION_DETAIL)
-        );
+        
         public MstSvt? GetServantEntityByCollectionNo(int collectionNo)
             => MstSvt.FindSync(Builders<MstSvt>.Filter.And(
                 Builders<MstSvt>.Filter.Eq("collectionNo", collectionNo),
-                TypeQuery
+                Builders<MstSvt>.Filter.Or(
+                    Builders<MstSvt>.Filter.Eq("type", SvtType.Type.NORMAL),
+                    Builders<MstSvt>.Filter.Eq("type", SvtType.Type.HEROINE),
+                    Builders<MstSvt>.Filter.Eq("type", SvtType.Type.ENEMY_COLLECTION_DETAIL)
+                )
             )).FirstOrDefault();
+        public MstSvt? GetServantEntityById(int id) => MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", id)).FirstOrDefault();
 
         public ServantLimits GetServantLimits(int servantId)
         {

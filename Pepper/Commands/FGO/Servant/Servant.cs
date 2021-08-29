@@ -54,10 +54,7 @@ namespace Pepper.Commands.FGO
 
             var pages = new[]
             {
-                GeneralPage(
-                    servant,
-                    jp.MstSvtCard.FindSync(Builders<MstSvtCard>.Filter.Eq("svtId", servant.ID)).ToList()
-                ),
+                GeneralPage(servant),
                 AscensionsPage(servant, limits, itemNames),
                 SkillLimitsPage(servant, limits, itemNames),
                 PassivesPage(servant)

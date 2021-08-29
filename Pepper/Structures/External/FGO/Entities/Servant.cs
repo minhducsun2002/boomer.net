@@ -9,13 +9,14 @@ namespace Pepper.Structures.External.FGO.Entities
     {
         public readonly MstSvtLimit[] Limits;
         public readonly MstSvt ServantEntity;
+        public readonly MstSvtCard[] Cards;
         public MstClass Class { get; set; }
         public readonly int Attribute;
         public readonly int[] Traits;
         public int ID => ServantEntity.ID;
         public string Name { get; set; }
 
-        internal BaseServant(MstSvt mstSvt, MstSvtLimit[] limits, MstClass @class, int attribute)
+        internal BaseServant(MstSvt mstSvt, MstSvtLimit[] limits, MstClass @class, int attribute, MstSvtCard[] cards)
         {
             Limits = limits;
             ServantEntity = mstSvt;
@@ -23,6 +24,7 @@ namespace Pepper.Structures.External.FGO.Entities
             Attribute = attribute;
             Traits = GetTrait(mstSvt, attribute);
             Name = mstSvt.Name;
+            Cards = cards;
         }
 
         private static int[] GetTrait(MstSvt servantEntity, int attribute)
