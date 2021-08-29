@@ -214,8 +214,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     servantName = ServantNamingService.Namings[SvtId].Name;
                 else
                 {
-                    var record = masterDataService.Connections[Region.NA]
-                        .MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", SvtId)).FirstOrDefault();
+                    var record = masterDataService.Connections[Region.NA].GetMstSvtById(SvtId);
                     if (record != default) servantName = record.Name;
                 }
             }

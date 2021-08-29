@@ -41,8 +41,7 @@ namespace Pepper.Services.FGO
             foreach (var region in masterDataService.Regions)
             {
                 var connection = masterDataService.Connections[region];
-                var result = connection.MstSvt.Find(Builders<MstSvt>.Filter.Eq("id", traitId)).Limit(1)
-                    .FirstOrDefault();
+                var result = connection.GetMstSvtById((int) traitId);
                 if (result != default) return reverse + result.Name;
             }
 

@@ -28,9 +28,8 @@ namespace Pepper.Commands.FGO
             
             MasterDataMongoDBConnection na = MasterDataService.Connections[Region.NA],
                 jp = MasterDataService.Connections[Region.JP];
-            return na.MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", servantIdentity))
-                       .FirstOrDefault()?.Name ??
-                   (hint?.ServantEntity.Name ?? jp.MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", servantIdentity)).First().Name);
+            return na.GetMstSvtById(servantIdentity)?.Name ??
+                   (hint?.ServantEntity.Name ?? jp.GetMstSvtById(servantIdentity)!.Name);
         }
 
         protected string ResolveServantName(BaseServant servant) =>

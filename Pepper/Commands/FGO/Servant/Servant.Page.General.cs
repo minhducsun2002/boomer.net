@@ -91,16 +91,15 @@ namespace Pepper.Commands.FGO
                 var skillMapping = jp.MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("skillId", skillId)).FirstOrDefault();
                 if (skillMapping != default)
                 {
-                    var svtQuery = Builders<MstSvt>.Filter.Eq("id", skillMapping.SvtId);
-                    var ceSvt = jp.MstSvt.FindSync(svtQuery).First();
-                    var naName = na.MstSvt.FindSync(svtQuery).FirstOrDefault()?.Name;
+                    var ceSvt = jp.GetMstSvtById(skillMapping.SvtId);
+                    var naName = na.GetMstSvtById(skillMapping.SvtId)?.Name;
                     var mstSkill = jp.MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("id", skillId)).First();
                     var (skill, referencedSkills) = new SkillRenderer(mstSkill, jp).Prepare(TraitService);
                     return new LocalEmbedField
                     {
                         Name = "Bond CE",
                         Value =
-                            $"[[**{ceSvt.CollectionNo}**. **{naName ?? ceSvt.Name}**]](https://apps.atlasacademy.io/db/JP/craft-essence/{ceSvt.ID})\n" +
+                            $"[[**{ceSvt!.CollectionNo}**. **{naName ?? ceSvt.Name}**]](https://apps.atlasacademy.io/db/JP/craft-essence/{ceSvt.ID})\n" +
                             string.Join("\n\n", skill)
                     };
                 }

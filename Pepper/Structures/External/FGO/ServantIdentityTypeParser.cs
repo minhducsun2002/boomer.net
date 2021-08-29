@@ -28,7 +28,7 @@ namespace Pepper.Structures.External.FGO
             var masterDataService = context.Services.GetRequiredService<MasterDataService>();
             if (int.TryParse(value, out var numericIdentity))
             {
-                var result = await ResolveNumericIdentifier(numericIdentity, masterDataService);
+                var result = ResolveNumericIdentifier(numericIdentity, masterDataService);
                 return result?.ID == null 
                     ? Failure($"Could not find a servant with collectionNo/ID {numericIdentity}.") 
                     : Success(new ServantIdentity { ServantId = result.ID });
@@ -39,7 +39,7 @@ namespace Pepper.Structures.External.FGO
             var alias = servantSearchService.GetAlias(query);
             if (alias.Count != 0)
             {
-                var result = await ResolveNumericIdentifier(alias[0].CollectionNo, masterDataService);
+                var result = ResolveNumericIdentifier(alias[0].CollectionNo, masterDataService);
                 return result?.ID == null 
                     ? Failure($"Could not find a servant with collectionNo {numericIdentity}.") 
                     : Success(new ServantIdentity { ServantId = result.ID });
@@ -75,22 +75,10 @@ namespace Pepper.Structures.External.FGO
         }
 
 
-        private static async Task<MstSvt?> ResolveNumericIdentifier(long idOrCollectionNo, MasterDataService masterDataService)
+        private static MstSvt? ResolveNumericIdentifier(int idOrCollectionNo, MasterDataService masterDataService)
         {
             var jp = masterDataService.Connections[Region.JP];
-            return (await jp.MstSvt.FindAsync(
-                Builders<MstSvt>.Filter.And(
-                    Builders<MstSvt>.Filter.Or(
-                        Builders<MstSvt>.Filter.Eq("collectionNo", idOrCollectionNo),
-                        Builders<MstSvt>.Filter.Eq("baseSvtId", idOrCollectionNo)
-                    ),
-                    Builders<MstSvt>.Filter.Or(
-                        Builders<MstSvt>.Filter.Eq("type", SvtType.Type.NORMAL),
-                        Builders<MstSvt>.Filter.Eq("type", SvtType.Type.HEROINE),
-                        Builders<MstSvt>.Filter.Eq("type", SvtType.Type.ENEMY_COLLECTION_DETAIL)
-                    )
-                )
-            )).FirstOrDefault();
+            return jp.GetMstSvtById(idOrCollectionNo) ?? jp.GetServantEntityByCollectionNo(idOrCollectionNo);
         }
         
         private static readonly Regex Whitespaces = new(@"\s", RegexOptions.Compiled | RegexOptions.ECMAScript | RegexOptions.CultureInvariant);

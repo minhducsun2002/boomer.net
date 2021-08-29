@@ -6,7 +6,7 @@ namespace Pepper.Structures.External.FGO
     public partial class MasterDataMongoDBConnection
     {
         // The field names must match the class names (i.e. a field named MstCollection1 must be of type IMongoCollection<MstCollection1>)
-        public IMongoCollection<MstSvt> MstSvt = null!;
+        private IMongoCollection<MstSvt> MstSvt = null!;
         public IMongoCollection<MstSvtLimit> MstSvtLimit = null!;
         public IMongoCollection<MstSvtSkill> MstSvtSkill = null!;
         public IMongoCollection<MstClass> MstClass = null!;
@@ -15,7 +15,7 @@ namespace Pepper.Structures.External.FGO
         public IMongoCollection<MstSvtTreasureDevice> MstSvtTreasureDevice = null!;
         private IMongoCollection<MstBuff> MstBuff = null!;
         private IMongoCollection<MstFunc> MstFunc = null!;
-        public IMongoCollection<MstEvent> MstEvent = null!;
+        private IMongoCollection<MstEvent> MstEvent = null!;
         public IMongoCollection<MstTreasureDeviceLv> MstTreasureDeviceLv = null!;
         private IMongoCollection<MstAttriRelation> MstAttriRelation = null!;
         public IMongoCollection<MstCombineLimit> MstCombineLimit = null!;

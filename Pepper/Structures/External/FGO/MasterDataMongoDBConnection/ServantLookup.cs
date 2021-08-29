@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Disqord;
+using FgoExportedConstants;
 using MongoDB.Driver;
 using Pepper.Structures.External.FGO.Entities;
 using Pepper.Structures.External.FGO.MasterData;
@@ -9,6 +10,7 @@ namespace Pepper.Structures.External.FGO
 {
     public partial class MasterDataMongoDBConnection
     {
+        
         public BaseServant GetServant(MstSvt svt) => GetServant(svt.ID, svt);
         public BaseServant GetServant(int id, MstSvt? hint = null)
         {
@@ -19,6 +21,19 @@ namespace Pepper.Structures.External.FGO
             var attributes = GetAttributeLists();
             return new BaseServant(svt, limits, @class, svt.Traits.First(attributes.Contains));
         }
+
+        public MstSvt? GetMstSvtById(int id) => MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", id)).FirstOrDefault();
+
+        private static readonly FilterDefinition<MstSvt> TypeQuery = Builders<MstSvt>.Filter.Or(
+            Builders<MstSvt>.Filter.Eq("type", SvtType.Type.NORMAL),
+            Builders<MstSvt>.Filter.Eq("type", SvtType.Type.HEROINE),
+            Builders<MstSvt>.Filter.Eq("type", SvtType.Type.ENEMY_COLLECTION_DETAIL)
+        );
+        public MstSvt? GetServantEntityByCollectionNo(int collectionNo)
+            => MstSvt.FindSync(Builders<MstSvt>.Filter.And(
+                Builders<MstSvt>.Filter.Eq("collectionNo", collectionNo),
+                TypeQuery
+            )).FirstOrDefault();
 
         public ServantLimits GetServantLimits(int servantId)
         {
