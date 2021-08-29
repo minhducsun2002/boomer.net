@@ -32,7 +32,7 @@ namespace Pepper.Commands.Osu
         [Description("What if you set a score with a certain pp amount?")]
         public async Task<DiscordCommandResult> Exec(
             [Flag("/")] [Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
-            int ppToCheck,
+            [Description("The amount of pp to check.")] int ppToCheck,
             [Description("Username to check. Default to your username, if set.")] Username username = null!
         )
         {

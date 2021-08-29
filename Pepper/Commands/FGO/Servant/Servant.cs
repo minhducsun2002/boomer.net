@@ -25,7 +25,7 @@ namespace Pepper.Commands.FGO
         [Command("servant", "s", "servant-info")]
         [Description("View information about a servant.")]
         [PrefixCategory("fgo")]
-        public DiscordCommandResult Exec([Remainder] ServantIdentity servantIdentity)
+        public DiscordCommandResult Exec([Remainder] [Description("A servant name, ID, or in-game number.")] ServantIdentity servantIdentity)
         {
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
             

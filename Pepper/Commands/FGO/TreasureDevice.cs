@@ -27,7 +27,7 @@ namespace Pepper.Commands.FGO
 
         [Command("np", "snp", "servant-np")]
         [Description("View information about a servant's Noble Phantasms.")]
-        public DiscordCommandResult Exec(ServantIdentity servant)
+        public DiscordCommandResult Exec([Remainder] [Description("A servant name, ID, or in-game number.")] ServantIdentity servant)
         {
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP],
                 na = MasterDataService.Connections[Region.NA];

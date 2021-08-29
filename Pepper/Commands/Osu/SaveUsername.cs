@@ -11,7 +11,7 @@ namespace Pepper.Commands.Osu
 
         [Command("usersave", "save", "userset", "set")]
         [Description("Set the username to default to in your future requests.")]
-        public DiscordCommandResult Exec([Remainder] string username)
+        public DiscordCommandResult Exec([Remainder] [Description("Username to save.")] string username)
         {
             var service = Context.Services.GetRequiredService<DiscordOsuUsernameLookupService>();
             var result = service.StoreUser(Context.Author.Id, username);
