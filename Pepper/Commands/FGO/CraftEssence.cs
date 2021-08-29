@@ -47,8 +47,9 @@ namespace Pepper.Commands.FGO
         public CraftEssence(MasterDataService m, TraitService t, ItemNamingService i) : base(m, t, i) {}
 
         [Command("ce", "show-craft-essence")]
+        [Description("View information about a certain Craft Essence.")]
         [PrefixCategory("fgo")]
-        public DiscordCommandResult Exec(int id = 1)
+        public DiscordCommandResult Exec([Description("Craft Essence's in-game number.")] int id = 1)
         {
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
             var ce = jp.GetCraftEssenceByCollectionNo(id)!;

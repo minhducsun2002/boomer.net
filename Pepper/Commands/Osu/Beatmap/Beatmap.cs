@@ -14,9 +14,10 @@ namespace Pepper.Commands.Osu
         public Beatmap(APIService service, BeatmapContextProviderService b) : base(service, b) {}
 
         [Command("map", "beatmap")]
+        [Description("View information about a beatmap(set).")]
         public async Task<DiscordCommandResult> Exec(
             [Description("Beatmap(set) ID, or an URL.")] IBeatmapOrSetResolvable beatmapResolvable,
-            [Flag("/")] bool set = false
+            [Description("In case a numeric ID is passed, whether this is a set ID.")] [Flag("/")] bool set = false
         )
         {
             return beatmapResolvable switch

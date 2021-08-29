@@ -26,6 +26,7 @@ namespace Pepper.Commands.FGO
         public TreasureDevice(MasterDataService m, TraitService t, ItemNamingService i, ServantNamingService n) : base(m, t, i, n) {}
 
         [Command("np", "snp", "servant-np")]
+        [Description("View information about a servant's Noble Phantasms.")]
         public DiscordCommandResult Exec(ServantIdentity servant)
         {
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP],
