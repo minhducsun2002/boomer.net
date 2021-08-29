@@ -42,7 +42,7 @@ namespace Pepper.Commands.FGO
                 {
                     var (mapping, treasureDevice) = pair;
                     var mstTreasureDevice = treasureDevice.MstTreasureDevice;
-                    var naRecord = na.MstTreasureDevice.Find(Builders<MstTreasureDevice>.Filter.Eq("id", mstTreasureDevice.ID)).FirstOrDefault();
+                    var naRecord = na.GetTreasureDeviceEntity(mstTreasureDevice.ID);
                     
                     var name = naRecord?.Name ?? mstTreasureDevice.Name;
                     var typeText = naRecord?.TypeText ?? mstTreasureDevice.TypeText;
@@ -58,10 +58,8 @@ namespace Pepper.Commands.FGO
 
                         if (mapping.CondQuestId != default)
                         {
-                            var quest = jp.MstQuest.FindSync(Builders<MstQuest>.Filter.Eq("id", mapping.CondQuestId))
-                                .FirstOrDefault();
-                            var naQuest = na.MstQuest.FindSync(Builders<MstQuest>.Filter.Eq("id", mapping.CondQuestId))
-                                .FirstOrDefault();
+                            var quest = jp.ResolveQuest(mapping.CondQuestId);
+                            var naQuest = na.ResolveQuest(mapping.CondQuestId);
                             var questType = InvocationRenderer.QuestTypeNames[(QuestEntity.enType) quest.Type];
                             condition.AppendLine(
                                 $"Requires completion of quest [[__{questType}__] {naQuest?.Name ?? quest.Name}](https://apps.atlasacademy.io/db/JP/quest/{quest.IconId}/{mapping.CondQuestPhase})"

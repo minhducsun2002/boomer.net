@@ -15,11 +15,10 @@ namespace Pepper.Commands.FGO
 {
     public partial class Servant
     {
-        private (LocalSelectionComponentOption, Page)? GeneralPage(BaseServant servant)
+        private (LocalSelectionComponentOption, Page)? GeneralPage(BaseServant servant, MstTreasureDeviceLv npGain)
         {
             var svtLimits = servant.Limits;
             var svt = servant.ServantEntity;
-            var npGain = GetNPGain(servant.ID);
             var cards = servant.Cards;
             var general = servant.BaseEmbed()
                 .WithFields(
@@ -82,23 +81,23 @@ namespace Pepper.Commands.FGO
         private LocalEmbedField? ResolveBondCE(BaseServant servant)
         {
             MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
-            var bondCESkill = jp.MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("actIndividuality", servant.ID)).FirstOrDefault();
+            var bondCESkill = jp.GetSkillEntityByActIndividuality(servant.ID).FirstOrDefault();
             if (bondCESkill != default)
             {
                 var skillId = bondCESkill.ID;
-                var skillMapping = jp.MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("skillId", skillId)).FirstOrDefault();
+                var skillMapping = jp.GetServantSkillAssociationBySkillId(skillId).FirstOrDefault();
                 if (skillMapping != default)
                 {
                     var ceSvt = jp.GetServantEntityById(skillMapping.SvtId);
                     var naName = na.GetServantEntityById(skillMapping.SvtId)?.Name;
-                    var mstSkill = jp.MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("id", skillId)).First();
-                    var (skill, referencedSkills) = new SkillRenderer(mstSkill, jp).Prepare(TraitService);
+                    var skill = jp.GetSkillById(skillId);
+                    var (skillDetail, referencedSkills) = new SkillRenderer(skill!.MstSkill, jp).Prepare(TraitService);
                     return new LocalEmbedField
                     {
                         Name = "Bond CE",
                         Value =
                             $"[[**{ceSvt!.CollectionNo}**. **{naName ?? ceSvt.Name}**]](https://apps.atlasacademy.io/db/JP/craft-essence/{ceSvt.ID})\n" +
-                            string.Join("\n\n", skill)
+                            string.Join("\n\n", skillDetail)
                     };
                 }
             }
@@ -124,22 +123,6 @@ namespace Pepper.Commands.FGO
             }
 
             return ret;
-        }
-        
-        private MstTreasureDeviceLv GetNPGain(int svtId)
-        {
-            var jp = MasterDataService.Connections[Region.JP];
-            var mapping = jp.MstSvtTreasureDevice.FindSync(
-                Builders<MstSvtTreasureDevice>.Filter.And(
-                    Builders<MstSvtTreasureDevice>.Filter.Eq("svtId", svtId),
-                    Builders<MstSvtTreasureDevice>.Filter.Eq("num", 1)
-                ),
-                new FindOptions<MstSvtTreasureDevice> {Limit = 1}
-            ).First()!;
-            return jp.MstTreasureDeviceLv.FindSync(
-                Builders<MstTreasureDeviceLv>.Filter.Eq("treaureDeviceId", mapping.TreasureDeviceId),
-                new FindOptions<MstTreasureDeviceLv> {Limit = 1}
-            ).First()!;
         }
     }
 }

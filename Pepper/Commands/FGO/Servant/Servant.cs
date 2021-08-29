@@ -54,7 +54,7 @@ namespace Pepper.Commands.FGO
 
             var pages = new[]
             {
-                GeneralPage(servant),
+                GeneralPage(servant, jp.GetNPGain(servant.ID)),
                 AscensionsPage(servant, limits, itemNames),
                 SkillLimitsPage(servant, limits, itemNames),
                 PassivesPage(servant)

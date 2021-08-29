@@ -9,12 +9,15 @@ namespace Pepper.Structures.External.FGO
 {
     public partial class MasterDataMongoDBConnection
     {
-        public TreasureDevice GetTreasureDevice(int treasureDeviceId)
-        {
-            var mstTreasureDevice = MstTreasureDevice
+        public MstTreasureDevice? GetTreasureDeviceEntity(int treasureDeviceId)
+            => MstTreasureDevice
                 .Find(Builders<MstTreasureDevice>.Filter.Eq("id", treasureDeviceId))
                 .Limit(1)
                 .First();
+        
+        public TreasureDevice GetTreasureDevice(int treasureDeviceId)
+        {
+            var mstTreasureDevice = GetTreasureDeviceEntity(treasureDeviceId);
 
             var levels = MstTreasureDeviceLv
                 .Find(Builders<MstTreasureDeviceLv>.Filter.Eq("treaureDeviceId", treasureDeviceId))
@@ -23,7 +26,7 @@ namespace Pepper.Structures.External.FGO
 
             var functions = levels[0].FuncId.Select(function => ResolveFunc(function)!);
             
-            return new TreasureDevice(mstTreasureDevice, levels.ToArray(), functions);
+            return new TreasureDevice(mstTreasureDevice!, levels.ToArray(), functions);
         }
 
 
@@ -37,5 +40,20 @@ namespace Pepper.Structures.External.FGO
                 : svtTreasureDeviceCache[servantId] = MstSvtTreasureDevice
                         .FindSync(Builders<MstSvtTreasureDevice>.Filter.Eq("svtId", servantId))
                     .ToList();
+        
+        public MstTreasureDeviceLv GetNPGain(int svtId)
+        {
+            var mapping = MstSvtTreasureDevice.FindSync(
+                Builders<MstSvtTreasureDevice>.Filter.And(
+                    Builders<MstSvtTreasureDevice>.Filter.Eq("svtId", svtId),
+                    Builders<MstSvtTreasureDevice>.Filter.Eq("num", 1)
+                ),
+                new FindOptions<MstSvtTreasureDevice> {Limit = 1}
+            ).First()!;
+            return MstTreasureDeviceLv.FindSync(
+                Builders<MstTreasureDeviceLv>.Filter.Eq("treaureDeviceId", mapping.TreasureDeviceId),
+                new FindOptions<MstTreasureDeviceLv> {Limit = 1}
+            ).First()!;
+        }
     }
 }

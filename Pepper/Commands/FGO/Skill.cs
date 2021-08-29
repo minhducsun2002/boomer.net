@@ -26,7 +26,7 @@ namespace Pepper.Commands.FGO
 
             var servant = jp.GetServant(servantIdentity.ServantId);
             
-            var records = jp.MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("svtId", servant.ID)).ToList()
+            var records = jp.GetServantSkillAssociationByServantId(servant.ID)
                 .OrderBy(skillMapping => skillMapping.Priority)
                 .GroupBy(skillMapping => skillMapping.Num)
                 .OrderBy(skillGrouping => skillGrouping.First().Num)

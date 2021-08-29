@@ -7,6 +7,9 @@ namespace Pepper.Structures.External.FGO
 {
     public partial class MasterDataMongoDBConnection
     {
+        public MstSkill[] GetSkillEntityByActIndividuality(int individuality)
+            => MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("actIndividuality", individuality)).ToList().ToArray();
+        
         public Skill? GetSkillById(int id, MstSkill? mstSkillHint = null)
         {
             var mstSkill = mstSkillHint ?? MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("id", id)).FirstOrDefault();

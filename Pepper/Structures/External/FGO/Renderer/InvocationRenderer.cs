@@ -147,7 +147,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     int individualty = int.Parse(statistics["Individuality"][0]),
                         eventId = int.Parse(statistics["EventId"][0]);
                     var @event = MasterData.GetEventById(eventId);
-                    var item = MasterData.MstItem.FindSync(Builders<MstItem>.Filter.Eq("individuality", individualty)).First();
+                    var item = MasterData.GetItemsByIndividuality(individualty)[0];
                     var (effect, stats, extra) = SpecializedInvocationParser.EventDropUp(function, @event, item, statistics);
                     // We are assuming a NP will not carry anything event-related,
                     output = output.WithEffect(effect);
