@@ -1,59 +1,58 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Pepper.Structures.Commands;
+using System.Reflection;
 using Qmmands;
 using Xunit;
-using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Pepper.Test.Commands
 {
-    public class CommandDescriptionTest
+    internal class CommandDataAttribute : DataAttribute
     {
-        private readonly ITestOutputHelper testOutputHelper;
-
-        public CommandDescriptionTest(ITestOutputHelper testOutputHelper)
+        public enum Data
         {
-            this.testOutputHelper = testOutputHelper;
-            // ensure the assembly will always be loaded by referring to it
-            var _ = Pepper.VersionHash;
+            Command = 1,
+            Parameter = 2
         }
 
-        [Fact]
-        public void AllCommandsFullyDescribed()
+        private readonly Data type;
+        public CommandDataAttribute(Data type) => this.type = type;
+        public override IEnumerable<object[]> GetData(MethodInfo testMethod)
         {
+            var _ = Pepper.VersionHash;
             var commandService = new CommandService();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                 if (assembly.FullName.StartsWith("Pepper"))
                     commandService.AddModules(assembly, null, Pepper.DownlevelAttributes);
 
-            foreach (var command in commandService.GetAllCommands())
+            return type switch
             {
-                try
-                {
-                    Assert.NotEqual("", command.Description);
-                    Assert.NotNull(command.Description);                    
-                }
-                catch
-                {
-                    var category = command.Attributes.OfType<CategoryAttribute>().FirstOrDefault()
-                        ?.Category;
-                    testOutputHelper.WriteLine($"Command : {command.Name}" + (category == null ? "" : $", category : {category}"));
-                    throw;
-                }
-                
-                foreach (var parameter in command.Parameters)
-                    try
-                    {
-                        Assert.NotEqual("", parameter.Description);
-                        Assert.NotNull(parameter.Description);
-                    }
-                    catch (Exception e)
-                    {
-                        testOutputHelper.WriteLine($"Command : {command.Name}, parameter : {parameter.Name}, type : {parameter.Type.FullName}");
-                        throw;
-                    }
-                
-            }
+                Data.Command => commandService.GetAllCommands().Select(command => new object[] { command }),
+                Data.Parameter => commandService.GetAllCommands()
+                    .SelectMany(command => command.Parameters)
+                    .Select(parameter => new object[] { parameter }),
+                _ => throw new ArgumentException($"Invalid data type for {nameof(type)}")
+            };
+        }
+    }
+    
+    public class CommandDescriptionTest
+    {
+        [Theory]
+        [CommandData(CommandDataAttribute.Data.Command)]
+        public void AllCommandsFullyDescribed(Command command)
+        {
+            Assert.NotEqual("", command.Description);
+            Assert.NotNull(command.Description);
+        }
+
+        [Theory]
+        [CommandData(CommandDataAttribute.Data.Parameter)]
+        public void AllParametersFullyDescribed(Parameter parameter)
+        {
+            Assert.NotEqual("", parameter.Description);
+            Assert.NotNull(parameter.Description);
         }
     }
 }
