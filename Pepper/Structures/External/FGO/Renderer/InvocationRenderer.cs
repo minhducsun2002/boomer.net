@@ -56,13 +56,13 @@ namespace Pepper.Structures.External.FGO.Renderer
         private bool single;
         private MstFunc function;
         private IMasterDataProvider MasterData;
-        private readonly TraitService traitService;
+        private readonly ITraitNameProvider traitProvider;
         
-        public InvocationRenderer(MstFunc function, Dictionary<string, string[]> arguments, IMasterDataProvider connection, TraitService traitService)
+        public InvocationRenderer(MstFunc function, Dictionary<string, string[]> arguments, IMasterDataProvider connection, ITraitNameProvider traitProvider)
         {
             this.arguments = arguments;
             this.function = function;
-            this.traitService = traitService;
+            this.traitProvider = traitProvider;
             MasterData = connection;
             single = false;
         }
@@ -119,7 +119,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     // I mean, there is only a single dataval tuple.
                     var buff = MasterData.ResolveBuffAndCache(function.Vals[0]);
                     var (effect, stats, extra, mutationTypes) = 
-                        SpecializedInvocationParser.AddState_Short(function, buff!, statistics, traitService, mutationTypeHint);
+                        SpecializedInvocationParser.AddState_Short(function, buff!, statistics, traitProvider, mutationTypeHint);
                     output = output.WithEffect(effect, null);
                     output.Statistics = stats;
                     output.TreasureDeviceMutationTypeHint = mutationTypes;
@@ -129,7 +129,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                 
                 case FuncList.TYPE.SUB_STATE:
                 {
-                    var buffTraits = function.Vals.Select(trait => traitService.GetTrait(trait)).ToArray();
+                    var buffTraits = function.Vals.Select(trait => traitProvider.GetTrait(trait)).ToArray();
                     if (buffTraits.Length < 3)
                         output.WithEffect($"Remove {string.Join('/', buffTraits)} effects");
                     else
@@ -217,7 +217,7 @@ namespace Pepper.Structures.External.FGO.Renderer
 
                     var specialDamageValue = statistics.Consume("Correction")
                         .Select(value => $"**{float.Parse(value) / 10}**%").ToArray();
-                    var trait = traitService.GetTrait(int.Parse(statistics.Consume("Target").First()));
+                    var trait = traitProvider.GetTrait(int.Parse(statistics.Consume("Target").First()));
                     
                     var mutationType = mutationTypeHint.ResolveMutationType("Correction");
                     if (mutationType.HasValue) output.TreasureDeviceMutationTypeHint[$"Special damage for {trait}"] = mutationType.Value;

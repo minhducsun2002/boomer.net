@@ -25,7 +25,7 @@ namespace Pepper.Structures.External.FGO.Renderer
         
         public static (string, Dictionary<string, string[]>, string[], Dictionary<string, TreasureDeviceMutationType>) AddState_Short(
             MstFunc function, MstBuff buff, Dictionary<string, string[]> values,
-            TraitService traitService,
+            ITraitNameProvider traitProvider,
             Dictionary<string, TreasureDeviceMutationType>? mutationTypeHint = null
         )
         {
@@ -146,7 +146,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     case BuffList.TYPE.ADD_INDIVIDUALITY:
                         extra.Add(
                             "Change all Command Cards of the target to"
-                            + values["Value"].Select(card => traitService.GetTrait(int.Parse(card) + 4000)).First()
+                            + values["Value"].Select(card => traitProvider.GetTrait(int.Parse(card) + 4000)).First()
                         );
                         break;
                 }
@@ -180,11 +180,11 @@ namespace Pepper.Structures.External.FGO.Renderer
 
             string ckSelfIndv = "";
             if (buff.CkSelfIndv.Length != 0)
-                ckSelfIndv = $" for {string.Join(" & ", buff.CkSelfIndv.Select(trait => $"{traitService.GetTrait(trait)}"))}";
+                ckSelfIndv = $" for {string.Join(" & ", buff.CkSelfIndv.Select(trait => $"{traitProvider.GetTrait(trait)}"))}";
 
             string ckOpIndv = "";
             if (buff.CkOpIndv.Length != 0)
-                ckOpIndv = $" against {string.Join(" & ", buff.CkOpIndv.Select(t => traitService.GetTrait(t)))}";
+                ckOpIndv = $" against {string.Join(" & ", buff.CkOpIndv.Select(t => traitProvider.GetTrait(t)))}";
             
             var zippedOutput = $"**{baseAction} [{buffName}{ckSelfIndv}{ckOpIndv}]** "
                                + (string.IsNullOrWhiteSpace(amount) ? "" : $"{amountPreposition} " + $"**{amount}**")
@@ -193,14 +193,14 @@ namespace Pepper.Structures.External.FGO.Renderer
             if (function.Tvals.Length != 0)
                 extra.Add(
                     "Only applies for "
-                    + string.Join(" & ", function.Tvals.Select(tvals => traitService.GetTrait(tvals)))
+                    + string.Join(" & ", function.Tvals.Select(tvals => traitProvider.GetTrait(tvals)))
                     + " targets."
                 );
             
             if (function.QuestTvals.Length != 0)
                 extra.Add(
                     "Only applies on "
-                      + string.Join(" & ", function.QuestTvals.Select(questTvals => traitService.GetTrait(questTvals)))
+                      + string.Join(" & ", function.QuestTvals.Select(questTvals => traitProvider.GetTrait(questTvals)))
                       + " field."
                 );
 

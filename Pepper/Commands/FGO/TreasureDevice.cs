@@ -29,12 +29,28 @@ namespace Pepper.Commands.FGO
         [Description("View information about a servant's Noble Phantasms.")]
         public DiscordCommandResult Exec([Remainder] [Description("A servant name, ID, or in-game number.")] ServantIdentity servant)
         {
-            IMasterDataProvider jp = MasterDataService.Connections[Region.JP],
-                na = MasterDataService.Connections[Region.NA];
+            IMasterDataProvider jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
 
             var servantName = ResolveServantName(servant);
+            var pages = SerializePages(servant, servantName, jp, na);
             
-            var pages = jp.GetCachedServantTreasureDevices(servant)
+            // TODO : Add buttons to quests
+            return View(new SelectionPagedView(pages));
+        }
+
+        private IEnumerable<(LocalSelectionComponentOption selection, Page page)> SerializePages(
+            int servantId,
+            string servantName,
+            IMasterDataProvider jp, IMasterDataProvider na
+        ) => SerializePages(servantId, servantName, jp, na, TraitService);
+
+        public static IEnumerable<(LocalSelectionComponentOption selection, Page page)> SerializePages(
+            int servantId,
+            string servantName,
+            IMasterDataProvider jp, IMasterDataProvider na, ITraitNameProvider traitService
+        )
+        {
+            var pages = jp.GetCachedServantTreasureDevices(servantId)
                 .Where(map => map.Priority != 0)
                 .OrderBy(map => map.TreasureDeviceId)
                 .Select(map => (map, jp.GetTreasureDevice(map.TreasureDeviceId)))
@@ -49,7 +65,7 @@ namespace Pepper.Commands.FGO
                     
                     Servant.DefaultCardTypes.TryGetValue((BattleCommand.TYPE) mapping.CardId, out var data);
 
-                    var invocations = RenderInvocations(treasureDevice, jp);
+                    var invocations = RenderInvocations(treasureDevice, jp, traitService);
                     
                     var condition = new StringBuilder();
                     {
@@ -111,12 +127,13 @@ namespace Pepper.Commands.FGO
 
                     return (selection, page);
                 });
-            
-            // TODO : Add buttons to quests
-            return View(new SelectionPagedView(pages));
+
+            return pages;
         }
 
-        private List<InvocationInformation> RenderInvocations(Structures.External.FGO.Entities.TreasureDevice treasureDevice, IMasterDataProvider connection)
+        private static List<InvocationInformation> RenderInvocations(
+            Structures.External.FGO.Entities.TreasureDevice treasureDevice,
+            IMasterDataProvider connection, ITraitNameProvider traitService)
         {
             var functions = treasureDevice.functions;
             var _ = functions
@@ -147,7 +164,7 @@ namespace Pepper.Commands.FGO
                             _ => baseInvocationArguments[key]
                         };
     
-                    return new InvocationRenderer(function, baseInvocationArguments, connection, TraitService).Render(mutationTypeHint);
+                    return new InvocationRenderer(function, baseInvocationArguments, connection, traitService).Render(mutationTypeHint);
                 });
 
             return _.ToList();

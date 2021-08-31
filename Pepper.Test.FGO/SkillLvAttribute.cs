@@ -7,6 +7,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Conventions;
 using Pepper.Structures.External.FGO.MasterData;
+using Pepper.Test.FGO;
 using Xunit.Sdk;
 
 namespace Pepper.Test
@@ -19,7 +20,7 @@ namespace Pepper.Test
     public class SkillLvAttribute : DataAttribute
     {
         private static readonly string ParsedName = "parsed_mstSkillLv.json";
-        private static readonly string FuncName = "mstFunc.json";
+        private static readonly string FuncName = $"{Names.MstFunc}.json";
 
         static SkillLvAttribute()
         {
@@ -32,12 +33,9 @@ namespace Pepper.Test
         
         public override IEnumerable<object[]> GetData(MethodInfo testMethod)
         {
-
-            var basePath = Path.Combine(Environment.CurrentDirectory, "master");
-            var versions = Directory.GetDirectories(basePath);
-            var @out = versions.SelectMany(version =>
+            var @out = Names.Versions.SelectMany(version =>
                 {
-                    var path = Path.Combine(basePath, version);
+                    var path = Path.Combine(Names.BasePath, version);
                     var parsedJson = File.ReadAllText(Path.Combine(path, ParsedName));
                     var funcJson = File.ReadAllText(Path.Combine(path, FuncName));
                     var mstSkillLvParsed = BsonSerializer.Deserialize<ParsedMstSkillLv[]>(parsedJson);

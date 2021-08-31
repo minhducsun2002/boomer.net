@@ -1,17 +1,15 @@
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using MongoDB.Driver;
-using Pepper.Structures.External.FGO.MasterData;
+using Pepper.Structures.External.FGO;
 using Serilog;
 
 namespace Pepper.Services.FGO
 {
-    public class TraitService : NamingService
+    public class TraitService : NamingService, ITraitNameProvider
     {
         private readonly string url;
         private readonly ILogger log = Log.Logger.ForContext<TraitService>();

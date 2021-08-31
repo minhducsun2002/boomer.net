@@ -7,7 +7,7 @@ namespace Pepper.Structures.External.FGO.Entities
 {
     public class TreasureDevice
     {
-        internal TreasureDevice(
+        public TreasureDevice(
             MstTreasureDevice mstTreasureDevice,
             MstTreasureDeviceLv[] levels,
             IEnumerable<MstFunc> resolvedFunctions
