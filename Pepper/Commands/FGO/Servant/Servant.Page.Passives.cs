@@ -29,7 +29,7 @@ namespace Pepper.Commands.FGO
         
         private (LocalSelectionComponentOption, Page)? PassivesPage(BaseServant servant)
         {
-            MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
+            IMasterDataProvider jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
             var passives = servant.ServantEntity.ClassPassive.Select(skillId => jp.GetSkillById(skillId))
                 .Select(skill =>
                 {

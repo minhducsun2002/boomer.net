@@ -31,6 +31,7 @@ namespace Pepper.Structures.External.FGO
                     Builders<MstSvt>.Filter.Eq("type", SvtType.Type.ENEMY_COLLECTION_DETAIL)
                 )
             )).FirstOrDefault();
+        
         public MstSvt? GetServantEntityById(int id) => MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", id)).FirstOrDefault();
 
         public ServantLimits GetServantLimits(int servantId)

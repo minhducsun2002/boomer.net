@@ -8,7 +8,7 @@ namespace Pepper.Structures.External.FGO
     {
         private readonly ConcurrentDictionary<int, MstBuff> buffCache = new();
 
-        public MstBuff? ResolveBuff(int id, bool reload = false)
+        public MstBuff? ResolveBuffAndCache(int id, bool reload = false)
         {
             if (!reload && buffCache.ContainsKey(id)) return buffCache[id];
             

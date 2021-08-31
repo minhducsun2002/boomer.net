@@ -7,10 +7,10 @@ namespace Pepper.Structures.External.FGO.Renderer
 {
     public class SkillReferenceEnumerator
     {
-        private readonly MasterDataMongoDBConnection connection;
+        private readonly IMasterDataProvider connection;
         private readonly Skill skill;
         private HashSet<int> init;
-        public SkillReferenceEnumerator(Skill skill, MasterDataMongoDBConnection connection, ref HashSet<int> init)
+        public SkillReferenceEnumerator(Skill skill, IMasterDataProvider connection, ref HashSet<int> init)
         {
             this.connection = connection;
             this.skill = skill;
@@ -31,7 +31,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                         continue;
                 }
                 
-                var buff = connection.ResolveBuff(func.Vals[0])!;
+                var buff = connection.ResolveBuffAndCache(func.Vals[0])!;
                 
                 switch ((BuffList.TYPE) buff.Type)
                 {

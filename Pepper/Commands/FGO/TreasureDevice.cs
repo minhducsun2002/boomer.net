@@ -29,12 +29,12 @@ namespace Pepper.Commands.FGO
         [Description("View information about a servant's Noble Phantasms.")]
         public DiscordCommandResult Exec([Remainder] [Description("A servant name, ID, or in-game number.")] ServantIdentity servant)
         {
-            MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP],
+            IMasterDataProvider jp = MasterDataService.Connections[Region.JP],
                 na = MasterDataService.Connections[Region.NA];
 
             var servantName = ResolveServantName(servant);
             
-            var pages = jp.GetServantTreasureDevices(servant)
+            var pages = jp.GetCachedServantTreasureDevices(servant)
                 .Where(map => map.Priority != 0)
                 .OrderBy(map => map.TreasureDeviceId)
                 .Select(map => (map, jp.GetTreasureDevice(map.TreasureDeviceId)))
@@ -116,7 +116,7 @@ namespace Pepper.Commands.FGO
             return View(new SelectionPagedView(pages));
         }
 
-        private List<InvocationInformation> RenderInvocations(Structures.External.FGO.Entities.TreasureDevice treasureDevice, MasterDataMongoDBConnection connection)
+        private List<InvocationInformation> RenderInvocations(Structures.External.FGO.Entities.TreasureDevice treasureDevice, IMasterDataProvider connection)
         {
             var functions = treasureDevice.functions;
             var _ = functions

@@ -80,7 +80,7 @@ namespace Pepper.Commands.FGO
 
         private LocalEmbedField? ResolveBondCE(BaseServant servant)
         {
-            MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
+            IMasterDataProvider jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
             var bondCESkill = jp.GetSkillEntityByActIndividuality(servant.ID).FirstOrDefault();
             if (bondCESkill != default)
             {

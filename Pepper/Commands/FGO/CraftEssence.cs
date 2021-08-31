@@ -51,7 +51,7 @@ namespace Pepper.Commands.FGO
         [PrefixCategory("fgo")]
         public DiscordCommandResult Exec([Description("Craft Essence's in-game number.")] int id = 1)
         {
-            MasterDataMongoDBConnection jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
+            IMasterDataProvider jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
             var ce = jp.GetCraftEssenceByCollectionNo(id)!;
             var localizedName = na.GetCraftEssenceByCollectionNo(id)?.MstSvt.Name;
             

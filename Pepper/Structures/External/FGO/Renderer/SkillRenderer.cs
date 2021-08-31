@@ -48,7 +48,7 @@ namespace Pepper.Structures.External.FGO.Renderer
     {
         private readonly Skill skill;
 
-        public SkillRenderer(MstSkill skill, MasterDataMongoDBConnection connection,  Skill? skillHint = null) : base(skill, connection)
+        public SkillRenderer(MstSkill skill, IMasterDataProvider connection,  Skill? skillHint = null) : base(skill, connection)
         {
             this.skill = skillHint ?? connection.GetSkillById(skill.ID, skill)!;
         }

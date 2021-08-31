@@ -31,10 +31,8 @@ namespace Pepper.Structures.External.FGO
 
 
         private readonly Dictionary<int, List<MstSvtTreasureDevice>> svtTreasureDeviceCache = new();
-
-        // public List<MstSvtTreasureDevice> GetServantTreasureDevices(MstSvt mstSvt, bool reload = false) => GetServantTreasureDevices(mstSvt.ID, reload);
-        // public List<MstSvtTreasureDevice> GetServantTreasureDevices(BaseServant servant, bool reload = false) => GetServantTreasureDevices(servant.ID, reload);
-        public List<MstSvtTreasureDevice> GetServantTreasureDevices(int servantId, bool reload = false)
+        
+        public List<MstSvtTreasureDevice> GetCachedServantTreasureDevices(int servantId, bool reload = false)
             => svtTreasureDeviceCache.TryGetValue(servantId, out var result)
                 ? result
                 : svtTreasureDeviceCache[servantId] = MstSvtTreasureDevice

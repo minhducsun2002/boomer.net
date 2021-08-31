@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -9,7 +10,7 @@ namespace Pepper.Structures.External.FGO
     {
         private int[] attributesCache = Array.Empty<int>();
         
-        public int[] GetAttributeLists(bool reload = false)
+        public IEnumerable<int> GetAttributeLists(bool reload = false)
         {
             if (attributesCache.Length != 0 && !reload) return attributesCache;
             

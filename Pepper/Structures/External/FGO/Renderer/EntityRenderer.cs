@@ -5,8 +5,8 @@ namespace Pepper.Structures.External.FGO.Renderer
 {
     public abstract class EntityRenderer<T> where T : MasterDataEntity
     {
-        protected MasterDataMongoDBConnection Connection;
-        protected EntityRenderer(T entity, MasterDataMongoDBConnection connection)
+        protected IMasterDataProvider Connection;
+        protected EntityRenderer(T _, IMasterDataProvider connection)
         {
             Connection = connection;
         }

@@ -20,7 +20,7 @@ namespace Pepper.Services.FGO
 
     public class MasterDataService : Service
     {
-        public ConcurrentDictionary<Region, MasterDataMongoDBConnection> Connections = new();
+        public ConcurrentDictionary<Region, IMasterDataProvider> Connections = new();
         public ConcurrentDictionary<Region, MongoClient> Clients { get; } = new();
         public readonly List<Region> Regions;
 
@@ -43,7 +43,7 @@ namespace Pepper.Services.FGO
                 
                 // TODO : switch all of these to use code generation
                 var connectionObject = new MasterDataMongoDBConnection();
-                foreach (var field in connectionObject.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance))
+                foreach (var field in connectionObject.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance))
                     if (MasterDataEntityTypes.ContainsKey(field.Name))
                     {
                         var method = db.GetType().GetMethod(nameof(db.GetCollection))!

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using MongoDB.Driver;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO;
@@ -18,7 +19,7 @@ namespace Pepper.Commands.FGO
         }
         
         private readonly ServantNamingService servantNamingService;
-        public int[] AttributeList => MasterDataService.Connections[Region.JP].GetAttributeLists();
+        public IEnumerable<int> AttributeList => MasterDataService.Connections[Region.JP].GetAttributeLists();
         private ConcurrentDictionary<int, ServantNaming> ServantNamings => servantNamingService.Namings;
 
         protected string ResolveServantName(ServantIdentity servantIdentity, BaseServant? hint = null)
@@ -26,7 +27,7 @@ namespace Pepper.Commands.FGO
             if (servantNamingService.Namings.ContainsKey(servantIdentity))
                 return servantNamingService.Namings[servantIdentity].Name;
             
-            MasterDataMongoDBConnection na = MasterDataService.Connections[Region.NA],
+            IMasterDataProvider na = MasterDataService.Connections[Region.NA],
                 jp = MasterDataService.Connections[Region.JP];
             return na.GetServantEntityById(servantIdentity)?.Name ??
                    (hint?.ServantEntity.Name ?? jp.GetServantEntityById(servantIdentity)!.Name);

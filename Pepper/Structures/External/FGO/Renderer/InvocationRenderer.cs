@@ -55,10 +55,10 @@ namespace Pepper.Structures.External.FGO.Renderer
         private Dictionary<string, string[]> arguments;
         private bool single;
         private MstFunc function;
-        private MasterDataMongoDBConnection MasterData;
+        private IMasterDataProvider MasterData;
         private readonly TraitService traitService;
         
-        public InvocationRenderer(MstFunc function, Dictionary<string, string[]> arguments, MasterDataMongoDBConnection connection, TraitService traitService)
+        public InvocationRenderer(MstFunc function, Dictionary<string, string[]> arguments, IMasterDataProvider connection, TraitService traitService)
         {
             this.arguments = arguments;
             this.function = function;
@@ -117,7 +117,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                 {
                     // We are assuming AddState(Short) functions only refer to a single buff.
                     // I mean, there is only a single dataval tuple.
-                    var buff = MasterData.ResolveBuff(function.Vals[0]);
+                    var buff = MasterData.ResolveBuffAndCache(function.Vals[0]);
                     var (effect, stats, extra, mutationTypes) = 
                         SpecializedInvocationParser.AddState_Short(function, buff!, statistics, traitService, mutationTypeHint);
                     output = output.WithEffect(effect, null);
@@ -126,7 +126,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                     output.ExtraInformation = extra;
                     break;
                 }
-
+                
                 case FuncList.TYPE.SUB_STATE:
                 {
                     var buffTraits = function.Vals.Select(trait => traitService.GetTrait(trait)).ToArray();
