@@ -13,7 +13,7 @@ namespace Pepper.Structures.External.FGO
             => MstTreasureDevice
                 .Find(Builders<MstTreasureDevice>.Filter.Eq("id", treasureDeviceId))
                 .Limit(1)
-                .First();
+                .FirstOrDefault();
         
         public TreasureDevice GetTreasureDevice(int treasureDeviceId)
         {
