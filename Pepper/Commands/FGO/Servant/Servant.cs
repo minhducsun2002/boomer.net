@@ -29,13 +29,7 @@ namespace Pepper.Commands.FGO
         {
             IMasterDataProvider jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
             
-            var servant = jp.GetServant(servantIdentity.ServantId);
-
-            // overwriting servant name
-            servant.Name = ResolveServantName(servant);
-            
-            // overwriting class
-            servant.Class = na.ResolveClass(servant.Class.ID) ?? servant.Class;
+            var servant = ResolveServant(servantIdentity);
             
             // overwriting item names
             var limits = jp.GetServantLimits(servant.ID);

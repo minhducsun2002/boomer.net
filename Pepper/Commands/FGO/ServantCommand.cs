@@ -22,6 +22,20 @@ namespace Pepper.Commands.FGO
         public IEnumerable<int> AttributeList => MasterDataService.Connections[Region.JP].GetAttributeLists();
         private ConcurrentDictionary<int, ServantNaming> ServantNamings => servantNamingService.Namings;
 
+        protected BaseServant ResolveServant(ServantIdentity servantIdentity)
+        {
+            IMasterDataProvider jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
+            
+            var servant = jp.GetServant(servantIdentity.ServantId);
+
+            // overwriting servant name
+            servant.Name = ResolveServantName(servant);
+            
+            // overwriting class
+            servant.Class = na.ResolveClass(servant.Class.ID) ?? servant.Class;
+            return servant;
+        }
+        
         protected string ResolveServantName(ServantIdentity servantIdentity, BaseServant? hint = null)
         {
             if (servantNamingService.Namings.ContainsKey(servantIdentity))

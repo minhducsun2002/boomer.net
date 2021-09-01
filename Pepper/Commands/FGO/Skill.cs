@@ -23,9 +23,8 @@ namespace Pepper.Commands.FGO
             IMasterDataProvider jp = MasterDataService.Connections[Region.JP],
                                         na = MasterDataService.Connections[Region.NA];
 
-            var servant = jp.GetServant(servantIdentity.ServantId);
-            servant.Name = ResolveServantName(servant);
-            
+            var servant = ResolveServant(servantIdentity);
+
             var records = jp.GetServantSkillAssociationByServantId(servant.ID)
                 .OrderBy(skillMapping => skillMapping.Priority)
                 .GroupBy(skillMapping => skillMapping.Num)
