@@ -31,7 +31,7 @@ namespace Pepper.Structures.External.FGO.MasterData
         [BsonElement("chapterSubStr")] public string ChapterSubStr = string.Empty;
         [BsonElement("recommendLv")] public string RecommendLv = string.Empty;
         [BsonElement("hasStartAction")] public int HasStartAction;
-        [BsonElement("flag")] public int Flag;
+        [BsonElement("flag")] public long Flag;
         [BsonElement("scriptQuestId")] public int ScriptQuestId;
         [BsonElement("noticeAt")] public int NoticeAt;
         [BsonElement("openedAt")] public int OpenedAt;

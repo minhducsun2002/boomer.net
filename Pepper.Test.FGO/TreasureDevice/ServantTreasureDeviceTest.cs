@@ -31,6 +31,7 @@ namespace Pepper.Test.FGO.TreasureDevice
         private readonly Dictionary<int, MstTreasureDeviceLv[]> mstTreasureDeviceLvById;
         private readonly Dictionary<int, MstFunc> functions;
         private readonly Dictionary<int, MstBuff> buffs;
+        private readonly Dictionary<int, MstQuest> quests;
 
         public NPDataProvider(string path)
         {
@@ -64,6 +65,8 @@ namespace Pepper.Test.FGO.TreasureDevice
                     td => td.ID,
                     td => td
                 );
+
+            quests = ResolveArray<MstQuest>(path, Names.MstQuest).ToDictionary(quest => quest.ID, quest => quest);
         }
 
         private static T[] ResolveArray<T>(string path, string name) where T : MasterDataEntity =>
@@ -96,7 +99,7 @@ namespace Pepper.Test.FGO.TreasureDevice
         public MstSkill[] GetSkillEntityByActIndividuality(int individuality) { throw new NotImplementedException(); }
         public MstSvtSkill[] GetServantSkillAssociationBySkillId(int skillId) { throw new NotImplementedException(); }
         public MstSvtSkill[] GetServantSkillAssociationByServantId(int svtId) { throw new NotImplementedException(); }
-        public MstQuest ResolveQuest(int questId) { throw new NotImplementedException(); }
+        public MstQuest ResolveQuest(int questId) => quests[questId];
         public MstBuff ResolveBuffAndCache(int id, bool reload = false) => buffs[id];
         public MstClass ResolveClass(int classId, bool reload = false) { throw new NotImplementedException(); }
         public MstEvent GetEventById(int eventId) { throw new NotImplementedException(); }

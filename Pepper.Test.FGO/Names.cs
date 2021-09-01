@@ -14,6 +14,7 @@ namespace Pepper.Test.FGO
         public static string MstSvtTreasureDevice = "mstSvtTreasureDevice";
         public static string MstTreasureDevice = "mstTreasureDevice";
         public static string MstTreasureDeviceLv = "mstTreasureDeviceLv";
+        public static string MstQuest = "mstQuest";
 
         static Names()
         {
