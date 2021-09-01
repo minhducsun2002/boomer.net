@@ -30,9 +30,9 @@ namespace Pepper.Structures.External.FGO.Entities
             
             MstTreasureDevice = mstTreasureDevice;
             Levels = levels;
-            functions = levels[0].FuncId.Select(function => funcTable[function]).ToArray();
+            Functions = levels[0].FuncId.Select(function => funcTable[function]).ToArray();
 
-            FuncToLevelsWithOvercharges = functions.Select((function, index) =>
+            FuncToLevelsWithOvercharges = Functions.Select((function, index) =>
                 {
                     var levels = Levels.Select(level =>
                     {
@@ -51,13 +51,13 @@ namespace Pepper.Structures.External.FGO.Entities
                         return (level, parsedAssociatedOvercharge);
                     }).ToArray();
 
-                    return (function, levels);
+                    return new KeyValuePair<MstFunc, (MstTreasureDeviceLv, DataVal[])[]>(function, levels);
                 })
-                .ToDictionary(pair => pair.function, pair => pair.levels);
+                .ToList();
         }
 
-        public readonly Dictionary<MstFunc, (MstTreasureDeviceLv, DataVal[])[]> FuncToLevelsWithOvercharges;
-        public readonly MstFunc[] functions;
+        public readonly List<KeyValuePair<MstFunc, (MstTreasureDeviceLv, DataVal[])[]>> FuncToLevelsWithOvercharges;
+        public readonly MstFunc[] Functions;
         public readonly MstTreasureDevice MstTreasureDevice;
         public readonly MstTreasureDeviceLv[] Levels;
 

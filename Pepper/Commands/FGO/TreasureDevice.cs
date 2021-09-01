@@ -135,16 +135,18 @@ namespace Pepper.Commands.FGO
             Structures.External.FGO.Entities.TreasureDevice treasureDevice,
             IMasterDataProvider connection, ITraitNameProvider traitService)
         {
-            var functions = treasureDevice.functions;
+            var functions = treasureDevice.Functions;
             var _ = functions
-                .Where(EnemyActionFilter.IsPlayerAction)
-                .Select(function =>
+                .Select((func, index) => (func, index))
+                .Where(pair => EnemyActionFilter.IsPlayerAction(pair.func) && pair.func.Type != (int) FuncList.TYPE.NONE )
+                .Select(pair =>
                 {
+                    var (_, index) = pair;
                     var mutationTypeHint = new Dictionary<string, TreasureDeviceMutationType>();
-    
-                    var data = treasureDevice.FuncToLevelsWithOvercharges[function];
-                    var oc1 = data.Select(level => level.Item2[0]).ToArray();
-                    var level1 = data[0].Item2;
+
+                    var (function, datavals) = treasureDevice.FuncToLevelsWithOvercharges[index];
+                    var oc1 = datavals.Select(level => level.Item2[0]).ToArray();
+                    var level1 = datavals[0].Item2;
     
                     foreach (var key in oc1[0].Keys)
                         if (oc1.Select(lvl => lvl[key]).Distinct().Count() > 1)
@@ -163,7 +165,7 @@ namespace Pepper.Commands.FGO
                             TreasureDeviceMutationType.Overcharge => level1.Select(dataVal => dataVal[key]).ToArray(),
                             _ => baseInvocationArguments[key]
                         };
-    
+                    
                     return new InvocationRenderer(function, baseInvocationArguments, connection, traitService).Render(mutationTypeHint);
                 });
 
