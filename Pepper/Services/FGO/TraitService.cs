@@ -13,7 +13,7 @@ namespace Pepper.Services.FGO
     {
         private readonly string url;
         private readonly ILogger log = Log.Logger.ForContext<TraitService>();
-        private ConcurrentDictionary<long, string> traits = new();
+        public ConcurrentDictionary<long, string> Traits = new();
         private readonly MasterDataService masterDataService;
         
         public TraitService(IConfiguration config, MasterDataService masterDataService)
@@ -32,7 +32,7 @@ namespace Pepper.Services.FGO
                 reverse = "not-";
             }
             
-            if (traits.TryGetValue(traitId, out var traitName))
+            if (Traits.TryGetValue(traitId, out var traitName))
                 return reverse + traitName;
             
             // tries to resolve to servant names
@@ -46,18 +46,23 @@ namespace Pepper.Services.FGO
             return (fallbackToEmpty ? "" : $"{reverse}{traitId}");
         }
         
+        public delegate void DataLoadedCallback(ConcurrentDictionary<long, string> traits);
+        public event DataLoadedCallback? DataLoaded;
+        
         public async Task<Dictionary<long, string>> Load()
         {
             var data = await GetCsv(url);
             var temporaryTraitMapping = data
                 .Where(line => line.Count >= 2 && long.TryParse(line[0], out _))
                 .Where(entry => !string.IsNullOrWhiteSpace(entry[1]))
+                .Where(entry => long.Parse(entry[0]) != 0)
                 .ToDictionary(
                     entry => long.Parse(entry[0]),
                     entry => entry[1]
                 );
-            traits = new ConcurrentDictionary<long, string>(temporaryTraitMapping);
-            log.Information($"Processed {this.traits.Count} entries.");
+            Traits = new ConcurrentDictionary<long, string>(temporaryTraitMapping);
+            log.Information($"Processed {this.Traits.Count} entries.");
+            DataLoaded?.Invoke(Traits);
             return temporaryTraitMapping;
         }
 
