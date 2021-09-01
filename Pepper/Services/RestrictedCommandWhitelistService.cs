@@ -27,6 +27,34 @@ namespace Pepper.Services
             collection = client.GetDatabase(value[1]).GetCollection<Record>(value[2]);
         }
 
+        public void AddAllowedGuild(string commandIdentifier, string guildId)
+        {
+            collection.FindOneAndReplace<Record>(
+                record => record.CommandIdentifier == commandIdentifier && record.GuildId == guildId,
+                new Record
+                {
+                    CommandIdentifier = commandIdentifier,
+                    GuildId = guildId
+                },
+                new FindOneAndReplaceOptions<Record> { IsUpsert = true }
+            );
+            cache.AddOrUpdate(
+                commandIdentifier,
+                (cache.TryGet(commandIdentifier, out var guilds) ? guilds : ImmutableHashSet<string>.Empty)
+                    .Add(guildId)
+            );
+        }
+        
+        public void RemoveAllowedGuild(string commandIdentifier, string guildId)
+        {
+            collection.FindOneAndDelete(record => record.CommandIdentifier == commandIdentifier && record.GuildId == guildId);
+            cache.AddOrUpdate(
+                commandIdentifier,
+                (cache.TryGet(commandIdentifier, out var guilds) ? guilds : ImmutableHashSet<string>.Empty)
+                    .Remove(guildId)
+            );
+        }
+        
         public ImmutableHashSet<string> GetAllowedGuilds(string commandIdentifier)
         {
             if (cache.TryGet(commandIdentifier, out var guilds)) return guilds;

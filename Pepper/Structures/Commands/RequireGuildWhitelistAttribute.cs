@@ -8,13 +8,13 @@ namespace Pepper.Structures.Commands
 {
     public class RequireGuildWhitelistAttribute : DiscordGuildCheckAttribute
     {
-        private readonly string uniqueCommandIdentifier;
-        public RequireGuildWhitelistAttribute(string uniqueCommandIdentifier) => this.uniqueCommandIdentifier = uniqueCommandIdentifier;
+        public readonly string CommandIdentifier;
+        public RequireGuildWhitelistAttribute(string commandIdentifier) => CommandIdentifier = commandIdentifier;
 
         public override ValueTask<CheckResult> CheckAsync(DiscordGuildCommandContext context)
         {
             var allowedServers = context.Services.GetRequiredService<RestrictedCommandWhitelistService>()
-                .GetAllowedGuilds(uniqueCommandIdentifier);
+                .GetAllowedGuilds(CommandIdentifier);
             return allowedServers.Contains(context.GuildId.ToString())
                 ? Success()
                 : Failure("This guild is not whitelisted to run this command.");
