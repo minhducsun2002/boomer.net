@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FgoExportedConstants;
+using Humanizer;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO.MasterData;
 using Pepper.Utilities;
@@ -53,6 +54,24 @@ namespace Pepper.Structures.External.FGO.Renderer
             
             if (values.ContainsKey("Turn")) output.Turn = values["Turn"].Distinct().Select(int.Parse).ToArray();
 
+            var skillTriggerChances =
+                values.TryGetValue("UseRate", out var useRate)
+                    ? useRate.Distinct().Select(chance => int.Parse(chance) / 10).ToList()
+                    : new List<int>();
+            var chanceText = "";
+            switch (skillTriggerChances.Count)
+            {
+                case 1:
+                    chanceText = $" with {skillTriggerChances[0]}% chance";
+                    break;
+                case > 1:
+                    extraStats["Skill trigger chance"] = skillTriggerChances.Select(chance => $"{chance}%").ToArray();
+                    var useRateMutationType = mutationTypeHint.ResolveMutationType("UseRate");
+                    if (useRateMutationType.HasValue)
+                        extraStatsMutationTypeHint["Skill trigger chance"] = useRateMutationType.Value;
+                    break;
+            }
+            
             if (Enum.IsDefined(typeof(BuffList.TYPE), buff.Type))
                 switch ((BuffList.TYPE) buff.Type)
                 {
@@ -115,30 +134,28 @@ namespace Pepper.Structures.External.FGO.Renderer
                         break;
                     case BuffList.TYPE.COMMANDATTACK_FUNCTION:
                         // We are assuming these buffs only push a single skill
-                        buffName = $"Trigger skill {values["Value"].First()} on attacks";
-                        var triggerChances =
-                            values.TryGetValue("UseRate", out var useRate)
-                                ? useRate.Distinct().Select(chance => int.Parse(chance) / 10).ToList()
-                                : new List<int>();
-                        switch (triggerChances.Count)
-                        {
-                            case 1:
-                                buffName = $"Trigger skill {values["Value"].First()} with {triggerChances[0]}% chance on attacks";
-                                break;
-                            case > 1:
-                                extraStats["Skill trigger chance"] = triggerChances.Select(chance => $"{chance}%").ToArray();
-                                var useRateMutationType = mutationTypeHint.ResolveMutationType("UseRate");
-                                if (useRateMutationType.HasValue)
-                                    extraStatsMutationTypeHint["Skill trigger chance"] = useRateMutationType.Value;
-                                break;
-                        }
+                        buffName = $"Trigger skill {values["Value"].First()}    {chanceText} on attacks";
                         break;
                     case BuffList.TYPE.DEAD_FUNCTION:
+                        buffName = $"Trigger skill {values["Value"].First()} upon death";
+                        break;
                     case BuffList.TYPE.DELAY_FUNCTION:
+                        // the Turn value in this case refers to the delayed turn count
+                        output.Turn = Array.Empty<int>();
+                        var turn = int.Parse(values["Turn"].First());
+                        buffName = $"Trigger skill {values["Value"].First()} after {turn} {(turn > 1 ? "turn".Pluralize() : "turn")}";
+                        break;
                     case BuffList.TYPE.ENTRY_FUNCTION:
+                        buffName = $"Trigger skill {values["Value"].First()} upon entry";
+                        break;
                     case BuffList.TYPE.GUTS_FUNCTION:
+                        buffName = $"Trigger skill {values["Value"].First()} upon Guts trigger";
+                        break;
                     case BuffList.TYPE.NPATTACK_PREV_BUFF:
+                        buffName = $"Trigger skill {values["Value"].First()} right before NPs";
+                        break;
                     case BuffList.TYPE.SELFTURNEND_FUNCTION:
+                        buffName = $"Trigger skill {values["Value"].First()} when turn ends";
                         break;
                     case BuffList.TYPE.AVOIDANCE:
                     case BuffList.TYPE.INVINCIBLE:

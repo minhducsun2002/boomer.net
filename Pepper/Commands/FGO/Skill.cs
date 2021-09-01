@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Disqord;
 using Disqord.Bot;
-using MongoDB.Driver;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO;
-using Pepper.Structures.External.FGO.MasterData;
 using Pepper.Structures.External.FGO.Renderer;
 using Qmmands;
 
@@ -25,6 +24,7 @@ namespace Pepper.Commands.FGO
                                         na = MasterDataService.Connections[Region.NA];
 
             var servant = jp.GetServant(servantIdentity.ServantId);
+            servant.Name = ResolveServantName(servant);
             
             var records = jp.GetServantSkillAssociationByServantId(servant.ID)
                 .OrderBy(skillMapping => skillMapping.Priority)
@@ -33,6 +33,8 @@ namespace Pepper.Commands.FGO
                 .ToList();
 
             var outputFields = new List<LocalEmbedField>();
+            HashSet<int> referencedSkillIds = new();
+
             foreach (var position in records)
             {
                 if (outputFields.Count != 0) outputFields.Add(Blank.WithBlankName().WithBlankValue());
@@ -48,13 +50,28 @@ namespace Pepper.Commands.FGO
                     {
                         var (skill, (effects, referencedSkills)) = pair;
                         var levels = skill.MstSkillLv.Select(level => level.ChargeTurn).Distinct().OrderByDescending(c => c);
+
+                        var reference = new StringBuilder();
+                        foreach (var (referencedSkill, description) in referencedSkills)
+                            if (!referencedSkillIds.Contains(referencedSkill.MstSkill.ID))
+                            {
+                                referencedSkillIds.Add(referencedSkill.MstSkill.ID);
+                                reference.AppendLine(
+                                    $"[Skill {referencedSkill.MstSkill.ID}]\n" 
+                                    + string.Join("\n", description.Select(line => $"→ {line}"))
+                                    + "\n"
+                                );
+                            }
+                        
+                        
                         return new LocalEmbedField
                         {
                             Name = $"{skill.MstSkill.Name} ({string.Join("-", levels)})",
-                            Value = string.Join("\n\n", effects)
+                            Value = string.Join("\n\n", effects) + "\n\n" + reference
                         };
                     })
                     .ToList();
+                
                 outputFields.AddRange(skills);
             }
 
