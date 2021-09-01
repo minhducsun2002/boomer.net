@@ -1,8 +1,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
-using LazyCache;
-using LazyCache.Providers;
-using Microsoft.Extensions.Caching.Memory;
+using BitFaster.Caching.Lru;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
@@ -14,29 +12,25 @@ namespace Pepper.Services.Osu.API
     internal class BeatmapCache
     {
         private static readonly HttpClient HttpClient = new();
-        private readonly IAppCache beatmapCache = new CachingService
-        (
-            new MemoryCacheProvider(new MemoryCache(new MemoryCacheOptions { SizeLimit = 50 }))
-        );
+        private readonly FastConcurrentLru<long, WorkingBeatmap> cache = new(200);
 
         public async Task<WorkingBeatmap> GetBeatmap(long beatmapId)
         {
-            async Task<WorkingBeatmap> BeatmapGetter()
-            {
-                await using var stream = await HttpClient.GetStreamAsync($"https://osu.ppy.sh/osu/{beatmapId}");
-                using var streamReader = new LineBufferedReader(stream);
-                var workingBeatmap = new WorkingBeatmap(Decoder.GetDecoder<Beatmap>(streamReader).Decode(streamReader));
-                if (workingBeatmap.BeatmapInfo.Length.Equals(default))
-                    workingBeatmap.BeatmapInfo.Length = workingBeatmap.Beatmap.HitObjects[^1].StartTime;
-                workingBeatmap.BeatmapInfo.Ruleset =
-                    RulesetTypeParser.SupportedRulesets[workingBeatmap.BeatmapInfo.RulesetID].RulesetInfo;
-                return workingBeatmap;
-            }
+            if (cache.TryGet(beatmapId, out var @return)) return @return;
 
-            return await beatmapCache.GetOrAddAsync($"beatmap-{beatmapId}", BeatmapGetter, new MemoryCacheEntryOptions
-            {
-                Size = 1
-            });
+            await using var stream = await HttpClient.GetStreamAsync($"https://osu.ppy.sh/osu/{beatmapId}");
+            using var streamReader = new LineBufferedReader(stream);
+            var workingBeatmap = new WorkingBeatmap(Decoder.GetDecoder<Beatmap>(streamReader).Decode(streamReader));
+            if (workingBeatmap.BeatmapInfo.Length.Equals(default))
+                workingBeatmap.BeatmapInfo.Length = workingBeatmap.Beatmap.HitObjects[^1].StartTime;
+            workingBeatmap.BeatmapInfo.Ruleset =
+                RulesetTypeParser.SupportedRulesets[workingBeatmap.BeatmapInfo.RulesetID].RulesetInfo;
+            
+            cache.AddOrUpdate(beatmapId, workingBeatmap);
+            
+            return workingBeatmap;
+
+            
         }
     }
 }

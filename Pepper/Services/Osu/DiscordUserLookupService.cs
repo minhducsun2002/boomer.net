@@ -1,19 +1,13 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BAMCIS.ChunkExtensionMethod;
-using Disqord.Bot.Hosting;
-using LazyCache;
-using LazyCache.Providers;
-using Microsoft.Extensions.Caching.Memory;
+using BitFaster.Caching.Lru;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Pepper.Structures;
-using Pepper.Structures.External.MongoDB;
 using Serilog;
 
 namespace Pepper.Services.Osu
@@ -30,10 +24,7 @@ namespace Pepper.Services.Osu
         private readonly string collectionName;
         private readonly string databaseName;
         private readonly string serverUri;
-        private readonly IAppCache usernameCache = new CachingService(new MemoryCacheProvider(new MemoryCache(new MemoryCacheOptions
-        {
-            SizeLimit = 500
-        })));
+        private readonly FastConcurrentLru<string, string> cache = new(500);
         private readonly ILogger log = Log.Logger.ForContext<DiscordOsuUsernameLookupService>();
 
         private IMongoCollection<DiscordOsuUsernameRecord> Collection => client.GetDatabase(databaseName)
@@ -67,8 +58,9 @@ namespace Pepper.Services.Osu
                 IsUpsert = true,
                 ReturnDocument = ReturnDocument.After
             });
-            usernameCache.Remove(uid);
-            usernameCache.Add(uid, results?.OsuUsername, new MemoryCacheEntryOptions { Size = 1 });
+
+            cache.TryRemove(uid);
+            if (results?.OsuUsername != null) cache.AddOrUpdate(uid, results.OsuUsername);
             return results;
         }
 
@@ -80,8 +72,8 @@ namespace Pepper.Services.Osu
             var uncached = new List<ulong>();
             
             foreach (var uid in discordUserIds)
-                if (usernameCache.TryGetValue<string>(uid.ToString(), out var username) && username != null)
-                    output[uid] = (string) username;
+                if (cache.TryGet(uid.ToString(), out var username))
+                    output[uid] = username;
                 else uncached.Add(uid);
 
             var usernames = uncached
@@ -95,8 +87,8 @@ namespace Pepper.Services.Osu
             foreach (var record in usernames) output[ulong.Parse(record.DiscordUserId)] = record.OsuUsername;
             foreach (var (uid, username) in output)
             {
-                usernameCache.Remove(uid.ToString());
-                usernameCache.Add(uid.ToString(), username, new MemoryCacheEntryOptions { Size = 1 });
+                cache.TryRemove(uid.ToString());
+                cache.AddOrUpdate(uid.ToString(), username);
             }                
             return output;
         }
@@ -104,22 +96,22 @@ namespace Pepper.Services.Osu
         public async Task<string?> GetUser(ulong discordUserId)
         {
             var userId = discordUserId.ToString();
-            async Task<string?> UserGetter()
+            if (cache.TryGet(userId, out var @return)) return @return;
+            
+            var filter = Builders<DiscordOsuUsernameRecord>.Filter.Eq(record => record.DiscordUserId, userId);
+            var results = Collection.Find(filter);
+            var count = await results.CountDocumentsAsync();
+            if (count == 0)
             {
-                var filter = Builders<DiscordOsuUsernameRecord>.Filter.Eq(record => record.DiscordUserId, userId);
-                var results = Collection.Find(filter);
-                var count = await results.CountDocumentsAsync();
-                if (count == 0)
-                {
-                    Log.Debug($"Username not found for user ID \"{userId}\"");
-                    return null;
-                }
-
-                var username = results.Limit(1).First().OsuUsername;
-                Log.Debug($"Found username \"{username}\" bound to user ID \"{userId}\".");
-                return username;
+                Log.Debug($"Username not found for user ID \"{userId}\"");
+                return null;
             }
-            return await usernameCache.GetOrAddAsync(userId, UserGetter, new MemoryCacheEntryOptions { Size = 1 });
+
+            var username = results.Limit(1).First().OsuUsername;
+            Log.Debug($"Found username \"{username}\" bound to user ID \"{userId}\".");
+            cache.AddOrUpdate(userId, username);
+            return username;
+            
         }
     }
 }
