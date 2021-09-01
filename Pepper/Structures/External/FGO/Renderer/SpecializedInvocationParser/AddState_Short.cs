@@ -116,7 +116,10 @@ namespace Pepper.Structures.External.FGO.Renderer
                     case BuffList.TYPE.COMMANDATTACK_FUNCTION:
                         // We are assuming these buffs only push a single skill
                         buffName = $"Trigger skill {values["Value"].First()} on attacks";
-                        var triggerChances = values["UseRate"].Distinct().Select(chance => int.Parse(chance) / 10).ToList();
+                        var triggerChances =
+                            values.TryGetValue("UseRate", out var useRate)
+                                ? useRate.Distinct().Select(chance => int.Parse(chance) / 10).ToList()
+                                : new List<int>();
                         switch (triggerChances.Count)
                         {
                             case 1:
