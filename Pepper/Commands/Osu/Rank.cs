@@ -20,6 +20,7 @@ namespace Pepper.Commands.Osu
     {
         public Rank(APIService service, BeatmapContextProviderService b) : base(service, b) {}
 
+        [RequireGuildWhitelist("osu-leaderboard")]
         [Command("rank", "ranks")]
         [Description("See your ranking compared to other players in this server")]
         public async Task<DiscordCommandResult> Exec([Flag("/")] [Description("Game mode to check. Default to osu!.")] Ruleset ruleset)

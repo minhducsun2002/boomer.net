@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BitFaster.Caching" Version="1.0.3" />
     <PackageReference Include="ChunkExtensionMethod" Version="1.0.2" />
     <PackageReference Include="Disqord.Bot" Version="1.0.0-07272021-86" />
     <PackageReference Include="dotenv.net" Version="3.0.0" />

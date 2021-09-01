@@ -1,6 +1,7 @@
 using Disqord.Bot;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Services.Osu;
+using Pepper.Structures.Commands;
 using Qmmands;
 
 namespace Pepper.Commands.Osu
@@ -9,6 +10,7 @@ namespace Pepper.Commands.Osu
     {
         public SaveUsername(APIService service) : base(service) {}
 
+        [RequireGuildWhitelist("osu-user-set")]
         [Command("usersave", "save", "userset", "set")]
         [Description("Set the username to default to in your future requests.")]
         public DiscordCommandResult Exec([Remainder] [Description("Username to save.")] string username)
