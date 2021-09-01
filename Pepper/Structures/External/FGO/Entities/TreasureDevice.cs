@@ -7,13 +7,26 @@ namespace Pepper.Structures.External.FGO.Entities
 {
     public class TreasureDevice
     {
+        private class FunctionComparer : IEqualityComparer<MstFunc>
+        {
+            public bool Equals(MstFunc? x, MstFunc? y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (x?.GetType() != y?.GetType()) return false;
+                return x?.ID == y?.ID;
+            }
+
+            public int GetHashCode(MstFunc obj) => obj.ID;
+            public static readonly FunctionComparer Instance = new();
+        }
+
         public TreasureDevice(
             MstTreasureDevice mstTreasureDevice,
             MstTreasureDeviceLv[] levels,
             IEnumerable<MstFunc> resolvedFunctions
         )
         {
-            var funcTable = resolvedFunctions.ToDictionary(func => func.ID, func => func);
+            var funcTable = resolvedFunctions.Distinct(FunctionComparer.Instance).ToDictionary(func => func.ID, func => func);
             
             MstTreasureDevice = mstTreasureDevice;
             Levels = levels;
