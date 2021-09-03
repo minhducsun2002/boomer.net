@@ -11,18 +11,11 @@ namespace Pepper.Commands.FGO
     {
         protected readonly MasterDataService MasterDataService;
         protected readonly TraitService TraitService;
-        protected readonly ItemNamingService ItemNamingService;
 
-        public FGOCommand(
-            MasterDataService masterDataService,
-            TraitService traitService,
-            ItemNamingService itemNamingService)
+        public FGOCommand(MasterDataService masterDataService, TraitService traitService)
         {
             MasterDataService = masterDataService;
             TraitService = traitService;
-            ItemNamingService = itemNamingService;
         }
-        
-        public ConcurrentDictionary<long, string> ItemNamings => ItemNamingService.Namings;
     }
 }

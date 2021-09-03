@@ -10,17 +10,14 @@ namespace Pepper.Commands.FGO
 {
     public class ServantCommand : FGOCommand
     {
-        public ServantCommand(
-            MasterDataService m, TraitService t, ItemNamingService i,
-            ServantNamingService naming
-            ) : base(m, t, i)
+        public ServantCommand(MasterDataService m, TraitService t, ItemNamingService i, ServantNamingService naming) : base(m, t)
         {
             servantNamingService = naming;
+            ItemNamingService = i;
         }
         
+        protected readonly ItemNamingService ItemNamingService;
         private readonly ServantNamingService servantNamingService;
-        public IEnumerable<int> AttributeList => MasterDataService.Connections[Region.JP].GetAttributeLists();
-        private ConcurrentDictionary<int, ServantNaming> ServantNamings => servantNamingService.Namings;
 
         protected BaseServant ResolveServant(ServantIdentity servantIdentity)
         {

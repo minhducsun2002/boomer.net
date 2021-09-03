@@ -44,7 +44,7 @@ namespace Pepper.Commands.FGO
     
     public class CraftEssence : FGOCommand
     {
-        public CraftEssence(MasterDataService m, TraitService t, ItemNamingService i) : base(m, t, i) {}
+        public CraftEssence(MasterDataService m, TraitService t) : base(m, t) {}
 
         [Command("ce", "show-craft-essence")]
         [Description("View information about a certain Craft Essence.")]

@@ -12,7 +12,7 @@ namespace Pepper.Commands.FGO
 {
     public class Traits : FGOCommand
     {
-        public Traits(MasterDataService m, TraitService t, ItemNamingService i) : base(m, t, i) {}
+        public Traits(MasterDataService m, TraitService t) : base(m, t) {}
 
         [Command("trait", "traits", "t")]
         [Description("List known traits, or search for one.")]

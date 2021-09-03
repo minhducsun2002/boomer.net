@@ -95,7 +95,7 @@ namespace Pepper.Test.FGO.TreasureDevice
 
         public MstTreasureDevice GetTreasureDeviceEntity(int treasureDeviceId) => treasureDevicesById[treasureDeviceId];
         public MstTreasureDeviceLv GetNPGain(int svtId) { throw new NotImplementedException(); }
-        public Skill GetSkillById(int id, MstSkill? mstSkillHint = null) { throw new NotImplementedException(); }
+        public Structures.External.FGO.Entities.Skill GetSkillById(int id, MstSkill? mstSkillHint = null) { throw new NotImplementedException(); }
         public MstSkill[] GetSkillEntityByActIndividuality(int individuality) { throw new NotImplementedException(); }
         public MstSvtSkill[] GetServantSkillAssociationBySkillId(int skillId) { throw new NotImplementedException(); }
         public MstSvtSkill[] GetServantSkillAssociationByServantId(int svtId) { throw new NotImplementedException(); }
