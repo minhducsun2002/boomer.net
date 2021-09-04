@@ -19,6 +19,8 @@ namespace Pepper.Structures
             NextPageButton.Emoji = null;
             LastPageButton.Label = ">>"; 
             LastPageButton.Emoji = null;
+            
+            if (pageProvider.PageCount <= 1) Menu.Stop();
         }
     }
 

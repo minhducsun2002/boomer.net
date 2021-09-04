@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -23,8 +24,8 @@ namespace Pepper.Services.FGO
     {
         private readonly string url;
         private readonly ILogger log = Log.Logger.ForContext<ServantNamingService>();
-        public ConcurrentDictionary<int, ServantNaming> Namings { get; private set; } = new();
-        public ConcurrentDictionary<string, int> ReverseNameLookupTable { get; private set; } = new();
+        public ImmutableDictionary<int, ServantNaming> Namings { get; private set; } = ImmutableDictionary<int, ServantNaming>.Empty;
+        public ImmutableDictionary<int, int> ServantIdToCollectionNo { get; private set; } = ImmutableDictionary<int, int>.Empty;
 
         public ServantNamingService(IConfiguration config)
         {
@@ -32,41 +33,48 @@ namespace Pepper.Services.FGO
             url = value[0];
         }
 
-        public async Task<Dictionary<int, ServantNaming>> Load()
+        public async Task<IDictionary<int, ServantNaming>> Load()
         {
             var data = await GetCsv(url);
-            var naming = data
+            var validLines = data
                 .Select(line => line.Where(cell => !string.IsNullOrWhiteSpace(cell)).ToList())
                 // collectionNo,servantId,servantOverwrite,servantAlias1,servantAlias2,...
                 .Where(line => line.Count >= 3 && int.TryParse(line[0], out _) && int.TryParse(line[1], out _))
-                .ToDictionary(
+                .ToList();
+
+            ServantIdToCollectionNo = validLines
+                .ToImmutableDictionary(
+                    entry => int.Parse(entry[1]),
+                    entry => int.Parse(entry[0])
+                );
+            
+            Namings = validLines
+                .ToImmutableDictionary(
                     entry => int.Parse(entry[1]),
                     entry => new ServantNaming {Aliases = entry.Skip(3).ToArray(), Name = entry[2]}
                 );
 
-            var reverseLookupTable = naming.SelectMany(pair =>
-                {
-                    var (servantId, naming) = pair;
-                    var _ = new List<string> { naming.Name };
-                    _.AddRange(naming.Aliases);
-                    return _.Select(name => (name, servantId));
-                })
-                .GroupBy(pair => pair.name)
-                .ToDictionary(
-                    grouping => grouping.Key,
-                    grouping => grouping.First().servantId
-                );
-
-            ReverseNameLookupTable = new ConcurrentDictionary<string, int>(reverseLookupTable);
-            Namings = new ConcurrentDictionary<int, ServantNaming>(naming);
+            // ReverseNameLookupTable = Namings.SelectMany(pair =>
+            //     {
+            //         var (servantId, naming) = pair;
+            //         var _ = new List<string> { naming.Name };
+            //         _.AddRange(naming.Aliases);
+            //         return _.Select(name => (name, servantId));
+            //     })
+            //     .GroupBy(pair => pair.name)
+            //     .ToImmutableDictionary(
+            //         grouping => grouping.Key,
+            //         grouping => grouping.First().servantId
+            //     );
+            
             
             
             log.Information($"Processed {Namings.Count} entries.");
             DataLoaded?.Invoke(Namings);
-            return naming;
+            return Namings;
         }
 
-        public delegate void DataLoadedCallback(ConcurrentDictionary<int, ServantNaming> namings);
+        public delegate void DataLoadedCallback(ImmutableDictionary<int, ServantNaming> namings);
         public event DataLoadedCallback? DataLoaded;
 
         public override async Task StartAsync(CancellationToken stoppingToken)

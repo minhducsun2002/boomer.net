@@ -1,15 +1,15 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Disqord.Bot;
-using FgoExportedConstants;
 using FuzzySharp;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO.MasterData;
 using Qmmands;
+
 
 namespace Pepper.Structures.External.FGO
 {
@@ -18,12 +18,71 @@ namespace Pepper.Structures.External.FGO
         public int ServantId;
         public static implicit operator int(ServantIdentity servant) => servant.ServantId;
     }
+
+    public class ServantSearchRecord : ServantNaming
+    {
+        public int ServantId;
+        public double Score;
+        public int Bucket;
+    }
     
     public class ServantIdentityTypeParser : DiscordTypeParser<ServantIdentity>
     {
         public static readonly ServantIdentityTypeParser Instance = new();
+
+        public ServantSearchRecord[] Search(string query, IServiceProvider serviceProvider)
+            => Search(
+                query,
+                serviceProvider.GetRequiredService<ServantSearchService>(),
+                serviceProvider.GetRequiredService<ServantNamingService>().Namings
+            );
         
-        public override async ValueTask<TypeParserResult<ServantIdentity>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
+        private static ServantSearchRecord[] Search(
+            string query, 
+            ServantSearchService servantSearchService,
+            IDictionary<int, ServantNaming> servantNamings)
+        {
+            // servant => token occurence count
+            var tokenSearchResult = TokenSearch(query, servantSearchService);
+
+            var scores = servantNamings.Select(entry =>
+            {
+                const double nameWeight = 1.0f;
+                const double aliasWeight = 1.5f;
+
+                var (servantId, naming) = entry;
+                var weightedNameSimilarity = Fuzz.WeightedRatio(naming.Name, query) * nameWeight;
+                var weightedAliasSimilarities =
+                    naming.Aliases.Select(alias => Fuzz.WeightedRatio(alias, query) * aliasWeight).ToList();
+                var score = (weightedNameSimilarity + weightedAliasSimilarities.Sum()) /
+                            (weightedAliasSimilarities.Count + 1);
+                return new ServantSearchRecord
+                {
+                    ServantId = servantId,
+                    Name = naming.Name,
+                    Aliases = naming.Aliases,
+                    Score = score,
+                    Bucket = tokenSearchResult.TryGetValue(servantId, out var value) ? value : 0
+                };
+            });
+            
+            List<ServantSearchRecord> match = new(), mismatch = new();
+            foreach (var record in scores)
+                (tokenSearchResult.ContainsKey(record.ServantId) ? match : mismatch).Add(record);
+            
+            match.Sort((r1, r2) =>
+            {
+                if (tokenSearchResult[r1.ServantId] != tokenSearchResult[r2.ServantId])
+                    return tokenSearchResult[r2.ServantId] - tokenSearchResult[r1.ServantId];
+
+                return r2.Score.CompareTo(r1.Score);
+            });
+            mismatch.Sort((r1, r2) => r1.Score.CompareTo(r2.Score));;
+            
+            return match.Concat(mismatch).ToArray();
+        }
+        
+        public override ValueTask<TypeParserResult<ServantIdentity>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
         {
             var masterDataService = context.Services.GetRequiredService<MasterDataService>();
             if (int.TryParse(value, out var numericIdentity))
@@ -44,34 +103,14 @@ namespace Pepper.Structures.External.FGO
                     ? Failure($"Could not find a servant with collectionNo {numericIdentity}.") 
                     : Success(new ServantIdentity { ServantId = result.ID });
             }
-                
-            var reverseLookupTable = context.Services.GetRequiredService<ServantNamingService>().ReverseNameLookupTable;
-            // servant => count
-            var tokenSearchResult = TokenSearch(query, servantSearchService);
-            var res = Process.ExtractTop(
+
+            var search = Search(
                 query,
-                reverseLookupTable.Keys,
-                name => name.ToLowerInvariant(),
-                limit: 100
+                servantSearchService,
+                context.Services.GetRequiredService<ServantNamingService>().Namings
             );
-            
-            // remap back
-            var servantIds = res.Select(res => (reverseLookupTable[res.Value], res.Score));
-            List<(int, int)> match = new(), mismatch = new();
-            foreach (var record in servantIds)
-                (tokenSearchResult.ContainsKey(record.Item1) ? match : mismatch).Add(record);
-            
-            match.Sort((r1, r2) =>
-            {
-                var (servantId1, score1) = r1;
-                var (servantId2, score2) = r2;
-                if (tokenSearchResult[servantId1] != tokenSearchResult[servantId2])
-                    return tokenSearchResult[servantId2] - tokenSearchResult[servantId1];
 
-                return score1 - score2;
-            });
-
-            return Success(new ServantIdentity { ServantId = match.Concat(mismatch).First().Item1 });
+            return Success(new ServantIdentity { ServantId = search.First().ServantId });
         }
 
 
