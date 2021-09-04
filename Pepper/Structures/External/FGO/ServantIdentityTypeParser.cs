@@ -40,40 +40,28 @@ namespace Pepper.Structures.External.FGO
         private static ServantSearchRecord[] Search(
             string query, 
             ServantSearchService servantSearchService,
-            IDictionary<int, ServantNaming> servantNamings)
+            SearchableKeyedNamedEntityCollection<int, ServantNaming> servantNamings)
         {
             // servant => token occurence count
             var tokenSearchResult = TokenSearch(query, servantSearchService);
 
-            var scores = servantNamings.Select(entry =>
-            {
-                const double nameWeight = 1.0f;
-                const double aliasWeight = 1.5f;
-
-                var (servantId, naming) = entry;
-                var weightedNameSimilarity = Fuzz.WeightedRatio(naming.Name, query) * nameWeight;
-                var weightedAliasSimilarities =
-                    naming.Aliases.Select(alias => Fuzz.WeightedRatio(alias, query) * aliasWeight).ToList();
-                var score = (weightedNameSimilarity + weightedAliasSimilarities.Sum()) /
-                            (weightedAliasSimilarities.Count + 1);
-                return new ServantSearchRecord
+            var scores = servantNamings.FuzzySearch(query)
+                .Select(entry => new ServantSearchRecord
                 {
-                    ServantId = servantId,
-                    Name = naming.Name,
-                    Aliases = naming.Aliases,
-                    Score = score,
-                    Bucket = tokenSearchResult.TryGetValue(servantId, out var value) ? value : 0
-                };
-            });
-            
+                    ServantId = entry.Key,
+                    Name = entry.Name,
+                    Aliases = entry.Aliases,
+                    Score = entry.Score,
+                    Bucket = tokenSearchResult.TryGetValue(entry.Key, out var value) ? value : 0 
+                });
+
             List<ServantSearchRecord> match = new(), mismatch = new();
             foreach (var record in scores)
                 (tokenSearchResult.ContainsKey(record.ServantId) ? match : mismatch).Add(record);
             
             match.Sort((r1, r2) =>
             {
-                if (tokenSearchResult[r1.ServantId] != tokenSearchResult[r2.ServantId])
-                    return tokenSearchResult[r2.ServantId] - tokenSearchResult[r1.ServantId];
+                if (r1.Bucket != r2.Bucket) return r2.Bucket - r1.Bucket;
 
                 return r2.Score.CompareTo(r1.Score);
             });

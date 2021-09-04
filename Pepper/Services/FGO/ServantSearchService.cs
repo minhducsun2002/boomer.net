@@ -47,7 +47,7 @@ namespace Pepper.Services.FGO
                 .ToList();
         }
 
-        private void ReloadTokenizationTable(IDictionary<int, ServantNaming> namings)
+        private void ReloadTokenizationTable(IEnumerable<KeyValuePair<int, ServantNaming>> namings)
         {
             var @out = new Dictionary<string, HashSet<int>>();
             foreach (var (servantId, servantNaming) in namings)

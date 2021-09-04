@@ -24,7 +24,7 @@ namespace Pepper.Services.FGO
     {
         private readonly string url;
         private readonly ILogger log = Log.Logger.ForContext<ServantNamingService>();
-        public ImmutableDictionary<int, ServantNaming> Namings { get; private set; } = ImmutableDictionary<int, ServantNaming>.Empty;
+        public SearchableKeyedNamedEntityCollection<int, ServantNaming> Namings = new(Array.Empty<NamedKeyedEntity<int, ServantNaming>>());
         public ImmutableDictionary<int, int> ServantIdToCollectionNo { get; private set; } = ImmutableDictionary<int, int>.Empty;
 
         public ServantNamingService(IConfiguration config)
@@ -33,7 +33,7 @@ namespace Pepper.Services.FGO
             url = value[0];
         }
 
-        public async Task<IDictionary<int, ServantNaming>> Load()
+        public async Task<SearchableKeyedNamedEntityCollection<int, ServantNaming>> Load()
         {
             var data = await GetCsv(url);
             var validLines = data
@@ -47,34 +47,23 @@ namespace Pepper.Services.FGO
                     entry => int.Parse(entry[1]),
                     entry => int.Parse(entry[0])
                 );
-            
-            Namings = validLines
-                .ToImmutableDictionary(
-                    entry => int.Parse(entry[1]),
-                    entry => new ServantNaming {Aliases = entry.Skip(3).ToArray(), Name = entry[2]}
-                );
 
-            // ReverseNameLookupTable = Namings.SelectMany(pair =>
-            //     {
-            //         var (servantId, naming) = pair;
-            //         var _ = new List<string> { naming.Name };
-            //         _.AddRange(naming.Aliases);
-            //         return _.Select(name => (name, servantId));
-            //     })
-            //     .GroupBy(pair => pair.name)
-            //     .ToImmutableDictionary(
-            //         grouping => grouping.Key,
-            //         grouping => grouping.First().servantId
-            //     );
-            
-            
-            
-            log.Information($"Processed {Namings.Count} entries.");
+            Namings = new SearchableKeyedNamedEntityCollection<int, ServantNaming>(
+                validLines
+                    .Select(entry => new NamedKeyedEntity<int, ServantNaming>(
+                        int.Parse(entry[1]),
+                        new ServantNaming { Aliases = entry.Skip(3).ToArray(), Name = entry[2] },
+                        entry[2],
+                        entry.Skip(3).ToArray()
+                    ))
+            );
+
+            log.Information($"Processed {validLines.Count} entries.");
             DataLoaded?.Invoke(Namings);
             return Namings;
         }
 
-        public delegate void DataLoadedCallback(ImmutableDictionary<int, ServantNaming> namings);
+        public delegate void DataLoadedCallback(IEnumerable<KeyValuePair<int, ServantNaming>> namings);
         public event DataLoadedCallback? DataLoaded;
 
         public override async Task StartAsync(CancellationToken stoppingToken)
