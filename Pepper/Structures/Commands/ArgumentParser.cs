@@ -40,35 +40,70 @@ namespace Pepper.Structures.Commands
             flagParameters = flagParameters
                 .OrderByDescending(pair => pair.Key, StringComparer.InvariantCultureIgnoreCase)
                 .ToDictionary(pair => pair.Key, pair => pair.Value);
+            
+            // sort parameters into two types : matches flags and doesn't
+            HashSet<string> flagArguments = new(); List<string> remainingArguments = new();
+            foreach (var argument in SmartSplit(rawArguments, Quote))
+                if (flagParameters.Any(f => argument.StartsWith(f.Key)))
+                    flagArguments.Add(argument);
+                else 
+                    remainingArguments.Add(argument);
 
-            var splitArguments = SmartSplit(rawArguments, Quote);
-            // filter for arguments that correspond to flags
-            var remainingArguments = splitArguments.Where(argument =>
+            
+            Dictionary<Parameter, object> flagParameterValues = new();
+            foreach (var (flagPrefix, parameter) in flagParameters)
             {
-                string flagPrefix = "";
-                // if not flag, leave it as-is
-                if (!flagParameters.Any(flagMap => argument.StartsWith(flagPrefix = flagMap.Key))) return true;
-                
-                var parameter = flagParameters[flagPrefix!];
-
-                // overwrite values if-and-only-if boolean flag ones
-                // this must be done at the parser level, since type readers will always get an empty string for boolean flag params.
-                if (parameter.Type == typeof(bool) && parameter.Attributes.Any(attrib => attrib is FlagAttribute))
-                    parameters[parameter] = bool.TrueString;
+                List<string> matchingArguments = new();
+                if (parameter.IsMultiple)
+                {
+                    foreach (var argument in flagArguments)
+                        if (argument.StartsWith(flagPrefix))
+                        {
+                            matchingArguments.Add(argument);
+                            flagArguments.Remove(argument);
+                        }
+                }
                 else
                 {
-                    var passingArgument = argument[flagPrefix.Length..] ?? "";
-                    parameters[parameter] = passingArgument.StartsWith(Quote) && passingArgument.EndsWith(Quote)
-                        ? passingArgument[1..^1] ?? ""
-                        : passingArgument;
+                    // only take the last matching argument if this is a single value parameter
+                    var arg = flagArguments.LastOrDefault(arg => arg.StartsWith(flagPrefix));
+                    if (arg != default)
+                    {
+                        matchingArguments.Add(arg);
+                        flagArguments.Remove(arg);
+                    }
+                }
+                
+                for (var i = 0; i < matchingArguments.Count; i++)
+                {
+                    var arg = matchingArguments[i];
+                    if (parameter.Type == typeof(bool) && parameter.Attributes.Any(attrib => attrib is FlagAttribute))
+                        arg = bool.TrueString;
+                    else
+                    {
+                        var passingArgument = arg[flagPrefix.Length..] ?? "";
+                        arg = passingArgument.StartsWith(Quote) && passingArgument.EndsWith(Quote)
+                            ? passingArgument[1..^1] ?? ""
+                            : passingArgument;
+                    }
+
+                    matchingArguments[i] = arg;
                 }
 
-                // don't consider this anymore in other parameters
-                return false;
-            }).ToArray();
+                if (parameter.IsMultiple)
+                {
+                    // in case this is a multiple-value parameter, merge previous parsed values
+                    if (flagParameterValues.TryGetValue(parameter, out var list))
+                        ((List<string>) list).AddRange(matchingArguments);
+                    else
+                        flagParameterValues[parameter] = matchingArguments;
+                }
+                else 
+                    if (matchingArguments.Count != 0) flagParameterValues[parameter] = matchingArguments[0];
+            }
 
 
-            foreach (var leftoverArgument in remainingArguments)
+            foreach (var (leftoverArgument, index) in remainingArguments.Select((arg, i) => (arg, i)))
             {
                 if (!nonFlagParameters.Any()) break;
 
@@ -78,13 +113,21 @@ namespace Pepper.Structures.Commands
 
                 if (param.IsRemainder)
                 {
-                    parameters[param] = string.Join(' ', remainingArguments);
+                    parameters[param] = string.Join(' ', remainingArguments.Skip(index));
                     break;
                 }
 
+                if (param.IsMultiple)
+                {
+                    parameters[param] = string.Join(' ', remainingArguments.Skip(index));
+                    break;
+                }
+                    
+
                 parameters[param] = leftoverArgument;
             }
-
+            
+            foreach (var (parameter, value) in flagParameterValues) parameters[parameter] = value;
             return new DefaultArgumentParserResult(command, parameters);
         }
 
