@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus.Paged;
-using Microsoft.Extensions.DependencyInjection;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO;
 using Qmmands;
@@ -13,18 +12,20 @@ namespace Pepper.Commands.FGO
 {
     public class ServantSearch : FGOCommand
     {
-        public ServantSearch(MasterDataService m, TraitService t) : base(m, t) {}
+        private readonly ServantNamingService namingService;
+        public ServantSearch(ServantNamingService namingService) => this.namingService = namingService;
 
         [Command("ss", "ssno", "ssn", "search-servants-name")]
         [Description("Search for servants,")]
-        public async Task<DiscordCommandResult> Exec([Description("Search query.")] string query = "")
+        public async Task<DiscordCommandResult> Exec(
+            [Description("Search query.")] string query = ""
+            // [Description("Traits")] params string[] traits
+        )
         {
             if (string.IsNullOrWhiteSpace(query)) return Reply("Please specify a query :frowning:");
             
             var servantIdentityTypeParser = (ServantIdentityTypeParser) Context.Bot.Commands.GetTypeParser<ServantIdentity>();
-            var namingService = Context.Services.GetRequiredService<ServantNamingService>();
             var collectionNoLookup = namingService.ServantIdToCollectionNo;
-            var names = namingService.Namings;
 
             var searchResults = servantIdentityTypeParser.Search(query, Context.Services);
             var isOwner = await Context.Bot.IsOwnerAsync(Context.Author.Id);

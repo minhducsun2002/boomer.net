@@ -42,7 +42,7 @@ namespace Pepper.Commands.FGO
         }
     }
     
-    public class CraftEssence : FGOCommand
+    public class CraftEssence : FGODataCommand
     {
         public CraftEssence(MasterDataService m, TraitService t) : base(m, t) {}
 

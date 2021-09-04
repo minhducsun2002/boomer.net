@@ -10,7 +10,7 @@ using PagedView = Pepper.Structures.PagedView;
 
 namespace Pepper.Commands.FGO
 {
-    public class Traits : FGOCommand
+    public class Traits : FGODataCommand
     {
         public Traits(MasterDataService m, TraitService t) : base(m, t) {}
 

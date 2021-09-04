@@ -8,7 +8,7 @@ using Pepper.Structures.External.FGO.MasterData;
 
 namespace Pepper.Commands.FGO
 {
-    public class ServantCommand : FGOCommand
+    public class ServantCommand : FGODataCommand
     {
         public ServantCommand(MasterDataService m, TraitService t, ItemNamingService i, ServantNamingService naming) : base(m, t)
         {
