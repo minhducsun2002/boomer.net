@@ -10,17 +10,25 @@ namespace Pepper.Structures
     {
         public PagedView(PageProvider pageProvider, LocalMessage? templateMessage = null) : base(pageProvider, templateMessage)
         {
-            RemoveComponent(StopButton);
-            FirstPageButton.Label = "<<"; 
-            FirstPageButton.Emoji = null;
-            PreviousPageButton.Label = "<";
-            PreviousPageButton.Emoji = null;
-            NextPageButton.Label = ">";
-            NextPageButton.Emoji = null;
-            LastPageButton.Label = ">>"; 
-            LastPageButton.Emoji = null;
-            
-            if (pageProvider.PageCount <= 1) Menu.Stop();
+            if (pageProvider.PageCount <= 1)
+                ClearComponents();
+            else
+            {
+                RemoveComponent(StopButton);
+                FirstPageButton.Label = "<<"; 
+                FirstPageButton.Emoji = null;
+                PreviousPageButton.Label = "<";
+                PreviousPageButton.Emoji = null;
+                NextPageButton.Label = ">";
+                NextPageButton.Emoji = null;
+                LastPageButton.Label = ">>"; 
+                LastPageButton.Emoji = null;
+            }
+        }
+
+        protected override void ApplyPageIndex(Page page)
+        {
+            if (PageProvider.PageCount > 1) base.ApplyPageIndex(page);
         }
     }
 

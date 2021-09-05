@@ -24,7 +24,7 @@ namespace Pepper.Commands.FGO
             if (!string.IsNullOrWhiteSpace(query))
             {
                 var res = Process.ExtractSorted(
-                    new KeyValuePair<long, string>(default, query),
+                    new KeyValuePair<int, string>(default, query),
                     listing,
                     kv => kv.Value,
                     null
@@ -33,7 +33,7 @@ namespace Pepper.Commands.FGO
                     .Select(result => result.Value).ToArray();
             }
             
-            var pageProvider = new ArrayPageProvider<KeyValuePair<long, string>>(
+            var pageProvider = new ArrayPageProvider<KeyValuePair<int, string>>(
                 listing,
                 (_, segment) => new Page().WithEmbeds(new LocalEmbed
                 {

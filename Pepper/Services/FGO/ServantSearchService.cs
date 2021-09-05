@@ -25,19 +25,24 @@ namespace Pepper.Services.FGO
     {
         private readonly ServantNamingService servantNamingService;
         private readonly MongoClient mongoClient;
+        private readonly MasterDataService masterDataService;
         private readonly string dbName, collectionName;
         public Dictionary<string, HashSet<int>> TokenTable = new();
+        public Dictionary<int, HashSet<int>> ServantTraits = new(); 
         private readonly ILogger log = Log.Logger.ForContext<ServantSearchService>();
 
-        public ServantSearchService(ServantNamingService servantNamings, IConfiguration config)
+        public bool TraitLoaded = false;
+
+        public ServantSearchService(ServantNamingService namingService, MasterDataService masterDataService, IConfiguration config)
         {
-            servantNamingService = servantNamings;
+            servantNamingService = namingService;
+            this.masterDataService = masterDataService;
             var value = config.GetSection("database:fgo:aliases").Get<string[]>();
 
             mongoClient = new MongoClient(value[0]);
             dbName = value[1];
             collectionName = value[2];
-            servantNamings.DataLoaded += ReloadTokenizationTable;
+            namingService.DataLoaded += ReloadTokenizationTable;
         }
 
         public List<AliasEntry> GetAlias(string query)
@@ -65,7 +70,26 @@ namespace Pepper.Services.FGO
             }
             
             TokenTable = @out;
-            Log.Information("Servant aliases tokenization complete.");
+            log.Information("Servant aliases tokenization complete.");
+        }
+
+        private void LoadServantTraits()
+        {
+            ServantTraits = masterDataService.Connections[Region.JP]
+                .GetAllServantEntities()
+                .ToDictionary(
+                    entity => entity.ID,
+                    entity => new HashSet<int>(entity.Traits)
+                );
+            
+            log.Information($"Loaded trait table for {ServantTraits.Count} servants.");
+        }
+
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            LoadServantTraits();
+            TraitLoaded = true;
+            return base.ExecuteAsync(stoppingToken);
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)

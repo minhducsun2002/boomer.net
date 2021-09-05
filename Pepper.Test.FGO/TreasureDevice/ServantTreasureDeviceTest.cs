@@ -15,7 +15,7 @@ namespace Pepper.Test.FGO.TreasureDevice
 {
     internal class TraitProvider : ITraitNameProvider
     {
-        public string GetTrait(long traitId, bool fallbackToEmpty = false)
+        public string GetTrait(int traitId, bool fallbackToEmpty = false)
         {
             return traitId.ToString();
         }
@@ -76,6 +76,8 @@ namespace Pepper.Test.FGO.TreasureDevice
         public MstSvt GetServantEntityById(int id) => ServantEntitiesById[id];
         public MstSvt GetServantEntityByCollectionNo(int collectionNo) { throw new NotImplementedException(); }
         public ServantLimits GetServantLimits(int servantId) { throw new NotImplementedException(); }
+        public MstSvt[] GetAllServantEntities() { throw new NotImplementedException(); }
+
         public CraftEssence GetCraftEssenceById(int id, MstSvt? mstSvtHint = null) { throw new NotImplementedException(); }
         public CraftEssence GetCraftEssenceByCollectionNo(int collectionNo, MstSvt? mstSvtHint = null) { throw new NotImplementedException(); }
 

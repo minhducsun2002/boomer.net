@@ -12,6 +12,8 @@ namespace Pepper.Structures.External.FGO
         public MstSvt? GetServantEntityByCollectionNo(int collectionNo);
         public ServantLimits GetServantLimits(int servantId);
 
+        public MstSvt[] GetAllServantEntities();
+
         public CraftEssence? GetCraftEssenceById(int id, MstSvt? mstSvtHint = null);
         public CraftEssence? GetCraftEssenceByCollectionNo(int collectionNo, MstSvt? mstSvtHint = null);
         

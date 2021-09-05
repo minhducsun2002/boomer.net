@@ -13,7 +13,7 @@ namespace Pepper.Services.FGO
     {
         private readonly string url;
         private readonly ILogger log = Log.Logger.ForContext<TraitService>();
-        public ConcurrentDictionary<long, string> Traits = new();
+        public ConcurrentDictionary<int, string> Traits = new();
         private readonly MasterDataService masterDataService;
         
         public TraitService(IConfiguration config, MasterDataService masterDataService)
@@ -23,7 +23,7 @@ namespace Pepper.Services.FGO
             this.masterDataService = masterDataService;
         }
 
-        public string GetTrait(long traitId, bool fallbackToEmpty = false)
+        public string GetTrait(int traitId, bool fallbackToEmpty = false)
         {
             string reverse = "";
             if (traitId < 0)
@@ -46,22 +46,22 @@ namespace Pepper.Services.FGO
             return (fallbackToEmpty ? "" : $"{reverse}{traitId}");
         }
         
-        public delegate void DataLoadedCallback(ConcurrentDictionary<long, string> traits);
+        public delegate void DataLoadedCallback(ConcurrentDictionary<int, string> traits);
         public event DataLoadedCallback? DataLoaded;
         
-        public async Task<Dictionary<long, string>> Load()
+        public async Task<Dictionary<int, string>> Load()
         {
             var data = await GetCsv(url);
             var temporaryTraitMapping = data
-                .Where(line => line.Count >= 2 && long.TryParse(line[0], out _))
+                .Where(line => line.Count >= 2 && int.TryParse(line[0], out _))
                 .Where(entry => !string.IsNullOrWhiteSpace(entry[1]))
-                .Where(entry => long.Parse(entry[0]) != 0)
+                .Where(entry => int.Parse(entry[0]) != 0)
                 .ToDictionary(
-                    entry => long.Parse(entry[0]),
+                    entry => int.Parse(entry[0]),
                     entry => entry[1]
                 );
-            Traits = new ConcurrentDictionary<long, string>(temporaryTraitMapping);
-            log.Information($"Processed {this.Traits.Count} entries.");
+            Traits = new ConcurrentDictionary<int, string>(temporaryTraitMapping);
+            log.Information($"Processed {Traits.Count} entries.");
             DataLoaded?.Invoke(Traits);
             return temporaryTraitMapping;
         }
