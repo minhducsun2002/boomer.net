@@ -55,6 +55,13 @@ namespace Pepper.Commands.FGO
             }
                 .Where(entry => entry.HasValue)
                 .Select(entry => entry!.Value)
+                .Select(entry =>
+                {
+                    entry.Item2.Content =
+                        "Search may not bring up the expected result."
+                        + "Please use ss command first to search, then call this command again with servant ID.";
+                    return entry;
+                })
                 .ToArray();
 
             return View(new SelectionPagedView(pages, new LocalMessage().WithReply(Context.Message.Id)));
