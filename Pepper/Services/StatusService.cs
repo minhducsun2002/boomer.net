@@ -1,35 +1,47 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Gateway;
+using Disqord.Hosting;
 using Humanizer;
+using Microsoft.Extensions.DependencyInjection;
 using Pepper.Structures;
 
 namespace Pepper.Services
 {
+    public interface IStatusProvider
+    {
+        public string GetCurrentStatus();
+    }
+    
     public class StatusService : Service
     {
-        private Task SetStatus(CancellationToken stoppingToken = default)
-        {
-            var interval = DateTime.Now - Process.GetCurrentProcess().StartTime;
-            
-            return Client.SetPresenceAsync(
-                new LocalActivity($"Uptime : {interval.Humanize(countEmptyUnits: true, precision: 3)}", ActivityType.Playing),
-                stoppingToken
-            );
-        }
+        private Task SetStatus(string status, CancellationToken stoppingToken = default)
+            => Client.SetPresenceAsync(new LocalActivity(status, ActivityType.Playing), stoppingToken);
         
+        private class UptimeStatusProvider : IStatusProvider
+        {
+            public string GetCurrentStatus()
+                => $"Uptime : {(DateTime.Now - Process.GetCurrentProcess().StartTime).Humanize(countEmptyUnits: true, precision: 3)}";
+        }
+
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await Client.WaitUntilReadyAsync(stoppingToken);
-            await SetStatus(stoppingToken);
+
+            var services = Bot.Services.GetServices<DiscordClientService>().OfType<IStatusProvider>().ToList();
+            services.Add(new UptimeStatusProvider());
+            var index = 0;
+            
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(20), stoppingToken);
-                // TODO : Queries for all services implementing IStatusProvider and use information from there instead
-                await SetStatus(stoppingToken);
+                await SetStatus(services[index].GetCurrentStatus(), stoppingToken);
+                index = (index + 1) % services.Count;
+                await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
             }
         }
     }

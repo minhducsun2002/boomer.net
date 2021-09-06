@@ -15,6 +15,8 @@ namespace Pepper.Services.Osu.API
         private static readonly HttpClient HttpClient = new();
         private readonly FastConcurrentLru<long, byte[]> cache = new(200);
 
+        public int CachedCount => cache.Count;
+        
         private WorkingBeatmap decodeBeatmapFile(byte[] file)
         {
             using var stream = new MemoryStream(file);

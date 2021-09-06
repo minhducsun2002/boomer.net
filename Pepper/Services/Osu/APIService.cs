@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Humanizer;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OsuSharp;
@@ -7,7 +8,7 @@ using Pepper.Structures;
 
 namespace Pepper.Services.Osu
 {
-    public partial class APIService : Service
+    public partial class APIService : Service, IStatusProvider
     {
         public APIService(IConfiguration configuration)
         {
@@ -27,5 +28,7 @@ namespace Pepper.Services.Osu
         };
 
         private readonly OsuClient legacyApiClient;
+        public string GetCurrentStatus() => $"Cached {beatmapCache.CachedCount} "
+            + (beatmapCache.CachedCount > 1 ? "beatmap".Pluralize() : "beatmap");
     }
 }

@@ -9,7 +9,7 @@ using Serilog;
 
 namespace Pepper.Services.FGO
 {
-    public class TraitService : NamingService, ITraitNameProvider
+    public class TraitService : NamingService, ITraitNameProvider, IStatusProvider
     {
         private readonly string url;
         private readonly ILogger log = Log.Logger.ForContext<TraitService>();
@@ -71,5 +71,7 @@ namespace Pepper.Services.FGO
             await Load();
             await base.StartAsync(cancellationToken);
         }
+
+        public string GetCurrentStatus() => $"Cached {Traits.Count} traits";
     }
 }
