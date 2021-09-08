@@ -1,12 +1,53 @@
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
 using Humanizer;
+using Microsoft.Extensions.DependencyInjection;
 using Pepper.Services.FGO;
+using Pepper.Structures.Commands;
 using Qmmands;
 
-namespace Pepper.Commands.FGO.Names
+namespace Pepper.Commands.FGO
 {
+    internal class ServantResolvableFailureFormatterAttribute : Attribute, IParameterCheckWithFailureFormatter
+    {
+        public LocalMessage? FormatFailure(ParameterChecksFailedResult parameterChecksFailedResult)
+            => new LocalMessage().WithContent("Please specify a valid servant alias or ID.");
+    }
+    
+    internal class ServantResolvableCheckAttribute : ParameterCheckAttribute
+    {
+        public override ValueTask<CheckResult> CheckAsync(object argument, CommandContext context)
+        {
+            if (argument is string maybeCollectionNo && int.TryParse(maybeCollectionNo, out var surelyCollectionNo))
+                argument = surelyCollectionNo;
+            
+            switch (argument)
+            {
+                case string alias:
+                {
+                    var searchService = context.Services.GetRequiredService<ServantSearchService>();
+                    var list = searchService.GetAlias(alias);
+                    return list.Count != 0
+                        ? Success()
+                        : Failure("Alias does not resolve to an existent servant.");
+                }
+                case int collectionNo:
+                {
+                    var masterDataService = context.Services.GetRequiredService<MasterDataService>();
+                    var servantEntity = masterDataService.Connections[Region.JP].GetServantEntityByCollectionNo(collectionNo);
+                    return servantEntity != null
+                        ? Success()
+                        : Failure("collectionNo does not map to an existent servant.");
+                }
+                default:
+                    return Failure("");
+            }
+        }
+    }
+    
     public class Aliases : FGOCommand
     {
         private readonly ServantNamingService servantNamingService;
@@ -20,22 +61,19 @@ namespace Pepper.Commands.FGO.Names
 
         private string Name(int collectionNo)
         {
-            var record = servantNamingService.ServantIdToCollectionNo.FirstOrDefault(kv => kv.Value == collectionNo);
-            return record.Equals(default) 
-                ? $"{collectionNo}"
-                : $"**{servantNamingService.Namings[record.Key].Name}** ({collectionNo})";
+            var (key, _) = servantNamingService.ServantIdToCollectionNo.FirstOrDefault(kv => kv.Value == collectionNo);
+            return servantNamingService.Namings.ContainsKey(key) 
+                ? $"**{servantNamingService.Namings[key].Name}** ({collectionNo})"
+                : $"{collectionNo}";
         }
             
 
         [Command("addname")]
         [Description("Add an alias to a servant.")]
         public DiscordCommandResult Add(
-            [Description("Servant collectionNo to add an alias for.")] int collectionNo, 
+            [Description("Servant collectionNo to add an alias for.")] [ServantResolvableCheck] int collectionNo, 
             [Description("Alias to add.")] string alias)
         {
-            if (!servantNamingService.ServantIdToCollectionNo.Values.Contains(collectionNo))
-                return Reply("Please specify a valid servant collectionNo.");
-
             if (searchService.GetAlias(alias).Any())
                 return Reply($"`{alias}` is already mapped to servant {Name(collectionNo)}.");
             
@@ -45,25 +83,15 @@ namespace Pepper.Commands.FGO.Names
 
         [Command("getnames", "getname")]
         [Description("List aliases of a servant.")]
-        public DiscordCommandResult Get([Description("Servant alias to list aliases for.")] string alias)
+        public DiscordCommandResult Get(
+            [Description("Servant alias/collectionNo to list aliases for.")] [ServantResolvableCheck] [ServantResolvableFailureFormatter] string alias
+        )
         {
-            var list = searchService.GetAlias(alias);
-            return !list.Any() 
-                ? Reply($"There's no servant associated with alias `{alias}`.") 
-                : Get(list[0].CollectionNo);
-        }
-        
-        [Priority(1)]
-        [Command("getnames", "getname")]
-        [Description("List aliases of a servant.")]
-        public DiscordCommandResult Get([Description("Servant collectionNo to list aliases for.")] int collectionNo)
-        {
-            if (!servantNamingService.ServantIdToCollectionNo.Values.Contains(collectionNo))
-                return Reply("Please specify a valid servant collectionNo.");
-
-            var list = searchService.GetAlias(collectionNo);
-            if (!list.Any())
-                return Reply($"There's no custom alias for servant {Name(collectionNo)}.");
+            var list = int.TryParse(alias, out var collectionNo) switch
+            {
+                false => searchService.GetAlias(alias),
+                true => searchService.GetAlias(collectionNo)
+            };
 
             return Reply(new LocalEmbed
             {

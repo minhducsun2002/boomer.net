@@ -159,8 +159,13 @@ namespace Pepper
                     embed.Description = $"```{exception.Message}\n{string.Join('\n', stackTrace.Take(4))}```";
                     break;
                 case TypeParseFailedResult typeParseFailedResult:
+                {
                     var parameter = typeParseFailedResult.Parameter;
-                    
+
+                    var formatter = parameter.Attributes.OfType<FormatTypeParseFailureAttribute>().FirstOrDefault();
+                    var res = formatter?.Format(typeParseFailedResult);
+                    if (res != null) return res;
+
                     content = "I'm sorry, an error occurred parsing your argument.";
                     embed.Fields = new List<LocalEmbedField>
                     {
@@ -174,13 +179,28 @@ namespace Pepper
                             Value = typeParseFailedResult.FailureReason
                         });
                     break;
+                }
+                case ParameterChecksFailedResult parameterChecksFailedResult:
+                {
+                    var formatter = parameterChecksFailedResult.Parameter.Attributes.OfType<IParameterCheckWithFailureFormatter>()
+                        .FirstOrDefault();
+                    var formatted = formatter?.FormatFailure(parameterChecksFailedResult);
+                    if (formatted != null) return formatted;
+
+                    goto default;
+                }
                 case ChecksFailedResult checksFailedResult:
                 {
-                    if (checksFailedResult.FailedChecks.Count == 1)
-                        if (checksFailedResult.FailedChecks[0].Check is PrefixCheckAttribute)
+                    switch (checksFailedResult.FailedChecks[0].Check)
+                    {
+                        case PrefixCheckAttribute:
                             return null!;
-                    goto default;
+                        case RequireGuildWhitelistAttribute:
+                            content = "This command is restricted (whitelisted on a per-guild basis), hence not callable from this guild.";
+                            break;
+                    }
                     
+                    goto default;
                 }
                 default:
                     embed.Description = result.FailureReason;
