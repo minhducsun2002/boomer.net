@@ -28,7 +28,7 @@ using Serilog.Templates;
 await new HostBuilder()
     .UseSerilog((_, configuration) =>
         configuration
-            .MinimumLevel.Debug()
+            .MinimumLevel.Information()
             .Enrich.WithThreadId()
             .Enrich.FromLogContext()
             .WriteTo.Console(
