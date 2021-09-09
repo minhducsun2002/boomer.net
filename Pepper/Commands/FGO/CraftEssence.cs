@@ -7,6 +7,7 @@ using Humanizer;
 using Pepper.Services.FGO;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.FGO;
+using Pepper.Structures.External.FGO.Entities;
 using Pepper.Structures.External.FGO.Renderer;
 using Qmmands;
 
@@ -49,11 +50,11 @@ namespace Pepper.Commands.FGO
         [Command("ce", "show-craft-essence")]
         [Description("View information about a certain Craft Essence.")]
         [PrefixCategory("fgo")]
-        public DiscordCommandResult Exec([Description("Craft Essence's in-game number.")] int id = 1)
+        public DiscordCommandResult Exec([Description("Craft Essence's collectionNo, name, or ID.")] CraftEssenceIdentity ceIdentity)
         {
             IMasterDataProvider jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
-            var ce = jp.GetCraftEssenceByCollectionNo(id)!;
-            var localizedName = na.GetCraftEssenceByCollectionNo(id)?.MstSvt.Name;
+            var ce = jp.GetCraftEssenceById(ceIdentity)!;
+            var localizedName = na.GetCraftEssenceById(ceIdentity)?.MstSvt.Name;
             
             var title = $"{ce.MstSvt.CollectionNo}. {localizedName ?? ce.MstSvt.Name} (`{ce.MstSvt.ID}`)";
             var author = $"Cost : {ce.MstSvt.Cost}";

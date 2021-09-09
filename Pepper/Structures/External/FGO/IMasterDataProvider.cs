@@ -4,7 +4,7 @@ using Pepper.Structures.External.FGO.MasterData;
 
 namespace Pepper.Structures.External.FGO
 {
-    public interface IMasterDataProvider
+    public interface IMasterDataProvider : ICraftEssenceDataProvider
     {
         public BaseServant GetServant(MstSvt svt) => GetServant(svt.ID, svt);
         public BaseServant GetServant(int id, MstSvt? hint = null);
@@ -14,9 +14,6 @@ namespace Pepper.Structures.External.FGO
 
         public MstSvt[] GetAllServantEntities();
 
-        public CraftEssence? GetCraftEssenceById(int id, MstSvt? mstSvtHint = null);
-        public CraftEssence? GetCraftEssenceByCollectionNo(int collectionNo, MstSvt? mstSvtHint = null);
-        
         public List<MstSvtTreasureDevice> GetCachedServantTreasureDevices(int servantId, bool reload = false);
         public TreasureDevice GetTreasureDevice(int treasureDeviceId);
         public MstTreasureDevice? GetTreasureDeviceEntity(int treasureDeviceId);

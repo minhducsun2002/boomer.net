@@ -8,6 +8,9 @@ namespace Pepper.Structures.External.FGO
 {
     public partial class MasterDataMongoDBConnection
     {
+        public MstSvt[] GetAllCraftEssenceEntities() =>
+            MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("type", SvtType.Type.SERVANT_EQUIP)).ToList().ToArray();
+        
         private CraftEssence? BuildCraftEssence(MstSvt? mstSvt = null)
         {
             if (mstSvt == null) return null;

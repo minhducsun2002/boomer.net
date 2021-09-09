@@ -80,6 +80,7 @@ namespace Pepper.Test.FGO.TreasureDevice
 
         public CraftEssence GetCraftEssenceById(int id, MstSvt? mstSvtHint = null) { throw new NotImplementedException(); }
         public CraftEssence GetCraftEssenceByCollectionNo(int collectionNo, MstSvt? mstSvtHint = null) { throw new NotImplementedException(); }
+        public MstSvt[] GetAllCraftEssenceEntities() { throw new NotImplementedException(); }
 
         public List<MstSvtTreasureDevice> GetCachedServantTreasureDevices(int servantId, bool reload = false)
             => cachedServantTreasureDevicesById.TryGetValue(servantId, out var @out) ? @out : new();

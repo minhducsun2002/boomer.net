@@ -64,7 +64,9 @@ namespace Pepper.Structures
                 return new NamedKeyedEntitySearchResult<TKey, TValue>(entry, score);
             });
 
-            return entries.ToArray();
+            var result = entries.ToList();
+            result.Sort((r1, r2) => r2.Score.CompareTo(r1.Score));
+            return result.ToArray();
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => Collection.GetEnumerator();

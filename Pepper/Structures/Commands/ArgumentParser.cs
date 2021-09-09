@@ -43,7 +43,7 @@ namespace Pepper.Structures.Commands
             
             // sort parameters into two types : matches flags and doesn't
             HashSet<string> flagArguments = new(); List<string> remainingArguments = new();
-            foreach (var argument in SmartSplit(rawArguments, Quote))
+            foreach (var argument in rawArguments.SmartSplit(Quote))
                 if (flagParameters.Any(f => argument.StartsWith(f.Key)))
                     flagArguments.Add(argument);
                 else 
@@ -129,45 +129,6 @@ namespace Pepper.Structures.Commands
             
             foreach (var (parameter, value) in flagParameterValues) parameters[parameter] = value;
             return new DefaultArgumentParserResult(command, parameters);
-        }
-
-        private static ImmutableArray<string> SmartSplit(string content, char quote, char whitespace = ' ',
-            char escape = '\\')
-        {
-            var output = new List<string>();
-            var piece = new StringBuilder();
-
-            bool isEscaping = false, isQuoting = false;
-            foreach (var character in content)
-            {
-                if (isEscaping)
-                {
-                    piece.Append(character);
-                    isEscaping = false;
-                    continue;
-                }
-
-                if (character == escape)
-                {
-                    isEscaping = true;
-                    continue;
-                }
-
-                if (character == quote) isQuoting = !isQuoting;
-
-                if (character == whitespace)
-                {
-                    // chunk
-                    output.Add(piece.ToString());
-                    piece.Clear();
-                    continue;
-                }
-
-                piece.Append(character);
-            }
-
-            if (piece.Length >= 0) output.Add(piece.ToString());
-            return output.ToImmutableArray();
         }
     }
 

@@ -224,11 +224,18 @@ namespace Pepper
             
             Commands.AddTypeParser(
                 new ServantIdentityTypeParser(
-                    Services.GetRequiredService<ServantNamingService>(),
                     Services.GetRequiredService<MasterDataService>(),
                     Services.GetRequiredService<IConfiguration>()
                 )
             );
+            
+            Commands.AddTypeParser(
+                new CraftEssenceIdentityTypeParser(
+                    Services.GetRequiredService<MasterDataService>(),
+                    Services.GetRequiredService<CraftEssenceNamingService>()
+                )
+            );
+            
             return base.AddTypeParsersAsync(cancellationToken);
         }
     }

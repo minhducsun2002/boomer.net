@@ -25,11 +25,9 @@ namespace Pepper.Structures.External.FGO
     
     public partial class ServantIdentityTypeParser : DiscordTypeParser<ServantIdentity>
     {
-        private readonly ServantNamingService servantNamingService;
         private readonly MasterDataService masterDataService;
-        public ServantIdentityTypeParser(ServantNamingService namingService, MasterDataService masterDataService, IConfiguration config)
+        public ServantIdentityTypeParser(MasterDataService masterDataService, IConfiguration config)
         {
-            servantNamingService = namingService;
             this.masterDataService = masterDataService;
             var value = config.GetSection("database:fgo:aliases").Get<string[]>();
 
