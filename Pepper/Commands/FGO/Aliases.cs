@@ -7,6 +7,8 @@ using Humanizer;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Services.FGO;
 using Pepper.Structures.Commands;
+using Pepper.Structures.External.FGO;
+using Pepper.Structures.External.FGO.Entities;
 using Qmmands;
 
 namespace Pepper.Commands.FGO
@@ -21,6 +23,7 @@ namespace Pepper.Commands.FGO
     {
         public override ValueTask<CheckResult> CheckAsync(object argument, CommandContext context)
         {
+            var typeParser = (ServantIdentityTypeParser) context.Command.Service.GetTypeParser<ServantIdentity>();
             if (argument is string maybeCollectionNo && int.TryParse(maybeCollectionNo, out var surelyCollectionNo))
                 argument = surelyCollectionNo;
             
@@ -28,8 +31,7 @@ namespace Pepper.Commands.FGO
             {
                 case string alias:
                 {
-                    var searchService = context.Services.GetRequiredService<ServantSearchService>();
-                    var list = searchService.GetAlias(alias);
+                    var list = typeParser.GetAlias(alias);
                     return list.Count != 0
                         ? Success()
                         : Failure("Alias does not resolve to an existent servant.");
@@ -51,12 +53,12 @@ namespace Pepper.Commands.FGO
     public class Aliases : FGOCommand
     {
         private readonly ServantNamingService servantNamingService;
-        private readonly ServantSearchService searchService;
+        private readonly ServantIdentityTypeParser servantIdentityTypeParser;
 
-        public Aliases(ServantNamingService s, ServantSearchService search)
+        public Aliases(ServantNamingService s, CommandService commandService)
         {
             servantNamingService = s;
-            searchService = search;
+            servantIdentityTypeParser = (ServantIdentityTypeParser) commandService.GetTypeParser<ServantIdentity>();
         }
 
         private string Name(int collectionNo)
@@ -74,10 +76,10 @@ namespace Pepper.Commands.FGO
             [Description("Servant collectionNo to add an alias for.")] [ServantResolvableCheck] int collectionNo, 
             [Description("Alias to add.")] string alias)
         {
-            if (searchService.GetAlias(alias).Any())
+            if (servantIdentityTypeParser.GetAlias(alias).Any())
                 return Reply($"`{alias}` is already mapped to servant {Name(collectionNo)}.");
             
-            searchService.AddAlias(alias, collectionNo, Context.Author.Id.ToString());
+            servantIdentityTypeParser.AddAlias(alias, collectionNo, Context.Author.Id.ToString());
             return Reply($"Mapped `{alias}` to servant {Name(collectionNo)}.");
         }
 
@@ -89,8 +91,8 @@ namespace Pepper.Commands.FGO
         {
             var list = int.TryParse(alias, out var collectionNo) switch
             {
-                false => searchService.GetAlias(alias),
-                true => searchService.GetAlias(collectionNo)
+                false => servantIdentityTypeParser.GetAlias(alias),
+                true => servantIdentityTypeParser.GetAlias(collectionNo)
             };
 
             return Reply(new LocalEmbed

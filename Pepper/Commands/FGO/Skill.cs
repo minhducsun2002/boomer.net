@@ -5,6 +5,7 @@ using Disqord;
 using Disqord.Bot;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO;
+using Pepper.Structures.External.FGO.Entities;
 using Pepper.Structures.External.FGO.Renderer;
 using Qmmands;
 

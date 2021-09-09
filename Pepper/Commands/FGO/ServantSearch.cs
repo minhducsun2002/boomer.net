@@ -10,6 +10,7 @@ using Humanizer;
 using Pepper.Services.FGO;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.FGO;
+using Pepper.Structures.External.FGO.Entities;
 using Qmmands;
 using PagedView = Pepper.Structures.PagedView;
 

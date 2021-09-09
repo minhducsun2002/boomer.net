@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
+using Pepper.Services.FGO;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.FGO;
@@ -218,9 +219,16 @@ namespace Pepper
         {
             Commands.AddTypeParser(RulesetTypeParser.Instance);
             Commands.AddTypeParser(UsernameTypeParser.Instance);
-            Commands.AddTypeParser(ServantIdentityTypeParser.Instance);
             Commands.AddTypeParser(BeatmapOrSetResolvableTypeParser.Instance);
             Commands.AddTypeParser(BeatmapResolvableTypeParser.Instance);
+            
+            Commands.AddTypeParser(
+                new ServantIdentityTypeParser(
+                    Services.GetRequiredService<ServantNamingService>(),
+                    Services.GetRequiredService<MasterDataService>(),
+                    Services.GetRequiredService<IConfiguration>()
+                )
+            );
             return base.AddTypeParsersAsync(cancellationToken);
         }
     }

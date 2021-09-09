@@ -5,20 +5,17 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Disqord.Bot;
 using FuzzySharp;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 using Pepper.Services.FGO;
+using Pepper.Structures.External.FGO.Entities;
 using Pepper.Structures.External.FGO.MasterData;
 using Qmmands;
 
 
 namespace Pepper.Structures.External.FGO
 {
-    public class ServantIdentity
-    {
-        public int ServantId;
-        public static implicit operator int(ServantIdentity servant) => servant.ServantId;
-    }
-
     public class ServantSearchRecord : ServantNaming
     {
         public int ServantId;
@@ -26,53 +23,23 @@ namespace Pepper.Structures.External.FGO
         public int Bucket;
     }
     
-    public class ServantIdentityTypeParser : DiscordTypeParser<ServantIdentity>
+    public partial class ServantIdentityTypeParser : DiscordTypeParser<ServantIdentity>
     {
-        public static readonly ServantIdentityTypeParser Instance = new();
-
-        public ServantSearchRecord[] Search(string query, IServiceProvider serviceProvider)
-            => Search(
-                query,
-                serviceProvider.GetRequiredService<ServantSearchService>(),
-                serviceProvider.GetRequiredService<ServantNamingService>().Namings
-            );
-        
-        private static ServantSearchRecord[] Search(
-            string query, 
-            ServantSearchService servantSearchService,
-            SearchableKeyedNamedEntityCollection<int, ServantNaming> servantNamings)
+        private readonly ServantNamingService servantNamingService;
+        private readonly MasterDataService masterDataService;
+        public ServantIdentityTypeParser(ServantNamingService namingService, MasterDataService masterDataService, IConfiguration config)
         {
-            // servant => token occurence count
-            var tokenSearchResult = TokenSearch(query, servantSearchService);
+            servantNamingService = namingService;
+            this.masterDataService = masterDataService;
+            var value = config.GetSection("database:fgo:aliases").Get<string[]>();
 
-            var scores = servantNamings.FuzzySearch(query)
-                .Select(entry => new ServantSearchRecord
-                {
-                    ServantId = entry.Key,
-                    Name = entry.Name,
-                    Aliases = entry.Aliases,
-                    Score = entry.Score,
-                    Bucket = tokenSearchResult.TryGetValue(entry.Key, out var value) ? value : 0 
-                });
-
-            List<ServantSearchRecord> match = new(), mismatch = new();
-            foreach (var record in scores)
-                (tokenSearchResult.ContainsKey(record.ServantId) ? match : mismatch).Add(record);
-            
-            match.Sort((r1, r2) =>
-            {
-                if (r1.Bucket != r2.Bucket) return r2.Bucket - r1.Bucket;
-
-                return r2.Score.CompareTo(r1.Score);
-            });
-            mismatch.Sort((r1, r2) => r1.Score.CompareTo(r2.Score));;
-            
-            return match.Concat(mismatch).ToArray();
+            mongoClient = new MongoClient(value[0]);
+            dbName = value[1];
+            collectionName = value[2];
         }
-        
+
         public override ValueTask<TypeParserResult<ServantIdentity>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
         {
-            var masterDataService = context.Services.GetRequiredService<MasterDataService>();
             if (int.TryParse(value, out var numericIdentity))
             {
                 var result = ResolveNumericIdentifier(numericIdentity, masterDataService);
@@ -83,7 +50,7 @@ namespace Pepper.Structures.External.FGO
 
             var query = value.ToLowerInvariant();
             var servantSearchService = context.Services.GetRequiredService<ServantSearchService>();
-            var alias = servantSearchService.GetAlias(query);
+            var alias = GetAlias(query);
             if (alias.Count != 0)
             {
                 var result = ResolveNumericIdentifier(alias[0].CollectionNo, masterDataService);
