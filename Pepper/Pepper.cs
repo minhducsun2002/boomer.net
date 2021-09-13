@@ -33,7 +33,7 @@ await new HostBuilder()
             .Enrich.FromLogContext()
             .WriteTo.Console(
                 new ExpressionTemplate(
-                    "[{@t:dd-MM-yy HH:mm:ss} {@l:u3}] [Thread {ThreadId,2}]{#if Contains(SourceContext, 'Service')} [{Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}]{#end} {@m:lj}\n{@x}"
+                    "[{@t:dd-MM-yy HH:mm:ss} {@l:u3}] [Thread {ThreadId,2}]{#if Contains(SourceContext, 'Service')} [{Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}]{#end} {@m:lj}\n{@x}{#if Contains(@x, 'Exception')}\n{#end}"
                 )
             )
     )
