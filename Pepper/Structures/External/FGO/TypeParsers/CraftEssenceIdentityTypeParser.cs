@@ -5,7 +5,7 @@ using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO.Entities;
 using Qmmands;
 
-namespace Pepper.Structures.External.FGO
+namespace Pepper.Structures.External.FGO.TypeParsers
 {
     public class CraftEssenceIdentityTypeParser : DiscordTypeParser<CraftEssenceIdentity>
     {

@@ -14,7 +14,7 @@ using Pepper.Structures.External.FGO.MasterData;
 using Qmmands;
 
 
-namespace Pepper.Structures.External.FGO
+namespace Pepper.Structures.External.FGO.TypeParsers
 {
     public class ServantSearchRecord : ServantNaming
     {

@@ -19,7 +19,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using Pepper.Services.FGO;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
-using Pepper.Structures.External.FGO;
+using Pepper.Structures.External.FGO.TypeParsers;
 using Pepper.Structures.External.Osu;
 using Qmmands;
 using Serilog;

@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Services.FGO;
 
-namespace Pepper.Structures.External.FGO
+namespace Pepper.Structures.External.FGO.TypeParsers
 {
     public partial class ServantIdentityTypeParser
     {

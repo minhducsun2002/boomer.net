@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MongoDB.Driver;
 using Pepper.Services.FGO;
 
-namespace Pepper.Structures.External.FGO
+namespace Pepper.Structures.External.FGO.TypeParsers
 {
     public partial class ServantIdentityTypeParser
     {
