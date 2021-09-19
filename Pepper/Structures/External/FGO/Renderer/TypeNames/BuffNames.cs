@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Pepper.Structures.External.FGO.Renderer
 {
-    public partial class InvocationRenderer
+    public partial class TypeNames
     {
         public static readonly Dictionary<FgoExportedConstants.BuffList.TYPE, string> BuffNames = new()
         {

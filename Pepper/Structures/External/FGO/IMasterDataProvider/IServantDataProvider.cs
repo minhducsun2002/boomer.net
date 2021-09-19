@@ -11,5 +11,6 @@ namespace Pepper.Structures.External.FGO
         public MstSvt? GetServantEntityByCollectionNo(int collectionNo);
         public ServantLimits GetServantLimits(int servantId);
         public MstSvt[] GetAllServantEntities();
+        public MstTreasureDeviceLv GetNPGain(int svtId);
     }
 }

@@ -42,14 +42,14 @@ namespace Pepper.Structures.External.FGO.Renderer
 
             var baseAction = funcType switch
             {
-                (int) FuncList.TYPE.ADD_STATE => InvocationRenderer.FunctionNames[FuncList.TYPE.ADD_STATE],
-                (int) FuncList.TYPE.ADD_STATE_SHORT => InvocationRenderer.FunctionNames[FuncList.TYPE.ADD_STATE_SHORT],
+                (int) FuncList.TYPE.ADD_STATE => TypeNames.FunctionNames[FuncList.TYPE.ADD_STATE],
+                (int) FuncList.TYPE.ADD_STATE_SHORT => TypeNames.FunctionNames[FuncList.TYPE.ADD_STATE_SHORT],
                 _ => throw new ArgumentException(
                     $"{nameof(funcType)} must be either AddState or AddStateShort. Received {funcType}")
             };
             
             if (Enum.IsDefined(typeof(BuffList.TYPE), buff.Type))
-                if (!InvocationRenderer.BuffNames.TryGetValue((BuffList.TYPE) buff.Type, out buffName))
+                if (!TypeNames.BuffNames.TryGetValue((BuffList.TYPE) buff.Type, out buffName))
                     buffName = $"[buffType ${buff.Type}]";
             
             if (values.ContainsKey("Turn")) output.Turn = values["Turn"].Distinct().Select(int.Parse).ToArray();

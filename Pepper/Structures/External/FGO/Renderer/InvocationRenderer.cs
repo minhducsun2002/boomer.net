@@ -50,15 +50,15 @@ namespace Pepper.Structures.External.FGO.Renderer
             => mutationTypeHint.TryGetValue(key, out var mutationType) ? mutationType : null;
     }
     
-    public partial class InvocationRenderer
+    public class InvocationRenderer<TProvider> where TProvider : IQuestDataProvider, IItemDataProvider, IBaseObjectsDataProvider
     {
         private Dictionary<string, string[]> arguments;
         private bool single;
         private MstFunc function;
-        private IMasterDataProvider MasterData;
+        private TProvider MasterData;
         private readonly ITraitNameProvider traitProvider;
         
-        public InvocationRenderer(MstFunc function, Dictionary<string, string[]> arguments, IMasterDataProvider connection, ITraitNameProvider traitProvider)
+        public InvocationRenderer(MstFunc function, Dictionary<string, string[]> arguments, TProvider connection, ITraitNameProvider traitProvider)
         {
             this.arguments = arguments;
             this.function = function;
@@ -82,7 +82,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                 }.WithEffect($"Function ID {function.ID}, type {function.Type}");
 
             var type = (FuncList.TYPE) function.Type;
-            if (!FunctionNames.TryGetValue(type, out var typeName)) typeName = "";
+            if (!TypeNames.FunctionNames.TryGetValue(type, out var typeName)) typeName = "";
             if (string.IsNullOrWhiteSpace(typeName)) typeName = $"[functionType {type}]";
             var statistics = arguments;
             var onField = false;

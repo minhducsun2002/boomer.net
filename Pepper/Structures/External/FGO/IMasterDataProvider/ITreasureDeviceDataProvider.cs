@@ -9,6 +9,5 @@ namespace Pepper.Structures.External.FGO
         public List<MstSvtTreasureDevice> GetCachedServantTreasureDevices(int servantId, bool reload = false);
         public TreasureDevice GetTreasureDevice(int treasureDeviceId);
         public MstTreasureDevice? GetTreasureDeviceEntity(int treasureDeviceId);
-        public MstTreasureDeviceLv GetNPGain(int svtId);
     }
 }

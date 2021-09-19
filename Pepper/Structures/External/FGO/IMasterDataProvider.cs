@@ -8,14 +8,10 @@ namespace Pepper.Structures.External.FGO
         IItemDataProvider,
         IServantDataProvider,
         ISkillDataProvider,
-        ITreasureDeviceDataProvider
+        ITreasureDeviceDataProvider,
+        IQuestDataProvider,
+        IBaseObjectsDataProvider
     {
-        public MstQuest? ResolveQuest(int questId);
-        public MstBuff? ResolveBuffAndCache(int id, bool reload = false);
-        public MstClass? ResolveClass(int classId, bool reload = false);
-        
-        public MstEvent GetEventById(int eventId);
-
         public IEnumerable<int> GetAttributeLists(bool reload = false);
     }
 }

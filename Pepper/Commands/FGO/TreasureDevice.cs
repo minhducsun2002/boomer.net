@@ -45,11 +45,11 @@ namespace Pepper.Commands.FGO
             IMasterDataProvider jp, IMasterDataProvider na
         ) => SerializePages(servantId, servantName, jp, na, TraitService);
 
-        public static IEnumerable<(LocalSelectionComponentOption selection, Page page)> SerializePages(
+        public static IEnumerable<(LocalSelectionComponentOption selection, Page page)> SerializePages<TProvider>(
             int servantId,
             string servantName,
-            IMasterDataProvider jp, IMasterDataProvider na, ITraitNameProvider traitService
-        )
+            TProvider jp, TProvider na, ITraitNameProvider traitService
+        ) where TProvider : ITreasureDeviceDataProvider, IQuestDataProvider, IItemDataProvider, IBaseObjectsDataProvider
         {
             var pages = jp.GetCachedServantTreasureDevices(servantId)
                 .Where(map => map.Priority != 0)
@@ -77,7 +77,7 @@ namespace Pepper.Commands.FGO
                         {
                             var quest = jp.ResolveQuest(mapping.CondQuestId);
                             var naQuest = na.ResolveQuest(mapping.CondQuestId);
-                            var questType = InvocationRenderer.QuestTypeNames[(QuestEntity.enType) quest.Type];
+                            var questType = TypeNames.QuestTypeNames[(QuestEntity.enType) quest.Type];
                             condition.AppendLine(
                                 $"Requires completion of quest [[__{questType}__] {naQuest?.Name ?? quest.Name}](https://apps.atlasacademy.io/db/JP/quest/{quest.IconId}/{mapping.CondQuestPhase})"
                             );
@@ -132,9 +132,10 @@ namespace Pepper.Commands.FGO
             return pages;
         }
 
-        private static List<InvocationInformation> RenderInvocations(
+        private static List<InvocationInformation> RenderInvocations<TProvider>(
             Structures.External.FGO.Entities.TreasureDevice treasureDevice,
-            IMasterDataProvider connection, ITraitNameProvider traitService)
+            TProvider connection, ITraitNameProvider traitService) 
+            where TProvider : IQuestDataProvider, IItemDataProvider, IBaseObjectsDataProvider
         {
             var functions = treasureDevice.Functions;
             var _ = functions
@@ -167,7 +168,7 @@ namespace Pepper.Commands.FGO
                             _ => baseInvocationArguments[key]
                         };
                     
-                    return new InvocationRenderer(function, baseInvocationArguments, connection, traitService).Render(mutationTypeHint);
+                    return new InvocationRenderer<TProvider>(function, baseInvocationArguments, connection, traitService).Render(mutationTypeHint);
                 });
 
             return _.ToList();

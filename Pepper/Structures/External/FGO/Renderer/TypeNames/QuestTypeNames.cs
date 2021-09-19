@@ -3,7 +3,7 @@ using FgoExportedConstants;
 
 namespace Pepper.Structures.External.FGO.Renderer
 {
-    public partial class InvocationRenderer
+    public partial class TypeNames
     {
         public static readonly Dictionary<QuestEntity.enType, string> QuestTypeNames = new()
         {

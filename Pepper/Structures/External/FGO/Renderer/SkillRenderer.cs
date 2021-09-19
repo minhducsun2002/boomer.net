@@ -89,7 +89,7 @@ namespace Pepper.Structures.External.FGO.Renderer
                             .SelectMany(dict => dict)
                             .ToLookup(pair => pair.Key, pair => pair.Value)
                             .ToDictionary(group => group.Key, group => group.ToArray());
-                        var invocationInformation = new InvocationRenderer(mstFunc, statistics, Connection, trait)
+                        var invocationInformation = new InvocationRenderer<IMasterDataProvider>(mstFunc, statistics, Connection, trait)
                             .Render();
                         if (invocationInformation.ActSetInformation != null) multipleActSet = true;
                         return invocationInformation;
