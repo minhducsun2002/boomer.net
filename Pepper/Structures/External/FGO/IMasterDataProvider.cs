@@ -10,7 +10,8 @@ namespace Pepper.Structures.External.FGO
         ISkillDataProvider,
         ITreasureDeviceDataProvider,
         IQuestDataProvider,
-        IBaseObjectsDataProvider
+        IBaseObjectsDataProvider,
+        IMapDataProvider
     {
         public IEnumerable<int> GetAttributeLists(bool reload = false);
     }

@@ -89,6 +89,9 @@ namespace Pepper.Test.FGO.TreasureDevice
 
         public MstTreasureDevice GetTreasureDeviceEntity(int treasureDeviceId) => treasureDevicesById[treasureDeviceId];
         public MstQuest ResolveQuest(int questId) => quests[questId];
+        public MstQuestPhase[] ListQuestPhases(int questId) { throw new NotImplementedException(); }
+        public MstQuest[] ListQuestsByQuestType(QuestEntity.enType questType) { throw new NotImplementedException(); }
+
         public MstBuff ResolveBuffAndCache(int id, bool reload = false) => buffs[id];
         public MstClass ResolveClass(int classId, bool reload = false) { throw new NotImplementedException(); }
         public MstEvent GetEventById(int eventId) { throw new NotImplementedException(); }

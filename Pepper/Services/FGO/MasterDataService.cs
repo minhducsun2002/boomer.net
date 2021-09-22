@@ -15,7 +15,7 @@ namespace Pepper.Services.FGO
     public enum Region
     {
         NA = 1 << 1,
-        JP = 1 << 2
+        JP = 1 << 0
     }
 
     public class MasterDataService : Service

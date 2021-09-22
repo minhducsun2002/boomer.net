@@ -25,5 +25,7 @@ namespace Pepper.Structures.External.FGO
         private IMongoCollection<MstTreasureDevice> MstTreasureDevice = null!;
         private IMongoCollection<MstQuest> MstQuest = null!;
         private IMongoCollection<MstSpot> MstSpot = null!;
+        private IMongoCollection<MstWar> MstWar = null!;
+        private IMongoCollection<MstQuestPhase> MstQuestPhase = null!;
     }
 }

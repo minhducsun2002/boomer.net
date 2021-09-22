@@ -33,7 +33,7 @@ await new HostBuilder()
             .Enrich.FromLogContext()
             .WriteTo.Console(
                 new ExpressionTemplate(
-                    "[{@t:dd-MM-yy HH:mm:ss} {@l:u3}] [Thread {ThreadId,2}]{#if Contains(SourceContext, 'Service')} [{Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}]{#end} {@m:lj}\n{@x}{#if Contains(@x, 'Exception')}\n{#end}"
+                    "[{@t:dd-MM-yy HH:mm:ss} {@l:u3}] [Thread {ThreadId,2}]{#if SourceContext is not null} [{Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}]{#end} {@m:lj}\n{@x}{#if Contains(@x, 'Exception')}\n{#end}"
                 )
             )
     )
@@ -233,6 +233,12 @@ namespace Pepper
                 new CraftEssenceIdentityTypeParser(
                     Services.GetRequiredService<MasterDataService>(),
                     Services.GetRequiredService<CraftEssenceNamingService>()
+                )
+            );
+            
+            Commands.AddTypeParser(
+                new QuestNameTypeParser(
+                    Services.GetRequiredService<MasterDataService>()
                 )
             );
             

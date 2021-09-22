@@ -52,13 +52,16 @@ namespace Pepper.Structures
             );
         }
 
-        public NamedKeyedEntitySearchResult<TKey, TValue>[] FuzzySearch(string query, double nameWeight = 1f, double aliasWeight = 1.5f)
+        public delegate int Scorer(string input1, string input2);
+        
+        public NamedKeyedEntitySearchResult<TKey, TValue>[] FuzzySearch(string query, Scorer? scorer = null, double nameWeight = 1f, double aliasWeight = 1.5f)
         {
+            if (scorer == null) scorer = Fuzz.WeightedRatio;
             var entries = collection.Select(entry =>
             {
-                var weightedNameSimilarity = Fuzz.WeightedRatio(entry.Name, query) * nameWeight;
+                var weightedNameSimilarity = scorer(entry.Name, query) * nameWeight;
                 var weightedAliasSimilarities = entry.Aliases
-                    .Select(alias => Fuzz.WeightedRatio(alias, query) * aliasWeight).ToList();
+                    .Select(alias => scorer(alias, query) * aliasWeight).ToList();
                 var score = (weightedNameSimilarity + weightedAliasSimilarities.Sum()) /
                             (weightedAliasSimilarities.Count + 1);
                 return new NamedKeyedEntitySearchResult<TKey, TValue>(entry, score);
