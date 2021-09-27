@@ -13,11 +13,11 @@ namespace Pepper.Services.Osu.API
     internal class BeatmapCache
     {
         private static readonly HttpClient HttpClient = new();
-        private readonly FastConcurrentLru<long, byte[]> cache = new(200);
+        private readonly FastConcurrentLru<int, byte[]> cache = new(200);
 
         public int CachedCount => cache.Count;
         
-        private WorkingBeatmap decodeBeatmapFile(byte[] file)
+        private WorkingBeatmap decodeBeatmapFile(byte[] file, int beatmapId)
         {
             using var stream = new MemoryStream(file);
             using var streamReader = new LineBufferedReader(stream);
@@ -26,19 +26,20 @@ namespace Pepper.Services.Osu.API
                 workingBeatmap.BeatmapInfo.Length = workingBeatmap.Beatmap.HitObjects[^1].StartTime;
             workingBeatmap.BeatmapInfo.Ruleset =
                 RulesetTypeParser.SupportedRulesets[workingBeatmap.BeatmapInfo.RulesetID].RulesetInfo;
+            workingBeatmap.BeatmapInfo.OnlineBeatmapID ??= beatmapId;
 
             return workingBeatmap;
         }
         
-        public async Task<WorkingBeatmap> GetBeatmap(long beatmapId)
+        public async Task<WorkingBeatmap> GetBeatmap(int beatmapId)
         {
-            if (cache.TryGet(beatmapId, out var @return)) return decodeBeatmapFile(@return);
+            if (cache.TryGet(beatmapId, out var @return)) return decodeBeatmapFile(@return, beatmapId);
 
             var file = await HttpClient.GetByteArrayAsync($"https://osu.ppy.sh/osu/{beatmapId}");
 
             cache.AddOrUpdate(beatmapId, file);
             
-            return decodeBeatmapFile(file);
+            return decodeBeatmapFile(file, beatmapId);
         }
     }
 }

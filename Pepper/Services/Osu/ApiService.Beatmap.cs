@@ -17,7 +17,7 @@ namespace Pepper.Services.Osu
         private readonly BeatmapCache beatmapCache = new BeatmapCache();
         private readonly BeatmapsetMetadataCache beatmapsetMetadataCache = new();
         
-        public Task<WorkingBeatmap> GetBeatmap(long beatmapId) => beatmapCache.GetBeatmap(beatmapId);
+        public Task<WorkingBeatmap> GetBeatmap(int beatmapId) => beatmapCache.GetBeatmap(beatmapId);
         public Task<APIBeatmapSet> GetBeatmapsetInfo(long id, bool isBeatmapSetId) =>
             beatmapsetMetadataCache.GetBeatmapsetInfo(id, isBeatmapSetId);
     }

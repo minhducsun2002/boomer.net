@@ -44,7 +44,7 @@ namespace Pepper.Commands.Osu
 
         protected async Task<DiscordCommandResult> SingleScore(osu.Game.Users.User user, OsuSharp.Score sc)
         {
-            var workingBeatmap = await APIService.GetBeatmap(sc.BeatmapId);
+            var workingBeatmap = await APIService.GetBeatmap((int) sc.BeatmapId);
             var b = workingBeatmap.Beatmap.BeatmapInfo;
             var ruleset = Rulesets[(int) sc.GameMode];
             var mods = ruleset.ConvertFromLegacyMods((LegacyMods) sc.Mods)!.ToArray();
