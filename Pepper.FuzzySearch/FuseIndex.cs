@@ -4,30 +4,39 @@ using System.Linq;
 
 namespace Pepper.FuzzySearch
 {
-    public class FuseField<T>
+    public class ArrayFuseField<T>
     {
-        public delegate string StringExtractor(T value);
-
+        public delegate string[] StringExtractor(T value);
         internal StringExtractor Extractor;
         internal double Weight;
-        public FuseField(StringExtractor extractor, double weight = 1F)
+
+        public ArrayFuseField(StringExtractor extractor, double weight = 1F)
         {
             Extractor = extractor;
             Weight = weight;
         }
     }
     
+    public class StringFuseField<T> : ArrayFuseField<T>
+    {
+        public new delegate string StringExtractor(T value);
+        public StringFuseField(StringExtractor extractor, double weight = 1F) : base(
+            value => new [] { extractor(value) },
+            weight
+        ) {}
+    }
+    
     public class FuseIndex<T>
     {
         internal struct Record
         {
-            public Dictionary<FuseField<T>, (string, double)> SubRecords;
+            public Dictionary<ArrayFuseField<T>, (string, double)[]> SubRecords;
             public T Element;
         }
         
         private bool isCreated = false;
         private readonly NormGenerator norm = new();
-        public readonly List<FuseField<T>> Keys;
+        public readonly List<ArrayFuseField<T>> Keys;
         internal Dictionary<int, Record> index = new(); 
         internal FuseIndex () {}
 
@@ -35,11 +44,14 @@ namespace Pepper.FuzzySearch
         {
             var values = Keys
                 .Select(key => new { value = key.Extractor(element), key })
-                .ToDictionary(_ => _.key, _ => (_.value, norm.Get(_.value)));
+                .ToDictionary(
+                    _ => _.key, 
+                    _ => _.value.Select(str => (str, norm.Get(str))).ToArray()
+                );
             index[(index.Count + 1) % int.MaxValue] = new Record { SubRecords = values, Element = element };
         }
 
-        public FuseIndex(IEnumerable<FuseField<T>> keys)
+        public FuseIndex(IEnumerable<ArrayFuseField<T>> keys)
         {
             Keys = keys.ToList();
         }

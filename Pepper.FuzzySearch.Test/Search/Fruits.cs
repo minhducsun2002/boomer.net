@@ -22,7 +22,7 @@ namespace Pepper.FuzzySearch.Tests.Search
         [TestCaseSource(typeof(Fruits), nameof(Fruits.FruitTestCases))]
         public void Search(string[] fruits, string query, string output)
         {
-            var fuse = new Fuse<string>(fruits, false, new FuseField<string>(s => s));
+            var fuse = new Fuse<string>(fruits, false, new StringFuseField<string>(s => s));
             var results = fuse.Search(query);
             Assert.AreEqual(results[0].Element, output);
         }
@@ -32,9 +32,9 @@ namespace Pepper.FuzzySearch.Tests.Search
         public void Search(Book[] books, string query, int index)
         {
             var fuse = new Fuse<Book>(books, false,
-                new FuseField<Book>(book => book.Title),
-                new FuseField<Book>(book => book.AuthorFirstName),
-                new FuseField<Book>(book => book.AuthorLastName)
+                new StringFuseField<Book>(book => book.Title),
+                new StringFuseField<Book>(book => book.AuthorFirstName),
+                new StringFuseField<Book>(book => book.AuthorLastName)
             );
 
             var result = fuse.Search(query);

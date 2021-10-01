@@ -22,7 +22,7 @@ namespace Pepper.FuzzySearch
         private bool ignoreFieldNorm;
         
         public Fuse(FuseIndex<T> index) => this.index = index;
-        public Fuse(IEnumerable<T> elements, bool ignoreFieldNorm = false, params FuseField<T>[] keys)
+        public Fuse(IEnumerable<T> elements, bool ignoreFieldNorm = false, params ArrayFuseField<T>[] keys)
         {
             this.ignoreFieldNorm = ignoreFieldNorm;
             index = new FuseIndex<T>(keys);
@@ -37,9 +37,9 @@ namespace Pepper.FuzzySearch
             foreach (var value in records.Values)
             {
                 var matches = value.SubRecords
-                    .Select(kv => FindMatches(kv.Key, kv.Value, searcher))
-                    .Where(match => match != null)
-                    .Select(match => (Match) match)
+                        // flatten the matches.
+                        // original : https://github.com/krisk/Fuse/blob/e5e3abb44e004662c98750d0964d2d9a73b87848/src/core/index.js#L230
+                    .SelectMany(kv => FindMatches(kv.Key, kv.Value, searcher))
                     .ToList();
                 
                 // computeScore
@@ -69,28 +69,32 @@ namespace Pepper.FuzzySearch
         private struct Match
         {
             public double Score;
-            public FuseField<T> Key;
+            public ArrayFuseField<T> Key;
             public string Text;
             public double Norm;
             public Range[] Indices;
         }
 
-        private static Match? FindMatches(FuseField<T> key, (string, double) valueTuple, BitapSearch searcher)
+        private static Match[] FindMatches(ArrayFuseField<T> key, (string, double)[] valueTuple, BitapSearch searcher)
         {
-            var (text, norm) = valueTuple;
-            var (isMatch, score, indices) = searcher.SearchIn(text);
-            if (isMatch)
+            var matches = new List<Match>();
+            foreach (var (text, norm) in valueTuple)
             {
-                return new Match
-                {
-                    Score = score,
-                    Key = key,
-                    Text = text,
-                    Norm = norm,
-                    Indices = indices
-                };
+                var (isMatch, score, indices) = searcher.SearchIn(text);
+                if (isMatch) 
+                    matches.Add(
+                        new Match
+                        {
+                            Score = score,
+                            Key = key,
+                            Text = text,
+                            Norm = norm,
+                            Indices = indices
+                        }
+                    );
             }
-            return null;
+
+            return matches.ToArray();
         }
     }
 }
