@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus.Paged;
-using FuzzySharp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pepper.FuzzySearch;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Pepper.Utilities;
@@ -51,16 +51,16 @@ namespace Pepper.Commmands.General
                         return View(new PagedView(new ListPageProvider(pages.Select(embed => new Page().WithEmbeds(embed)))));
                     return Reply(pages[0]);
                 }
-                
-                var categoryMatches = Process.ExtractTop(
-                    query.ToLowerInvariant(),
-                    categories.Select(_ => _.Key),
-                    s => s.ToLowerInvariant(),
-                    limit: 1)
-                    .ToArray();
 
-                if (categoryMatches[0].Score >= 60)
-                    return Reply(HandleCategory(categoryMatches[0].Value, categories[categoryMatches[0].Value]));
+                var categoryMatch = new Fuse<string>(
+                        categories.Keys,
+                        false,
+                        new StringFuseField<string>(s => s))
+                    .Search(query.ToLowerInvariant())
+                    .First();
+
+                if (categoryMatch.Score <= 0.6)
+                    return Reply(HandleCategory(categoryMatch.Element, categories[categoryMatch.Element]));
             }
 
             return Reply(new LocalEmbed()

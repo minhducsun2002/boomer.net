@@ -2,7 +2,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord.Bot;
 using FgoExportedConstants;
-using FuzzySharp;
 using Pepper.Services.FGO;
 using Pepper.Structures.External.FGO.Entities;
 using Pepper.Structures.External.FGO.MasterData;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Pepper.FuzzySearch;
 using Pepper.Structures.External.FGO;
 using Serilog;
 
@@ -14,6 +15,8 @@ namespace Pepper.Services.FGO
         private readonly string url;
         private readonly ILogger log = Log.Logger.ForContext<TraitService>();
         public ConcurrentDictionary<int, string> Traits = new();
+        public Fuse<KeyValuePair<int, string>> FuzzySearch;
+
         private readonly MasterDataService masterDataService;
         
         public TraitService(IConfiguration config, MasterDataService masterDataService)
@@ -61,6 +64,11 @@ namespace Pepper.Services.FGO
                     entry => entry[1]
                 );
             Traits = new ConcurrentDictionary<int, string>(temporaryTraitMapping);
+            FuzzySearch = new Fuse<KeyValuePair<int, string>>(
+                Traits,
+                false,
+                new StringFuseField<KeyValuePair<int, string>>(kv => kv.Value)
+            );
             log.Information($"Processed {Traits.Count} entries.");
             DataLoaded?.Invoke(Traits);
             return temporaryTraitMapping;

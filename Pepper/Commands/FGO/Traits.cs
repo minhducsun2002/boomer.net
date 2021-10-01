@@ -3,7 +3,7 @@ using System.Linq;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus.Paged;
-using FuzzySharp;
+using Pepper.FuzzySearch;
 using Pepper.Services.FGO;
 using Qmmands;
 using PagedView = Pepper.Structures.PagedView;
@@ -23,14 +23,8 @@ namespace Pepper.Commands.FGO
 
             if (!string.IsNullOrWhiteSpace(query))
             {
-                var res = Process.ExtractSorted(
-                    new KeyValuePair<int, string>(default, query),
-                    listing,
-                    kv => kv.Value,
-                    null
-                );
-                listing = res
-                    .Select(result => result.Value).ToArray();
+                var res = TraitService.FuzzySearch.Search(query);
+                listing = res.Select(result => result.Element).ToArray();
             }
             
             var pageProvider = new ArrayPageProvider<KeyValuePair<int, string>>(

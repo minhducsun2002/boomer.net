@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus.Paged;
-using FuzzySharp;
 using Humanizer;
 using Pepper.Services.FGO;
 using Pepper.Structures.Commands;
@@ -49,18 +48,11 @@ namespace Pepper.Commands.FGO
                     return Reply("Sorry, filtering by traits is not currently available. Please wait and try again.");
                 
                 var matches = traits.Select(
-                    trait =>
-                        Process.ExtractTop(
-                                new KeyValuePair<int, string>(default, trait),
-                                traitService.Traits,
-                                kv => kv.Value,
-                                limit: 1
-                            )
-                            .First()
+                    trait => traitService.FuzzySearch.Search(trait).First()
                 ).ToList();
                 
-                traitNames = matches.Select(match => match.Value.Value).ToArray();
-                var longTraits = matches.Select(match => match.Value.Key).ToHashSet();
+                traitNames = matches.Select(match => match.Element.Value).ToArray();
+                var longTraits = matches.Select(match => match.Element.Key).ToHashSet();
 
                 searchResults = searchResults
                     .Where(record => searchService.ServantTraits.ContainsKey(record.ServantId))

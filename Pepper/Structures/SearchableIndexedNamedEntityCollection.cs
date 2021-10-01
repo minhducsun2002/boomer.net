@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using FuzzySharp;
 using Pepper.FuzzySearch;
 
 namespace Pepper.Structures
