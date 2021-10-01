@@ -30,7 +30,7 @@ namespace Pepper.Structures.External.FGO.TypeParsers
 
             var search = craftEssenceNamingService.Namings.FuzzySearch(value.ToLowerInvariant());
             
-            return Success(new CraftEssenceIdentity { CraftEssenceId = search.First().Key });
+            return Success(new CraftEssenceIdentity { CraftEssenceId = search.First().Element.Key });
         }
         
         private static CraftEssence? ResolveNumericIdentifier(int idOrCollectionNo, MasterDataService masterDataService)

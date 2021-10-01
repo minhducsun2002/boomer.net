@@ -37,6 +37,10 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pepper.FuzzySearch\Pepper.FuzzySearch.csproj" />
+  </ItemGroup>
   
   
   

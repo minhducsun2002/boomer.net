@@ -79,7 +79,7 @@ namespace Pepper.Commands.FGO
                             "\n ",
                             segment.Select(result =>
                                 $"{collectionNoLookup[result.ServantId]}. **{result.Name}**"
-                                + (isOwner ? $" [{result.Score:0.#}, {result.Bucket}]" : "")
+                                + (isOwner ? $" [{result.Score:E2}, {result.Bucket}]" : "")
                             )
                         ),
                         Fields = traitNames.Length == 0

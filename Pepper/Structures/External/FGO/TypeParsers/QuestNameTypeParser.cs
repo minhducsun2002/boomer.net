@@ -37,7 +37,8 @@ namespace Pepper.Structures.External.FGO.TypeParsers
                     new NamedKeyedEntity<int, QuestWithSpotDetail>(
                         quest.Quest.ID, quest, quest.Quest.Name,
                         new[] { quest.Spot.Name })
-                )
+                ),
+                aliasWeight: 1D
             );
         }
 
@@ -46,9 +47,9 @@ namespace Pepper.Structures.External.FGO.TypeParsers
         {
             if (int.TryParse(value, out var questId)) return Success(new QuestIdentity { QuestId = questId });
 
-            var search = SearchableCollection.FuzzySearch(value, aliasWeight: 1, scorer: Fuzz.PartialRatio);
+            var search = SearchableCollection.FuzzySearch(value);
 
-            return Success(new QuestIdentity { QuestId = search.First().Key });
+            return Success(new QuestIdentity { QuestId = search.First().Element.Key });
         }
     }
 }

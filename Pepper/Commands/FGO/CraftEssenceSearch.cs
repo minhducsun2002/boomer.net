@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Humanizer;
+using Pepper.FuzzySearch;
 using Pepper.Services.FGO;
 using Pepper.Structures;
 using Pepper.Structures.External.FGO;
@@ -28,7 +29,7 @@ namespace Pepper.Commands.FGO
             if (string.IsNullOrWhiteSpace(query)) return Reply("Please specify a query :frowning:");
             var searchResults = ceNamingService.Namings.FuzzySearch(query);
             var isOwner = await Context.Bot.IsOwnerAsync(Context.Author.Id);
-            var pageProvider = new ArrayPageProvider<NamedKeyedEntitySearchResult<int, string>>(
+            var pageProvider = new ArrayPageProvider<FuseSearchResult<NamedKeyedEntity<int,string>>>(
                 searchResults,
                 (_, segment) => new Page().WithEmbeds(
                     new LocalEmbed
@@ -37,7 +38,7 @@ namespace Pepper.Commands.FGO
                         Description = string.Join(
                             "\n ",
                             segment.Select(result =>
-                                $"{ceNamingService.CEIdToCollectionNo[result.Key]}. **{result.Name}**"
+                                $"{ceNamingService.CEIdToCollectionNo[result.Element.Key]}. **{result.Element.Name}**"
                                 + (isOwner ? $" [{result.Score:0.#}]" : "")
                             )
                         )

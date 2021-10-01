@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using FuzzySharp;
+using Pepper.FuzzySearch;
 
 namespace Pepper.Structures
 {
@@ -34,11 +35,13 @@ namespace Pepper.Structures
         private readonly NamedKeyedEntity<TKey, TValue>[] collection;
         private readonly Lazy<ImmutableDictionary<TKey, TValue>> lookupLazy;
         private ImmutableDictionary<TKey, TValue> Collection => lookupLazy.Value;
+        private Fuse<NamedKeyedEntity<TKey, TValue>> fuse;
+
         public TValue this[TKey key] => lookupLazy.Value[key];
         public bool ContainsKey(TKey key) => lookupLazy.Value.ContainsKey(key);
         // public int Count => Collection.Count;
 
-        public SearchableKeyedNamedEntityCollection(IEnumerable<NamedKeyedEntity<TKey, TValue>> collection)
+        public SearchableKeyedNamedEntityCollection(IEnumerable<NamedKeyedEntity<TKey, TValue>> collection, double nameWeight = 1D, double aliasWeight = 1.5D)
         {
             this.collection = collection.ToArray();
             lookupLazy = new Lazy<ImmutableDictionary<TKey, TValue>>(
@@ -50,26 +53,20 @@ namespace Pepper.Structures
                             group => group.First().Value
                         )
             );
+            fuse = new Fuse<NamedKeyedEntity<TKey, TValue>>(
+                this.collection,
+                false,
+                new StringFuseField<NamedKeyedEntity<TKey, TValue>>(entity => entity.Name, nameWeight),
+                new ArrayFuseField<NamedKeyedEntity<TKey, TValue>>(entity => entity.Aliases, aliasWeight)
+            );
         }
 
         public delegate int Scorer(string input1, string input2);
         
-        public NamedKeyedEntitySearchResult<TKey, TValue>[] FuzzySearch(string query, Scorer? scorer = null, double nameWeight = 1f, double aliasWeight = 1.5f)
+        public FuseSearchResult<NamedKeyedEntity<TKey, TValue>>[] FuzzySearch(string query)
         {
-            if (scorer == null) scorer = Fuzz.WeightedRatio;
-            var entries = collection.Select(entry =>
-            {
-                var weightedNameSimilarity = scorer(entry.Name, query) * nameWeight;
-                var weightedAliasSimilarities = entry.Aliases
-                    .Select(alias => scorer(alias, query) * aliasWeight).ToList();
-                var score = (weightedNameSimilarity + weightedAliasSimilarities.Sum()) /
-                            (weightedAliasSimilarities.Count + 1);
-                return new NamedKeyedEntitySearchResult<TKey, TValue>(entry, score);
-            });
-
-            var result = entries.ToList();
-            result.Sort((r1, r2) => r2.Score.CompareTo(r1.Score));
-            return result.ToArray();
+            var results = fuse.Search(query);
+            return results;
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => Collection.GetEnumerator();

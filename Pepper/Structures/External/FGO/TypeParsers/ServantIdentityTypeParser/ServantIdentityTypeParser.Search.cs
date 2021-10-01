@@ -26,11 +26,11 @@ namespace Pepper.Structures.External.FGO.TypeParsers
             var scores = servantNamings.FuzzySearch(query)
                 .Select(entry => new ServantSearchRecord
                 {
-                    ServantId = entry.Key,
-                    Name = entry.Name,
-                    Aliases = entry.Aliases,
+                    ServantId = entry.Element.Key,
+                    Name = entry.Element.Name,
+                    Aliases = entry.Element.Aliases,
                     Score = entry.Score,
-                    Bucket = tokenSearchResult.TryGetValue(entry.Key, out var value) ? value : 0 
+                    Bucket = tokenSearchResult.TryGetValue(entry.Element.Key, out var value) ? value : 0 
                 });
 
             List<ServantSearchRecord> match = new(), mismatch = new();
@@ -41,9 +41,9 @@ namespace Pepper.Structures.External.FGO.TypeParsers
             {
                 if (r1.Bucket != r2.Bucket) return r2.Bucket - r1.Bucket;
 
-                return r2.Score.CompareTo(r1.Score);
+                return r1.Score.CompareTo(r2.Score);
             });
-            mismatch.Sort((r1, r2) => r1.Score.CompareTo(r2.Score));;
+            mismatch.Sort((r1, r2) => r2.Score.CompareTo(r1.Score));;
             
             return match.Concat(mismatch).ToArray();
         }
