@@ -15,8 +15,13 @@ namespace Pepper.FuzzySearch
             Score = score;
         }
     }
+
+    public class FuseConstants
+    {
+        internal static readonly double Epsilon = Math.Pow(2, -52);
+    }
     
-    public class Fuse<T>
+    public class Fuse<T> : FuseConstants
     {
         private FuseIndex<T> index;
         private bool ignoreFieldNorm;
@@ -50,8 +55,8 @@ namespace Pepper.FuzzySearch
                         score = match.Score,
                         norm = match.Norm;
                     totalScore *= Math.Pow(
-                        score == 0 && (weight != 0) ? double.Epsilon : score,
-                        (weight != 0 ? weight : 1) * (ignoreFieldNorm ? 1 : norm)
+                        score == 0 && weight != 0 ? Epsilon : score,
+                        (weight != 0 ? weight : 1D) * (ignoreFieldNorm ? 1 : norm)
                     );
                 }
 
