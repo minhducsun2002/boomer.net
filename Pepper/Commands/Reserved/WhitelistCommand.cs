@@ -10,7 +10,7 @@ using Command = Pepper.Structures.Command;
 namespace Pepper.Commands.Reserved
 {
     [RequireGuild]
-    public class WhitelistCommand : Command
+    public class WhitelistCommand : ReservedCommand
     {
         [Command("toggle-cmd")]
         [Description("Toggle the locking state of a command.")]
