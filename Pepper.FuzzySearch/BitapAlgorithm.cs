@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Pepper.FuzzySearch
 {
@@ -48,7 +49,7 @@ namespace Pepper.FuzzySearch
                 }
             }
 
-            if (matchMask[i - 1] != 0 && i - start >= minMatchCharLength)
+            if (matchMask.ElementAtOrDefault(i - 1) != 0 && i - start >= minMatchCharLength)
             {
                 indices.Add(new Range(start, i - 1));
             }
