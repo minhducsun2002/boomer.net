@@ -171,7 +171,13 @@ namespace Pepper
                     embed.Fields = new List<LocalEmbedField>
                     {
                         new() { Name = "Parameter", Value = $"Name : `{parameter.Name}`\nType : `{parameter.Type.Name}`" },
-                        new() { Name = "Parsing value", Value = $"`{typeParseFailedResult.Value}`" }
+                        new()
+                        {
+                            Name = "Parsing value",
+                            Value = string.IsNullOrEmpty(typeParseFailedResult.Value)
+                                ? $"`{typeParseFailedResult.Value}`"
+                                : $"(empty value)"
+                        }
                     };
                     if (!string.IsNullOrWhiteSpace(typeParseFailedResult.FailureReason))
                         embed.Fields.Add(new LocalEmbedField
@@ -194,6 +200,9 @@ namespace Pepper
                 {
                     switch (checksFailedResult.FailedChecks[0].Check)
                     {
+                        case RequireBotOwnerAttribute:
+                            content = "This command can only be called by the bot owner.";
+                            break;
                         case PrefixCheckAttribute:
                             return null!;
                         case RequireGuildWhitelistAttribute:
