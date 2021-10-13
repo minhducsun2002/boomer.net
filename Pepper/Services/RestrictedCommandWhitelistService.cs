@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using BitFaster.Caching.Lru;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Pepper.Structures;
@@ -33,6 +34,7 @@ namespace Pepper.Services
                 record => record.CommandIdentifier == commandIdentifier && record.GuildId == guildId,
                 new Record
                 {
+                    BsonDocumentId = ObjectId.GenerateNewId(),
                     CommandIdentifier = commandIdentifier,
                     GuildId = guildId
                 },
