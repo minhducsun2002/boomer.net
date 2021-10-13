@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus.Paged;
@@ -159,20 +158,22 @@ namespace Pepper.Commmands.General
         
         private LocalEmbed HandleCategory(string category, IReadOnlyCollection<Command> commands)
         {
-            return new()
+            var restricted = false;
+            var embed = new LocalEmbed
             {
                 Description = $"The following command{StringUtilities.Plural(commands.Count)} belong to the **{category}** category :",
                 Fields = commands.Select(command =>
                 {
-                    var prefixCategory = command.Attributes.OfType<PrefixCategoryAttribute>().FirstOrDefault()?.PrefixCategory;
-                    var config = Context.Services.GetRequiredService<IConfiguration>();
-                    var prefixes = string.IsNullOrWhiteSpace(prefixCategory)
-                        ? ((DefaultPrefixProvider) Context.Bot.Prefixes).Prefixes.Select(prefix => prefix.ToString())
-                        : config.GetCommandPrefixes(prefixCategory);
+                    var prefixes = command.GetPrefixes(Context.Bot);
                     var basePrefix = prefixes.First();
+                    
+                    // TODO: Do actual permission checking
+                    var locked = command.Checks.OfType<RequireBotOwnerAttribute>().Any();
+                    restricted |= locked;
+                    
                     return new LocalEmbedField
                     {
-                        Name = $@"`{basePrefix}{command.Aliases[0]}`{(
+                        Name = (locked ? "\u1f512" : "") + $@"`{basePrefix}{command.Aliases[0]}`{(
                             command.Aliases.Count > 1
                             ? $" ({string.Join(", ", command.Aliases.Skip(1).Select(_ => $"`{basePrefix}{_}`"))})"
                             : ""
@@ -182,6 +183,10 @@ namespace Pepper.Commmands.General
                 })
                     .ToList()
             };
+
+            if (restricted) embed.Footer = new LocalEmbedFooter().WithText("Certain commands cannot be invoked.");
+
+            return embed;
         }
         
         private string SelfInvocation() => $"{Context.Prefix}{Context.Command.Aliases[0]}";

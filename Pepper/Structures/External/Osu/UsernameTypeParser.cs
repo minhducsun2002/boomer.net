@@ -1,7 +1,9 @@
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Disqord.Bot;
 using Microsoft.Extensions.DependencyInjection;
+using Pepper.Commands.Osu;
 using Pepper.Services.Osu;
 using Qmmands;
 
@@ -34,9 +36,24 @@ namespace Pepper.Structures.External.Osu
             var lookupService = context.Services.GetRequiredService<DiscordOsuUsernameLookupService>();
             var username = await lookupService.GetUser(uidToLookup);
             if (username != null) return TypeParserResult<Username>.Successful((Username) username);
-            return !parameter.IsOptional
-                ? TypeParserResult<Username>.Failed($"{nameof(username)} must be specified and not be null")
-                : TypeParserResult<Username>.Successful(null!);
+            if (parameter.IsOptional)
+            {
+                return Success(null!);
+            }
+            
+            var saveHintText = "";
+            var saveCommand = context.Command.Service.GetAllCommands()
+                .FirstOrDefault(command => command.Attributes.OfType<SaveUsernameAttribute>().Any());
+            if (saveCommand != default && await saveCommand.RunChecksAsync(context) == CheckResult.Successful)
+            {
+                saveHintText =
+                    $"\nUse \"{saveCommand.GetPrefixes(context.Bot).First()}{saveCommand.Aliases[0]}\" with your username to set it up.";
+            }
+            
+            return TypeParserResult<Username>.Failed(
+                "An username wasn't specified and couldn't find a saved username for you."
+                + saveHintText
+            );
         }
     }
 }
