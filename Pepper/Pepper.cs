@@ -198,19 +198,25 @@ namespace Pepper
                 }
                 case ChecksFailedResult checksFailedResult:
                 {
-                    switch (checksFailedResult.FailedChecks[0].Check)
+                    var firstCheck = checksFailedResult.FailedChecks[0].Check;
+                    switch (firstCheck)
                     {
                         case RequireBotOwnerAttribute:
-                            content = "This command can only be called by the bot owner.";
+                            content = "";
+                            embed.Description = "This command can only be called by the bot owner.";
                             break;
                         case PrefixCheckAttribute:
                             return null!;
                         case RequireGuildWhitelistAttribute:
-                            content = "This command is restricted (whitelisted on a per-guild basis), hence not callable from this guild.";
+                            content = "";
+                            embed.Description = "This command is restricted (whitelisted on a per-guild basis), hence not callable from this guild.";
+                            break;
+                        default:
+                            embed.Description = $"Check {firstCheck.GetType().Name} failed.";
                             break;
                     }
-                    
-                    goto default;
+
+                    break;
                 }
                 default:
                     embed.Description = result.FailureReason;
@@ -219,7 +225,7 @@ namespace Pepper
 
             return new LocalMessage
             {
-                Content = content,
+                Content = string.IsNullOrWhiteSpace(content) ? null : content,
                 Embeds = new List<LocalEmbed> { embed },
             }.WithReply(context.Message.Id);
         }
