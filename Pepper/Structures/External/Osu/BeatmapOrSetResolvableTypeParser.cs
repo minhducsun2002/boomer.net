@@ -42,15 +42,18 @@ namespace Pepper.Structures.External.Osu
     
     public class BeatmapResolvableTypeParser : DiscordTypeParser<IBeatmapResolvable>
     {
-        public static readonly BeatmapResolvableTypeParser Instance = new();
+        private readonly BeatmapContextProviderService contextProviderService;
+        public BeatmapResolvableTypeParser(BeatmapContextProviderService contextProvider)
+        {
+            contextProviderService = contextProvider;
+        }
         
         public override ValueTask<TypeParserResult<IBeatmapResolvable>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
         {
             var isEmpty = string.IsNullOrWhiteSpace(value);
             if (isEmpty)
             {
-                var service = context.Services.GetRequiredService<BeatmapContextProviderService>();
-                var beatmapId = service.GetBeatmap(context.ChannelId.ToString());
+                var beatmapId = contextProviderService.GetBeatmap(context.ChannelId.ToString());
                 if (beatmapId != null) return Success(new BeatmapResolvable(beatmapId.Value));
             }
             
@@ -69,15 +72,18 @@ namespace Pepper.Structures.External.Osu
 
     public class BeatmapOrSetResolvableTypeParser : DiscordTypeParser<IBeatmapOrSetResolvable>
     {
-        public static readonly BeatmapOrSetResolvableTypeParser Instance = new();
+        private readonly BeatmapContextProviderService contextProviderService;
+        public BeatmapOrSetResolvableTypeParser(BeatmapContextProviderService contextProvider)
+        {
+            contextProviderService = contextProvider;
+        }
         
         public override ValueTask<TypeParserResult<IBeatmapOrSetResolvable>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
         {
             var isEmpty = string.IsNullOrWhiteSpace(value);
             if (isEmpty)
             {
-                var service = context.Services.GetRequiredService<BeatmapContextProviderService>();
-                var beatmapId = service.GetBeatmap(context.ChannelId.ToString());
+                var beatmapId = contextProviderService.GetBeatmap(context.ChannelId.ToString());
                 if (beatmapId != null) return Success(new BeatmapResolvable(beatmapId.Value));
             }
             

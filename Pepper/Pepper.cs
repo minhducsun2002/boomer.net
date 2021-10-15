@@ -232,31 +232,14 @@ namespace Pepper
 
         protected override ValueTask AddTypeParsersAsync(CancellationToken cancellationToken = default)
         {
-            Commands.AddTypeParser(RulesetTypeParser.Instance);
-            Commands.AddTypeParser(UsernameTypeParser.Instance);
-            Commands.AddTypeParser(BeatmapOrSetResolvableTypeParser.Instance);
-            Commands.AddTypeParser(BeatmapResolvableTypeParser.Instance);
-            
-            Commands.AddTypeParser(
-                new ServantIdentityTypeParser(
-                    Services.GetRequiredService<MasterDataService>(),
-                    Services.GetRequiredService<IConfiguration>()
-                )
-            );
-            
-            Commands.AddTypeParser(
-                new CraftEssenceIdentityTypeParser(
-                    Services.GetRequiredService<MasterDataService>(),
-                    Services.GetRequiredService<CraftEssenceNamingService>()
-                )
-            );
-            
-            Commands.AddTypeParser(
-                new QuestNameTypeParser(
-                    Services.GetRequiredService<MasterDataService>()
-                )
-            );
-            
+            Commands.AddTypeParser(new RulesetTypeParser());
+            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<UsernameTypeParser>(Services));
+            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<BeatmapOrSetResolvableTypeParser>(Services));
+            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<BeatmapResolvableTypeParser>(Services));
+            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<ServantIdentityTypeParser>(Services));
+            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<CraftEssenceIdentityTypeParser>(Services));
+            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<QuestNameTypeParser>(Services));
+
             return base.AddTypeParsersAsync(cancellationToken);
         }
     }

@@ -18,7 +18,11 @@ namespace Pepper.Structures.External.Osu
 
     public class UsernameTypeParser : DiscordTypeParser<Username>
     {
-        public static UsernameTypeParser Instance = new();
+        private readonly DiscordOsuUsernameLookupService lookupService;
+        public UsernameTypeParser(DiscordOsuUsernameLookupService lookupService)
+        {
+            this.lookupService = lookupService;
+        }
         
         public override async ValueTask<TypeParserResult<Username>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
         {
@@ -32,8 +36,7 @@ namespace Pepper.Structures.External.Osu
                 uidToLookup = ulong.Parse(match.Groups[1].Value);
             }
             else uidToLookup = context.Author.Id;
-
-            var lookupService = context.Services.GetRequiredService<DiscordOsuUsernameLookupService>();
+            
             var username = await lookupService.GetUser(uidToLookup);
             if (username != null) return TypeParserResult<Username>.Successful((Username) username);
             if (parameter.IsOptional)

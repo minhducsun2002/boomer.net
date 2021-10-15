@@ -13,8 +13,6 @@ namespace Pepper.Structures.External.Osu
 {
     public class RulesetTypeParser : DiscordTypeParser<Ruleset>
     {
-        public static readonly RulesetTypeParser Instance = new RulesetTypeParser();
-
         public static readonly Ruleset[] SupportedRulesets = 
         {
             new OsuRuleset(),
