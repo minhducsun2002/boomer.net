@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Bot.Hosting;
@@ -16,16 +13,16 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
-using Pepper.Services.FGO;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
-using Pepper.Structures.External.FGO.TypeParsers;
-using Pepper.Structures.External.Osu;
+using Prometheus;
+using Prometheus.DotNetRuntime;
 using Qmmands;
 using Serilog;
 using Serilog.Templates;
 
-await new HostBuilder()
+DotEnv.Load();
+var hostBuilder = new HostBuilder()
     .UseSerilog((_, configuration) =>
         configuration
             .MinimumLevel.Information()
@@ -39,6 +36,14 @@ await new HostBuilder()
     )
     .ConfigureServices(services =>
     {
+        var enableMetrics = Environment.GetEnvironmentVariable("ENABLE_METRICS");
+        var portEnv = Environment.GetEnvironmentVariable("PORT") ?? "2827"; 
+        if (enableMetrics == "true" && int.TryParse(portEnv, out var port))
+        {
+            DotNetRuntimeStatsBuilder.Default().StartCollecting();
+            var server = new MetricServer(port).Start();
+            services.AddSingleton(server);
+        }
         services.Configure<CommandServiceConfiguration>(config =>
         {
             config.DefaultRunMode = RunMode.Parallel;
@@ -49,14 +54,13 @@ await new HostBuilder()
     })
     .ConfigureAppConfiguration(app =>
     {
-        DotEnv.Load();
         app.AddEnvironmentVariables("PEPPER_");
         ConventionRegistry.Register(
             "IgnoreExtraElements",
             new ConventionPack { new IgnoreExtraElementsConvention(true) },
             _ => true
         );
-        
+
         var configUrl = Environment.GetEnvironmentVariable("PEPPER_CONFIG_URL");
         if (!string.IsNullOrWhiteSpace(configUrl))
         {
@@ -76,8 +80,9 @@ await new HostBuilder()
         bot.Prefixes = context.Configuration.GetAllCommandPrefixes()
             .SelectMany(kv => kv.Value);
     })
-    .UseDefaultServiceProvider(option => option.ValidateOnBuild = true)
-    .RunConsoleAsync();
+    .UseDefaultServiceProvider(option => option.ValidateOnBuild = true);
+
+await hostBuilder.RunConsoleAsync();
 
 namespace Pepper
 {
