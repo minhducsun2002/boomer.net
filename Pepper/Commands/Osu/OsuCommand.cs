@@ -7,15 +7,11 @@ using Disqord;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Difficulty;
-using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Scoring;
 using Pepper.Services.Osu;
@@ -112,7 +108,7 @@ namespace Pepper.Commands.Osu
             => new()
             {
                 IconUrl = string.IsNullOrWhiteSpace(user.AvatarUrl) ? $"https://a.ppy.sh/{user.Id}" : user.AvatarUrl,
-                Name = $"{user.Username} ({user.Statistics.PP}pp)",
+                Name = $"{user.Username}" + ((user.Statistics.PP ?? decimal.Zero) == decimal.Zero ? "" : $" ({user.Statistics.PP}pp)"),
                 Url = $"https://osu.ppy.sh/users/{user.Id}"
             };
 
