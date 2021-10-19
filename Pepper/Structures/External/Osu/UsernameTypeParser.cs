@@ -47,7 +47,7 @@ namespace Pepper.Structures.External.Osu
             var saveHintText = "";
             var saveCommand = context.Command.Service.GetAllCommands()
                 .FirstOrDefault(command => command.Attributes.OfType<SaveUsernameAttribute>().Any());
-            if (saveCommand != default && await saveCommand.RunChecksAsync(context) == CheckResult.Successful)
+            if (saveCommand != default && await saveCommand.RunChecksAsync(context) is SuccessfulResult)
             {
                 saveHintText =
                     $"\nUse \"{saveCommand.GetPrefixes(context.Bot).First()}{saveCommand.Aliases[0]}\" with your username to set it up.";
