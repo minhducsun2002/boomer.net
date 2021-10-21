@@ -44,6 +44,8 @@ var hostBuilder = new HostBuilder()
             var server = new MetricServer(port).Start();
             services.AddSingleton(server);
         }
+
+        services.AddSingleton<HttpClient>();
         services.Configure<CommandServiceConfiguration>(config =>
         {
             config.DefaultRunMode = RunMode.Parallel;
