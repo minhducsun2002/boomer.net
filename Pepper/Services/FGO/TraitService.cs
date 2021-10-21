@@ -18,7 +18,7 @@ namespace Pepper.Services.FGO
         public Fuse<KeyValuePair<int, string>> FuzzySearch;
 
         private readonly MasterDataService masterDataService;
-        
+
         public TraitService(IConfiguration config, MasterDataService masterDataService)
         {
             var value = config.GetSection("fgo:traits:csv").Get<string[]>();
@@ -34,24 +34,29 @@ namespace Pepper.Services.FGO
                 traitId = -traitId;
                 reverse = "not-";
             }
-            
+
             if (Traits.TryGetValue(traitId, out var traitName))
+            {
                 return reverse + traitName;
-            
+            }
+
             // tries to resolve to servant names
             foreach (var region in masterDataService.Regions)
             {
                 var connection = masterDataService.Connections[region];
                 var result = connection.GetServantEntityById((int) traitId);
-                if (result != default) return reverse + result.Name;
+                if (result != default)
+                {
+                    return reverse + result.Name;
+                }
             }
 
             return (fallbackToEmpty ? "" : $"{reverse}{traitId}");
         }
-        
+
         public delegate void DataLoadedCallback(ConcurrentDictionary<int, string> traits);
         public event DataLoadedCallback? DataLoaded;
-        
+
         public async Task<Dictionary<int, string>> Load()
         {
             var data = await GetCsv(url);

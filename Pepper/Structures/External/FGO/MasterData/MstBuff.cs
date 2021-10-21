@@ -27,7 +27,7 @@ namespace Pepper.Structures.External.FGO.MasterData
         {
             return buff.CkSelfIndv.Select(t => traitService.GetTrait(t)).ToArray();
         }
-        
+
         public static string[] GetOpponentTraits(this MstBuff buff, TraitService traitService)
         {
             return buff.CkSelfIndv.Select(t => traitService.GetTrait(t)).ToArray();

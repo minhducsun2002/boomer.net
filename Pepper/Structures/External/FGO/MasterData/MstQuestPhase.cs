@@ -11,6 +11,6 @@ namespace Pepper.Structures.External.FGO.MasterData
         [BsonElement("qp")] public int Qp;
         [BsonElement("playerExp")] public int PlayerEXP;
         [BsonElement("friendshipExp")] public int FriendshipEXP;
-        [BsonElement("phase")] public int Phase; 
+        [BsonElement("phase")] public int Phase;
     }
 }

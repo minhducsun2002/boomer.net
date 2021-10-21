@@ -27,7 +27,10 @@ namespace Pepper.Structures
                     continue;
                 }
 
-                if (character == quote) isQuoting = !isQuoting;
+                if (character == quote)
+                {
+                    isQuoting = !isQuoting;
+                }
 
                 if (character == whitespace)
                 {
@@ -40,7 +43,11 @@ namespace Pepper.Structures
                 piece.Append(character);
             }
 
-            if (piece.Length >= 0) output.Add(piece.ToString());
+            if (piece.Length >= 0)
+            {
+                output.Add(piece.ToString());
+            }
+
             return output.ToArray();
         }
     }

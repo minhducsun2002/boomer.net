@@ -7,7 +7,7 @@ namespace Pepper.Structures.External.FGO
     {
         public MstSvtSkill[] GetServantSkillAssociationByServantId(int svtId)
             => MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("svtId", svtId)).ToList().ToArray();
-        
+
         public MstSvtSkill[] GetServantSkillAssociationBySkillId(int skillId)
             => MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("skillId", skillId)).ToList().ToArray();
     }

@@ -18,19 +18,19 @@ namespace Pepper.Commands.Osu
     [RequireGuild]
     public class Rank : BeatmapContextCommand
     {
-        public Rank(APIService service, BeatmapContextProviderService b) : base(service, b) {}
+        public Rank(APIService service, BeatmapContextProviderService b) : base(service, b) { }
 
         [RequireGuildWhitelist("osu-leaderboard")]
         [Command("rank", "ranks")]
         [Description("See your ranking compared to other players in this server")]
-        public async Task<DiscordCommandResult> Exec([Flag("/")] [Description("Game mode to check. Default to osu!.")] Ruleset ruleset)
+        public async Task<DiscordCommandResult> Exec([Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset)
         {
             var service = Context.Services.GetRequiredService<DiscordOsuUsernameLookupService>();
             var context = (DiscordGuildCommandContext) Context;
             var cachedMembers = context.Guild.GetMembers().Values;
 
             var msg = await Reply("Please wait a bit. I'm collecting usernames & stats. Hang tight...");
-            var records = await service.GetManyUsers(cachedMembers.Select(member => (ulong)member.Id).ToArray());
+            var records = await service.GetManyUsers(cachedMembers.Select(member => (ulong) member.Id).ToArray());
             var profiles = await Task.WhenAll(
                 records
                     .Select(async kv => (kv.Key, await APIService.GetUser(kv.Value, ruleset.RulesetInfo)))
@@ -62,7 +62,11 @@ namespace Pepper.Commands.Osu
 
             await msg.DeleteAsync();
 
-            if (pages.Count == 0) return Reply("No registered users in this guild.");
+            if (pages.Count == 0)
+            {
+                return Reply("No registered users in this guild.");
+            }
+
             return pages.Count == 1
                 ? Reply(pages[0].Embeds[0])
                 : View(new PagedView(new ListPageProvider(pages)));

@@ -14,7 +14,7 @@ namespace Pepper.Structures.External.FGO
                 .Find(Builders<MstTreasureDevice>.Filter.Eq("id", treasureDeviceId))
                 .Limit(1)
                 .FirstOrDefault();
-        
+
         public TreasureDevice GetTreasureDevice(int treasureDeviceId)
         {
             var mstTreasureDevice = GetTreasureDeviceEntity(treasureDeviceId);
@@ -25,20 +25,20 @@ namespace Pepper.Structures.External.FGO
                 .ToList();
 
             var functions = levels[0].FuncId.Select(function => ResolveFunc(function)!);
-            
+
             return new TreasureDevice(mstTreasureDevice!, levels.ToArray(), functions);
         }
 
 
         private readonly Dictionary<int, List<MstSvtTreasureDevice>> svtTreasureDeviceCache = new();
-        
+
         public List<MstSvtTreasureDevice> GetCachedServantTreasureDevices(int servantId, bool reload = false)
             => svtTreasureDeviceCache.TryGetValue(servantId, out var result)
                 ? result
                 : svtTreasureDeviceCache[servantId] = MstSvtTreasureDevice
                         .FindSync(Builders<MstSvtTreasureDevice>.Filter.Eq("svtId", servantId))
                     .ToList();
-        
+
         public MstTreasureDeviceLv GetNPGain(int svtId)
         {
             var mapping = MstSvtTreasureDevice.FindSync(
@@ -46,11 +46,11 @@ namespace Pepper.Structures.External.FGO
                     Builders<MstSvtTreasureDevice>.Filter.Eq("svtId", svtId),
                     Builders<MstSvtTreasureDevice>.Filter.Eq("num", 1)
                 ),
-                new FindOptions<MstSvtTreasureDevice> {Limit = 1}
+                new FindOptions<MstSvtTreasureDevice> { Limit = 1 }
             ).First()!;
             return MstTreasureDeviceLv.FindSync(
                 Builders<MstTreasureDeviceLv>.Filter.Eq("treaureDeviceId", mapping.TreasureDeviceId),
-                new FindOptions<MstTreasureDeviceLv> {Limit = 1}
+                new FindOptions<MstTreasureDeviceLv> { Limit = 1 }
             ).First()!;
         }
     }

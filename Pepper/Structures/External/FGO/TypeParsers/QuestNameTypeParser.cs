@@ -20,7 +20,7 @@ namespace Pepper.Structures.External.FGO.TypeParsers
         public readonly MstQuest Quest;
         public readonly MstSpot Spot;
     }
-    
+
     public class QuestNameTypeParser : DiscordTypeParser<QuestIdentity>
     {
         private static readonly ILogger Log = Serilog.Log.Logger.ForContext<QuestNameTypeParser>();
@@ -44,7 +44,10 @@ namespace Pepper.Structures.External.FGO.TypeParsers
 
         public override ValueTask<TypeParserResult<QuestIdentity>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
         {
-            if (int.TryParse(value, out var questId)) return Success(new QuestIdentity { QuestId = questId });
+            if (int.TryParse(value, out var questId))
+            {
+                return Success(new QuestIdentity { QuestId = questId });
+            }
 
             var search = SearchableCollection.FuzzySearch(value);
 

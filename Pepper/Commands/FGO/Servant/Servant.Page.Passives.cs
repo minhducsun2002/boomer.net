@@ -26,7 +26,7 @@ namespace Pepper.Commands.FGO
         }
 
         private static readonly IEqualityComparer<(Skill, List<string>)> ReferencedSkillComparer = new ReferencedSkillEquality();
-        
+
         private (LocalSelectionComponentOption, Page)? PassivesPage(BaseServant servant)
         {
             IMasterDataProvider jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
@@ -38,7 +38,7 @@ namespace Pepper.Commands.FGO
                         new SkillRenderer(skill.MstSkill, jp, skill).Prepare(TraitService);
                     return (skill, baseSkill, referencedSkills);
                 }).ToList();
-            
+
             if (passives.Count != 0)
             {
                 var passive = servant.BaseEmbed()
@@ -47,7 +47,7 @@ namespace Pepper.Commands.FGO
                         Name = skill.Item1.MstSkill.Name,
                         Value = string.Join('\n', skill.Item2)
                     }));
-                    
+
                 var relatedSkills = passives
                     .SelectMany(related => related.Item3).Distinct(ReferencedSkillComparer)
                     .Select(skill => new LocalEmbedField
@@ -60,7 +60,10 @@ namespace Pepper.Commands.FGO
                 if (relatedSkills.Count != 0)
                 {
                     passive.AddBlankField();
-                    foreach (var relatedSkill in relatedSkills) passive.Fields.Add(relatedSkill);
+                    foreach (var relatedSkill in relatedSkills)
+                    {
+                        passive.Fields.Add(relatedSkill);
+                    }
                 }
 
                 return (

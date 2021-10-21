@@ -11,8 +11,16 @@ namespace Pepper.Structures.External.FGO.Entities
         {
             public bool Equals(MstFunc? x, MstFunc? y)
             {
-                if (ReferenceEquals(x, y)) return true;
-                if (x?.GetType() != y?.GetType()) return false;
+                if (ReferenceEquals(x, y))
+                {
+                    return true;
+                }
+
+                if (x?.GetType() != y?.GetType())
+                {
+                    return false;
+                }
+
                 return x?.ID == y?.ID;
             }
 
@@ -27,7 +35,7 @@ namespace Pepper.Structures.External.FGO.Entities
         )
         {
             var funcTable = resolvedFunctions.Distinct(FunctionComparer.Instance).ToDictionary(func => func.ID, func => func);
-            
+
             MstTreasureDevice = mstTreasureDevice;
             Levels = levels;
             Functions = levels[0].FuncId.Select(function => funcTable[function]).ToArray();

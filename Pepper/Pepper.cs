@@ -7,8 +7,8 @@ using Disqord;
 using Disqord.Bot;
 using Disqord.Bot.Hosting;
 using dotenv.net;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -37,7 +37,7 @@ var hostBuilder = new HostBuilder()
     .ConfigureServices(services =>
     {
         var enableMetrics = Environment.GetEnvironmentVariable("ENABLE_METRICS");
-        var portEnv = Environment.GetEnvironmentVariable("PORT") ?? "2827"; 
+        var portEnv = Environment.GetEnvironmentVariable("PORT") ?? "2827";
         if (enableMetrics == "true" && int.TryParse(portEnv, out var port))
         {
             DotNetRuntimeStatsBuilder.Default().StartCollecting();
@@ -93,12 +93,12 @@ namespace Pepper
         public static readonly string VersionHash = typeof(Pepper)
             .Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
             .FirstOrDefault(a => a.Key == "GitHash")?.Value ?? "unknown";
-        
+
         public Pepper(
             IOptions<DiscordBotConfiguration> options,
             ILogger<Pepper> logger,
             IServiceProvider services,
             DiscordClient client
-        ) : base(options, logger, services, client) {}
+        ) : base(options, logger, services, client) { }
     }
 }

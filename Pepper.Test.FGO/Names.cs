@@ -20,7 +20,7 @@ namespace Pepper.Test.FGO
         {
             BasePath = Path.Combine(Environment.CurrentDirectory, "master");
             Versions = Directory.GetDirectories(BasePath);
-            
+
         }
     }
 }

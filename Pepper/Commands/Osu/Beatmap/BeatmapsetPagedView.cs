@@ -26,11 +26,12 @@ namespace Pepper.Commands.Osu
 
             PreviousPageButton.Label = "Previous page";
             PreviousPageButton.Emoji = null;
-            
+
             NextPageButton.Label = "Next page";
             NextPageButton.Emoji = null;
-            
+
             foreach (var (text, index) in jumps)
+            {
                 AddComponent(pageJumps[index] = new ButtonViewComponent(e =>
                 {
                     CurrentPageIndex = index;
@@ -41,24 +42,35 @@ namespace Pepper.Commands.Osu
                     Label = text,
                     Row = CustomRow,
                 });
-            
+            }
+
             UpdateButtonStates();
         }
 
         private void UpdateButtonStates()
         {
             foreach (var viewComponent in EnumerateComponents())
+            {
                 // if (viewComponent is ButtonViewComponent button && button.Row == CustomRow)
-                if (viewComponent is ButtonViewComponent {Row: CustomRow} button)
+                if (viewComponent is ButtonViewComponent { Row: CustomRow } button)
+                {
                     button.IsDisabled = false;
-                
+                }
+            }
 
             var index = 0;
-            foreach (var (first, _) in pageJumps) if (first <= CurrentPageIndex) index = Math.Max(index, first);
+            foreach (var (first, _) in pageJumps)
+            {
+                if (first <= CurrentPageIndex)
+                {
+                    index = Math.Max(index, first);
+                }
+            }
+
             pageJumps[index].IsDisabled = true;
         }
 
-        protected override void ApplyPageIndex(Page page) {}
+        protected override void ApplyPageIndex(Page page) { }
 
         protected override ValueTask OnNextPageButtonAsync(ButtonEventArgs e)
         {
@@ -66,7 +78,7 @@ namespace Pepper.Commands.Osu
             UpdateButtonStates();
             return result;
         }
-    
+
         protected override ValueTask OnLastPageButtonAsync(ButtonEventArgs e)
         {
             var result = base.OnLastPageButtonAsync(e);
@@ -88,30 +100,30 @@ namespace Pepper.Commands.Osu
                         .Chunk(MaxDiffPerPage).ToList();
                     var index = 1;
                     var modeEmbeds = chunked.Select(mapChunk => new LocalEmbed
-                        {
-                            Title = $"{beatmapset.Artist} - {beatmapset.Title}",
-                            Author = OsuCommand.SerializeAuthorBuilder(beatmapset.Author),
-                            Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.OnlineBeatmapSetID}",
-                            Description = (int) beatmapset.Status < 0
+                    {
+                        Title = $"{beatmapset.Artist} - {beatmapset.Title}",
+                        Author = OsuCommand.SerializeAuthorBuilder(beatmapset.Author),
+                        Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.OnlineBeatmapSetID}",
+                        Description = (int) beatmapset.Status < 0
                                 ? (beatmapset.Status == BeatmapSetOnlineStatus.WIP ? "WIP." : $"{beatmapset.Status}.")
                                   + $" Last updated **{OsuCommand.SerializeTimestamp(beatmapset.LastUpdated)}**."
                                 : $"Ranked **{OsuCommand.SerializeTimestamp(beatmapset.Ranked!.Value)}**.",
-                            ImageUrl = beatmapset.Covers.Cover,
-                            Fields = mapChunk.Select(map => new LocalEmbedField
-                            {
-                                Name = $"[{map.StarDifficulty:F2}⭐] {map.Version}",
-                                Value = (map.MaxCombo != null ? $"**{map.MaxCombo}**x • " : "")
-                                        + $"`CS`**{map.CircleSize}** `AR`**{map.ApproachRate}** `OD`**{map.OverallDifficulty}** `HP`**{map.DrainRate}**"
-                                        + $" • **{beatmapset.Bpm:0.}** BPM"
-                                        + $@" • :clock3: {
-                                            (map.TotalLengthInSeconds / 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                                        }:{(map.TotalLengthInSeconds % 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
-                            }).ToList(),
-                            Footer = new LocalEmbedFooter
-                            {
-                                Text = $"Mode : {RulesetTypeParser.SupportedRulesets[grouping.Key].RulesetInfo.Name} | Page {index++}/{chunked.Count}"
-                            }
-                        })
+                        ImageUrl = beatmapset.Covers.Cover,
+                        Fields = mapChunk.Select(map => new LocalEmbedField
+                        {
+                            Name = $"[{map.StarDifficulty:F2}⭐] {map.Version}",
+                            Value = (map.MaxCombo != null ? $"**{map.MaxCombo}**x • " : "")
+                                    + $"`CS`**{map.CircleSize}** `AR`**{map.ApproachRate}** `OD`**{map.OverallDifficulty}** `HP`**{map.DrainRate}**"
+                                    + $" • **{beatmapset.Bpm:0.}** BPM"
+                                    + $@" • :clock3: {
+                                        (map.TotalLengthInSeconds / 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
+                                    }:{(map.TotalLengthInSeconds % 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
+                        }).ToList(),
+                        Footer = new LocalEmbedFooter
+                        {
+                            Text = $"Mode : {RulesetTypeParser.SupportedRulesets[grouping.Key].RulesetInfo.Name} | Page {index++}/{chunked.Count}"
+                        }
+                    })
                         .Select(embed => (grouping.Key, embed));
                     return modeEmbeds;
                 })
@@ -123,7 +135,7 @@ namespace Pepper.Commands.Osu
                 var (rulesetId, _) = embeds[i];
                 outputJumps.TryAdd(RulesetTypeParser.SupportedRulesets[rulesetId].RulesetInfo.Name, i);
             }
-            
+
             jumps = outputJumps;
             return embeds.Select(embed => new Page().AddEmbed(embed.embed));
         }

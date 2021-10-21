@@ -1,0 +1,10 @@
+root = true
+
+[*.cs]
+# Styling issues are warnings
+dotnet_diagnostic.IDE0055.severity = warning; 
+
+csharp_prefer_braces = true:error
+csharp_space_after_cast = true
+dotnet_style_readonly_field = true:error
+dotnet_sort_system_directives_first = true

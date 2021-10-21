@@ -55,7 +55,7 @@ namespace Pepper.Commands.FGO
         {
             [JsonProperty("svts")] public Svt[] Svts = Array.Empty<Svt>();
         }
-        
+
         private class Quest
         {
             [JsonProperty("battleId")] public int BattleId;

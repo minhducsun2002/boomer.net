@@ -8,8 +8,8 @@ using Disqord.Extensions.Interactivity.Menus.Paged;
 using Humanizer;
 using Pepper.Services.FGO;
 using Pepper.Structures.Commands;
-using Pepper.Structures.External.FGO.TypeParsers;
 using Pepper.Structures.External.FGO.Entities;
+using Pepper.Structures.External.FGO.TypeParsers;
 using Qmmands;
 using PagedView = Pepper.Structures.PagedView;
 
@@ -32,25 +32,30 @@ namespace Pepper.Commands.FGO
         [Description("Search for servants,")]
         public async Task<DiscordCommandResult> Exec(
             [Description("Search query.")] string query = "",
-            [Description("Traits")] [Flag("-t", "-t=", "/t:", "--trait=", "/trait:", "/")] params string[] traits
+            [Description("Traits")][Flag("-t", "-t=", "/t:", "--trait=", "/trait:", "/")] params string[] traits
         )
         {
-            if (string.IsNullOrWhiteSpace(query) && traits.Length == 0) return Reply("Please specify a query :frowning:");
-            
+            if (string.IsNullOrWhiteSpace(query) && traits.Length == 0)
+            {
+                return Reply("Please specify a query :frowning:");
+            }
+
             var servantIdentityTypeParser = (ServantIdentityTypeParser) Context.Bot.Commands.GetTypeParser<ServantIdentity>();
             var collectionNoLookup = namingService.ServantIdToCollectionNo;
 
             var searchResults = servantIdentityTypeParser.Search(query, Context.Services);
-            var traitNames = Array.Empty<string>(); 
+            var traitNames = Array.Empty<string>();
             if (traits.Length != 0)
             {
                 if (!searchService.TraitLoaded)
+                {
                     return Reply("Sorry, filtering by traits is not currently available. Please wait and try again.");
-                
+                }
+
                 var matches = traits.Select(
                     trait => traitService.FuzzySearch.Search(trait).First()
                 ).ToList();
-                
+
                 traitNames = matches.Select(match => match.Element.Value).ToArray();
                 var longTraits = matches.Select(match => match.Element.Key).ToHashSet();
 
@@ -59,7 +64,7 @@ namespace Pepper.Commands.FGO
                     .Where(record => searchService.ServantTraits[record.ServantId].IsSupersetOf(longTraits))
                     .ToArray();
             }
-            
+
             var isOwner = await Context.Bot.IsOwnerAsync(Context.Author.Id);
             var pageProvider = new ArrayPageProvider<ServantSearchRecord>(
                 searchResults,

@@ -10,10 +10,17 @@ namespace Pepper.Structures.External.FGO
 
         public MstFunc? ResolveFunc(int id, bool reload = false)
         {
-            if (!reload && funcCache.ContainsKey(id)) return funcCache[id];
-            
+            if (!reload && funcCache.ContainsKey(id))
+            {
+                return funcCache[id];
+            }
+
             var obj = MstFunc.FindSync(Builders<MstFunc>.Filter.Eq("id", id)).FirstOrDefault();
-            if (obj != null) funcCache[id] = obj;
+            if (obj != null)
+            {
+                funcCache[id] = obj;
+            }
+
             return obj;
 
         }

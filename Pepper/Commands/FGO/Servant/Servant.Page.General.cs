@@ -73,8 +73,11 @@ namespace Pepper.Commands.FGO
                 );
 
             var bondCE = ResolveBondCE(servant);
-            if (bondCE != default) general.Fields.Add(bondCE); 
-            
+            if (bondCE != default)
+            {
+                general.Fields.Add(bondCE);
+            }
+
             return (new LocalSelectionComponentOption { Label = "General info" }, new Page().WithEmbeds(general));
         }
 
@@ -104,7 +107,7 @@ namespace Pepper.Commands.FGO
 
             return null;
         }
-        
+
         public static readonly Dictionary<BattleCommand.TYPE, Tuple<int, int[], string>> DefaultCardTypes = new()
         {
             { BattleCommand.TYPE.ARTS, new Tuple<int, int[], string>(0, Array.Empty<int>(), "Arts  ") },

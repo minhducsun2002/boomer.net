@@ -7,17 +7,20 @@ namespace Pepper.FuzzySearch
     internal static class BitapAlgorithm
     {
         public static double ComputeScore(
-            string pattern, 
+            string pattern,
             int errors = 0,
             bool ignoreLocation = false,
             int currentLocation = 0, int expectedLocation = 0,
             int distance = 100)
         {
             var accuracy = (double) errors / pattern.Length;
-            if (ignoreLocation) return accuracy;
+            if (ignoreLocation)
+            {
+                return accuracy;
+            }
 
             var proximity = Math.Abs(expectedLocation - currentLocation);
-            
+
             if (distance == 0)
             {
                 return proximity != 0 ? 1.0D : accuracy;

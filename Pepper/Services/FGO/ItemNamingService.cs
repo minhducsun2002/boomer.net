@@ -16,13 +16,13 @@ namespace Pepper.Services.FGO
         public ConcurrentDictionary<long, string> Namings { get; set; } = new();
         private readonly string url;
         private readonly ILogger log = Log.Logger.ForContext<ItemNamingService>();
-        
+
         public ItemNamingService(IConfiguration config)
         {
             var value = config.GetSection("fgo:items:csv").Get<string[]>();
             url = value[0];
         }
-        
+
         public async Task<Dictionary<long, string>> Load()
         {
             var data = await GetCsv(url);

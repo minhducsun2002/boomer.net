@@ -9,7 +9,7 @@ namespace Pepper.Commands.Osu
     public partial class Scoreset : OsuScoreCommand
     {
         private const int MaxScorePerPage = 5;
-        public Scoreset(APIService s, BeatmapContextProviderService b) : base(s, b) {}
+        public Scoreset(APIService s, BeatmapContextProviderService b) : base(s, b) { }
 
         public static LocalEmbedField SerializeScoreInList(APILegacyScoreInfo score, bool utcHint = false, bool scoreLink = true)
         {
@@ -30,7 +30,7 @@ namespace Pepper.Commands.Osu
                         + (scoreLink ? $" [[**Score**]](https://osu.ppy.sh/scores/{Rulesets[score.OnlineRulesetID].ShortName}/{score.OnlineScoreID})" : "")
             };
         }
-        
+
         private static LocalEmbed SerializeScoreset(IEnumerable<APILegacyScoreInfo> scores, bool utcHint = false, bool scoreLink = true)
             => new()
             {

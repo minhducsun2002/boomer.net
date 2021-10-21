@@ -28,8 +28,8 @@ namespace Pepper.Structures.External.FGO.Renderer
             FuncList.TYPE.ENEMY_ENCOUNT_COPY_RATE_UP,
             FuncList.TYPE.ENEMY_ENCOUNT_RATE_UP
         };
-        
-        
+
+
         private static readonly FunctionToDatavalMapping[] ParsingInstructions =
         {
             new()
@@ -81,7 +81,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             new()
             {
                 Conditions = EventFunctions,
-                Guides = new object[] { 
+                Guides = new object[] {
                     "Individuality",
                     new SpecialParsingInstruction
                     {
@@ -136,10 +136,14 @@ namespace Pepper.Structures.External.FGO.Renderer
                 Guides = new object[] { "Rate", "Value", "Target", "SetLimitCount" }
             }
         };
-        
+
         private static string[] NestedSplitting(string raw)
         {
-            while (raw.StartsWith('[') && raw.EndsWith(']')) raw = raw[1..^1];
+            while (raw.StartsWith('[') && raw.EndsWith(']'))
+            {
+                raw = raw[1..^1];
+            }
+
             var @out = new List<string>();
             int depth = 0;
             string current = "";
@@ -152,15 +156,23 @@ namespace Pepper.Structures.External.FGO.Renderer
                     continue;
                 }
 
-                if (character == '[') depth++;
-                if (character == ']') depth--;
+                if (character == '[')
+                {
+                    depth++;
+                }
+
+                if (character == ']')
+                {
+                    depth--;
+                }
+
                 current += character;
             }
 
             @out.Add(current);
             return @out.ToArray();
         }
-        
+
         private static readonly Type FunctionType = typeof(FuncList.TYPE);
         public static Entities.DataVal Parse(string raw, int functionType)
         {
@@ -179,15 +191,21 @@ namespace Pepper.Structures.External.FGO.Renderer
                     );
 
                 if (!Enum.IsDefined(FunctionType, functionType))
+                {
                     throw new ArgumentException($"{functionType} is not a valid function type!");
+                }
 
                 var instructions = ParsingInstructions.FirstOrDefault(mapping => mapping.Conditions.Contains((FuncList.TYPE) functionType));
-                object[] guides = instructions == null ? new object[] {"Rate", "Value", "Target"} : instructions.Guides;
+                object[] guides = instructions == null ? new object[] { "Rate", "Value", "Target" } : instructions.Guides;
 
                 var currentPosition = 0;
                 foreach (var key in guides)
                 {
-                    if (currentPosition >= numericParsed.Length) break;
+                    if (currentPosition >= numericParsed.Length)
+                    {
+                        break;
+                    }
+
                     switch (key)
                     {
                         case string normalKey:

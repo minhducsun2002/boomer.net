@@ -20,12 +20,12 @@ namespace Pepper.FuzzySearch
     {
         internal static readonly double Epsilon = Math.Pow(2, -52);
     }
-    
+
     public class Fuse<T> : FuseConstants
     {
-        private FuseIndex<T> index;
-        private bool ignoreFieldNorm;
-        
+        private readonly FuseIndex<T> index;
+        private readonly bool ignoreFieldNorm;
+
         public Fuse(FuseIndex<T> index) => this.index = index;
         public Fuse(IEnumerable<T> elements, bool ignoreFieldNorm = false, params ArrayFuseField<T>[] keys)
         {
@@ -42,11 +42,11 @@ namespace Pepper.FuzzySearch
             foreach (var value in records.Values)
             {
                 var matches = value.SubRecords
-                        // flatten the matches.
-                        // original : https://github.com/krisk/Fuse/blob/e5e3abb44e004662c98750d0964d2d9a73b87848/src/core/index.js#L230
+                    // flatten the matches.
+                    // original : https://github.com/krisk/Fuse/blob/e5e3abb44e004662c98750d0964d2d9a73b87848/src/core/index.js#L230
                     .SelectMany(kv => FindMatches(kv.Key, kv.Value, searcher))
                     .ToList();
-                
+
                 // computeScore
                 var totalScore = 1D;
                 foreach (var match in matches)
@@ -63,7 +63,7 @@ namespace Pepper.FuzzySearch
                 var result = (value.Element, matches, totalScore);
                 results.Add(result);
             }
-            
+
             // lower score implies more accurate match
             return results
                 .OrderBy(v => v.Item3)
@@ -86,7 +86,8 @@ namespace Pepper.FuzzySearch
             foreach (var (text, norm) in valueTuple)
             {
                 var (isMatch, score, indices) = searcher.SearchIn(text);
-                if (isMatch) 
+                if (isMatch)
+                {
                     matches.Add(
                         new Match
                         {
@@ -97,6 +98,7 @@ namespace Pepper.FuzzySearch
                             Indices = indices
                         }
                     );
+                }
             }
 
             return matches.ToArray();

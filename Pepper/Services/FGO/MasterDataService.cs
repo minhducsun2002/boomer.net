@@ -40,24 +40,26 @@ namespace Pepper.Services.FGO
                 var region = Enum.Parse<Region>(regionCode);
                 Clients[region] = new MongoClient(cfg[0]);
                 var db = Clients[region].GetDatabase(cfg[1]);
-                
+
                 // TODO : switch all of these to use code generation
                 var connectionObject = new MasterDataMongoDBConnection();
                 foreach (var field in connectionObject.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance))
+                {
                     if (MasterDataEntityTypes.ContainsKey(field.Name))
                     {
                         var method = db.GetType().GetMethod(nameof(db.GetCollection))!
                             .MakeGenericMethod(MasterDataEntityTypes[field.Name]);
-                        
+
                         // call generic method GetCollection with proper entity type
                         var collectionName = char.ToLowerInvariant(field.Name[0]) + field.Name[1..];
-                        
+
                         // and assign the return type back to the field
                         field.SetValue(connectionObject, method.Invoke(db, new object[] { collectionName, null! }));
-                        
+
                         // equivalent :
                         // connectionObject.MstSvt = db.GetCollection<MstSvt>("mstSvt")
                     }
+                }
 
                 Connections[region] = connectionObject;
                 regions.Add(region);

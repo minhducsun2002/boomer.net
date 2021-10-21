@@ -19,7 +19,7 @@ namespace Pepper.Services.FGO
         public string Name = "";
         public string[] Aliases = Array.Empty<string>();
     }
-    
+
     public class ServantNamingService : NamingService
     {
         private readonly string url;

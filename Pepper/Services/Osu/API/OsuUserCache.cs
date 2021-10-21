@@ -26,8 +26,8 @@ namespace Pepper.Services.Osu.API
         private readonly FastConcurrentTLru<string, Color> userAvatarCache = new(
             200, TimeSpan.FromSeconds(UserAvatarMainColorCachingDurationSeconds)
         );
-        
-        private static readonly HttpClient HttpClient = new ();
+
+        private static readonly HttpClient HttpClient = new();
         private static readonly JsonSerializerSettings SerializerSettings = new() { NullValueHandling = NullValueHandling.Ignore };
         private static readonly ILogger Log = Serilog.Log.Logger.ForContext<OsuUserCache>();
 
@@ -64,8 +64,11 @@ namespace Pepper.Services.Osu.API
         public async Task<Color> GetUserAvatarDominantColor(User user)
         {
             var key = $"osu-user-avatar-{user.Id}";
-            if (userAvatarCache.TryGet(key, out var @return)) return @return;
-            
+            if (userAvatarCache.TryGet(key, out var @return))
+            {
+                return @return;
+            }
+
             var avatar = await HttpClient.GetByteArrayAsync(user.AvatarUrl);
             var image = Image.Load(avatar);
             image.Mutate(img => img.Quantize(new OctreeQuantizer(new QuantizerOptions { MaxColors = 2 }))

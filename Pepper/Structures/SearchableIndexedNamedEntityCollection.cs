@@ -24,7 +24,7 @@ namespace Pepper.Structures
 
     public class NamedKeyedEntitySearchResult<TKey, TValue> : NamedKeyedEntity<TKey, TValue>
     {
-        public NamedKeyedEntitySearchResult(NamedKeyedEntity<TKey, TValue> keyedEntity, double score) 
+        public NamedKeyedEntitySearchResult(NamedKeyedEntity<TKey, TValue> keyedEntity, double score)
             : base(keyedEntity.Key, keyedEntity.Value, keyedEntity.Name, keyedEntity.Aliases) => Score = score;
         public readonly double Score;
     }
@@ -34,7 +34,7 @@ namespace Pepper.Structures
         private readonly NamedKeyedEntity<TKey, TValue>[] collection;
         private readonly Lazy<ImmutableDictionary<TKey, TValue>> lookupLazy;
         private ImmutableDictionary<TKey, TValue> Collection => lookupLazy.Value;
-        private Fuse<NamedKeyedEntity<TKey, TValue>> fuse;
+        private readonly Fuse<NamedKeyedEntity<TKey, TValue>> fuse;
 
         public TValue this[TKey key] => lookupLazy.Value[key];
         public bool ContainsKey(TKey key) => lookupLazy.Value.ContainsKey(key);
@@ -61,7 +61,7 @@ namespace Pepper.Structures
         }
 
         public delegate int Scorer(string input1, string input2);
-        
+
         public FuseSearchResult<NamedKeyedEntity<TKey, TValue>>[] FuzzySearch(string query)
         {
             var results = fuse.Search(query);

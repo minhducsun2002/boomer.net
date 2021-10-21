@@ -17,14 +17,21 @@ namespace Pepper.Structures.External.FGO.Renderer
             var actSetInformation = invocationInformation.ActSetInformation;
             var stats = invocationInformation.Statistics;
             var limits = new List<string>();
-            foreach (var (limitKey, outputName) in new[] {("Turn", "turn"), ("Count", "time")})
+            foreach (var (limitKey, outputName) in new[] { ("Turn", "turn"), ("Count", "time") })
             {
                 stats.TryGetValue(limitKey, out var values);
                 values = values?.Distinct().ToArray();
-                if (values?.Length != 1) continue;
+                if (values?.Length != 1)
+                {
+                    continue;
+                }
+
                 stats.Remove(limitKey);
                 var value = long.Parse(values[0]);
-                if (value > 0) limits.Add($"{value} {outputName}" + (value > 1 ? "s" : ""));
+                if (value > 0)
+                {
+                    limits.Add($"{value} {outputName}" + (value > 1 ? "s" : ""));
+                }
             }
 
             return
@@ -43,12 +50,12 @@ namespace Pepper.Structures.External.FGO.Renderer
                     : "");
         }
     }
-    
+
     public class SkillRenderer : EntityRenderer<MstSkill>
     {
         private readonly Skill skill;
 
-        public SkillRenderer(MstSkill skill, IMasterDataProvider connection,  Skill? skillHint = null) : base(skill, connection)
+        public SkillRenderer(MstSkill skill, IMasterDataProvider connection, Skill? skillHint = null) : base(skill, connection)
         {
             this.skill = skillHint ?? connection.GetSkillById(skill.ID, skill)!;
         }
@@ -75,11 +82,11 @@ namespace Pepper.Structures.External.FGO.Renderer
                 .Select(kv => kv.Serialize()).ToList();
             return (serializedEffects, skills);
         }
-        
+
         public (Dictionary<MstFunc, InvocationInformation>, bool) ResolveEffects(TraitService trait)
         {
             var multipleActSet = false;
-            var @out =  skill.Invocations
+            var @out = skill.Invocations
                 .ToDictionary(
                     function => function.Key,
                     function =>
@@ -91,7 +98,11 @@ namespace Pepper.Structures.External.FGO.Renderer
                             .ToDictionary(group => group.Key, group => group.ToArray());
                         var invocationInformation = new InvocationRenderer<IMasterDataProvider>(mstFunc, statistics, Connection, trait)
                             .Render();
-                        if (invocationInformation.ActSetInformation != null) multipleActSet = true;
+                        if (invocationInformation.ActSetInformation != null)
+                        {
+                            multipleActSet = true;
+                        }
+
                         return invocationInformation;
                     }
                 );

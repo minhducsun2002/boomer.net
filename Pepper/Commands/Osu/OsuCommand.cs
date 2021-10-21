@@ -65,9 +65,16 @@ namespace Pepper.Commands.Osu
 
             var speedChange = 1.0;
             if (difficultyOverwrite != null)
+            {
                 foreach (var mod in difficultyOverwrite.Mods)
+                {
                     if (mod is ModRateAdjust rateAdjustment)
+                    {
                         speedChange *= rateAdjustment.SpeedChange.Value;
+                    }
+                }
+            }
+
             var mapLength = map.Length / speedChange;
 
             var bpm = $"**{map.BPM * speedChange:0.##}**";
@@ -76,15 +83,15 @@ namespace Pepper.Commands.Osu
                 double min = controlPointInfo.BPMMinimum, max = controlPointInfo.BPMMaximum;
                 bpm = max - min < 2.0 ? $"**{min * speedChange:0.##}**" : $"**{min * speedChange:0.##}**-**{max * speedChange:0.##}**";
             }
-            
+
             return
                 $"{difficultyOverwrite?.StarRating ?? map.StarDifficulty:F2} :star: "
                 + $" {delimiter} `CS`**{diff.CircleSize}** `AR`**{diff.ApproachRate}** `OD`**{diff.OverallDifficulty}** `HP`**{diff.DrainRate}**"
                 + $" {delimiter} {bpm} BPM"
-                + (showLength 
+                + (showLength
                     ? $@" {delimiter} :clock3: {
                         Math.Floor(mapLength / 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                    }:{((long) mapLength % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}" 
+                    }:{((long) mapLength % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
                     : "");
         }
 
@@ -92,10 +99,10 @@ namespace Pepper.Commands.Osu
             => $"{diff.StarDifficulty:F2}⭐ "
                + $" {delimiter} CS{diff.CircleSize} AR{diff.ApproachRate} OD{diff.OverallDifficulty} HP{diff.DrainRate}"
                + (showBPM ? $" {delimiter} {set.Bpm} BPM" : "")
-               + (showLength 
+               + (showLength
                    ? $@" {delimiter} :clock3: {
                        (diff.TotalLengthInSeconds / 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                   }:{(diff.TotalLengthInSeconds % 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}" 
+                   }:{(diff.TotalLengthInSeconds % 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
                    : "");
 
         protected static string SerializeHitStats(Dictionary<string, int> statistics)
@@ -129,7 +136,7 @@ namespace Pepper.Commands.Osu
         {
             var allMods = ruleset.GetAllMods().ToArray();
             return modStrings
-                .Select(modString => 
+                .Select(modString =>
                     allMods.FirstOrDefault(mod => string.Equals(mod.Acronym, modString, StringComparison.InvariantCultureIgnoreCase)))
                 .Where(mod => mod != null)
                 .ToArray()!;

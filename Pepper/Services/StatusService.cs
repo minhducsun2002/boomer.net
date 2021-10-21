@@ -16,12 +16,12 @@ namespace Pepper.Services
     {
         public string GetCurrentStatus();
     }
-    
+
     public class StatusService : Service
     {
         private Task SetStatus(string status, CancellationToken stoppingToken = default)
             => Client.SetPresenceAsync(new LocalActivity(status, ActivityType.Playing), stoppingToken);
-        
+
         private class UptimeStatusProvider : IStatusProvider
         {
             public string GetCurrentStatus()
@@ -36,7 +36,7 @@ namespace Pepper.Services
             var services = Bot.Services.GetServices<DiscordClientService>().OfType<IStatusProvider>().ToList();
             services.Add(new UptimeStatusProvider());
             var index = 0;
-            
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 await SetStatus(services[index].GetCurrentStatus(), stoppingToken);

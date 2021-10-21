@@ -19,20 +19,20 @@ namespace Pepper.Structures.External.FGO.Renderer
         Level,
         Overcharge
     }
-    
+
     public class InvocationInformation
     {
-        internal InvocationInformation() {}
+        internal InvocationInformation() { }
 
         public string Effect { get; private set; } = "";
-        public TreasureDeviceMutationType? EffectMutationType { get; private set;  } = null;
+        public TreasureDeviceMutationType? EffectMutationType { get; private set; } = null;
         public InvocationInformation WithEffect(string effect, TreasureDeviceMutationType? effectMutationType = null)
         {
             Effect = effect;
             EffectMutationType = effectMutationType;
             return this;
         }
-        
+
         public MstFunc RawFunction;
         public Dictionary<string, string[]> Statistics = new();
         public Dictionary<string, TreasureDeviceMutationType> TreasureDeviceMutationTypeHint = new();
@@ -49,15 +49,15 @@ namespace Pepper.Structures.External.FGO.Renderer
         )
             => mutationTypeHint.TryGetValue(key, out var mutationType) ? mutationType : null;
     }
-    
+
     public class InvocationRenderer<TProvider> where TProvider : IQuestDataProvider, IItemDataProvider, IBaseObjectsDataProvider
     {
-        private Dictionary<string, string[]> arguments;
-        private bool single;
-        private MstFunc function;
-        private TProvider MasterData;
+        private readonly Dictionary<string, string[]> arguments;
+        private readonly bool single;
+        private readonly MstFunc function;
+        private readonly TProvider MasterData;
         private readonly ITraitNameProvider traitProvider;
-        
+
         public InvocationRenderer(MstFunc function, Dictionary<string, string[]> arguments, TProvider connection, ITraitNameProvider traitProvider)
         {
             this.arguments = arguments;
@@ -66,12 +66,13 @@ namespace Pepper.Structures.External.FGO.Renderer
             MasterData = connection;
             single = false;
         }
-        
+
 
         public InvocationInformation Render(Dictionary<string, TreasureDeviceMutationType>? mutationTypeHint = null)
         {
-            mutationTypeHint ??= new(); 
+            mutationTypeHint ??= new();
             if (!Enum.IsDefined(typeof(FuncList.TYPE), function.Type))
+            {
                 return new InvocationInformation
                 {
                     Statistics = arguments,
@@ -80,22 +81,37 @@ namespace Pepper.Structures.External.FGO.Renderer
                         "This function type is not defined. Contact my owner for this."
                     }
                 }.WithEffect($"Function ID {function.ID}, type {function.Type}");
+            }
 
             var type = (FuncList.TYPE) function.Type;
-            if (!TypeNames.FunctionNames.TryGetValue(type, out var typeName)) typeName = "";
-            if (string.IsNullOrWhiteSpace(typeName)) typeName = $"[functionType {type}]";
+            if (!TypeNames.FunctionNames.TryGetValue(type, out var typeName))
+            {
+                typeName = "";
+            }
+
+            if (string.IsNullOrWhiteSpace(typeName))
+            {
+                typeName = $"[functionType {type}]";
+            }
+
             var statistics = arguments;
             var onField = false;
-            
+
             ActSetInformation? actSetInformation = null;
             if (statistics.ContainsKey("ActSet"))
+            {
                 actSetInformation = new ActSetInformation
                 {
                     ActSetID = int.Parse(statistics.Consume("ActSet").Distinct().First()),
                     ActSetWeight = int.Parse(statistics.Consume("ActSetWeight").Distinct().First())
                 };
-            
-            if (statistics.Remove("OnField")) onField = true;
+            }
+
+            if (statistics.Remove("OnField"))
+            {
+                onField = true;
+            }
+
             statistics.Remove("HideMiss"); // 960407
 
             statistics.TryGetValue("Count", out var count);
@@ -109,144 +125,155 @@ namespace Pepper.Structures.External.FGO.Renderer
                 $"**{typeName}** {(count == default ? "" : "of")} {string.Join(" / ", count ?? Array.Empty<string>())}".TrimEnd(),
                 mutationTypeHint.ResolveMutationType("Count")
             );
-            
+
             switch (type)
             {
                 case FuncList.TYPE.ADD_STATE:
                 case FuncList.TYPE.ADD_STATE_SHORT:
-                {
-                    // We are assuming AddState(Short) functions only refer to a single buff.
-                    // I mean, there is only a single dataval tuple.
-                    var buff = MasterData.ResolveBuffAndCache(function.Vals[0]);
-                    var (effect, stats, extra, mutationTypes) = 
-                        SpecializedInvocationParser.AddState_Short(function, buff!, statistics, traitProvider, mutationTypeHint);
-                    output = output.WithEffect(effect, null);
-                    output.Statistics = stats;
-                    output.TreasureDeviceMutationTypeHint = mutationTypes;
-                    output.ExtraInformation = extra;
-                    break;
-                }
-                
-                case FuncList.TYPE.SUB_STATE:
-                {
-                    var buffTraits = function.Vals.Select(trait => traitProvider.GetTrait(trait)).ToArray();
-                    if (buffTraits.Length < 3)
-                        output.WithEffect($"Remove {string.Join('/', buffTraits)} effects");
-                    else
                     {
-                        output = output.WithEffect("Remove effects with certain traits");
-                        output.Statistics["Affected traits"] = buffTraits;
+                        // We are assuming AddState(Short) functions only refer to a single buff.
+                        // I mean, there is only a single dataval tuple.
+                        var buff = MasterData.ResolveBuffAndCache(function.Vals[0]);
+                        var (effect, stats, extra, mutationTypes) =
+                            SpecializedInvocationParser.AddState_Short(function, buff!, statistics, traitProvider, mutationTypeHint);
+                        output = output.WithEffect(effect, null);
+                        output.Statistics = stats;
+                        output.TreasureDeviceMutationTypeHint = mutationTypes;
+                        output.ExtraInformation = extra;
+                        break;
                     }
-                    break;
-                }
+
+                case FuncList.TYPE.SUB_STATE:
+                    {
+                        var buffTraits = function.Vals.Select(trait => traitProvider.GetTrait(trait)).ToArray();
+                        if (buffTraits.Length < 3)
+                        {
+                            output.WithEffect($"Remove {string.Join('/', buffTraits)} effects");
+                        }
+                        else
+                        {
+                            output = output.WithEffect("Remove effects with certain traits");
+                            output.Statistics["Affected traits"] = buffTraits;
+                        }
+                        break;
+                    }
 
                 case FuncList.TYPE.EVENT_DROP_UP:
-                {
-                    // We are assuming the individuality refers to only one item
-                    // We are also assuming that individuality does not change.
-                    int individualty = int.Parse(statistics["Individuality"][0]),
-                        eventId = int.Parse(statistics["EventId"][0]);
-                    var @event = MasterData.GetEventById(eventId);
-                    var item = MasterData.GetItemsByIndividuality(individualty)[0];
-                    var (effect, stats, extra) = SpecializedInvocationParser.EventDropUp(function, @event, item, statistics);
-                    // We are assuming a NP will not carry anything event-related,
-                    output = output.WithEffect(effect);
-                    output.Statistics = stats;
-                    output.ExtraInformation = new [] { extra };
-                    break;
-                }
+                    {
+                        // We are assuming the individuality refers to only one item
+                        // We are also assuming that individuality does not change.
+                        int individualty = int.Parse(statistics["Individuality"][0]),
+                            eventId = int.Parse(statistics["EventId"][0]);
+                        var @event = MasterData.GetEventById(eventId);
+                        var item = MasterData.GetItemsByIndividuality(individualty)[0];
+                        var (effect, stats, extra) = SpecializedInvocationParser.EventDropUp(function, @event, item, statistics);
+                        // We are assuming a NP will not carry anything event-related,
+                        output = output.WithEffect(effect);
+                        output.Statistics = stats;
+                        output.ExtraInformation = new[] { extra };
+                        break;
+                    }
 
                 case FuncList.TYPE.GAIN_NP:
                 case FuncList.TYPE.LOSS_NP:
-                {
-                    var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 100}**%").ToArray();
-                    output = output.WithEffect($"**{typeName}** by {string.Join(" / ", values)}",
-                        mutationTypeHint.ResolveMutationType("Value"));
-                    output.Statistics = statistics;
-                    break;
-                }
+                    {
+                        var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 100}**%").ToArray();
+                        output = output.WithEffect($"**{typeName}** by {string.Join(" / ", values)}",
+                            mutationTypeHint.ResolveMutationType("Value"));
+                        output.Statistics = statistics;
+                        break;
+                    }
 
                 case FuncList.TYPE.GAIN_STAR:
                 case FuncList.TYPE.GAIN_HP:
                 case FuncList.TYPE.LOSS_HP:
                 case FuncList.TYPE.LOSS_HP_SAFE:
                 case FuncList.TYPE.HASTEN_NPTURN:
-                {
-                    var values = statistics.Consume("Value").Distinct().Select(value => $"**{value}**");
-                    output.WithEffect($"**{typeName}** by {string.Join(" / ", values)}",
-                        mutationTypeHint.ResolveMutationType("Value"));
+                    {
+                        var values = statistics.Consume("Value").Distinct().Select(value => $"**{value}**");
+                        output.WithEffect($"**{typeName}** by {string.Join(" / ", values)}",
+                            mutationTypeHint.ResolveMutationType("Value"));
 
-                    if (statistics.ContainsKey("MultipleGainStar"))
-                        output.ExtraInformation = new[] { "Star is gained per target with matching traits." }; 
-                    
-                    break;
-                }
+                        if (statistics.ContainsKey("MultipleGainStar"))
+                        {
+                            output.ExtraInformation = new[] { "Star is gained per target with matching traits." };
+                        }
+
+                        break;
+                    }
 
                 case FuncList.TYPE.SHORTEN_SKILL:
-                {
-                    var values = statistics.Consume("Value").ToArray();
-                    var turnText = values.Length > 1
-                        ? "turn" + (values.Contains("1") ? "(s)" : "")
-                        : "turn" + (values[0] == "1" ? "" : "s");
-                    output = output.WithEffect(
-                        $"**{typeName}** by {string.Join(" / ", values.Select(value => $"**{value}**"))} {turnText}",
-                        mutationTypeHint.ResolveMutationType("Value")
-                    );
-                    break;
-                }
+                    {
+                        var values = statistics.Consume("Value").ToArray();
+                        var turnText = values.Length > 1
+                            ? "turn" + (values.Contains("1") ? "(s)" : "")
+                            : "turn" + (values[0] == "1" ? "" : "s");
+                        output = output.WithEffect(
+                            $"**{typeName}** by {string.Join(" / ", values.Select(value => $"**{value}**"))} {turnText}",
+                            mutationTypeHint.ResolveMutationType("Value")
+                        );
+                        break;
+                    }
 
                 case FuncList.TYPE.DAMAGE_NP:
                 case FuncList.TYPE.DAMAGE_NP_PIERCE:
-                {
-                    var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 10}**%").ToList();
-                    output = output.WithEffect(
-                        $"**{typeName}** of {string.Join(" / ", values)}",
-                        mutationTypeHint.ResolveMutationType("Value")
-                    );
-                    break;
-                }
+                    {
+                        var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 10}**%").ToList();
+                        output = output.WithEffect(
+                            $"**{typeName}** of {string.Join(" / ", values)}",
+                            mutationTypeHint.ResolveMutationType("Value")
+                        );
+                        break;
+                    }
 
                 case FuncList.TYPE.DAMAGE_NP_INDIVIDUAL:
                 case FuncList.TYPE.DAMAGE_NP_STATE_INDIVIDUAL_FIX:
-                {
-                    var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 10}**%").ToList();
-                    output = output.WithEffect(
-                        $"**{typeName}** of {string.Join(" / ", values)}",
-                        mutationTypeHint.ResolveMutationType("Value")
-                    );
+                    {
+                        var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 10}**%").ToList();
+                        output = output.WithEffect(
+                            $"**{typeName}** of {string.Join(" / ", values)}",
+                            mutationTypeHint.ResolveMutationType("Value")
+                        );
 
-                    var specialDamageValue = statistics.Consume("Correction")
-                        .Select(value => $"**{float.Parse(value) / 10}**%").ToArray();
-                    var trait = traitProvider.GetTrait(int.Parse(statistics.Consume("Target").First()));
-                    
-                    var mutationType = mutationTypeHint.ResolveMutationType("Correction");
-                    if (mutationType.HasValue) output.TreasureDeviceMutationTypeHint[$"Special damage for {trait}"] = mutationType.Value;
-                    
-                    output.Statistics[$"Special damage for {trait}"] = specialDamageValue;
-                    break;
-                }
+                        var specialDamageValue = statistics.Consume("Correction")
+                            .Select(value => $"**{float.Parse(value) / 10}**%").ToArray();
+                        var trait = traitProvider.GetTrait(int.Parse(statistics.Consume("Target").First()));
+
+                        var mutationType = mutationTypeHint.ResolveMutationType("Correction");
+                        if (mutationType.HasValue)
+                        {
+                            output.TreasureDeviceMutationTypeHint[$"Special damage for {trait}"] = mutationType.Value;
+                        }
+
+                        output.Statistics[$"Special damage for {trait}"] = specialDamageValue;
+                        break;
+                    }
 
                 case FuncList.TYPE.DAMAGE_NP_RARE:
-                {
-                    var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 10}**%").ToList();
-                    var specialDamageValue = statistics.Consume("Correction")
-                        .Select(value => $"**{float.Parse(value) / 10}**%").ToArray();
-                    var rarities = statistics.Consume("TargetRarityList")[0].Split('/');
-                    
-                    var mutationType = mutationTypeHint.ResolveMutationType("Correction");
-                    
-                    output = output.WithEffect(
-                        $"**{typeName}** of {string.Join(" / ", values)}",
-                        mutationTypeHint.ResolveMutationType("Value")
-                    );
+                    {
+                        var values = statistics.Consume("Value").Select(value => $"**{float.Parse(value) / 10}**%").ToList();
+                        var specialDamageValue = statistics.Consume("Correction")
+                            .Select(value => $"**{float.Parse(value) / 10}**%").ToArray();
+                        var rarities = statistics.Consume("TargetRarityList")[0].Split('/');
+
+                        var mutationType = mutationTypeHint.ResolveMutationType("Correction");
+
+                        output = output.WithEffect(
+                            $"**{typeName}** of {string.Join(" / ", values)}",
+                            mutationTypeHint.ResolveMutationType("Value")
+                        );
 
 
-                    var key = $"Special damage for {string.Join('/', rarities)}-star targets";
-                    if (mutationType.HasValue) output.TreasureDeviceMutationTypeHint[key] = mutationType.Value;
-                    output.Statistics[key] = specialDamageValue;
+                        var key = $"Special damage for {string.Join('/', rarities)}-star targets";
+                        if (mutationType.HasValue)
+                        {
+                            output.TreasureDeviceMutationTypeHint[key] = mutationType.Value;
+                        }
 
-                    break;
-                }
+                        output.Statistics[key] = specialDamageValue;
+
+                        break;
+                    }
             }
 
             if (statistics.ContainsKey("Rate"))
@@ -261,7 +288,10 @@ namespace Pepper.Structures.External.FGO.Renderer
                         output.Statistics["Chance to activate"] = chance;
                         var mutationType = mutationTypeHint.ResolveMutationType("Rate");
                         if (mutationType != null)
+                        {
                             output.TreasureDeviceMutationTypeHint["Chance to activate"] = mutationType.Value;
+                        }
+
                         break;
                 }
             }

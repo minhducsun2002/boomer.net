@@ -21,15 +21,19 @@ namespace Pepper.Commands.FGO
         private readonly CraftEssenceNamingService ceNamingService;
         public CraftEssenceSearch(CraftEssenceNamingService craftEssenceNamingService)
             => ceNamingService = craftEssenceNamingService;
-        
+
         public async Task<DiscordCommandResult> Exec(
             [Description("A CE name, ID, or collectionNo.")] string query
         )
         {
-            if (string.IsNullOrWhiteSpace(query)) return Reply("Please specify a query :frowning:");
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return Reply("Please specify a query :frowning:");
+            }
+
             var searchResults = ceNamingService.Namings.FuzzySearch(query);
             var isOwner = await Context.Bot.IsOwnerAsync(Context.Author.Id);
-            var pageProvider = new ArrayPageProvider<FuseSearchResult<NamedKeyedEntity<int,string>>>(
+            var pageProvider = new ArrayPageProvider<FuseSearchResult<NamedKeyedEntity<int, string>>>(
                 searchResults,
                 (_, segment) => new Page().WithEmbeds(
                     new LocalEmbed
@@ -45,7 +49,7 @@ namespace Pepper.Commands.FGO
                     }),
                 Math.Min(15, searchResults.Length)
             );
-            
+
             return View(new PagedView(pageProvider));
         }
     }

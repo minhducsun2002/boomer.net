@@ -31,13 +31,13 @@ namespace Pepper.Services.FGO
                 // collectionNo,ceId,name
                 .Where(line => line.Count >= 3 && int.TryParse(line[0], out _) && int.TryParse(line[1], out _))
                 .ToList();
-            
+
             CEIdToCollectionNo = validLines
                 .ToImmutableDictionary(
                     entry => int.Parse(entry[1]),
                     entry => int.Parse(entry[0])
                 );
-            
+
             Namings = new SearchableKeyedNamedEntityCollection<int, string>(
                 validLines
                     .Select(entry => new NamedKeyedEntity<int, string>(

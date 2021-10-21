@@ -11,9 +11,9 @@ namespace Pepper.FuzzySearch.Tests.Search
             {
                 get
                 {
-                    yield return new TestCaseData(new [] { "Apple", "Banana", "Orange" }, "Apple", "Apple").SetName("Apple => Apple");
-                    yield return new TestCaseData(new [] { "Apple", "Banana", "Orange" }, "ran", "Orange").SetName("ran => Orange");
-                    yield return new TestCaseData(new [] { "Apple", "Banana", "Orange" }, "nan", "Banana").SetName("nan => Banana");
+                    yield return new TestCaseData(new[] { "Apple", "Banana", "Orange" }, "Apple", "Apple").SetName("Apple => Apple");
+                    yield return new TestCaseData(new[] { "Apple", "Banana", "Orange" }, "ran", "Orange").SetName("ran => Orange");
+                    yield return new TestCaseData(new[] { "Apple", "Banana", "Orange" }, "nan", "Banana").SetName("nan => Banana");
                 }
             }
         }
@@ -26,7 +26,7 @@ namespace Pepper.FuzzySearch.Tests.Search
             var results = fuse.Search(query);
             Assert.AreEqual(results[0].Element, output);
         }
-        
+
         [Test]
         [TestCaseSource(typeof(Book), nameof(Book.BookTestCases))]
         public void Search(Book[] books, string query, int index)

@@ -9,7 +9,7 @@ namespace Pepper.Structures.External.FGO.TypeParsers
     {
         private readonly MongoClient mongoClient;
         private readonly string dbName, collectionName;
-        
+
         public void AddAlias(string alias, int collectionNo, string creatorId)
             => mongoClient.GetDatabase(dbName).GetCollection<AliasEntry>(collectionName)
                 .InsertOne(new AliasEntry
@@ -24,7 +24,7 @@ namespace Pepper.Structures.External.FGO.TypeParsers
             => mongoClient.GetDatabase(dbName).GetCollection<AliasEntry>(collectionName)
                 .FindSync(alias => alias.CollectionNo == collectionNo)
                 .ToList();
-        
+
         public List<AliasEntry> GetAlias(string query)
             => mongoClient.GetDatabase(dbName).GetCollection<AliasEntry>(collectionName)
                 .FindSync(alias => alias.Alias == query.ToLowerInvariant())

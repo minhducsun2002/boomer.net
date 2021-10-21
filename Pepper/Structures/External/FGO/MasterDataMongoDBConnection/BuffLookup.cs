@@ -10,10 +10,17 @@ namespace Pepper.Structures.External.FGO
 
         public MstBuff? ResolveBuffAndCache(int id, bool reload = false)
         {
-            if (!reload && buffCache.ContainsKey(id)) return buffCache[id];
-            
+            if (!reload && buffCache.ContainsKey(id))
+            {
+                return buffCache[id];
+            }
+
             var obj = MstBuff.FindSync(Builders<MstBuff>.Filter.Eq("id", id)).FirstOrDefault();
-            if (obj != null) buffCache[id] = obj;
+            if (obj != null)
+            {
+                buffCache[id] = obj;
+            }
+
             return obj;
         }
     }

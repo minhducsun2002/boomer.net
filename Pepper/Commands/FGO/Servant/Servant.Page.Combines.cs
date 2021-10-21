@@ -11,8 +11,11 @@ namespace Pepper.Commands.FGO
     {
         private (LocalSelectionComponentOption, Page)? AscensionsPage(BaseServant servant, ServantLimits limits, IReadOnlyDictionary<int, string> itemNames)
         {
-            if (limits.AscensionCombine.Length == 0) return null;
-            
+            if (limits.AscensionCombine.Length == 0)
+            {
+                return null;
+            }
+
             var page = servant.BaseEmbed()
                 .WithDescription(limits.AscensionCombine.Length == 0 ? "No materials needed." : "")
                 .WithFields(
@@ -28,11 +31,14 @@ namespace Pepper.Commands.FGO
 
             return (new LocalSelectionComponentOption { Label = "Ascension materials" }, new Page().WithEmbeds(page));
         }
-        
+
         private (LocalSelectionComponentOption, Page)? SkillLimitsPage(BaseServant servant, ServantLimits limits, IReadOnlyDictionary<int, string> itemNames)
         {
-            if (limits.SkillCombine.Length == 0) return null;
-            
+            if (limits.SkillCombine.Length == 0)
+            {
+                return null;
+            }
+
             var page = servant.BaseEmbed()
                 .WithDescription(limits.SkillCombine.Length == 0 ? "No materials needed." : "")
                 .WithFields(
@@ -45,7 +51,7 @@ namespace Pepper.Commands.FGO
                                 .Select(tuple => $"- **{tuple.Second}**x **{itemNames[tuple.First]}**")
                         )
                     }));
-            
+
             return (new LocalSelectionComponentOption { Label = "Skill materials" }, new Page().WithEmbeds(page));
         }
     }

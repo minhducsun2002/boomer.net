@@ -57,7 +57,7 @@ namespace Pepper.Test.FGO.TreasureDevice
                 .Where(lv => validTreasureDeviceIds.Contains(lv.TreaureDeviceId))
                 .GroupBy(lv => lv.TreaureDeviceId)
                 .ToDictionary(lv => lv.Key, lv => lv.ToArray());
-            
+
             treasureDevicesById = ResolveArray<MstTreasureDevice>(path, Names.MstTreasureDevice)
                 .Where(td => validTreasureDeviceIds.Contains(td.ID))
                 .ToDictionary(
@@ -70,7 +70,7 @@ namespace Pepper.Test.FGO.TreasureDevice
 
         private static T[] ResolveArray<T>(string path, string name) where T : MasterDataEntity =>
             BsonSerializer.Deserialize<T[]>(File.ReadAllText(Path.Combine(path, name + ".json")));
-        
+
         public MstSvt GetServantEntityById(int id) => ServantEntitiesById[id];
 
         public List<MstSvtTreasureDevice> GetCachedServantTreasureDevices(int servantId, bool reload = false)
@@ -98,7 +98,7 @@ namespace Pepper.Test.FGO.TreasureDevice
         public MstItem[] GetItemsByIndividuality(int individualty) { throw new NotImplementedException(); }
         public string GetItemName(int itemId, bool reload = false) { throw new NotImplementedException(); }
     }
-    
+
     internal class NPMasterProvideAttribute : DataAttribute
     {
         public override IEnumerable<object[]> GetData(MethodInfo testMethod)
@@ -108,7 +108,7 @@ namespace Pepper.Test.FGO.TreasureDevice
             return provider.ServantEntitiesById.Keys.Select(key => new object[] { key, provider });
         }
     }
-    
+
     public class ServantTreasureDeviceTest
     {
         [Theory]
@@ -122,10 +122,14 @@ namespace Pepper.Test.FGO.TreasureDevice
                 masterDataProvider,
                 masterDataProvider, TraitProvider.Instance
             );
-            
+
             foreach (var page in pages)
+            {
                 foreach (var embed in page.page.Embeds)
+                {
                     embed.Validate();
+                }
+            }
         }
     }
 }

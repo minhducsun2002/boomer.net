@@ -14,9 +14,9 @@ namespace Pepper.Structures.External.FGO.TypeParsers
                 serviceProvider.GetRequiredService<ServantSearchService>(),
                 serviceProvider.GetRequiredService<ServantNamingService>().Namings
             );
-        
+
         private static ServantSearchRecord[] Search(
-            string query, 
+            string query,
             ServantSearchService servantSearchService,
             SearchableKeyedNamedEntityCollection<int, ServantNaming> servantNamings)
         {
@@ -30,21 +30,26 @@ namespace Pepper.Structures.External.FGO.TypeParsers
                     Name = entry.Element.Name,
                     Aliases = entry.Element.Aliases,
                     Score = entry.Score,
-                    Bucket = tokenSearchResult.TryGetValue(entry.Element.Key, out var value) ? value : 0 
+                    Bucket = tokenSearchResult.TryGetValue(entry.Element.Key, out var value) ? value : 0
                 });
 
             List<ServantSearchRecord> match = new(), mismatch = new();
             foreach (var record in scores)
+            {
                 (tokenSearchResult.ContainsKey(record.ServantId) ? match : mismatch).Add(record);
-            
+            }
+
             match.Sort((r1, r2) =>
             {
-                if (r1.Bucket != r2.Bucket) return r2.Bucket - r1.Bucket;
+                if (r1.Bucket != r2.Bucket)
+                {
+                    return r2.Bucket - r1.Bucket;
+                }
 
                 return r1.Score.CompareTo(r2.Score);
             });
-            mismatch.Sort((r1, r2) => r2.Score.CompareTo(r1.Score));;
-            
+            mismatch.Sort((r1, r2) => r2.Score.CompareTo(r1.Score)); ;
+
             return match.Concat(mismatch).ToArray();
         }
     }

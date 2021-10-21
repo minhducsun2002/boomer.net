@@ -9,11 +9,15 @@ namespace Pepper.Structures.External.FGO
     {
         public MstSkill[] GetSkillEntityByActIndividuality(int individuality)
             => MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("actIndividuality", individuality)).ToList().ToArray();
-        
+
         public Skill? GetSkillById(int id, MstSkill? mstSkillHint = null)
         {
             var mstSkill = mstSkillHint ?? MstSkill.FindSync(Builders<MstSkill>.Filter.Eq("id", id)).FirstOrDefault();
-            if (mstSkill == null) return null;
+            if (mstSkill == null)
+            {
+                return null;
+            }
+
             var levels = MstSkillLv
                 .FindSync(Builders<MstSkillLv>.Filter.Eq("skillId", id))
                 .ToList()

@@ -6,5 +6,5 @@ namespace Pepper.Commands.Reserved
 {
     [Category("Reserved")]
     [RequireBotOwner]
-    public abstract class ReservedCommand : Command {}
+    public abstract class ReservedCommand : Command { }
 }

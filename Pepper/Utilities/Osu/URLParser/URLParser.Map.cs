@@ -6,7 +6,7 @@ namespace Pepper.Utilities.Osu
 {
     public static partial class URLParser
     {
-        private static readonly Regex BeatmapOrBeatmapsetRegex = new (
+        private static readonly Regex BeatmapOrBeatmapsetRegex = new(
             @"http(?:s)*:\/\/osu\.ppy\.sh\/(b|beatmapsets|beatmaps|s)\/(\d+)",
         RegexOptions.Compiled | RegexOptions.ECMAScript | RegexOptions.CultureInvariant
         );
@@ -31,15 +31,24 @@ namespace Pepper.Utilities.Osu
             mode = default;
             id = default;
             setId = default;
-        
+
             var match = BeatmapOrBeatmapsetRegex.Match(url);
-            if (!match.Success) return false;
+            if (!match.Success)
+            {
+                return false;
+            }
 
             var setMatch = BeatmapsetRegex.Match(url);
-            if (setMatch.Success) setId = Convert.ToInt32(setMatch.Groups!.Values.Skip(2).First().Value);
+            if (setMatch.Success)
+            {
+                setId = Convert.ToInt32(setMatch.Groups!.Values.Skip(2).First().Value);
+            }
 
             var idMatch = BeatmapRegex.Match(url);
-            if (idMatch.Success) id = Convert.ToInt32(idMatch.Groups!.Values.Skip(2).First().Value);
+            if (idMatch.Success)
+            {
+                id = Convert.ToInt32(idMatch.Groups!.Values.Skip(2).First().Value);
+            }
 
             var fullMatch = BeatmapAndBeatmapsetRegex.Match(url);
             if (fullMatch.Success)

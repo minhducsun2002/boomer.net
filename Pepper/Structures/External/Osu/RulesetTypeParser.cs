@@ -13,14 +13,14 @@ namespace Pepper.Structures.External.Osu
 {
     public class RulesetTypeParser : DiscordTypeParser<Ruleset>
     {
-        public static readonly Ruleset[] SupportedRulesets = 
+        public static readonly Ruleset[] SupportedRulesets =
         {
             new OsuRuleset(),
             new TaikoRuleset(),
             new CatchRuleset(),
             new ManiaRuleset()
         };
-        
+
         public override ValueTask<TypeParserResult<Ruleset>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
         {
             Ruleset defaultRuleset = new OsuRuleset();
@@ -29,7 +29,7 @@ namespace Pepper.Structures.External.Osu
                 defaultRuleset = SupportedRulesets
                     .First(ruleset =>
                         string.Equals(ruleset.ShortName, value, StringComparison.InvariantCultureIgnoreCase));
-                
+
             }
             catch { /* ignored, defaults to osu! */ }
 

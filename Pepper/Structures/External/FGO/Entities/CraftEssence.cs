@@ -1,5 +1,5 @@
- using System;
- using Pepper.Structures.External.FGO.MasterData;
+using System;
+using Pepper.Structures.External.FGO.MasterData;
 
 namespace Pepper.Structures.External.FGO.Entities
 {

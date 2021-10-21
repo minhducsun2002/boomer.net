@@ -3,7 +3,7 @@ using Pepper.Structures.External.FGO.MasterData;
 
 namespace Pepper.Structures.External.FGO
 {
-    public interface IMasterDataProvider : 
+    public interface IMasterDataProvider :
         ICraftEssenceDataProvider,
         IItemDataProvider,
         IServantDataProvider,

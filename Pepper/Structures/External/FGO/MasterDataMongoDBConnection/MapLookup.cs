@@ -19,8 +19,11 @@ namespace Pepper.Structures.External.FGO
                     spots[spotObj.ID] = spotObj;
                 }
             }
-            
-            if (spots.TryGetValue(spotId, out var @return) && !reload) return @return;
+
+            if (spots.TryGetValue(spotId, out var @return) && !reload)
+            {
+                return @return;
+            }
 
             var spot = MstSpot.FindSync(Builders<MstSpot>.Filter.Eq("id", spotId)).FirstOrDefault();
             return spot != default ? spots[spotId] = spot : default;
@@ -28,7 +31,10 @@ namespace Pepper.Structures.External.FGO
 
         public MstWar? ResolveWar(int warId, bool reload = false)
         {
-            if (wars.TryGetValue(warId, out var @return) && !reload) return @return;
+            if (wars.TryGetValue(warId, out var @return) && !reload)
+            {
+                return @return;
+            }
 
             var war = MstWar.FindSync(Builders<MstWar>.Filter.Eq("id", warId)).FirstOrDefault();
             return war != default ? wars[warId] = war : default;

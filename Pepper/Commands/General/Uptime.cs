@@ -1,7 +1,7 @@
 using System;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Disqord;
 using Disqord.Bot;
 using Pepper.Utilities;
@@ -29,7 +29,7 @@ namespace Pepper.Commmands.General
                         }
                         .Select((field, index) =>
                             field.Item1 >= 1
-                            // index == 3 is second
+                                // index == 3 is second
                                 ? $"{field.Item1.ToString().PadLeft(index == 3 ? 2 : 1, '0')}{field.Item2}"
                                 : index == 3
                                     ? "0" + field.Item2
@@ -45,10 +45,10 @@ namespace Pepper.Commmands.General
                 }
             }).Where(_ => _ != default).ToArray();
 
-            var presentColumns = new[] {threads.Take(threads.Length / 2), threads.Skip(threads.Length / 2)}
+            var presentColumns = new[] { threads.Take(threads.Length / 2), threads.Skip(threads.Length / 2) }
                 .Select(column =>
                 {
-                    var _ = new[] {("Thread", "Uptime")}.Concat(column).ToArray();
+                    var _ = new[] { ("Thread", "Uptime") }.Concat(column).ToArray();
                     var maxThreadIdLength = _.Select(row => row.Item1.Length).Max();
                     var maxUptimeLength = _.Select(row => row.Item2.Length).Max();
                     return _.Select(record =>

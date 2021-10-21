@@ -20,7 +20,9 @@ namespace Pepper.Structures.Commands
 
             // Initialize to default values.
             foreach (var param in command.Parameters)
+            {
                 parameters[param] = param.DefaultValue ?? "";
+            }
 
             // sort parameters into two types : with and without flags
             var flagParameters = new Dictionary<string, Parameter>();
@@ -29,10 +31,16 @@ namespace Pepper.Structures.Commands
             {
                 var flagAttribute = param.Attributes.FirstOrDefault(attrib => attrib is FlagAttribute);
                 if (flagAttribute == null)
+                {
                     nonFlagParameters.AddLast(param);
+                }
                 else
+                {
                     foreach (var flag in ((FlagAttribute) flagAttribute).Flags)
+                    {
                         flagParameters.Add(flag, param);
+                    }
+                }
             }
 
             // sort dictionary by key.
@@ -40,16 +48,21 @@ namespace Pepper.Structures.Commands
             flagParameters = flagParameters
                 .OrderByDescending(pair => pair.Key, StringComparer.InvariantCultureIgnoreCase)
                 .ToDictionary(pair => pair.Key, pair => pair.Value);
-            
+
             // sort parameters into two types : matches flags and doesn't
             HashSet<string> flagArguments = new(); List<string> remainingArguments = new();
             foreach (var argument in rawArguments.SmartSplit(Quote))
+            {
                 if (flagParameters.Any(f => argument.StartsWith(f.Key)))
+                {
                     flagArguments.Add(argument);
-                else 
+                }
+                else
+                {
                     remainingArguments.Add(argument);
+                }
+            }
 
-            
             Dictionary<Parameter, object> flagParameterValues = new();
             foreach (var (flagPrefix, parameter) in flagParameters)
             {
@@ -57,11 +70,13 @@ namespace Pepper.Structures.Commands
                 if (parameter.IsMultiple)
                 {
                     foreach (var argument in flagArguments)
+                    {
                         if (argument.StartsWith(flagPrefix))
                         {
                             matchingArguments.Add(argument);
                             flagArguments.Remove(argument);
                         }
+                    }
                 }
                 else
                 {
@@ -73,12 +88,14 @@ namespace Pepper.Structures.Commands
                         flagArguments.Remove(arg);
                     }
                 }
-                
+
                 for (var i = 0; i < matchingArguments.Count; i++)
                 {
                     var arg = matchingArguments[i];
                     if (parameter.Type == typeof(bool) && parameter.Attributes.Any(attrib => attrib is FlagAttribute))
+                    {
                         arg = bool.TrueString;
+                    }
                     else
                     {
                         var passingArgument = arg[flagPrefix.Length..] ?? "";
@@ -94,18 +111,28 @@ namespace Pepper.Structures.Commands
                 {
                     // in case this is a multiple-value parameter, merge previous parsed values
                     if (flagParameterValues.TryGetValue(parameter, out var list))
+                    {
                         ((List<string>) list).AddRange(matchingArguments);
+                    }
                     else
+                    {
                         flagParameterValues[parameter] = matchingArguments;
+                    }
                 }
-                else 
-                    if (matchingArguments.Count != 0) flagParameterValues[parameter] = matchingArguments[0];
+                else
+                    if (matchingArguments.Count != 0)
+                {
+                    flagParameterValues[parameter] = matchingArguments[0];
+                }
             }
 
 
             foreach (var (leftoverArgument, index) in remainingArguments.Select((arg, i) => (arg, i)))
             {
-                if (!nonFlagParameters.Any()) break;
+                if (!nonFlagParameters.Any())
+                {
+                    break;
+                }
 
                 // take the first parameter and remove it from the queue
                 var param = nonFlagParameters.First!.Value;
@@ -122,12 +149,16 @@ namespace Pepper.Structures.Commands
                     parameters[param] = string.Join(' ', remainingArguments.Skip(index));
                     break;
                 }
-                    
+
 
                 parameters[param] = leftoverArgument;
             }
-            
-            foreach (var (parameter, value) in flagParameterValues) parameters[parameter] = value;
+
+            foreach (var (parameter, value) in flagParameterValues)
+            {
+                parameters[parameter] = value;
+            }
+
             return new DefaultArgumentParserResult(command, parameters);
         }
     }

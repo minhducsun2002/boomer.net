@@ -13,13 +13,13 @@ namespace Pepper.Commands.Osu
 {
     public class User : OsuCommand
     {
-        public User(APIService service) : base(service) {}
+        public User(APIService service) : base(service) { }
 
         [Command("user", "u")]
         [Description("Show statistics of an osu! player.")]
         public async Task<DiscordCommandResult> Exec(
-            [Flag("/")] [Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
-            [Remainder] [Description("Username to check. Default to your username, if set.")] Username username)
+            [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
+            [Remainder][Description("Username to check. Default to your username, if set.")] Username username)
         {
             var (user, scores, color) = await APIService.GetUser(username, ruleset.RulesetInfo);
             var stats = user.Statistics;
@@ -66,7 +66,7 @@ namespace Pepper.Commands.Osu
                 {
                     Name = "Best performance",
                     Value = $"[**{score.Rank}**] **{score.PP}**pp "
-                            + $"(**{(score.Accuracy * 100):F3}**% | **{score.MaxCombo}**x)" + (score.Perfect ? " (FC)" : "") 
+                            + $"(**{(score.Accuracy * 100):F3}**% | **{score.MaxCombo}**x)" + (score.Perfect ? " (FC)" : "")
                             + $"\n[{mapset.Artist} - {mapset.Title} [{map.Version}]](https://osu.ppy.sh/beatmaps/{map.OnlineBeatmapID})"
                             + (score.Mods.Length > 0 ? $"+{string.Join("", score.Mods)}" : "")
                             + $"\n{SerializeBeatmapStats(map)}"

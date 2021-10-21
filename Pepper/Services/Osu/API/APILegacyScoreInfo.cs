@@ -6,7 +6,7 @@ namespace Pepper.Services.Osu.API
     {
         [JsonProperty("perfect")]
         public bool Perfect { get; set; }
-        
+
         [JsonProperty("best_id")]
         public long? OnlineBestScoreID { get; set; }
     }

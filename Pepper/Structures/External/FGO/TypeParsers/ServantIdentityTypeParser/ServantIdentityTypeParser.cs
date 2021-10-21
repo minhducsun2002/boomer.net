@@ -21,7 +21,7 @@ namespace Pepper.Structures.External.FGO.TypeParsers
         public double Score;
         public int Bucket;
     }
-    
+
     public partial class ServantIdentityTypeParser : DiscordTypeParser<ServantIdentity>
     {
         private readonly MasterDataService masterDataService;
@@ -40,8 +40,8 @@ namespace Pepper.Structures.External.FGO.TypeParsers
             if (int.TryParse(value, out var numericIdentity))
             {
                 var result = ResolveNumericIdentifier(numericIdentity, masterDataService);
-                return result?.ID == null 
-                    ? Failure($"Could not find a servant with collectionNo/ID {numericIdentity}.") 
+                return result?.ID == null
+                    ? Failure($"Could not find a servant with collectionNo/ID {numericIdentity}.")
                     : Success(new ServantIdentity { ServantId = result.ID });
             }
 
@@ -51,8 +51,8 @@ namespace Pepper.Structures.External.FGO.TypeParsers
             if (alias.Count != 0)
             {
                 var result = ResolveNumericIdentifier(alias[0].CollectionNo, masterDataService);
-                return result?.ID == null 
-                    ? Failure($"Could not find a servant with collectionNo {numericIdentity}.") 
+                return result?.ID == null
+                    ? Failure($"Could not find a servant with collectionNo {numericIdentity}.")
                     : Success(new ServantIdentity { ServantId = result.ID });
             }
 
@@ -71,7 +71,7 @@ namespace Pepper.Structures.External.FGO.TypeParsers
             var jp = masterDataService.Connections[Region.JP];
             return jp.GetServantEntityById(idOrCollectionNo) ?? jp.GetServantEntityByCollectionNo(idOrCollectionNo);
         }
-        
+
         private static readonly Regex Whitespaces = new(@"\s", RegexOptions.Compiled | RegexOptions.ECMAScript | RegexOptions.CultureInvariant);
         private static Dictionary<int, int> TokenSearch(string query, ServantSearchService searchService)
         {

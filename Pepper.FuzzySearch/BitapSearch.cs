@@ -5,11 +5,11 @@ namespace Pepper.FuzzySearch
 {
     internal class BitapSearch
     {
-        private string pattern;
-        private List<(string, Dictionary<char, int>, int)> chunks;
+        private readonly string pattern;
+        private readonly List<(string, Dictionary<char, int>, int)> chunks;
         private const int MaxBits = 32;
-        private bool ignoreLocation, isCaseSensitive;
-        private int minMatchCharLength;
+        private readonly bool ignoreLocation, isCaseSensitive;
+        private readonly int minMatchCharLength;
 
         public BitapSearch(
             string pattern, int minMatchCharLength = 1, bool isCaseSensitive = false,
@@ -57,7 +57,7 @@ namespace Pepper.FuzzySearch
             text = isCaseSensitive ? text : text.ToLowerInvariant();
             if (pattern == text)
             {
-                return (true, 0, new [] { new Range(0, pattern.Length - 1) });
+                return (true, 0, new[] { new Range(0, pattern.Length - 1) });
             }
 
             var hasMatches = false;
@@ -66,7 +66,7 @@ namespace Pepper.FuzzySearch
             foreach (var (pattern, alphabet, startIndex) in chunks)
             {
                 const int location = 0;
-                
+
                 var (isMatch, score, indices) = Search(
                     text, pattern, alphabet,
                     location: location + startIndex,
@@ -80,7 +80,10 @@ namespace Pepper.FuzzySearch
                 }
 
                 totalScore += score;
-                if (isMatch && indices.Length != 0) allIndices.AddRange(indices);
+                if (isMatch && indices.Length != 0)
+                {
+                    allIndices.AddRange(indices);
+                }
             }
 
             return (hasMatches, hasMatches ? totalScore / chunks.Count : 1, allIndices.ToArray());
@@ -142,11 +145,15 @@ namespace Pepper.FuzzySearch
                     );
 
                     if (localScore <= currentThreshold)
+                    {
                         binMin = binMid;
+                    }
                     else
+                    {
                         binMax = binMid;
+                    }
 
-                    binMid = (int)Math.Floor((double)(binMax - binMin) / 2 + binMin);
+                    binMid = (int) Math.Floor((double) (binMax - binMin) / 2 + binMin);
                 }
 
                 binMax = binMid;
@@ -221,7 +228,9 @@ namespace Pepper.FuzzySearch
             {
                 var indices = BitapAlgorithm.ConvertMaskToIndices(matchMask, minMatchCharLength);
                 if (indices.Length == 0)
+                {
                     result.Item1 = false;
+                }
                 else
                 {
                     result.Item3 = indices;

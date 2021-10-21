@@ -6,8 +6,11 @@ namespace Pepper.Structures.External.FGO.Renderer
     {
         public static bool IsPlayerAction(MstFunc function)
         {
-            if ((TargetTypeText.ApplyTarget) function.ApplyTarget == TargetTypeText.ApplyTarget.PlayerAndEnemy) return true;
-            
+            if ((TargetTypeText.ApplyTarget) function.ApplyTarget == TargetTypeText.ApplyTarget.PlayerAndEnemy)
+            {
+                return true;
+            }
+
             bool targetEnemies = false, targetPlayers = false;
             switch ((TargetTypeText.TargetType) function.TargetType)
             {

@@ -30,7 +30,10 @@ namespace Pepper.Services.Osu
                 init += maxSingle;
                 var scores = JArray.Parse(res).Select(SerializeToAPILegacyScoreInfo).ToArray();
                 scoreCache.AddRange(scores);
-                if (scores.Length == 0) break;
+                if (scores.Length == 0)
+                {
+                    break;
+                }
             }
 
             return scoreCache.Count > count ? scoreCache.GetRange(0, count).ToArray() : scoreCache.ToArray();

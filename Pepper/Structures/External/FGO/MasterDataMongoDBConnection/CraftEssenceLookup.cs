@@ -10,10 +10,14 @@ namespace Pepper.Structures.External.FGO
     {
         public MstSvt[] GetAllCraftEssenceEntities() =>
             MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("type", SvtType.Type.SERVANT_EQUIP)).ToList().ToArray();
-        
+
         private CraftEssence? BuildCraftEssence(MstSvt? mstSvt = null)
         {
-            if (mstSvt == null) return null;
+            if (mstSvt == null)
+            {
+                return null;
+            }
+
             var ce = new CraftEssence(mstSvt);
             var associatedSkill = MstSvtSkill.FindSync(Builders<MstSvtSkill>.Filter.Eq("svtId", mstSvt.ID)).ToList()!;
             var condLimitCounts = associatedSkill.Select(assoc => assoc.CondLimitCount).ToArray();
@@ -32,7 +36,7 @@ namespace Pepper.Structures.External.FGO
 
         public CraftEssence? GetCraftEssenceById(int id, MstSvt? mstSvtHint = null)
             => BuildCraftEssence(mstSvtHint ?? MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", id)).FirstOrDefault());
-        
+
         public CraftEssence? GetCraftEssenceByCollectionNo(int collectionNo, MstSvt? mstSvtHint = null)
             => BuildCraftEssence(mstSvtHint ?? MstSvt.FindSync(
                 Builders<MstSvt>.Filter.And(

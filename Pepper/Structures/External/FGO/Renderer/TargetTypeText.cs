@@ -8,7 +8,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             Enemy,
             PlayerAndEnemy
         }
-        
+
         public enum TargetType
         {
             Self = 0,
@@ -42,7 +42,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             PtOneHpLowestValue = 28,
             PtOneHpLowestRate = 29
         }
-        
+
         public static string ResolveText(int type)
         {
             var casted = (TargetType) type;

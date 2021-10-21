@@ -9,7 +9,7 @@ namespace Pepper.FuzzySearch.Tests.Search
         public string AuthorFirstName;
         public string AuthorLastName;
 
-        public static Book[] Data = 
+        public static Book[] Data =
         {
             new() { Title = "Old Mans War", AuthorFirstName = "John", AuthorLastName = "Scalzi" },
             new() { Title = "The Lock Artist", AuthorFirstName = "Steve", AuthorLastName = "Hamilton" },

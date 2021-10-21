@@ -15,7 +15,7 @@ namespace Pepper.Services.Osu.API
             get => onlineBeatmapSetID;
             set => onlineBeatmapSetID = value > 0 ? value : null;
         }
-        
+
         [JsonProperty(@"covers")] public BeatmapSetOnlineCovers Covers { get; set; }
         [JsonProperty(@"preview_url")] public string Preview { get; set; }
         [JsonProperty(@"has_favourited")] public bool HasFavourited { get; set; }

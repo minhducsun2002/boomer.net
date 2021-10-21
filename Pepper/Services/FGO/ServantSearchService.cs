@@ -19,7 +19,7 @@ namespace Pepper.Services.FGO
         [BsonElement("addedAt")] public DateTimeOffset AddedAt = DateTimeOffset.MinValue;
         [BsonElement("creator")] public string CreatorId = string.Empty;
     }
-    
+
     public class ServantSearchService : Service
     {
         private readonly ServantNamingService servantNamingService;
@@ -27,7 +27,7 @@ namespace Pepper.Services.FGO
         private readonly MasterDataService masterDataService;
         private readonly string dbName, collectionName;
         public Dictionary<string, HashSet<int>> TokenTable = new();
-        public Dictionary<int, HashSet<int>> ServantTraits = new(); 
+        public Dictionary<int, HashSet<int>> ServantTraits = new();
         private readonly ILogger log = Log.Logger.ForContext<ServantSearchService>();
 
         public bool TraitLoaded = false;
@@ -44,7 +44,7 @@ namespace Pepper.Services.FGO
             namingService.DataLoaded += ReloadTokenizationTable;
         }
 
-        
+
 
         private void ReloadTokenizationTable(IEnumerable<KeyValuePair<int, ServantNaming>> namings)
         {
@@ -59,10 +59,14 @@ namespace Pepper.Services.FGO
                     .SelectMany(alias => alias.Split(" ").Where(token => !string.IsNullOrWhiteSpace(token)));
 
                 foreach (var token in tokenized)
+                {
                     if (!@out.TryAdd(token, new HashSet<int> { servantId }))
+                    {
                         @out[token].Add(servantId);
+                    }
+                }
             }
-            
+
             TokenTable = @out;
             log.Information("Servant aliases tokenization complete.");
         }
@@ -75,7 +79,7 @@ namespace Pepper.Services.FGO
                     entity => entity.ID,
                     entity => new HashSet<int>(entity.Traits)
                 );
-            
+
             log.Information($"Loaded trait table for {ServantTraits.Count} servants.");
         }
 

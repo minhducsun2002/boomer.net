@@ -10,10 +10,17 @@ namespace Pepper.Structures.External.FGO
 
         public MstClass? ResolveClass(int classId, bool reload = false)
         {
-            if (!reload && buffCache.ContainsKey(classId)) return classCache[classId];
-            
+            if (!reload && buffCache.ContainsKey(classId))
+            {
+                return classCache[classId];
+            }
+
             var obj = MstClass.FindSync(Builders<MstClass>.Filter.Eq("id", classId)).FirstOrDefault();
-            if (obj != null) classCache[classId] = obj;
+            if (obj != null)
+            {
+                classCache[classId] = obj;
+            }
+
             return obj;
         }
     }

@@ -6,7 +6,6 @@ using Disqord;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus;
 using FgoExportedConstants;
-using Qmmands;
 using MongoDB.Driver;
 using Pepper.Services.FGO;
 using Pepper.Structures;
@@ -15,22 +14,23 @@ using Pepper.Structures.External.FGO;
 using Pepper.Structures.External.FGO.Entities;
 using Pepper.Structures.External.FGO.MasterData;
 using Pepper.Structures.External.FGO.Renderer;
+using Qmmands;
 
 namespace Pepper.Commands.FGO
 {
     public partial class Servant : ServantCommand
     {
-        public Servant(MasterDataService m, TraitService t, ItemNamingService i, ServantNamingService n) : base(m, t, i, n) {}
-        
+        public Servant(MasterDataService m, TraitService t, ItemNamingService i, ServantNamingService n) : base(m, t, i, n) { }
+
         [Command("servant", "s", "servant-info")]
         [Description("View information about a servant.")]
         [PrefixCategory("fgo")]
-        public DiscordCommandResult Exec([Remainder] [Description("A servant name, ID, or in-game number.")] ServantIdentity servantIdentity)
+        public DiscordCommandResult Exec([Remainder][Description("A servant name, ID, or in-game number.")] ServantIdentity servantIdentity)
         {
             IMasterDataProvider jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
-            
+
             var servant = ResolveServant(servantIdentity);
-            
+
             // overwriting item names
             var limits = jp.GetServantLimits(servant.ID);
             var itemNames = limits.AscensionCombine
@@ -41,7 +41,11 @@ namespace Pepper.Commands.FGO
                     itemId => itemId,
                     itemId =>
                     {
-                        if (ItemNamingService.Namings.TryGetValue(itemId, out var name)) return name;
+                        if (ItemNamingService.Namings.TryGetValue(itemId, out var name))
+                        {
+                            return name;
+                        }
+
                         return na.GetItemName(itemId) ?? jp.GetItemName(itemId)!;
                     }
                 );

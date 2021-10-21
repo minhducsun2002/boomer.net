@@ -14,7 +14,10 @@ namespace Pepper.Structures.External.Osu
             this.beatmap = beatmap;
 
             // beatmap.BeatmapInfo.Ruleset = ;
-            if (beatmapId.HasValue) beatmap.BeatmapInfo.OnlineBeatmapID = beatmapId;
+            if (beatmapId.HasValue)
+            {
+                beatmap.BeatmapInfo.OnlineBeatmapID = beatmapId;
+            }
         }
 
         public string GetOnlineUrl(bool forceFullUrl = false)
@@ -26,11 +29,15 @@ namespace Pepper.Structures.External.Osu
             }
             catch
             {
-                if (forceFullUrl) throw;
+                if (forceFullUrl)
+                {
+                    throw;
+                }
+
                 return $"https://osu.ppy.sh/b/{beatmap.BeatmapInfo.OnlineBeatmapID}";
             }
         }
-        
+
         protected override IBeatmap GetBeatmap() => beatmap;
         protected override Texture GetBackground() => null!;
         protected override Track GetBeatmapTrack() => null!;

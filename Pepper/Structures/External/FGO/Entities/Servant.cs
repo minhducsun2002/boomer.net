@@ -36,7 +36,7 @@ namespace Pepper.Structures.External.FGO.Entities
             traits.Remove(attribute);
             return traits.ToArray();
         }
-        
+
         public LocalEmbed BaseEmbed()
         {
             return new LocalEmbed

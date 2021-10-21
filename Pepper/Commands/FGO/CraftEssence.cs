@@ -21,31 +21,36 @@ namespace Pepper.Commands.FGO
             IList<LocalEmbed> embeds, Snowflake? messageId = null
         ) : base(new LocalMessage { Embeds = new List<LocalEmbed> { embeds[0] } })
         {
-            if (messageId != null) TemplateMessage = TemplateMessage.WithReply(messageId.Value);
+            if (messageId != null)
+            {
+                TemplateMessage = TemplateMessage.WithReply(messageId.Value);
+            }
+
             if (embeds.Count > 1)
             {
                 var button = new ButtonViewComponent(e =>
                 {
                     isMLBPage = !isMLBPage;
                     e.Button.Label = isMLBPage ? "Switch to base effect" : "Switch to MLB effects";
-                    TemplateMessage.Embeds = new List<LocalEmbed> {embeds[isMLBPage ? 1 : 0]};
+                    TemplateMessage.Embeds = new List<LocalEmbed> { embeds[isMLBPage ? 1 : 0] };
                     ReportChanges();
                     return default;
                 })
                 {
                     Label = "Switch to MLB effect",
                     Style = LocalButtonComponentStyle.Primary,
-                    Row = 1, Position = 0
+                    Row = 1,
+                    Position = 0
                 };
-                
+
                 AddComponent(button);
             }
         }
     }
-    
+
     public class CraftEssence : FGODataCommand
     {
-        public CraftEssence(MasterDataService m, TraitService t) : base(m, t) {}
+        public CraftEssence(MasterDataService m, TraitService t) : base(m, t) { }
 
         [Command("ce", "show-craft-essence")]
         [Description("View information about a certain Craft Essence.")]
@@ -55,11 +60,11 @@ namespace Pepper.Commands.FGO
             IMasterDataProvider jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
             var ce = jp.GetCraftEssenceById(ceIdentity)!;
             var localizedName = na.GetCraftEssenceById(ceIdentity)?.MstSvt.Name;
-            
+
             var title = $"{ce.MstSvt.CollectionNo}. {localizedName ?? ce.MstSvt.Name} (`{ce.MstSvt.ID}`)";
             var author = $"Cost : {ce.MstSvt.Cost}";
 
-            var _ = new[] {ce.BaseSkills, ce.MLBSkills}
+            var _ = new[] { ce.BaseSkills, ce.MLBSkills }
                 .Select(skills => skills.SelectMany(skill =>
                         new SkillRenderer(skill.MstSkill, jp, skill).ResolveEffects(TraitService).Item1
                             .Select(kv => kv.Serialize()))
@@ -78,6 +83,7 @@ namespace Pepper.Commands.FGO
                     }
                 };
                 if (ce.MLBSkills.Length != 0)
+                {
                     embeds.Add(
                         new LocalEmbed
                         {
@@ -86,7 +92,8 @@ namespace Pepper.Commands.FGO
                             Description = mlbEffects,
                             Footer = new LocalEmbedFooter { Text = $"MLB {(ce.MLBSkills.Length > 1 ? "effect".Pluralize() : "effects")}" }
                         });
-                
+                }
+
                 return View(new CEView(embeds, Context.Message.Id));
             }
 
@@ -106,7 +113,7 @@ namespace Pepper.Commands.FGO
                         {
                             Name = $"MLB {(ce.BaseSkills.Length > 1 ? "effect".Pluralize() : "effects")}",
                             Value = mlbEffects
-                        } 
+                        }
                         : null)
                 }.Where(embed => embed != null).ToList()
             });

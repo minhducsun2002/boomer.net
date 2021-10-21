@@ -15,11 +15,11 @@ namespace Pepper.Commands.FGO
     {
         private static readonly LocalEmbedField Blank = new();
 
-        public ServantSkill(MasterDataService m, TraitService t, ItemNamingService i, ServantNamingService n) : base(m, t, i, n) {}
+        public ServantSkill(MasterDataService m, TraitService t, ItemNamingService i, ServantNamingService n) : base(m, t, i, n) { }
 
         [Command("skill", "sk", "skills", "servant-skill", "servant-skills")]
         [Description("Show skills of a servant")]
-        public DiscordCommandResult Exec([Remainder] [Description("A servant name, ID, or in-game number.")] ServantIdentity servantIdentity)
+        public DiscordCommandResult Exec([Remainder][Description("A servant name, ID, or in-game number.")] ServantIdentity servantIdentity)
         {
             IMasterDataProvider jp = MasterDataService.Connections[Region.JP],
                                         na = MasterDataService.Connections[Region.NA];
@@ -37,7 +37,11 @@ namespace Pepper.Commands.FGO
 
             foreach (var position in records)
             {
-                if (outputFields.Count != 0) outputFields.Add(Blank.WithBlankName().WithBlankValue());
+                if (outputFields.Count != 0)
+                {
+                    outputFields.Add(Blank.WithBlankName().WithBlankValue());
+                }
+
                 var skills = position.Select(mapping =>
                     {
                         var skill = jp.GetSkillById(mapping.SkillId);
@@ -53,17 +57,18 @@ namespace Pepper.Commands.FGO
 
                         var reference = new StringBuilder();
                         foreach (var (referencedSkill, description) in referencedSkills)
+                        {
                             if (!referencedSkillIds.Contains(referencedSkill.MstSkill.ID))
                             {
                                 referencedSkillIds.Add(referencedSkill.MstSkill.ID);
                                 reference.AppendLine(
-                                    $"[Skill {referencedSkill.MstSkill.ID}]\n" 
+                                    $"[Skill {referencedSkill.MstSkill.ID}]\n"
                                     + string.Join("\n", description.Select(line => $"→ {line}"))
                                     + "\n"
                                 );
                             }
-                        
-                        
+                        }
+
                         return new LocalEmbedField
                         {
                             Name = $"{skill.MstSkill.Name} ({string.Join("-", levels)})",
@@ -71,7 +76,7 @@ namespace Pepper.Commands.FGO
                         };
                     })
                     .ToList();
-                
+
                 outputFields.AddRange(skills);
             }
 

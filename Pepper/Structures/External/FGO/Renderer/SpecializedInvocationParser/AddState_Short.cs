@@ -23,7 +23,7 @@ namespace Pepper.Structures.External.FGO.Renderer
             public TreasureDeviceMutationType? CountMutationType;
             public TreasureDeviceMutationType? AmountMutationType;
         }
-        
+
         public static (string, Dictionary<string, string[]>, string[], Dictionary<string, TreasureDeviceMutationType>) AddState_Short(
             MstFunc function, MstBuff buff, Dictionary<string, string[]> values,
             ITraitNameProvider traitProvider,
@@ -31,7 +31,7 @@ namespace Pepper.Structures.External.FGO.Renderer
         )
         {
             mutationTypeHint ??= new();
-            
+
             var funcType = function.Type;
             var output = new HumanizedEntry();
             var extra = new List<string>();
@@ -47,12 +47,19 @@ namespace Pepper.Structures.External.FGO.Renderer
                 _ => throw new ArgumentException(
                     $"{nameof(funcType)} must be either AddState or AddStateShort. Received {funcType}")
             };
-            
+
             if (Enum.IsDefined(typeof(BuffList.TYPE), buff.Type))
+            {
                 if (!TypeNames.BuffNames.TryGetValue((BuffList.TYPE) buff.Type, out buffName))
+                {
                     buffName = $"[buffType ${buff.Type}]";
-            
-            if (values.ContainsKey("Turn")) output.Turn = values["Turn"].Distinct().Select(int.Parse).ToArray();
+                }
+            }
+
+            if (values.ContainsKey("Turn"))
+            {
+                output.Turn = values["Turn"].Distinct().Select(int.Parse).ToArray();
+            }
 
             var skillTriggerChances =
                 values.TryGetValue("UseRate", out var useRate)
@@ -68,32 +75,51 @@ namespace Pepper.Structures.External.FGO.Renderer
                     extraStats["Skill trigger chance"] = skillTriggerChances.Select(chance => $"{chance}%").ToArray();
                     var useRateMutationType = mutationTypeHint.ResolveMutationType("UseRate");
                     if (useRateMutationType.HasValue)
+                    {
                         extraStatsMutationTypeHint["Skill trigger chance"] = useRateMutationType.Value;
+                    }
+
                     break;
             }
-            
+
             if (Enum.IsDefined(typeof(BuffList.TYPE), buff.Type))
+            {
                 switch ((BuffList.TYPE) buff.Type)
                 {
-                    case BuffList.TYPE.UP_TOLERANCE:     case BuffList.TYPE.DOWN_TOLERANCE:
-                    case BuffList.TYPE.UP_COMMANDALL:    case BuffList.TYPE.DOWN_COMMANDALL:
-                    case BuffList.TYPE.UP_GRANTSTATE:    case BuffList.TYPE.DOWN_GRANTSTATE:
-                    case BuffList.TYPE.UP_CRITICALPOINT: case BuffList.TYPE.DOWN_CRITICALPOINT:
-                    case BuffList.TYPE.UP_CRITICALRATE:  case BuffList.TYPE.DOWN_CRITICALRATE:
-                    case BuffList.TYPE.UP_CRITICALDAMAGE:case BuffList.TYPE.DOWN_CRITICALDAMAGE:
-                    case BuffList.TYPE.UP_DAMAGE:        case BuffList.TYPE.DOWN_DAMAGE:
-                    case BuffList.TYPE.UP_GAIN_HP:       case BuffList.TYPE.DOWN_GAIN_HP:
-                    case BuffList.TYPE.UP_DEFENCE:       case BuffList.TYPE.DOWN_DEFENCE:
+                    case BuffList.TYPE.UP_TOLERANCE:
+                    case BuffList.TYPE.DOWN_TOLERANCE:
+                    case BuffList.TYPE.UP_COMMANDALL:
+                    case BuffList.TYPE.DOWN_COMMANDALL:
+                    case BuffList.TYPE.UP_GRANTSTATE:
+                    case BuffList.TYPE.DOWN_GRANTSTATE:
+                    case BuffList.TYPE.UP_CRITICALPOINT:
+                    case BuffList.TYPE.DOWN_CRITICALPOINT:
+                    case BuffList.TYPE.UP_CRITICALRATE:
+                    case BuffList.TYPE.DOWN_CRITICALRATE:
+                    case BuffList.TYPE.UP_CRITICALDAMAGE:
+                    case BuffList.TYPE.DOWN_CRITICALDAMAGE:
+                    case BuffList.TYPE.UP_DAMAGE:
+                    case BuffList.TYPE.DOWN_DAMAGE:
+                    case BuffList.TYPE.UP_GAIN_HP:
+                    case BuffList.TYPE.DOWN_GAIN_HP:
+                    case BuffList.TYPE.UP_DEFENCE:
+                    case BuffList.TYPE.DOWN_DEFENCE:
                     case BuffList.TYPE.UP_GIVEGAIN_HP:
-                    case BuffList.TYPE.UP_DAMAGEDROPNP:  case BuffList.TYPE.DOWN_DAMAGEDROPNP:
-                    case BuffList.TYPE.UP_DROPNP:        case BuffList.TYPE.DOWN_DROPNP:
+                    case BuffList.TYPE.UP_DAMAGEDROPNP:
+                    case BuffList.TYPE.DOWN_DAMAGEDROPNP:
+                    case BuffList.TYPE.UP_DROPNP:
+                    case BuffList.TYPE.DOWN_DROPNP:
                     case BuffList.TYPE.UP_RESIST_INSTANTDEATH:
-                    case BuffList.TYPE.UP_NPDAMAGE:      case BuffList.TYPE.DOWN_NPDAMAGE:
-                    case BuffList.TYPE.UP_COMMANDATK:    case BuffList.TYPE.DOWN_COMMANDATK:
-                    case BuffList.TYPE.UP_STARWEIGHT:    case BuffList.TYPE.DOWN_STARWEIGHT:
+                    case BuffList.TYPE.UP_NPDAMAGE:
+                    case BuffList.TYPE.DOWN_NPDAMAGE:
+                    case BuffList.TYPE.UP_COMMANDATK:
+                    case BuffList.TYPE.DOWN_COMMANDATK:
+                    case BuffList.TYPE.UP_STARWEIGHT:
+                    case BuffList.TYPE.DOWN_STARWEIGHT:
                     case BuffList.TYPE.UP_GRANT_INSTANTDEATH:
                     case BuffList.TYPE.UP_FUNC_HP_REDUCE:
-                    case BuffList.TYPE.UP_ATK:           case BuffList.TYPE.DOWN_ATK:
+                    case BuffList.TYPE.UP_ATK:
+                    case BuffList.TYPE.DOWN_ATK:
                     case BuffList.TYPE.UP_TOLERANCE_SUBSTATE:
                     case BuffList.TYPE.GUTS_RATIO:
                     case BuffList.TYPE.DOWN_DEFENCECOMMANDALL:
@@ -102,7 +128,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                         output.CountMutationType = mutationTypeHint.ResolveMutationType("Count");
                         output.AmountMutationType = mutationTypeHint.ResolveMutationType("Value");
                         break;
-                    case BuffList.TYPE.REDUCE_HP:        case BuffList.TYPE.REGAIN_HP:
+                    case BuffList.TYPE.REDUCE_HP:
+                    case BuffList.TYPE.REGAIN_HP:
                     case BuffList.TYPE.GUTS:
                     case BuffList.TYPE.UP_CHAGETD:
                         output.Count = values["Count"].Select(int.Parse).ToArray();
@@ -121,7 +148,8 @@ namespace Pepper.Structures.External.FGO.Renderer
                     case BuffList.TYPE.ADD_DAMAGE:
                     case BuffList.TYPE.REGAIN_STAR:
                     case BuffList.TYPE.UP_DAMAGE_INDIVIDUALITY_ACTIVEONLY:
-                    case BuffList.TYPE.ADD_MAXHP:        case BuffList.TYPE.SUB_MAXHP:
+                    case BuffList.TYPE.ADD_MAXHP:
+                    case BuffList.TYPE.SUB_MAXHP:
                     case BuffList.TYPE.OVERWRITE_CLASSRELATIO_ATK:
                     case BuffList.TYPE.SUB_SELFDAMAGE:
                         output.Amount = values["Value"].Select(value => $"{int.Parse(value)}").ToArray();
@@ -170,21 +198,30 @@ namespace Pepper.Structures.External.FGO.Renderer
                         );
                         break;
                 }
+            }
 
-            output.Amount = output.Amount.Distinct().ToArray(); 
+            output.Amount = output.Amount.Distinct().ToArray();
             output.Chance = output.Chance.Distinct().ToArray();
             output.Turn = output.Turn.Distinct().ToArray();
             output.Count = output.Count.Distinct().ToArray();
-            
+
             string amount = "", limits = "";
 
-            foreach (var (limitType, data) in new[] {("turn", output.Turn), ("time", output.Count)})
+            foreach (var (limitType, data) in new[] { ("turn", output.Turn), ("time", output.Count) })
             {
-                if (data.Length != 1) continue;
-                if (data[0] < 1) continue;
+                if (data.Length != 1)
+                {
+                    continue;
+                }
+
+                if (data[0] < 1)
+                {
+                    continue;
+                }
+
                 limits += (string.IsNullOrEmpty(limits) ? "" : ", ") + $"**{data[0]}** {limitType}{(data[0] > 1 ? "s" : "")}";
             }
-            
+
             switch (output.Amount.Length)
             {
                 case 1:
@@ -193,36 +230,47 @@ namespace Pepper.Structures.External.FGO.Renderer
                     break;
                 case > 1:
                     if (output.AmountMutationType.HasValue)
+                    {
                         extraStatsMutationTypeHint[buffName!] = output.AmountMutationType.Value;
+                    }
+
                     extraStats[buffName!] = output.Amount;
                     break;
             }
 
             string ckSelfIndv = "";
             if (buff.CkSelfIndv.Length != 0)
+            {
                 ckSelfIndv = $" for {string.Join(" & ", buff.CkSelfIndv.Select(trait => $"{traitProvider.GetTrait(trait)}"))}";
+            }
 
             string ckOpIndv = "";
             if (buff.CkOpIndv.Length != 0)
+            {
                 ckOpIndv = $" against {string.Join(" & ", buff.CkOpIndv.Select(t => traitProvider.GetTrait(t)))}";
-            
+            }
+
             var zippedOutput = $"**{baseAction} [{buffName}{ckSelfIndv}{ckOpIndv}]** "
                                + (string.IsNullOrWhiteSpace(amount) ? "" : $"{amountPreposition} " + $"**{amount}**")
                                + (string.IsNullOrWhiteSpace(limits) ? "" : $" ({limits})");
 
             if (function.Tvals.Length != 0)
+            {
                 extra.Add(
                     "Only applies for "
                     + string.Join(" & ", function.Tvals.Select(tvals => traitProvider.GetTrait(tvals)))
                     + " targets."
                 );
-            
+            }
+
             if (function.QuestTvals.Length != 0)
+            {
                 extra.Add(
                     "Only applies on "
                       + string.Join(" & ", function.QuestTvals.Select(questTvals => traitProvider.GetTrait(questTvals)))
                       + " field."
                 );
+            }
 
             return (zippedOutput.Trim(), extraStats, extra.ToArray(), extraStatsMutationTypeHint);
         }

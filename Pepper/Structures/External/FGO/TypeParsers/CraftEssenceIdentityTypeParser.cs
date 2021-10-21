@@ -23,16 +23,16 @@ namespace Pepper.Structures.External.FGO.TypeParsers
             if (int.TryParse(value, out var numericIdentity))
             {
                 var result = ResolveNumericIdentifier(numericIdentity, masterDataService);
-                return result == null 
-                    ? Failure($"Could not find a craft essence with collectionNo/ID {numericIdentity}.") 
+                return result == null
+                    ? Failure($"Could not find a craft essence with collectionNo/ID {numericIdentity}.")
                     : Success(new CraftEssenceIdentity { CraftEssenceId = result.MstSvt.ID });
             }
 
             var search = craftEssenceNamingService.Namings.FuzzySearch(value.ToLowerInvariant());
-            
+
             return Success(new CraftEssenceIdentity { CraftEssenceId = search.First().Element.Key });
         }
-        
+
         private static CraftEssence? ResolveNumericIdentifier(int idOrCollectionNo, MasterDataService masterDataService)
         {
             var jp = masterDataService.Connections[Region.JP];

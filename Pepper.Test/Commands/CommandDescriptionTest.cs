@@ -24,8 +24,12 @@ namespace Pepper.Test.Commands
             var _ = Pepper.VersionHash;
             var commandService = new CommandService();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
                 if (assembly.FullName.StartsWith("Pepper"))
+                {
                     commandService.AddModules(assembly, null, Pepper.DownlevelAttributes);
+                }
+            }
 
             return type switch
             {
@@ -37,7 +41,7 @@ namespace Pepper.Test.Commands
             };
         }
     }
-    
+
     public class CommandDescriptionTest
     {
         private readonly ITestOutputHelper testOutputHelper;

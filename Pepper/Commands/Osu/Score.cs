@@ -18,14 +18,14 @@ namespace Pepper.Commands.Osu
 {
     public class Score : OsuScoreCommand
     {
-        public Score(APIService s, BeatmapContextProviderService b) : base(s, b) {}
+        public Score(APIService s, BeatmapContextProviderService b) : base(s, b) { }
 
         [Command("sc", "score", "scores", "c", "check")]
         [Description("View/list scores on a certain map")]
         [Priority(1)]
         public async Task<DiscordCommandResult> BeatmapBased(
             [Description("A score URL, a beatmap URL, or a beatmap ID.")] IBeatmapResolvable beatmapResolvable,
-            [Remainder] [Description("Username to check. Default to your username, if set.")] Username? username = null
+            [Remainder][Description("Username to check. Default to your username, if set.")] Username? username = null
         )
         {
 
@@ -35,7 +35,7 @@ namespace Pepper.Commands.Osu
                 var map = await APIService.GetBeatmap(mapId);
                 var ruleset = RulesetTypeParser.SupportedRulesets[map.BeatmapInfo.RulesetID];
                 SetBeatmapContext(mapId);
-                
+
                 var (user, _, _) = await APIService.GetUser(username, ruleset.RulesetInfo);
                 var scores = await APIService.GetLegacyBeatmapScores(
                     user.Id,
@@ -43,7 +43,10 @@ namespace Pepper.Commands.Osu
                     ruleset.RulesetInfo
                 );
 
-                if (scores.Count == 0) return Reply($"No score found on that beatmap for user `{username.Content}`.");
+                if (scores.Count == 0)
+                {
+                    return Reply($"No score found on that beatmap for user `{username.Content}`.");
+                }
 
                 var difficultyCalculator = ruleset.CreateDifficultyCalculator(map);
                 var difficulty = difficultyCalculator.Calculate();
@@ -60,10 +63,11 @@ namespace Pepper.Commands.Osu
                             var mods = ruleset.ConvertFromLegacyMods((LegacyMods) score.Mods)!.ToArray();
                             var pp = score.PerformancePoints;
                             if (!pp.HasValue)
+                            {
                                 try
                                 {
                                     var scoreInfo = new ScoreInfo
-                                        {Mods = mods, MaxCombo = score.MaxCombo!.Value, Accuracy = score.Accuracy};
+                                    { Mods = mods, MaxCombo = score.MaxCombo!.Value, Accuracy = score.Accuracy };
                                     var performanceCalculator = GetPerformanceCalculator(
                                         (int) score.GameMode,
                                         difficultyCalculator.Calculate(mods),
@@ -73,6 +77,7 @@ namespace Pepper.Commands.Osu
                                     localPP = true;
                                 }
                                 catch { /* ignore */ }
+                            }
 
                             return
                                 $"[**{score.Rank}**] **{pp}**pp{(localPP ? " (?)" : "")} (**{score.MaxCombo}**x | **{score.Accuracy:F3}**%)"
@@ -89,8 +94,12 @@ namespace Pepper.Commands.Osu
                     }
                 });
             }
-            
-            if (username == null) throw new ArgumentException("No username is passed!");
+
+            if (username == null)
+            {
+                throw new ArgumentException("No username is passed!");
+            }
+
             throw new ArgumentException("A valid beatmap-resolvable must be passed!");
         }
 

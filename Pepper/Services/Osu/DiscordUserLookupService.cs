@@ -17,7 +17,7 @@ namespace Pepper.Services.Osu
         [BsonElement("discordUserId")] public string DiscordUserId;
         [BsonElement("osuUsername")] public string OsuUsername;
     }
-    
+
     public class DiscordOsuUsernameLookupService : Service
     {
         private MongoClient client = null!;
@@ -60,21 +60,35 @@ namespace Pepper.Services.Osu
             });
 
             cache.TryRemove(uid);
-            if (results?.OsuUsername != null) cache.AddOrUpdate(uid, results.OsuUsername);
+            if (results?.OsuUsername != null)
+            {
+                cache.AddOrUpdate(uid, results.OsuUsername);
+            }
+
             return results;
         }
 
         public async Task<Dictionary<ulong, string>> GetManyUsers(params ulong[] discordUserIds)
         {
-            if (discordUserIds.Length == 0) return new Dictionary<ulong, string>();
+            if (discordUserIds.Length == 0)
+            {
+                return new Dictionary<ulong, string>();
+            }
 
-            var output = new Dictionary<ulong, string>(); 
+            var output = new Dictionary<ulong, string>();
             var uncached = new List<ulong>();
-            
+
             foreach (var uid in discordUserIds)
+            {
                 if (cache.TryGet(uid.ToString(), out var username))
+                {
                     output[uid] = username;
-                else uncached.Add(uid);
+                }
+                else
+                {
+                    uncached.Add(uid);
+                }
+            }
 
             var usernames = uncached
                 .Where(uid => !output.ContainsKey(uid))
@@ -84,20 +98,27 @@ namespace Pepper.Services.Osu
                 ))
                 .SelectMany(filterExpression => Collection.Find(filterExpression).ToList());
 
-            foreach (var record in usernames) output[ulong.Parse(record.DiscordUserId)] = record.OsuUsername;
+            foreach (var record in usernames)
+            {
+                output[ulong.Parse(record.DiscordUserId)] = record.OsuUsername;
+            }
+
             foreach (var (uid, username) in output)
             {
                 cache.TryRemove(uid.ToString());
                 cache.AddOrUpdate(uid.ToString(), username);
-            }                
+            }
             return output;
         }
-        
+
         public async Task<string?> GetUser(ulong discordUserId)
         {
             var userId = discordUserId.ToString();
-            if (cache.TryGet(userId, out var @return)) return @return;
-            
+            if (cache.TryGet(userId, out var @return))
+            {
+                return @return;
+            }
+
             var filter = Builders<DiscordOsuUsernameRecord>.Filter.Eq(record => record.DiscordUserId, userId);
             var results = Collection.Find(filter);
             var count = await results.CountDocumentsAsync();
@@ -111,7 +132,7 @@ namespace Pepper.Services.Osu
             Log.Debug($"Found username \"{username}\" bound to user ID \"{userId}\".");
             cache.AddOrUpdate(userId, username);
             return username;
-            
+
         }
     }
 }

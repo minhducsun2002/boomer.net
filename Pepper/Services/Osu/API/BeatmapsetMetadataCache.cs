@@ -14,15 +14,18 @@ namespace Pepper.Services.Osu.API
         public async Task<APIBeatmapSet> GetBeatmapsetInfo(long id, bool isBeatmapSetId)
         {
             var key = id + "-" + (isBeatmapSetId ? "1" : "0");
-            if (cache.TryGet(key, out var @return)) return @return;
-            
+            if (cache.TryGet(key, out var @return))
+            {
+                return @return;
+            }
+
             var res = await HttpClient.GetStringAsync(
                 $"https://osu.ppy.sh/{(isBeatmapSetId ? "beatmapsets" : "beatmaps")}/{id}"
             );
 
             var doc = new HtmlDocument(); doc.LoadHtml(res);
             var obj = JsonConvert.DeserializeObject<APIBeatmapSet>(doc.GetElementbyId("json-beatmapset").InnerText)!;
-            
+
             cache.AddOrUpdate(key, obj);
             return obj;
         }

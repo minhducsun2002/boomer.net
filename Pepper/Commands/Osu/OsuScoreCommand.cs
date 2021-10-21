@@ -18,7 +18,7 @@ namespace Pepper.Commands.Osu
 {
     public abstract class OsuScoreCommand : BeatmapContextCommand
     {
-        protected OsuScoreCommand(APIService s, BeatmapContextProviderService b) : base(s, b) {}
+        protected OsuScoreCommand(APIService s, BeatmapContextProviderService b) : base(s, b) { }
 
         protected async Task<DiscordCommandResult> SingleScore(APILegacyScoreInfo sc)
         {
@@ -83,12 +83,12 @@ namespace Pepper.Commands.Osu
             double? fullComboPP = pp;
             var calculated = false;
             var rulesetId = ruleset.RulesetInfo.ID!.Value;
-            
+
             if (!pp.HasValue || !perfect)
             {
                 if (!pp.HasValue)
                 {
-                    var score = new ScoreInfo {Mods = mods, MaxCombo = scoreMaxCombo, Accuracy = accuracy};
+                    var score = new ScoreInfo { Mods = mods, MaxCombo = scoreMaxCombo, Accuracy = accuracy };
                     score.SetStatistics(statistics);
                     var performanceCalculator = GetPerformanceCalculator(rulesetId, difficulty, score);
                     pp = performanceCalculator.Calculate();
@@ -97,7 +97,7 @@ namespace Pepper.Commands.Osu
 
                 if (!perfect)
                 {
-                    var fcScore = new ScoreInfo {Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = accuracy};
+                    var fcScore = new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = accuracy };
                     fcScore.SetStatistics(statistics);
                     fcScore.SetCount300((int) (fcScore.GetCount300() + fcScore.GetCountMiss())!);
                     fcScore.SetCountMiss(0);

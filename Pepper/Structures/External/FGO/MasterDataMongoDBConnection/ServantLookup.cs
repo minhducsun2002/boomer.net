@@ -16,7 +16,7 @@ namespace Pepper.Structures.External.FGO
             var svt = hint ?? MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", id)).First();
             var limits = MstSvtLimit.FindSync(Builders<MstSvtLimit>.Filter.Eq("svtId", id)).ToList().ToArray();
             var @class = MstClass.FindSync(Builders<MstClass>.Filter.Eq("id", svt.ClassId),
-                new FindOptions<MstClass> {Limit = 1}).First();
+                new FindOptions<MstClass> { Limit = 1 }).First();
             var attributes = GetAttributeLists();
             var cards = MstSvtCard.FindSync(Builders<MstSvtCard>.Filter.Eq("svtId", id)).ToList().ToArray();
             return new BaseServant(svt, limits, @class, svt.Traits.First(attributes.Contains), cards);
@@ -32,7 +32,7 @@ namespace Pepper.Structures.External.FGO
                 Builders<MstSvt>.Filter.Eq("collectionNo", collectionNo),
                 servantTypeFilter
             )).FirstOrDefault();
-        
+
         public MstSvt? GetServantEntityById(int id) => MstSvt.FindSync(Builders<MstSvt>.Filter.Eq("baseSvtId", id)).FirstOrDefault();
 
         public ServantLimits GetServantLimits(int servantId)

@@ -16,22 +16,22 @@ namespace Pepper.Commands.Osu
 {
     public class NetGain : OsuCommand
     {
-        public NetGain(APIService service) : base(service) {}
-        
-        private class ScoreComparer: IComparer<APILegacyScoreInfo>
+        public NetGain(APIService service) : base(service) { }
+
+        private class ScoreComparer : IComparer<APILegacyScoreInfo>
         {
             public int Compare(APILegacyScoreInfo? x, APILegacyScoreInfo? y)
             {
                 return (y?.PP ?? 0).CompareTo(x?.PP ?? 0);
             }
-            
+
             public static ScoreComparer Instance = new();
         }
-        
+
         [Command("whatif", "if", "netgain")]
         [Description("What if you set a score with a certain pp amount?")]
         public async Task<DiscordCommandResult> Exec(
-            [Flag("/")] [Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
+            [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
             [Description("The amount of pp to check.")] int ppToCheck,
             [Description("Username to check. Default to your username, if set.")] Username username = null!
         )
@@ -54,22 +54,27 @@ namespace Pepper.Commands.Osu
                 Title = $"Setting a new {ppToCheck}pp score would change by +{next - previous:0.##}pp to {next + bonus:0.##}pp",
                 Description = ""
             };
-            
+
             if (ppToCheck > sortedScores[0].PP!.Value)
             {
                 embed.Description += "\nThis will be the new __**best**__ play. The best play currently is :";
                 embed.Fields = new List<LocalEmbedField> { Scoreset.SerializeScoreInList(sortedScores[0]) };
-            } 
+            }
             else if (ppToCheck < sortedScores[^1].PP!.Value)
+            {
                 embed.Description += "\nThis play won't appear on the best performance list.";
+            }
             else
             {
                 var scoreToCompare = new APILegacyScoreInfo { PP = ppToCheck };
                 var lowerIndex = Array.BinarySearch(scores, scoreToCompare, ScoreComparer.Instance);
-                if (lowerIndex < 0) lowerIndex = ~lowerIndex;
+                if (lowerIndex < 0)
+                {
+                    lowerIndex = ~lowerIndex;
+                }
 
                 embed.Description += $"\nThis will be the new #__**{lowerIndex}**__ play. Here's how it will change :";
-                
+
                 embed.Fields = new List<LocalEmbedField>
                 {
                     Scoreset.SerializeScoreInList(sortedScores[lowerIndex - 1]),
@@ -77,7 +82,7 @@ namespace Pepper.Commands.Osu
                     Scoreset.SerializeScoreInList(sortedScores[lowerIndex])
                 };
             }
-            
+
             return Reply(embed);
         }
     }

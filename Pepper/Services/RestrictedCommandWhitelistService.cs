@@ -15,7 +15,7 @@ namespace Pepper.Services
         [BsonElement("commandId")] public string CommandIdentifier = "";
         [BsonElement("guildId")] public string GuildId = "";
     }
-    
+
     public class RestrictedCommandWhitelistService : Service
     {
         private readonly IMongoCollection<Record> collection;
@@ -46,7 +46,7 @@ namespace Pepper.Services
                     .Add(guildId)
             );
         }
-        
+
         public void RemoveAllowedGuild(string commandIdentifier, string guildId)
         {
             collection.FindOneAndDelete(record => record.CommandIdentifier == commandIdentifier && record.GuildId == guildId);
@@ -56,18 +56,24 @@ namespace Pepper.Services
                     .Remove(guildId)
             );
         }
-        
+
         public ImmutableHashSet<string> GetAllowedGuilds(string commandIdentifier)
         {
-            if (cache.TryGet(commandIdentifier, out var guilds)) return guilds;
-            
+            if (cache.TryGet(commandIdentifier, out var guilds))
+            {
+                return guilds;
+            }
+
             var result = collection.FindSync(record => record.CommandIdentifier == commandIdentifier)
                 .ToList()
                 .Select(record => record.GuildId)
                 .ToImmutableHashSet();
-            
-            if (result.Count != 0) cache.AddOrUpdate(commandIdentifier, result);
-            
+
+            if (result.Count != 0)
+            {
+                cache.AddOrUpdate(commandIdentifier, result);
+            }
+
             return result;
         }
     }

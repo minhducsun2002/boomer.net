@@ -16,29 +16,35 @@ namespace Pepper.Services.Osu.API
         private readonly FastConcurrentLru<int, byte[]> cache = new(200);
 
         public int CachedCount => cache.Count;
-        
+
         private WorkingBeatmap decodeBeatmapFile(byte[] file, int beatmapId)
         {
             using var stream = new MemoryStream(file);
             using var streamReader = new LineBufferedReader(stream);
             var workingBeatmap = new WorkingBeatmap(Decoder.GetDecoder<Beatmap>(streamReader).Decode(streamReader));
             if (workingBeatmap.BeatmapInfo.Length.Equals(default))
+            {
                 workingBeatmap.BeatmapInfo.Length = workingBeatmap.Beatmap.HitObjects[^1].StartTime;
+            }
+
             workingBeatmap.BeatmapInfo.Ruleset =
                 RulesetTypeParser.SupportedRulesets[workingBeatmap.BeatmapInfo.RulesetID].RulesetInfo;
             workingBeatmap.BeatmapInfo.OnlineBeatmapID ??= beatmapId;
 
             return workingBeatmap;
         }
-        
+
         public async Task<WorkingBeatmap> GetBeatmap(int beatmapId)
         {
-            if (cache.TryGet(beatmapId, out var @return)) return decodeBeatmapFile(@return, beatmapId);
+            if (cache.TryGet(beatmapId, out var @return))
+            {
+                return decodeBeatmapFile(@return, beatmapId);
+            }
 
             var file = await HttpClient.GetByteArrayAsync($"https://osu.ppy.sh/osu/{beatmapId}");
 
             cache.AddOrUpdate(beatmapId, file);
-            
+
             return decodeBeatmapFile(file, beatmapId);
         }
     }

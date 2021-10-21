@@ -12,7 +12,7 @@ namespace Pepper.Commands.FGO
 {
     public class Traits : FGODataCommand
     {
-        public Traits(MasterDataService m, TraitService t) : base(m, t) {}
+        public Traits(MasterDataService m, TraitService t) : base(m, t) { }
 
         [Command("trait", "traits", "t")]
         [Description("List known traits, or search for one.")]
@@ -26,7 +26,7 @@ namespace Pepper.Commands.FGO
                 var res = TraitService.FuzzySearch.Search(query);
                 listing = res.Select(result => result.Element).ToArray();
             }
-            
+
             var pageProvider = new ArrayPageProvider<KeyValuePair<int, string>>(
                 listing,
                 (_, segment) => new Page().WithEmbeds(new LocalEmbed

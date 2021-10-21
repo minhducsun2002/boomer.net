@@ -21,6 +21,7 @@ namespace Pepper
             foreach (var command in CommandUtilities.EnumerateAllCommands(moduleBuilder))
             {
                 foreach (var attribute in DownleveledAttributes)
+                {
                     if (command.Attributes.All(attrib => attrib.GetType() != attribute))
                     {
                         var module = command.Module;
@@ -36,6 +37,7 @@ namespace Pepper
                             module = module.Parent;
                         }
                     }
+                }
             }
         }
         protected override void MutateModule(ModuleBuilder moduleBuilder)
@@ -43,20 +45,27 @@ namespace Pepper
             DownlevelAttributes(moduleBuilder);
             foreach (var command in CommandUtilities.EnumerateAllCommands(moduleBuilder))
             {
-                if (command.Parameters.Count == 0) continue;
-                
+                if (command.Parameters.Count == 0)
+                {
+                    continue;
+                }
+
                 var lastNotFlag = command.Parameters
                     .LastOrDefault(param => !param.Attributes.OfType<FlagAttribute>().Any());
-                if (lastNotFlag == null || lastNotFlag.IsRemainder) continue;
+                if (lastNotFlag == null || lastNotFlag.IsRemainder)
+                {
+                    continue;
+                }
+
                 Logger.LogDebug(
                     "Parameter \"{0}\" in command \"{1}\" is the last parameter - setting remainder attribute to True.",
                     lastNotFlag.Name, command.Aliases.First());
                 lastNotFlag.IsRemainder = true;
             }
-            
+
             base.MutateModule(moduleBuilder);
         }
-        
+
         protected override ValueTask AddTypeParsersAsync(CancellationToken cancellationToken = default)
         {
             Commands.AddTypeParser(new RulesetTypeParser());

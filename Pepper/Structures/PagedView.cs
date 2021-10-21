@@ -11,31 +11,36 @@ namespace Pepper.Structures
         public PagedView(PageProvider pageProvider, LocalMessage? templateMessage = null) : base(pageProvider, templateMessage)
         {
             if (pageProvider.PageCount <= 1)
+            {
                 ClearComponents();
+            }
             else
             {
                 RemoveComponent(StopButton);
-                FirstPageButton.Label = "<<"; 
+                FirstPageButton.Label = "<<";
                 FirstPageButton.Emoji = null;
                 PreviousPageButton.Label = "<";
                 PreviousPageButton.Emoji = null;
                 NextPageButton.Label = ">";
                 NextPageButton.Emoji = null;
-                LastPageButton.Label = ">>"; 
+                LastPageButton.Label = ">>";
                 LastPageButton.Emoji = null;
             }
         }
 
         protected override void ApplyPageIndex(Page page)
         {
-            if (PageProvider.PageCount > 1) base.ApplyPageIndex(page);
+            if (PageProvider.PageCount > 1)
+            {
+                base.ApplyPageIndex(page);
+            }
         }
     }
 
     public class SelectionPagedView : PagedViewBase
     {
         private readonly Dictionary<int, LocalSelectionComponentOption> details;
-        public SelectionPagedView(IEnumerable<(LocalSelectionComponentOption, Page)> pages, LocalMessage? templateMessage = null) 
+        public SelectionPagedView(IEnumerable<(LocalSelectionComponentOption, Page)> pages, LocalMessage? templateMessage = null)
             : base(PreparePages(pages, out var pageDetails), templateMessage ?? new LocalMessage())
         {
             details = pageDetails;
@@ -82,7 +87,7 @@ namespace Pepper.Structures
             );
 
             details = indexedDetails;
-            
+
             return pageProvider;
         }
     }

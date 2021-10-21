@@ -33,15 +33,15 @@ namespace Pepper.Commands.FGO
                 $"ID {parameterChecksFailedResult.Argument} does not resolve to a valid quest."
             );
     }
-    
+
     public partial class FreeQuest : FGODataCommand
     {
-        public FreeQuest(MasterDataService m, TraitService t) : base(m, t) {}
-        
+        public FreeQuest(MasterDataService m, TraitService t) : base(m, t) { }
+
         [Command("show-free-quest", "q", "ssq", "sfq", "sq")]
         [Description("Show information about a free quest.")]
         public async Task<DiscordCommandResult> Exec(
-            [QuestIdentityCheck] [QuestIdentityCheckFailureFormatter] [Description("A quest ID or quest name.")] QuestIdentity questResolvable
+            [QuestIdentityCheck][QuestIdentityCheckFailureFormatter][Description("A quest ID or quest name.")] QuestIdentity questResolvable
         )
         {
             var na = MasterDataService.Connections[Region.NA];
@@ -103,7 +103,7 @@ namespace Pepper.Commands.FGO
                         });
 
                     return (
-                        new LocalSelectionComponentOption($"Wave {index + 1}", (index + 1).ToString()), 
+                        new LocalSelectionComponentOption($"Wave {index + 1}", (index + 1).ToString()),
                         new Page().WithEmbeds(embed.WithFields(fields))
                     );
                 });

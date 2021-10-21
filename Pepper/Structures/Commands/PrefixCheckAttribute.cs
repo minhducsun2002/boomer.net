@@ -14,12 +14,19 @@ namespace Pepper.Structures.Commands
         {
             var command = context.Command;
             var category = command.Module.Attributes.OfType<PrefixCategoryAttribute>().FirstOrDefault();
-            if (category == null) return Success();
-            
+            if (category == null)
+            {
+                return Success();
+            }
+
             var prefix = context.Prefix.ToString();
             var config = context.Services.GetRequiredService<IConfiguration>();
             var prefixes = config.GetCommandPrefixes(category.PrefixCategory);
-            if (prefixes.Length == 0) return Success();
+            if (prefixes.Length == 0)
+            {
+                return Success();
+            }
+
             return prefixes.Contains(prefix, StringComparer.InvariantCultureIgnoreCase)
                 ? Success()
                 : Failure($"Command {context.Command.Name} cannot be invoked with prefix {prefix}");

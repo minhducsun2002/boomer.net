@@ -12,8 +12,8 @@ namespace Pepper.Services.Osu
 {
     public class BeatmapContextProviderService : Service
     {
-        private static HttpClient httpClient = new();
-        private string? keyValueUrl;
+        private static readonly HttpClient httpClient = new();
+        private readonly string? keyValueUrl;
         private const string key = "beatmap-context";
         public BeatmapContextProviderService(IConfiguration config)
         {
@@ -48,7 +48,7 @@ namespace Pepper.Services.Osu
                     var text = await httpClient.GetStringAsync($"{keyValueUrl}/Data/Get/{key}", cancellationToken);
                     var dict = Deserialize(text);
                     cache = dict;
-                    Log.Information("Restored {0} entries.", dict.Count);   
+                    Log.Information("Restored {0} entries.", dict.Count);
                 }
                 catch (Exception e)
                 {
@@ -56,7 +56,9 @@ namespace Pepper.Services.Osu
                 }
             }
             else
+            {
                 Log.Warning("A key-value store was not configured - no beatmap context synchronization will be carried out.");
+            }
 
             await base.StartAsync(cancellationToken);
         }
@@ -77,7 +79,10 @@ namespace Pepper.Services.Osu
                 }
             }
             else
+            {
                 Log.Warning("A key-value store was not configured - not synchronizing cache back up.");
+            }
+
             await base.StopAsync(cancellationToken);
         }
     }

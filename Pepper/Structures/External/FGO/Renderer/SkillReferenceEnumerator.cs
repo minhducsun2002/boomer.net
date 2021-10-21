@@ -30,9 +30,9 @@ namespace Pepper.Structures.External.FGO.Renderer
                     default:
                         continue;
                 }
-                
+
                 var buff = connection.ResolveBuffAndCache(func.Vals[0])!;
-                
+
                 switch ((BuffList.TYPE) buff.Type)
                 {
                     case BuffList.TYPE.DEAD_FUNCTION:
@@ -45,10 +45,16 @@ namespace Pepper.Structures.External.FGO.Renderer
                         var skillIds = value.Select(values => int.Parse(values["Value"])).Distinct().ToList();
                         foreach (var skillId in skillIds)
                         {
-                            if (init.Contains(skillId)) continue;
+                            if (init.Contains(skillId))
+                            {
+                                continue;
+                            }
+
                             init.Add(skillId);
                             foreach (var referencedSkillId in new SkillReferenceEnumerator(connection.GetSkillById(skillId), connection, ref init).Enumerate())
+                            {
                                 init.Add(referencedSkillId);
+                            }
                         }
                         break;
                     default:

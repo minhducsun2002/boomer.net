@@ -26,12 +26,14 @@ namespace Pepper.Commands.Osu
             Beatmapset = beatmapSet;
             this.apiService = apiService;
         }
-        
+
         public override async ValueTask<Page> GetPageAsync(PagedViewBase view)
         {
             var currentIndex = view.CurrentPageIndex;
             if (!beatmapEmbeds.TryGetValue(currentIndex, out var embed))
+            {
                 embed = beatmapEmbeds[currentIndex] = await PrepareEmbed(Beatmapset, apiService, Beatmapset.Beatmaps[currentIndex].OnlineBeatmapID);
+            }
 
             return new Page().WithEmbeds(embed);
         }
@@ -49,7 +51,7 @@ namespace Pepper.Commands.Osu
             var data = new List<(double, double)>();
             for (var current = AccStart; current <= AccEnd; current += AccStep)
             {
-                var fcScore = new ScoreInfo {MaxCombo = difficulty.MaxCombo, Accuracy = current / 100};
+                var fcScore = new ScoreInfo { MaxCombo = difficulty.MaxCombo, Accuracy = current / 100 };
                 fcScore.SetCountMiss(0);
                 var pp = OsuCommand.GetPerformanceCalculator(beatmap.Ruleset, difficulty, fcScore).Calculate();
                 data.Add((current, pp));
@@ -57,7 +59,8 @@ namespace Pepper.Commands.Osu
 
             var chart = new QuickChart.Chart
             {
-                Height = 300, Width = 500,
+                Height = 300,
+                Width = 500,
                 Config = $@"{{
                     type: 'line',
                     data: {{
@@ -96,7 +99,7 @@ namespace Pepper.Commands.Osu
             };
         }
     }
-    
+
     internal class BeatmapSingleView : PagedViewBase
     {
         private readonly APIBeatmapSet beatmapset;
@@ -106,7 +109,7 @@ namespace Pepper.Commands.Osu
             beatmapset = pageProvider.Beatmapset;
             beatmapIdToIndex = beatmapset.Beatmaps.Select((beatmap, index) => (beatmap.OnlineBeatmapID, index))
                 .ToDictionary(pair => pair.OnlineBeatmapID, pair => pair.index);
-            
+
             CurrentPageIndex = beatmapIdToIndex[initialBeatmapId];
             var select = new SelectionViewComponent(async e =>
             {

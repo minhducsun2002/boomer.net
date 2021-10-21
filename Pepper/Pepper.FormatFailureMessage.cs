@@ -13,8 +13,11 @@ namespace Pepper
     {
         protected override LocalMessage FormatFailureMessage(DiscordCommandContext context, FailedResult result)
         {
-            if (result is CommandNotFoundResult) return null!;
-        
+            if (result is CommandNotFoundResult)
+            {
+                return null!;
+            }
+
             var content = "I'm sorry, an error occurred.";
             var embed = new LocalEmbed
             {
@@ -28,20 +31,20 @@ namespace Pepper
                 case CommandExecutionFailedResult executionFailedResult:
                     var exception = executionFailedResult.Exception;
                     var stackTrace = exception.StackTrace!.Split('\n');
-                    
+
                     content = "I'm sorry, an error occurred executing your command.";
                     embed.Description = $"```{exception.Message}\n{string.Join('\n', stackTrace.Take(4))}```";
                     break;
                 case TypeParseFailedResult typeParseFailedResult:
-                {
-                    if (typeParseFailedResult.TryFormatFailure(out var res))
                     {
-                        return res!;
-                    }
-                    var parameter = typeParseFailedResult.Parameter;
+                        if (typeParseFailedResult.TryFormatFailure(out var res))
+                        {
+                            return res!;
+                        }
+                        var parameter = typeParseFailedResult.Parameter;
 
-                    content = "I'm sorry, an error occurred parsing your argument.";
-                    embed.Fields = new List<LocalEmbedField>
+                        content = "I'm sorry, an error occurred parsing your argument.";
+                        embed.Fields = new List<LocalEmbedField>
                     {
                         new() { Name = "Parameter", Value = $"Name : `{parameter.Name}`\nType : `{parameter.Type.Name}`" },
                         new()
@@ -52,45 +55,48 @@ namespace Pepper
                                 : "(empty value)"
                         }
                     };
-                    if (!string.IsNullOrWhiteSpace(typeParseFailedResult.FailureReason))
-                        embed.Fields.Add(new LocalEmbedField
+                        if (!string.IsNullOrWhiteSpace(typeParseFailedResult.FailureReason))
                         {
-                            Name = "Failure reason",
-                            Value = typeParseFailedResult.FailureReason
-                        });
-                    break;
-                }
+                            embed.Fields.Add(new LocalEmbedField
+                            {
+                                Name = "Failure reason",
+                                Value = typeParseFailedResult.FailureReason
+                            });
+                        }
+
+                        break;
+                    }
                 case ParameterChecksFailedResult parameterChecksFailedResult:
-                {
-                    if (parameterChecksFailedResult.TryFormatFailure(out var formatted))
                     {
-                        return formatted!;
-                    }
+                        if (parameterChecksFailedResult.TryFormatFailure(out var formatted))
+                        {
+                            return formatted!;
+                        }
 
-                    goto default;
-                }
+                        goto default;
+                    }
                 case ChecksFailedResult checksFailedResult:
-                {
-                    var firstCheck = checksFailedResult.FailedChecks[0].Check;
-                    switch (firstCheck)
                     {
-                        case RequireBotOwnerAttribute:
-                            content = "";
-                            embed.Description = "This command can only be called by the bot owner.";
-                            break;
-                        case PrefixCheckAttribute:
-                            return null!;
-                        case RequireGuildWhitelistAttribute:
-                            content = "";
-                            embed.Description = "This command is restricted (whitelisted on a per-guild basis), hence not callable from this guild.";
-                            break;
-                        default:
-                            embed.Description = $"Check {firstCheck.GetType().Name} failed.";
-                            break;
-                    }
+                        var firstCheck = checksFailedResult.FailedChecks[0].Check;
+                        switch (firstCheck)
+                        {
+                            case RequireBotOwnerAttribute:
+                                content = "";
+                                embed.Description = "This command can only be called by the bot owner.";
+                                break;
+                            case PrefixCheckAttribute:
+                                return null!;
+                            case RequireGuildWhitelistAttribute:
+                                content = "";
+                                embed.Description = "This command is restricted (whitelisted on a per-guild basis), hence not callable from this guild.";
+                                break;
+                            default:
+                                embed.Description = $"Check {firstCheck.GetType().Name} failed.";
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
                 default:
                     embed.Description = result.FailureReason;
                     break;

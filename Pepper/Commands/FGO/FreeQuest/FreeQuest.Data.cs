@@ -15,10 +15,10 @@ namespace Pepper.Commands.FGO
 
         private static async Task<Dictionary<int, Quest>?> Query(Region region, int questId, int questPhase)
         {
-            var url = Endpoint + $"get?questId={questId}&questPhase={questPhase}&region={(int)region}&apiKey={APIKey}";
+            var url = Endpoint + $"get?questId={questId}&questPhase={questPhase}&region={(int) region}&apiKey={APIKey}";
             var raw = await HttpClient.GetStringAsync(url);
             var obj = JObject.Parse(raw);
-            return obj["status"]!.ToObject<int>() == 404 
+            return obj["status"]!.ToObject<int>() == 404
                 ? null
                 : obj["response"]!["questDetails"]!.ToObject<Dictionary<int, Quest>>()!;
         }

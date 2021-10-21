@@ -38,16 +38,19 @@ namespace Pepper.Commmands.General
                 Name = $"{self.Tag}",
                 IconUrl = self.GetAvatarUrl(CdnAssetFormat.Png, 1024)
             };
-            
+
             if (!string.IsNullOrWhiteSpace(query))
             {
                 var commandMatches = service.FindCommands(query);
                 if (commandMatches.Count != 0)
                 {
                     var pages = HandleCommand(commandMatches.Select(match => match.Command).ToArray()).ToList();
-                        
+
                     if (pages.Count > 1)
+                    {
                         return View(new PagedView(new ListPageProvider(pages.Select(embed => new Page().WithEmbeds(embed)))));
+                    }
+
                     return Reply(pages[0]);
                 }
 
@@ -59,7 +62,9 @@ namespace Pepper.Commmands.General
                     .First();
 
                 if (categoryMatch.Score <= 0.6)
+                {
                     return Reply(HandleCategory(categoryMatch.Element, categories[categoryMatch.Element]));
+                }
             }
 
             return Reply(new LocalEmbed()
@@ -79,7 +84,7 @@ namespace Pepper.Commmands.General
             var prefixes = string.IsNullOrWhiteSpace(prefixCategory)
                 ? ((DefaultPrefixProvider) Context.Bot.Prefixes).Prefixes.Select(prefix => prefix.ToString()!).ToArray()
                 : config.GetCommandPrefixes(prefixCategory);
-            
+
             string basePrefix = prefixes[0], baseInvocation = $"{basePrefix}{commands[0].Aliases[0]}";
             var otherPrefixes = prefixes.Length > 1 ? prefixes[1..] : System.Array.Empty<string>();
 
@@ -115,6 +120,7 @@ namespace Pepper.Commmands.General
                 };
 
                 if (flagParams.Count != 0)
+                {
                     fields.Add(
                         new LocalEmbedField
                         {
@@ -133,6 +139,7 @@ namespace Pepper.Commmands.General
                                         })
                                     )
                         });
+                }
 
                 var embed = new LocalEmbed
                 {
@@ -152,10 +159,10 @@ namespace Pepper.Commmands.General
                 return embed;
             });
 
-            
+
             return embeds.ToList();
         }
-        
+
         private LocalEmbed HandleCategory(string category, IReadOnlyCollection<Command> commands)
         {
             var restricted = false;
@@ -166,11 +173,11 @@ namespace Pepper.Commmands.General
                 {
                     var prefixes = command.GetPrefixes(Context.Bot);
                     var basePrefix = prefixes.First();
-                    
+
                     // TODO: Do actual permission checking
                     var locked = command.Checks.OfType<RequireBotOwnerAttribute>().Any();
                     restricted |= locked;
-                    
+
                     return new LocalEmbedField
                     {
                         Name = (locked ? "\u1f512" : "") + $@"`{basePrefix}{command.Aliases[0]}`{(
@@ -184,11 +191,14 @@ namespace Pepper.Commmands.General
                     .ToList()
             };
 
-            if (restricted) embed.Footer = new LocalEmbedFooter().WithText("Certain commands cannot be invoked.");
+            if (restricted)
+            {
+                embed.Footer = new LocalEmbedFooter().WithText("Certain commands cannot be invoked.");
+            }
 
             return embed;
         }
-        
+
         private string SelfInvocation() => $"{Context.Prefix}{Context.Command.Aliases[0]}";
     }
 }

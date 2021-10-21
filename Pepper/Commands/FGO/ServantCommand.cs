@@ -15,29 +15,31 @@ namespace Pepper.Commands.FGO
             servantNamingService = naming;
             ItemNamingService = i;
         }
-        
+
         protected readonly ItemNamingService ItemNamingService;
         private readonly ServantNamingService servantNamingService;
 
         protected BaseServant ResolveServant(ServantIdentity servantIdentity)
         {
             IMasterDataProvider jp = MasterDataService.Connections[Region.JP], na = MasterDataService.Connections[Region.NA];
-            
+
             var servant = jp.GetServant(servantIdentity.ServantId);
 
             // overwriting servant name
             servant.Name = ResolveServantName(servant);
-            
+
             // overwriting class
             servant.Class = na.ResolveClass(servant.Class.ID) ?? servant.Class;
             return servant;
         }
-        
+
         protected string ResolveServantName(ServantIdentity servantIdentity, BaseServant? hint = null)
         {
             if (servantNamingService.Namings.ContainsKey(servantIdentity))
+            {
                 return servantNamingService.Namings[servantIdentity].Name;
-            
+            }
+
             IMasterDataProvider na = MasterDataService.Connections[Region.NA],
                 jp = MasterDataService.Connections[Region.JP];
             return na.GetServantEntityById(servantIdentity)?.Name ??

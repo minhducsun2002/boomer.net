@@ -16,7 +16,7 @@ namespace Pepper.Test
     {
         [BsonElement("svalsParsed")] public Dictionary<string, string>[] Parsed = Array.Empty<Dictionary<string, string>>();
     }
-    
+
     public class SkillLvAttribute : DataAttribute
     {
         private static readonly string ParsedName = "parsed_mstSkillLv.json";
@@ -30,7 +30,7 @@ namespace Pepper.Test
                 _ => true
             );
         }
-        
+
         public override IEnumerable<object[]> GetData(MethodInfo testMethod)
         {
             var @out = Names.Versions.SelectMany(version =>
@@ -46,14 +46,14 @@ namespace Pepper.Test
                         skillLv =>
                             skillLv.FuncId.Zip(skillLv.Svals).Zip(skillLv.Parsed)
                                 .Where(zip => mstFunc.ContainsKey(zip.First.First))     // filter for existent function IDs
-                                // ((funcId, sval), parsed)
-                                .Select(zip => 
+                                                                                        // ((funcId, sval), parsed)
+                                .Select(zip =>
                                     (mstFunc[zip.First.First].Type, zip.First.First, skillLv.SkillId, skillLv.Level, zip.First.Second, zip.Second))
-                                // (funcType, sval, parsed)
+                    // (funcType, sval, parsed)
                     );
                     return _;
                 })
-                .Select(testCase => new object[] {testCase.Item1, testCase.Item2, testCase.Item3, testCase.Item4, testCase.Item5, testCase.Item6});
+                .Select(testCase => new object[] { testCase.Item1, testCase.Item2, testCase.Item3, testCase.Item4, testCase.Item5, testCase.Item6 });
             return @out;
         }
     }
