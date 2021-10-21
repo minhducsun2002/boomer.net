@@ -46,9 +46,9 @@ namespace Pepper
                         new()
                         {
                             Name = "Parsing value",
-                            Value = string.IsNullOrEmpty(typeParseFailedResult.Value)
+                            Value = !string.IsNullOrEmpty(typeParseFailedResult.Value)
                                 ? $"`{typeParseFailedResult.Value}`"
-                                : $"(empty value)"
+                                : "(empty value)"
                         }
                     };
                     if (!string.IsNullOrWhiteSpace(typeParseFailedResult.FailureReason))
