@@ -13,7 +13,7 @@ using Qmmands;
 
 namespace Pepper.Commands.FGO
 {
-    internal class ServantResolvableFailureFormatterAttribute : Attribute, IParameterCheckWithFailureFormatter
+    internal class ServantResolvableFailureFormatterAttribute : Attribute, IParameterCheckFailureFormatter
     {
         public LocalMessage? FormatFailure(ParameterChecksFailedResult parameterChecksFailedResult)
             => new LocalMessage().WithContent("Please specify a valid servant alias or ID.");

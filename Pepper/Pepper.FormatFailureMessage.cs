@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Disqord;
 using Disqord.Bot;
+using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Qmmands;
 
@@ -33,11 +34,11 @@ namespace Pepper
                     break;
                 case TypeParseFailedResult typeParseFailedResult:
                 {
+                    if (typeParseFailedResult.TryFormatFailure(out var res))
+                    {
+                        return res!;
+                    }
                     var parameter = typeParseFailedResult.Parameter;
-
-                    var formatter = parameter.Attributes.OfType<FormatTypeParseFailureAttribute>().FirstOrDefault();
-                    var res = formatter?.Format(typeParseFailedResult);
-                    if (res != null) return res;
 
                     content = "I'm sorry, an error occurred parsing your argument.";
                     embed.Fields = new List<LocalEmbedField>
@@ -61,10 +62,10 @@ namespace Pepper
                 }
                 case ParameterChecksFailedResult parameterChecksFailedResult:
                 {
-                    var formatter = parameterChecksFailedResult.Parameter.Attributes.OfType<IParameterCheckWithFailureFormatter>()
-                        .FirstOrDefault();
-                    var formatted = formatter?.FormatFailure(parameterChecksFailedResult);
-                    if (formatted != null) return formatted;
+                    if (parameterChecksFailedResult.TryFormatFailure(out var formatted))
+                    {
+                        return formatted!;
+                    }
 
                     goto default;
                 }

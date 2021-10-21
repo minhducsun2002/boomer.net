@@ -26,7 +26,7 @@ namespace Pepper.Commands.FGO
         }
     }
 
-    internal class QuestIdentityCheckFailureFormatterAttribute : Attribute, IParameterCheckWithFailureFormatter
+    internal class QuestIdentityCheckFailureFormatterAttribute : Attribute, IParameterCheckFailureFormatter
     {
         public LocalMessage? FormatFailure(ParameterChecksFailedResult parameterChecksFailedResult)
             => new LocalMessage().WithContent(
