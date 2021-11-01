@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Disqord.Bot;
+using Microsoft.Extensions.Configuration;
 using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
 using Pepper.Services.Osu.API;
@@ -12,7 +13,12 @@ namespace Pepper.Commands.Osu
 {
     public class Beatmap : BeatmapContextCommand
     {
-        public Beatmap(APIService service, BeatmapContextProviderService b) : base(service, b) { }
+        private readonly IConfiguration configuration;
+
+        public Beatmap(APIService service, BeatmapContextProviderService b, IConfiguration configuration) : base(service, b)
+        {
+            this.configuration = configuration;
+        }
 
         [Command("map", "beatmap")]
         [Description("View information about a beatmap(set).")]
@@ -42,7 +48,7 @@ namespace Pepper.Commands.Osu
         private DiscordCommandResult BeatmapSingle(APIBeatmapSet beatmapset, int beatmapId)
         {
             SetBeatmapContext(beatmapId);
-            return View(new BeatmapSingleView(new BeatmapPageProvider(beatmapset, APIService), beatmapId));
+            return View(new BeatmapSingleView(new BeatmapPageProvider(beatmapset, APIService, configuration), beatmapId));
         }
     }
 }
