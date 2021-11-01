@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Threading.Tasks;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu.API;
 
 namespace Pepper.Services.Osu

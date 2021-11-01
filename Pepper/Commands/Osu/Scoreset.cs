@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Disqord;
+using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
 using Pepper.Services.Osu.API;
 
@@ -13,7 +14,7 @@ namespace Pepper.Commands.Osu
 
         public static LocalEmbedField SerializeScoreInList(APILegacyScoreInfo score, bool utcHint = false, bool scoreLink = true)
         {
-            var map = score.Beatmap!;
+            var map = score.BeatmapInfo!;
             var mapset = map.Metadata!;
             return new LocalEmbedField
             {

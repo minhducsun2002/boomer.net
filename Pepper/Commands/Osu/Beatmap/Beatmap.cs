@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Disqord.Bot;
+using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
 using Pepper.Services.Osu.API;
 using Pepper.Structures.Commands;

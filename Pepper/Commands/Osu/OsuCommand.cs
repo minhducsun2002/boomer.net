@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Scoring;
+using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
 using Pepper.Services.Osu.API;
 using Pepper.Structures;
@@ -134,7 +135,7 @@ namespace Pepper.Commands.Osu
 
         protected static Mod[] ResolveMods(Ruleset ruleset, params string[] modStrings)
         {
-            var allMods = ruleset.GetAllMods().ToArray();
+            var allMods = ruleset.CreateAllMods().ToArray();
             return modStrings
                 .Select(modString =>
                     allMods.FirstOrDefault(mod => string.Equals(mod.Acronym, modString, StringComparison.InvariantCultureIgnoreCase)))

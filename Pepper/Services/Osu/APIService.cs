@@ -4,6 +4,7 @@ using Humanizer;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OsuSharp;
+using Pepper.Commons.Osu;
 using Pepper.Structures;
 
 namespace Pepper.Services.Osu

@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using Pepper.Commons.Osu.API;
 using Serilog;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
@@ -44,14 +45,14 @@ namespace Pepper.Services.Osu.API
                 {
                     var legacyScoreInfo = token.ToObject<APILegacyScoreInfo>();
                     var jsonBeatmapInfo = token["beatmap"]!;
-                    legacyScoreInfo!.Beatmap.BaseDifficulty = new BeatmapDifficulty
+                    legacyScoreInfo!.BeatmapInfo.BaseDifficulty = new BeatmapDifficulty
                     {
                         ApproachRate = jsonBeatmapInfo["ar"]!.ToObject<float>(),
                         CircleSize = jsonBeatmapInfo["cs"]!.ToObject<float>(),
                         DrainRate = jsonBeatmapInfo["drain"]!.ToObject<float>(),
                         OverallDifficulty = jsonBeatmapInfo["accuracy"]!.ToObject<float>()
                     };
-                    legacyScoreInfo!.Beatmap.Length = jsonBeatmapInfo["hit_length"]!.ToObject<int>() * 1000;
+                    legacyScoreInfo!.BeatmapInfo.Length = jsonBeatmapInfo["hit_length"]!.ToObject<int>() * 1000;
                     return legacyScoreInfo;
                 }).ToArray();
 

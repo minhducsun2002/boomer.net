@@ -8,6 +8,7 @@ using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Beatmaps;
+using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu.API;
 using Pepper.Structures.External.Osu;
 

@@ -9,10 +9,10 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
+using Pepper.Commons.Osu;
+using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
-using Pepper.Services.Osu.API;
 using Pepper.Structures.External.Osu.Extensions;
-using WorkingBeatmap = Pepper.Structures.External.Osu.WorkingBeatmap;
 
 namespace Pepper.Commands.Osu
 {
@@ -22,15 +22,15 @@ namespace Pepper.Commands.Osu
 
         protected async Task<DiscordCommandResult> SingleScore(APILegacyScoreInfo sc)
         {
-            var b = sc.Beatmap!;
+            var b = sc.BeatmapInfo!;
             var workingBeatmap = await APIService.GetBeatmap(b.OnlineBeatmapID!.Value);
             var ruleset = Rulesets[sc.OnlineRulesetID];
 
             var mods = ResolveMods(ruleset, sc.Mods);
-            var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(mods);
+            var difficulty = workingBeatmap.CalculateDifficulty();
 
             b.StarDifficulty = difficulty.StarRating;
-            SetBeatmapContext(sc.Beatmap.OnlineBeatmapID!.Value);
+            SetBeatmapContext(b.OnlineBeatmapID!.Value);
             return SingleScoreOutput(
                 sc.User,
                 artist: b.Metadata.Artist, title: b.Metadata.Title, version: b.Version,
@@ -79,10 +79,9 @@ namespace Pepper.Commands.Osu
         )
         {
             SetBeatmapContext(workingBeatmap.BeatmapInfo.OnlineBeatmapID!.Value);
-            var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(mods);
+            var difficulty = workingBeatmap.CalculateDifficulty(mods);
             double? fullComboPP = pp;
             var calculated = false;
-            var rulesetId = ruleset.RulesetInfo.ID!.Value;
 
             if (!pp.HasValue || !perfect)
             {
@@ -90,7 +89,7 @@ namespace Pepper.Commands.Osu
                 {
                     var score = new ScoreInfo { Mods = mods, MaxCombo = scoreMaxCombo, Accuracy = accuracy };
                     score.SetStatistics(statistics);
-                    var performanceCalculator = GetPerformanceCalculator(rulesetId, difficulty, score);
+                    var performanceCalculator = workingBeatmap.GetPerformanceCalculator(score, ruleset);
                     pp = performanceCalculator.Calculate();
                     calculated = true;
                 }
@@ -101,7 +100,7 @@ namespace Pepper.Commands.Osu
                     fcScore.SetStatistics(statistics);
                     fcScore.SetCount300((int) (fcScore.GetCount300() + fcScore.GetCountMiss())!);
                     fcScore.SetCountMiss(0);
-                    var performanceCalculator = GetPerformanceCalculator(rulesetId, difficulty, fcScore);
+                    var performanceCalculator = workingBeatmap.GetPerformanceCalculator(fcScore, ruleset);
                     fullComboPP = performanceCalculator.Calculate();
                 }
             }

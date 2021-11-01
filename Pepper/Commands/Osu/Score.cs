@@ -33,7 +33,7 @@ namespace Pepper.Commands.Osu
             if (username != null)
             {
                 var map = await APIService.GetBeatmap(mapId);
-                var ruleset = RulesetTypeParser.SupportedRulesets[map.BeatmapInfo.RulesetID];
+                var ruleset = map.GetDefaultRuleset();
                 SetBeatmapContext(mapId);
 
                 var (user, _, _) = await APIService.GetUser(username, ruleset.RulesetInfo);
@@ -48,8 +48,7 @@ namespace Pepper.Commands.Osu
                     return Reply($"No score found on that beatmap for user `{username.Content}`.");
                 }
 
-                var difficultyCalculator = ruleset.CreateDifficultyCalculator(map);
-                var difficulty = difficultyCalculator.Calculate();
+                var difficulty = map.CalculateDifficulty();
 
                 return Reply(new LocalEmbed
                 {
@@ -66,13 +65,8 @@ namespace Pepper.Commands.Osu
                             {
                                 try
                                 {
-                                    var scoreInfo = new ScoreInfo
-                                    { Mods = mods, MaxCombo = score.MaxCombo!.Value, Accuracy = score.Accuracy };
-                                    var performanceCalculator = GetPerformanceCalculator(
-                                        (int) score.GameMode,
-                                        difficultyCalculator.Calculate(mods),
-                                        scoreInfo
-                                    );
+                                    var scoreInfo = new ScoreInfo { Mods = mods, MaxCombo = score.MaxCombo!.Value, Accuracy = score.Accuracy };
+                                    var performanceCalculator = map.GetPerformanceCalculator(scoreInfo);
                                     pp = (float) performanceCalculator.Calculate();
                                     localPP = true;
                                 }

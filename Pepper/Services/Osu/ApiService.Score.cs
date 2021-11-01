@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using OsuSharp;
+using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu.API;
 using User = osu.Game.Users.User;
 
@@ -60,15 +61,15 @@ namespace Pepper.Services.Osu
         {
             var score = scoreObject.ToObject<APILegacyScoreInfo>()!;
             var beatmap = scoreObject["beatmap"]!;
-            score.Beatmap.BaseDifficulty = new BeatmapDifficulty
+            score.BeatmapInfo.BaseDifficulty = new BeatmapDifficulty
             {
                 ApproachRate = beatmap["ar"]!.ToObject<float>(),
                 CircleSize = beatmap["cs"]!.ToObject<float>(),
                 DrainRate = beatmap["drain"]!.ToObject<float>(),
                 OverallDifficulty = beatmap["accuracy"]!.ToObject<float>()
             };
-            score.Beatmap.BPM = beatmap["bpm"]!.ToObject<double>();
-            score.Beatmap.Length = beatmap["hit_length"]!.ToObject<double>() * 1000;
+            score.BeatmapInfo.BPM = beatmap["bpm"]!.ToObject<double>();
+            score.BeatmapInfo.Length = beatmap["hit_length"]!.ToObject<double>() * 1000;
             return score;
         }
     }

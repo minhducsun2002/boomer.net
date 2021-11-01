@@ -6,6 +6,7 @@ using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu.API;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;

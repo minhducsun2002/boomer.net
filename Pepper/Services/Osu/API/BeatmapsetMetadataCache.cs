@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BitFaster.Caching.Lru;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
+using Pepper.Commons.Osu.API;
 
 namespace Pepper.Services.Osu.API
 {

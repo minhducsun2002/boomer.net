@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="ppy.osu.Game.Rulesets.Catch" Version="2021.1028.0" />
+        <PackageReference Include="ppy.osu.Game.Rulesets.Mania" Version="2021.1028.0" />
+        <PackageReference Include="ppy.osu.Game.Rulesets.Osu" Version="2021.1028.0" />
+        <PackageReference Include="ppy.osu.Game.Rulesets.Taiko" Version="2021.1028.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="BitFaster.Caching" Version="1.0.3" />
+    </ItemGroup>
+</Project>

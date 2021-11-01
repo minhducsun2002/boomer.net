@@ -1,7 +1,6 @@
 using Newtonsoft.Json;
-using osu.Game.Beatmaps;
 
-namespace Pepper.Services.Osu.API
+namespace Pepper.Commons.Osu.API
 {
     public class APIBeatmap : osu.Game.Online.API.Requests.Responses.APIBeatmap
     {

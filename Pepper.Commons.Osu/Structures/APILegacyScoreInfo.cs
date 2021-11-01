@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Pepper.Services.Osu.API
+namespace Pepper.Commons.Osu.API
 {
     public class APILegacyScoreInfo : osu.Game.Online.API.Requests.Responses.APILegacyScoreInfo
     {

@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
+using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
 using Pepper.Services.Osu.API;
 using Pepper.Structures.External.Osu;
@@ -32,7 +33,7 @@ namespace Pepper.Commands.Osu
             var currentIndex = view.CurrentPageIndex;
             if (!beatmapEmbeds.TryGetValue(currentIndex, out var embed))
             {
-                embed = beatmapEmbeds[currentIndex] = await PrepareEmbed(Beatmapset, apiService, Beatmapset.Beatmaps[currentIndex].OnlineBeatmapID);
+                embed = beatmapEmbeds[currentIndex] = await PrepareEmbed(Beatmapset, apiService, Beatmapset.Beatmaps[currentIndex].OnlineID);
             }
 
             return new Page().WithEmbeds(embed);
@@ -43,7 +44,7 @@ namespace Pepper.Commands.Osu
         private const double AccStart = 93, AccEnd = 100, AccStep = 0.5;
         private static async Task<LocalEmbed> PrepareEmbed(APIBeatmapSet beatmapset, APIService service, int beatmapId, Mod[]? mods = null)
         {
-            var beatmap = beatmapset.Beatmaps.First(beatmap => beatmap.OnlineBeatmapID == beatmapId);
+            var beatmap = beatmapset.Beatmaps.First(beatmap => beatmap.OnlineID == beatmapId);
             var ruleset = RulesetTypeParser.SupportedRulesets[beatmap.Ruleset];
             var workingBeatmap = await service.GetBeatmap(beatmapId);
             var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(mods ?? Array.Empty<Mod>());
@@ -57,31 +58,11 @@ namespace Pepper.Commands.Osu
                 data.Add((current, pp));
             }
 
-            var chart = new QuickChart.Chart
-            {
-                Height = 300,
-                Width = 500,
-                Config = $@"{{
-                    type: 'line',
-                    data: {{
-                        labels: [{string.Join(", ", data.Select(pair => $"\"{pair.Item1}%\""))}],
-                        datasets: [{{
-                            label: '{beatmapset.Artist} - {beatmapset.Title}',
-                            data: [{string.Join(", ", data.Select(pair => $"{pair.Item2:F2}"))}],
-                            borderColor: '#42adf5',
-                            backgroundColor: 'black'
-                        }}],
-                        options: {{ scales: {{ y: {{ min: {data.Min(pair => pair.Item2)} }} }} }}
-                    }}      
-                }}",
-                BackgroundColor = "white"
-            };
-
             return new LocalEmbed
             {
                 Title = $"{beatmapset.Artist} - {beatmapset.Title} [{beatmap.Version}]",
                 Author = OsuCommand.SerializeAuthorBuilder(beatmapset.Author),
-                Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.OnlineBeatmapSetID}#{ruleset.ShortName}/{beatmap.OnlineBeatmapID}",
+                Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.OnlineBeatmapSetID}#{ruleset.ShortName}/{beatmap.OnlineID}",
                 Description = (int) beatmapset.Status < 0
                     ? (beatmapset.Status == BeatmapSetOnlineStatus.WIP ? "WIP." : $"{beatmapset.Status}.")
                       + $" Last updated **{OsuCommand.SerializeTimestamp(beatmapset.LastUpdated)}**."
@@ -95,7 +76,7 @@ namespace Pepper.Commands.Osu
                     }
                 },
                 Footer = new LocalEmbedFooter().WithText(ruleset.RulesetInfo.Name),
-                ImageUrl = chart.GetUrl() + "&version=3"
+                ImageUrl = $"https://$HOST/performance/chart/{beatmap.OnlineID}.png"
             };
         }
     }
@@ -107,8 +88,8 @@ namespace Pepper.Commands.Osu
         public BeatmapSingleView(BeatmapPageProvider pageProvider, int initialBeatmapId) : base(pageProvider)
         {
             beatmapset = pageProvider.Beatmapset;
-            beatmapIdToIndex = beatmapset.Beatmaps.Select((beatmap, index) => (beatmap.OnlineBeatmapID, index))
-                .ToDictionary(pair => pair.OnlineBeatmapID, pair => pair.index);
+            beatmapIdToIndex = beatmapset.Beatmaps.Select((beatmap, index) => (beatmap.OnlineID, index))
+                .ToDictionary(pair => pair.OnlineID, pair => pair.index);
 
             CurrentPageIndex = beatmapIdToIndex[initialBeatmapId];
             var select = new SelectionViewComponent(async e =>
@@ -136,8 +117,8 @@ namespace Pepper.Commands.Osu
                         ? beatmap.Version
                         : beatmap.Version[..22] + "...",
                     Description = OsuCommand.SerializeBeatmapStats(beatmapset, beatmap, false, false),
-                    Value = $"{beatmap.OnlineBeatmapID}",
-                    IsDefault = CurrentPageIndex == beatmapIdToIndex[beatmap.OnlineBeatmapID]
+                    Value = $"{beatmap.OnlineID}",
+                    IsDefault = CurrentPageIndex == beatmapIdToIndex[beatmap.OnlineID]
                 })
                 .ToList();
         }

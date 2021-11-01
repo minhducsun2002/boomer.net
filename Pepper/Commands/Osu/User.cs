@@ -60,7 +60,7 @@ namespace Pepper.Commands.Osu
             if (scores.Length > 0)
             {
                 var score = scores[0];
-                var map = score.Beatmap;
+                var map = score.BeatmapInfo;
                 var mapset = map.Metadata;
                 embed.Fields.Add(new LocalEmbedField
                 {
