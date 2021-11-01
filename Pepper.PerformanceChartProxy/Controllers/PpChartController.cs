@@ -11,11 +11,11 @@ namespace Pepper.PerformanceChartProxy.Controllers
 {
     [ApiController]
     [Route("/performance")]
-    public class BeatmapChartController : Controller
+    public class PpChartController : Controller
     {
         private readonly IEasyCachingProvider cachingProvider;
         private readonly HttpClient httpClient;
-        public BeatmapChartController(IEasyCachingProvider cachingProvider, HttpClient httpClient)
+        public PpChartController(IEasyCachingProvider cachingProvider, HttpClient httpClient)
         {
             this.cachingProvider = cachingProvider;
             this.httpClient = httpClient;
