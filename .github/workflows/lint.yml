@@ -1,0 +1,24 @@
+name: Check source code styling
+
+on:
+  push:
+    paths:
+      - '**/*.cs'
+      - '.github/workflows/lint.yml'
+  repository_dispatch:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Check code styling
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Setup dotnet-format
+        run: dotnet tool install -g dotnet-format
+      - name: Run format checker
+        run: dotnet format --check
