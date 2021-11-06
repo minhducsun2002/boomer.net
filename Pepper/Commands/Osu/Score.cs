@@ -115,7 +115,9 @@ namespace Pepper.Commands.Osu
                 return await SingleScore(sc);
             }
 
-            throw new ArgumentException("You have not passed a valid score link!");
+            return Reply(string.IsNullOrWhiteSpace(link)
+                ? "Couldn't determine a beatmap to use in this channel. It's likely that I'm recently restarted."
+                : "Your score link doesn't look valid.");
         }
     }
 }
