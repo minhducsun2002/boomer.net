@@ -120,7 +120,7 @@ namespace Pepper.Commands.Osu
                         + (mods.Length != 0 ? "+" + string.Join("", mods.Select(mod => mod.Acronym)) : ""),
                 Url = workingBeatmap.GetOnlineUrl(),
                 ThumbnailUrl =
-                    $"https://assets.ppy.sh/beatmaps/{workingBeatmap.BeatmapSetInfo?.OnlineBeatmapSetID}/covers/list@2x.jpg?",
+                    $"https://b.ppy.sh/thumb/{workingBeatmap.BeatmapSetInfo.OnlineBeatmapSetID}l.jpg",
                 Timestamp = timestamp,
                 Fields = new List<LocalEmbedField>
                 {
