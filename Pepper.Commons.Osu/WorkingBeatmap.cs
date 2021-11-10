@@ -21,7 +21,6 @@ namespace Pepper.Commons.Osu
 {
     public partial class WorkingBeatmap : osu.Game.Beatmaps.WorkingBeatmap
     {
-        private readonly DifficultyCalculator difficultyCalculator;
         private readonly Beatmap beatmap;
         private static readonly Ruleset[] BuiltInRulesets =
         {
@@ -35,7 +34,6 @@ namespace Pepper.Commons.Osu
         {
             this.beatmap = beatmap;
             this.beatmap.BeatmapInfo.Ruleset = GetDefaultRuleset().RulesetInfo;
-            difficultyCalculator = GetDefaultRuleset().CreateDifficultyCalculator(this);
 
             if (beatmapId.HasValue)
             {
@@ -50,9 +48,9 @@ namespace Pepper.Commons.Osu
         /// <param name="rulesetOverwrite">Use a custom ruleset to calculate performance. Useful for converts.</param>
         public PerformanceCalculator GetPerformanceCalculator(ScoreInfo score, Ruleset? rulesetOverwrite = null)
         {
-            var difficultyAttributes = CalculateDifficulty(score.Mods);
             var ruleset = rulesetOverwrite ?? GetDefaultRuleset();
             var rulesetId = ruleset.RulesetInfo.ID;
+            var difficultyAttributes = CalculateDifficulty(rulesetId!.Value, score.Mods);
             return rulesetId switch
             {
                 0 => new OsuPerformanceCalculator(ruleset, difficultyAttributes, score),
@@ -63,14 +61,17 @@ namespace Pepper.Commons.Osu
             };
         }
 
-        public DifficultyAttributes CalculateDifficulty(params Mod[] mods) => difficultyCalculator.Calculate(mods);
+        public DifficultyAttributes CalculateDifficulty(int rulesetId, params Mod[] mods) => BuiltInRulesets[rulesetId]
+            .CreateDifficultyCalculator(this)
+            .Calculate(mods);
 
-        public string GetOnlineUrl(bool forceFullUrl = false)
+        public string GetOnlineUrl(bool forceFullUrl = false, Ruleset? rulesetOverwrite = null)
         {
+            var ruleset = rulesetOverwrite ?? BuiltInRulesets[BeatmapInfo.RulesetID];
             try
             {
                 return $"https://osu.ppy.sh/beatmapsets/{BeatmapInfo.BeatmapSet.OnlineBeatmapSetID}"
-                       + $"#{BuiltInRulesets[BeatmapInfo.RulesetID].ShortName}/{beatmap.BeatmapInfo.OnlineBeatmapID}";
+                       + $"#{ruleset.ShortName}/{beatmap.BeatmapInfo.OnlineBeatmapID}";
             }
             catch
             {

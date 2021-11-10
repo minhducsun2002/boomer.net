@@ -11,7 +11,7 @@ namespace Pepper.PerformanceChartProxy
         private const double AccStart = 93, AccEnd = 100, AccStep = 0.5;
         public static string GenerateChartUrl(this WorkingBeatmap beatmap)
         {
-            var difficulty = beatmap.CalculateDifficulty();
+            var difficulty = beatmap.CalculateDifficulty(beatmap.GetDefaultRuleset().RulesetInfo.OnlineID);
             List<(double, double)> ppByAccuracy = new(), ppByCombo = new();
             var maxCombo = difficulty.MaxCombo;
 

@@ -28,7 +28,7 @@ namespace Pepper.Commands.Osu
             var ruleset = Rulesets[sc.RulesetID];
 
             var mods = ResolveMods(ruleset, sc.Mods.Select(mod => mod.Acronym));
-            var difficulty = workingBeatmap.CalculateDifficulty();
+            var difficulty = workingBeatmap.CalculateDifficulty(sc.RulesetID, mods);
 
             b.StarRating = difficulty.StarRating;
             SetBeatmapContext(b.OnlineID);
@@ -80,7 +80,7 @@ namespace Pepper.Commands.Osu
         )
         {
             SetBeatmapContext(workingBeatmap.BeatmapInfo.OnlineBeatmapID!.Value);
-            var difficulty = workingBeatmap.CalculateDifficulty(mods);
+            var difficulty = workingBeatmap.CalculateDifficulty(ruleset.RulesetInfo.OnlineID, mods);
             double? fullComboPP = pp;
             var calculated = false;
 

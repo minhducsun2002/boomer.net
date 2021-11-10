@@ -48,7 +48,7 @@ namespace Pepper.Commands.Osu
                     return Reply($"No score found on that beatmap for user `{username.Content}`.");
                 }
 
-                var difficulty = map.CalculateDifficulty();
+                var difficulty = map.CalculateDifficulty(ruleset.RulesetInfo.OnlineID);
 
                 return Reply(new LocalEmbed
                 {
