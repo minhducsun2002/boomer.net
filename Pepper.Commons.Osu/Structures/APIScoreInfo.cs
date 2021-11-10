@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Pepper.Commons.Osu.API
 {
-    public class APILegacyScoreInfo : osu.Game.Online.API.Requests.Responses.APILegacyScoreInfo
+    public class APIScoreInfo : osu.Game.Online.API.Requests.Responses.APIScoreInfo
     {
         [JsonProperty("perfect")]
         public bool Perfect { get; set; }

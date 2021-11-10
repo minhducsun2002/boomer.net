@@ -3,23 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using OsuSharp;
 using Pepper.Commons.Osu.API;
-using Pepper.Services.Osu.API;
-using User = osu.Game.Users.User;
 
 namespace Pepper.Services.Osu
 {
     public partial class APIService
     {
-        public async Task<APILegacyScoreInfo[]> GetUserScores(int userId, ScoreType scoreType, RulesetInfo rulesetInfo, int count = 100, int offset = 0)
+        public async Task<APIScoreInfo[]> GetUserScores(int userId, ScoreType scoreType, RulesetInfo rulesetInfo, int count = 100, int offset = 0)
         {
-            var scoreCache = new List<APILegacyScoreInfo>();
+            var scoreCache = new List<APIScoreInfo>();
 
             var init = offset;
             while (scoreCache.Count < count)
@@ -40,7 +36,7 @@ namespace Pepper.Services.Osu
             return scoreCache.Count > count ? scoreCache.GetRange(0, count).ToArray() : scoreCache.ToArray();
         }
 
-        public async Task<APILegacyScoreInfo> GetScore(long scoreId, RulesetInfo rulesetInfo)
+        public async Task<APIScoreInfo> GetScore(long scoreId, RulesetInfo rulesetInfo)
         {
             var res = await httpClient.GetStringAsync($"https://osu.ppy.sh/scores/{rulesetInfo.ShortName}/{scoreId}");
             var doc = new HtmlDocument(); doc.LoadHtml(res);
@@ -57,19 +53,12 @@ namespace Pepper.Services.Osu
             return await legacyApiClient.GetUserRecentsByUserIdAsync(userId, (GameMode) rulesetInfo.ID!, limit);
         }
 
-        private static APILegacyScoreInfo SerializeToAPILegacyScoreInfo(JToken scoreObject)
+        private static APIScoreInfo SerializeToAPILegacyScoreInfo(JToken scoreObject)
         {
-            var score = scoreObject.ToObject<APILegacyScoreInfo>()!;
+            var score = scoreObject.ToObject<APIScoreInfo>()!;
             var beatmap = scoreObject["beatmap"]!;
-            score.BeatmapInfo.BaseDifficulty = new BeatmapDifficulty
-            {
-                ApproachRate = beatmap["ar"]!.ToObject<float>(),
-                CircleSize = beatmap["cs"]!.ToObject<float>(),
-                DrainRate = beatmap["drain"]!.ToObject<float>(),
-                OverallDifficulty = beatmap["accuracy"]!.ToObject<float>()
-            };
-            score.BeatmapInfo.BPM = beatmap["bpm"]!.ToObject<double>();
-            score.BeatmapInfo.Length = beatmap["hit_length"]!.ToObject<double>() * 1000;
+            score.Beatmap.BPM = beatmap["bpm"]!.ToObject<double>();
+            score.Beatmap.Length = beatmap["hit_length"]!.ToObject<double>() * 1000;
             return score;
         }
     }

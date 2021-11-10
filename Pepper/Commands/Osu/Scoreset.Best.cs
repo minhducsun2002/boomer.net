@@ -50,7 +50,7 @@ namespace Pepper.Commands.Osu
 
             var modFilters = ResolveMods(
                 ruleset,
-                mods.Chunk(2).Select(chunk => new string(chunk.ToArray())).ToArray()
+                mods.Chunk(2).Select(chunk => new string(chunk.ToArray()))
             );
 
             var scores = await APIService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
@@ -62,10 +62,10 @@ namespace Pepper.Commands.Osu
                         return true;
                     }
 
-                    var checkedMods = score.Mods!;
+                    var checkedMods = score.Mods.Select(mod => mod.Acronym).ToList();
                     if (checkedMods.Contains(new OsuModNightcore().Acronym, StringComparer.InvariantCultureIgnoreCase))
                     {
-                        checkedMods = score.Mods.Append(new OsuModDoubleTime().Acronym).ToArray();
+                        checkedMods.Add(new OsuModDoubleTime().Acronym);
                     }
 
                     return modFilters.All(mod =>
@@ -73,7 +73,7 @@ namespace Pepper.Commands.Osu
                 })
                 .ToArray();
 
-            var pages = new ArrayPageProvider<APILegacyScoreInfo>(
+            var pages = new ArrayPageProvider<APIScoreInfo>(
                 filtered,
                 (_, chunk) => new Page().WithEmbeds(
                     SerializeScoreset(chunk, scoreLink: false)

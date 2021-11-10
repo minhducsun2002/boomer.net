@@ -92,19 +92,19 @@ namespace Pepper.Commands.Osu
         {
             var embeds = beatmapset.Beatmaps
                 .Concat(beatmapset.Converts)
-                .GroupBy(beatmap => beatmap.Ruleset)
+                .GroupBy(beatmap => beatmap.RulesetID)
                 .OrderBy(group => group.Key)
                 .Where(group => group.Any())
                 .SelectMany(grouping =>
                 {
-                    var chunked = grouping.OrderBy(map => map.StarDifficulty)
+                    var chunked = grouping.OrderBy(map => map.StarRating)
                         .Chunk(MaxDiffPerPage).ToList();
                     var index = 1;
                     var modeEmbeds = chunked.Select(mapChunk => new LocalEmbed
                     {
                         Title = $"{beatmapset.Artist} - {beatmapset.Title}",
                         Author = OsuCommand.SerializeAuthorBuilder(beatmapset.Author),
-                        Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.OnlineBeatmapSetID}",
+                        Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.OnlineID}",
                         Description = (int) beatmapset.Status < 0
                                 ? (beatmapset.Status == BeatmapSetOnlineStatus.WIP ? "WIP." : $"{beatmapset.Status}.")
                                   + $" Last updated **{OsuCommand.SerializeTimestamp(beatmapset.LastUpdated)}**."
@@ -112,13 +112,13 @@ namespace Pepper.Commands.Osu
                         ImageUrl = beatmapset.Covers.Cover,
                         Fields = mapChunk.Select(map => new LocalEmbedField
                         {
-                            Name = $"[{map.StarDifficulty:F2}⭐] {map.Version}",
+                            Name = $"[{map.StarRating:F2}⭐] {map.DifficultyName}",
                             Value = (map.MaxCombo != null ? $"**{map.MaxCombo}**x • " : "")
                                     + $"`CS`**{map.CircleSize}** `AR`**{map.ApproachRate}** `OD`**{map.OverallDifficulty}** `HP`**{map.DrainRate}**"
-                                    + $" • **{beatmapset.Bpm:0.}** BPM"
+                                    + $" • **{beatmapset.BPM:0.}** BPM"
                                     + $@" • :clock3: {
-                                        (map.TotalLengthInSeconds / 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                                    }:{(map.TotalLengthInSeconds % 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
+                                        (((long) map.Length / 60000)).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
+                                    }:{((long) map.Length % 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
                         }).ToList(),
                         Footer = new LocalEmbedFooter
                         {

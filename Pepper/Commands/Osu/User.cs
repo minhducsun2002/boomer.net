@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
@@ -60,15 +61,15 @@ namespace Pepper.Commands.Osu
             if (scores.Length > 0)
             {
                 var score = scores[0];
-                var map = score.BeatmapInfo;
+                var map = score.Beatmap;
                 var mapset = map.Metadata;
                 embed.Fields.Add(new LocalEmbedField
                 {
                     Name = "Best performance",
                     Value = $"[**{score.Rank}**] **{score.PP}**pp "
                             + $"(**{(score.Accuracy * 100):F3}**% | **{score.MaxCombo}**x)" + (score.Perfect ? " (FC)" : "")
-                            + $"\n[{mapset.Artist} - {mapset.Title} [{map.Version}]](https://osu.ppy.sh/beatmaps/{map.OnlineBeatmapID})"
-                            + (score.Mods.Length > 0 ? $"+{string.Join("", score.Mods)}" : "")
+                            + $"\n[{mapset.Artist} - {mapset.Title} [{map.DifficultyName}]](https://osu.ppy.sh/beatmaps/{map.OnlineID})"
+                            + (score.Mods.Any() ? $"+{string.Join("", score.Mods)}" : "")
                             + $"\n{SerializeBeatmapStats(map)}"
                 });
             }

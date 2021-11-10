@@ -5,14 +5,15 @@ using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using Pepper.Commons.Osu;
-using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
 using Pepper.Structures.External.Osu.Extensions;
+using APIScoreInfo = Pepper.Commons.Osu.API.APIScoreInfo;
 
 namespace Pepper.Commands.Osu
 {
@@ -20,20 +21,20 @@ namespace Pepper.Commands.Osu
     {
         protected OsuScoreCommand(APIService s, BeatmapContextProviderService b) : base(s, b) { }
 
-        protected async Task<DiscordCommandResult> SingleScore(APILegacyScoreInfo sc)
+        protected async Task<DiscordCommandResult> SingleScore(APIScoreInfo sc)
         {
-            var b = sc.BeatmapInfo!;
-            var workingBeatmap = await APIService.GetBeatmap(b.OnlineBeatmapID!.Value);
-            var ruleset = Rulesets[sc.OnlineRulesetID];
+            var b = sc.Beatmap!;
+            var workingBeatmap = await APIService.GetBeatmap(b.OnlineID);
+            var ruleset = Rulesets[sc.RulesetID];
 
-            var mods = ResolveMods(ruleset, sc.Mods);
+            var mods = ResolveMods(ruleset, sc.Mods.Select(mod => mod.Acronym));
             var difficulty = workingBeatmap.CalculateDifficulty();
 
-            b.StarDifficulty = difficulty.StarRating;
-            SetBeatmapContext(b.OnlineBeatmapID!.Value);
+            b.StarRating = difficulty.StarRating;
+            SetBeatmapContext(b.OnlineID);
             return SingleScoreOutput(
                 sc.User,
-                artist: b.Metadata.Artist, title: b.Metadata.Title, version: b.Version,
+                artist: b.Metadata.Artist, title: b.Metadata.Title, version: b.DifficultyName,
                 rank: $"{sc.Rank}",
                 mods: mods, accuracy: sc.Accuracy, perfect: sc.Perfect, totalScore: sc.TotalScore,
                 scoreMaxCombo: sc.MaxCombo, pp: sc.PP,
@@ -42,7 +43,7 @@ namespace Pepper.Commands.Osu
             );
         }
 
-        protected async Task<DiscordCommandResult> SingleScore(osu.Game.Users.User user, OsuSharp.Score sc)
+        protected async Task<DiscordCommandResult> SingleScore(APIUser user, OsuSharp.Score sc)
         {
             var workingBeatmap = await APIService.GetBeatmap((int) sc.BeatmapId);
             var b = workingBeatmap.Beatmap.BeatmapInfo;
@@ -69,7 +70,7 @@ namespace Pepper.Commands.Osu
         }
 
         private DiscordCommandResult SingleScoreOutput(
-            osu.Game.Users.User user,
+            APIUser user,
             string rank, string artist, string title, string version, Mod[] mods,
             WorkingBeatmap workingBeatmap, DateTimeOffset timestamp,
             Ruleset ruleset,

@@ -39,20 +39,20 @@ namespace Pepper.Commands.Osu
             return new Page().WithEmbeds(embed);
         }
 
-        public override int PageCount => Beatmapset.Beatmaps.Count;
+        public override int PageCount => Beatmapset.Beatmaps.Length;
 
         private async Task<LocalEmbed> PrepareEmbed(APIBeatmapSet beatmapset, APIService service, int beatmapId, Mod[]? mods = null)
         {
             var beatmap = beatmapset.Beatmaps.First(beatmap => beatmap.OnlineID == beatmapId);
-            var ruleset = RulesetTypeParser.SupportedRulesets[beatmap.Ruleset];
+            var ruleset = RulesetTypeParser.SupportedRulesets[beatmap.RulesetID];
             var workingBeatmap = await service.GetBeatmap(beatmapId);
             var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(mods ?? Array.Empty<Mod>());
 
             return new LocalEmbed
             {
-                Title = $"{beatmapset.Artist} - {beatmapset.Title} [{beatmap.Version}]",
+                Title = $"{beatmapset.Artist} - {beatmapset.Title} [{beatmap.DifficultyName}]",
                 Author = OsuCommand.SerializeAuthorBuilder(beatmapset.Author!),
-                Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.OnlineBeatmapSetID}#{ruleset.ShortName}/{beatmap.OnlineID}",
+                Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.OnlineID}#{ruleset.ShortName}/{beatmap.OnlineID}",
                 Description = (int) beatmapset.Status < 0
                     ? (beatmapset.Status == BeatmapSetOnlineStatus.WIP ? "WIP." : $"{beatmapset.Status}.")
                       + $" Last updated **{OsuCommand.SerializeTimestamp(beatmapset.LastUpdated)}**."
@@ -100,12 +100,12 @@ namespace Pepper.Commands.Osu
         private List<LocalSelectionComponentOption> GetCurrentOptionList()
         {
             return beatmapset.Beatmaps.Take(LocalSelectionComponent.MaxOptionsAmount)
-                .OrderBy(beatmap => beatmap.StarDifficulty)
+                .OrderBy(beatmap => beatmap.StarRating)
                 .Select(beatmap => new LocalSelectionComponentOption
                 {
-                    Label = beatmap.Version.Length < LocalSelectionComponentOption.MaxLabelLength
-                        ? beatmap.Version
-                        : beatmap.Version[..22] + "...",
+                    Label = beatmap.DifficultyName.Length < LocalSelectionComponentOption.MaxLabelLength
+                        ? beatmap.DifficultyName
+                        : beatmap.DifficultyName[..22] + "...",
                     Description = OsuCommand.SerializeBeatmapStats(beatmapset, beatmap, false, false),
                     Value = $"{beatmap.OnlineID}",
                     IsDefault = CurrentPageIndex == beatmapIdToIndex[beatmap.OnlineID]

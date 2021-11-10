@@ -9,13 +9,13 @@ using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
-using osu.Game.Users;
-using Pepper.Commons.Osu.API;
 using Serilog;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Quantization;
+using APIScoreInfo = Pepper.Commons.Osu.API.APIScoreInfo;
 using Color = System.Drawing.Color;
 
 namespace Pepper.Services.Osu.API
@@ -32,28 +32,21 @@ namespace Pepper.Services.Osu.API
         private static readonly JsonSerializerSettings SerializerSettings = new() { NullValueHandling = NullValueHandling.Ignore };
         private static readonly ILogger Log = Serilog.Log.Logger.ForContext<OsuUserCache>();
 
-        public async Task<(User, APILegacyScoreInfo[])> Get(string username, RulesetInfo rulesetInfo)
+        public async Task<(APIUser, APIScoreInfo[])> Get(string username, RulesetInfo rulesetInfo)
         {
             var rulesetName = rulesetInfo.ShortName;
             var key = $"osu-user-{username.ToLowerInvariant()}-{rulesetName}";
 
             var _ = await HttpClient.GetStringAsync($"https://osu.ppy.sh/users/{HttpUtility.UrlPathEncode(username)}/{rulesetName}");
             var doc = new HtmlDocument(); doc.LoadHtml(_);
-            var user = JsonConvert.DeserializeObject<User>(doc.GetElementbyId("json-user").InnerText, SerializerSettings)!;
+            var user = JsonConvert.DeserializeObject<APIUser>(doc.GetElementbyId("json-user").InnerText, SerializerSettings)!;
             var scores = JObject.Parse(doc.GetElementbyId("json-extras").InnerText)["scoresBest"]!
                 .ToArray().Select(token =>
                 {
-                    var legacyScoreInfo = token.ToObject<APILegacyScoreInfo>();
+                    var apiScoreInfo = token.ToObject<APIScoreInfo>();
                     var jsonBeatmapInfo = token["beatmap"]!;
-                    legacyScoreInfo!.BeatmapInfo.BaseDifficulty = new BeatmapDifficulty
-                    {
-                        ApproachRate = jsonBeatmapInfo["ar"]!.ToObject<float>(),
-                        CircleSize = jsonBeatmapInfo["cs"]!.ToObject<float>(),
-                        DrainRate = jsonBeatmapInfo["drain"]!.ToObject<float>(),
-                        OverallDifficulty = jsonBeatmapInfo["accuracy"]!.ToObject<float>()
-                    };
-                    legacyScoreInfo!.BeatmapInfo.Length = jsonBeatmapInfo["hit_length"]!.ToObject<int>() * 1000;
-                    return legacyScoreInfo;
+                    apiScoreInfo!.Beatmap.Length = jsonBeatmapInfo["hit_length"]!.ToObject<int>() * 1000;
+                    return apiScoreInfo;
                 }).ToArray();
 
             return (user, scores);
@@ -62,7 +55,7 @@ namespace Pepper.Services.Osu.API
         /**
          * Used to set the embed color of o!user
          */
-        public async Task<Color> GetUserAvatarDominantColor(User user)
+        public async Task<Color> GetUserAvatarDominantColor(APIUser user)
         {
             var key = $"osu-user-avatar-{user.Id}";
             if (userAvatarCache.TryGet(key, out var @return))
@@ -84,6 +77,6 @@ namespace Pepper.Services.Osu.API
             return result;
         }
 
-        private static string SerializeUserInLog(User user) => $"{user.Id} - \"{user.Username}\"";
+        private static string SerializeUserInLog(APIUser user) => $"{user.Id} - \"{user.Username}\"";
     }
 }

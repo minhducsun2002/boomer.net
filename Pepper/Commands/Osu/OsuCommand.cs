@@ -6,6 +6,7 @@ using AJ.Code;
 using Disqord;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Difficulty;
@@ -14,12 +15,11 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Scoring;
-using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
-using Pepper.Services.Osu.API;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
+using APIBeatmapSet = Pepper.Commons.Osu.API.APIBeatmapSet;
 
 namespace Pepper.Commands.Osu
 {
@@ -45,11 +45,11 @@ namespace Pepper.Commands.Osu
         }
 
         public static string SerializeBeatmapStats(
-            BeatmapInfo map, DifficultyAttributes? difficultyOverwrite = null,
+            IBeatmapInfo map, DifficultyAttributes? difficultyOverwrite = null,
             ControlPointInfo? controlPointInfo = null,
             bool showLength = true, char delimiter = '•')
         {
-            var diff = map.BaseDifficulty;
+            var diff = new BeatmapDifficulty(map.Difficulty);
             switch (difficultyOverwrite)
             {
                 case OsuDifficultyAttributes osuDifficulty:
@@ -86,7 +86,7 @@ namespace Pepper.Commands.Osu
             }
 
             return
-                $"{difficultyOverwrite?.StarRating ?? map.StarDifficulty:F2} :star: "
+                $"{difficultyOverwrite?.StarRating ?? map.StarRating:F2} :star: "
                 + $" {delimiter} `CS`**{diff.CircleSize}** `AR`**{diff.ApproachRate}** `OD`**{diff.OverallDifficulty}** `HP`**{diff.DrainRate}**"
                 + $" {delimiter} {bpm} BPM"
                 + (showLength
@@ -97,22 +97,24 @@ namespace Pepper.Commands.Osu
         }
 
         public static string SerializeBeatmapStats(APIBeatmapSet set, APIBeatmap diff, bool showLength = true, bool showBPM = true, char delimiter = '•')
-            => $"{diff.StarDifficulty:F2}⭐ "
+            => $"{diff.StarRating:F2}⭐ "
                + $" {delimiter} CS{diff.CircleSize} AR{diff.ApproachRate} OD{diff.OverallDifficulty} HP{diff.DrainRate}"
-               + (showBPM ? $" {delimiter} {set.Bpm} BPM" : "")
+               + (showBPM ? $" {delimiter} {diff.BPM} BPM" : "")
                + (showLength
                    ? $@" {delimiter} :clock3: {
-                       (diff.TotalLengthInSeconds / 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                   }:{(diff.TotalLengthInSeconds % 60).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
+                       ((long) diff.Length / 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
+                   }:{((long) diff.Length % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
                    : "");
 
         protected static string SerializeHitStats(Dictionary<string, int> statistics)
             => $"**{statistics["count_300"]}**/**{statistics["count_100"]}**/**{statistics["count_50"]}**/**{statistics["count_miss"]}**";
 
-        public static string SerializeTimestamp(DateTimeOffset timestamp, bool utcHint = true)
-            => timestamp.ToUniversalTime().ToString($"HH:mm:ss, dd/MM/yyyy{(utcHint ? " 'UTC'" : "")}", CultureInfo.InvariantCulture);
+        public static string SerializeTimestamp(DateTimeOffset? timestamp, bool utcHint = true)
+            => (timestamp ?? DateTimeOffset.UnixEpoch)
+                .ToUniversalTime()
+                .ToString($"HH:mm:ss, dd/MM/yyyy{(utcHint ? " 'UTC'" : "")}", CultureInfo.InvariantCulture);
 
-        public static LocalEmbedAuthor SerializeAuthorBuilder(osu.Game.Users.User user)
+        public static LocalEmbedAuthor SerializeAuthorBuilder(APIUser user)
             => new()
             {
                 IconUrl = string.IsNullOrWhiteSpace(user.AvatarUrl) ? $"https://a.ppy.sh/{user.Id}" : user.AvatarUrl,
@@ -133,7 +135,7 @@ namespace Pepper.Commands.Osu
             };
         }
 
-        protected static Mod[] ResolveMods(Ruleset ruleset, params string[] modStrings)
+        protected static Mod[] ResolveMods(Ruleset ruleset, IEnumerable<string> modStrings)
         {
             var allMods = ruleset.CreateAllMods().ToArray();
             return modStrings
