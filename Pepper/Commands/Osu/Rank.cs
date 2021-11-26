@@ -37,7 +37,7 @@ namespace Pepper.Commands.Osu
             );
 
             var pages = profiles
-                .OrderByDescending(profile => profile.Item2.Item1.Statistics.GlobalRank)
+                .OrderBy(profile => profile.Item2.Item1.Statistics.GlobalRank)
                 .Chunk(10)
                 .Select(chunk =>
                 {
