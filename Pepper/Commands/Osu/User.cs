@@ -4,8 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
+using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
-using Pepper.Services.Osu;
+using Pepper.Commons.Osu;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
@@ -14,7 +15,7 @@ namespace Pepper.Commands.Osu
 {
     public class User : OsuCommand
     {
-        public User(APIService service) : base(service) { }
+        public User(IAPIClient service) : base(service) { }
 
         [Command("user", "u")]
         [Description("Show statistics of an osu! player.")]
@@ -22,7 +23,10 @@ namespace Pepper.Commands.Osu
             [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
             [Remainder][Description("Username to check. Default to your username, if set.")] Username username)
         {
-            var (user, scores, color) = await APIService.GetUser(username, ruleset.RulesetInfo);
+            var user = await APIService.GetUser(username, ruleset.RulesetInfo);
+            var color = await APIService.GetUserColor(user);
+            var scores = await APIService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, 1);
+
             var stats = user.Statistics;
             var grades = stats.GradesCount;
             var playTime = new TimeSpan((stats.PlayTime ?? 0) * (long) 1e7);

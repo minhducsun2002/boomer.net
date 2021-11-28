@@ -2,9 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Disqord.Bot;
 using Microsoft.Extensions.Configuration;
+using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
-using Pepper.Services.Osu.API;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
@@ -15,7 +15,7 @@ namespace Pepper.Commands.Osu
     {
         private readonly IConfiguration configuration;
 
-        public Beatmap(APIService service, BeatmapContextProviderService b, IConfiguration configuration) : base(service, b)
+        public Beatmap(IAPIClient service, BeatmapContextProviderService b, IConfiguration configuration) : base(service, b)
         {
             this.configuration = configuration;
         }

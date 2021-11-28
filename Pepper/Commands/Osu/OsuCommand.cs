@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Scoring;
-using Pepper.Services.Osu;
+using Pepper.Commons.Osu;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
@@ -27,8 +27,8 @@ namespace Pepper.Commands.Osu
     [Category("osu!")]
     public abstract class OsuCommand : Command
     {
-        public OsuCommand(APIService service) => APIService = service;
-        protected readonly APIService APIService;
+        public OsuCommand(IAPIClient service) => APIService = service;
+        protected readonly IAPIClient APIService;
         protected static Ruleset[] Rulesets => RulesetTypeParser.SupportedRulesets;
 
         protected static string ResolveEarthEmoji(string countryCode)

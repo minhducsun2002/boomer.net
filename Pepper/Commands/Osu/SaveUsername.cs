@@ -1,6 +1,7 @@
 using System;
 using Disqord.Bot;
 using Microsoft.Extensions.DependencyInjection;
+using Pepper.Commons.Osu;
 using Pepper.Services.Osu;
 using Pepper.Structures.Commands;
 using Qmmands;
@@ -12,7 +13,7 @@ namespace Pepper.Commands.Osu
 
     public class SaveUsername : OsuCommand
     {
-        public SaveUsername(APIService service) : base(service) { }
+        public SaveUsername(IAPIClient service) : base(service) { }
 
         [SaveUsername]
         [RequireGuildWhitelist("osu-user-set")]

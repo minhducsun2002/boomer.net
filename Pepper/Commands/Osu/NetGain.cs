@@ -6,9 +6,8 @@ using Disqord;
 using Disqord.Bot;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
-using Pepper.Services.Osu;
-using Pepper.Services.Osu.API;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
@@ -17,7 +16,7 @@ namespace Pepper.Commands.Osu
 {
     public class NetGain : OsuCommand
     {
-        public NetGain(APIService service) : base(service) { }
+        public NetGain(IAPIClient service) : base(service) { }
 
         private class ScoreComparer : IComparer<APIScoreInfo>
         {
@@ -37,7 +36,7 @@ namespace Pepper.Commands.Osu
             [Description("Username to check. Default to your username, if set.")] Username username = null!
         )
         {
-            var (user, _, _) = await APIService.GetUser(username, ruleset.RulesetInfo);
+            var user = await APIService.GetUser(username, ruleset.RulesetInfo);
             var scores = await APIService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
             var sortedScores = scores.OrderByDescending(score => score.PP!.Value).ToList();
 

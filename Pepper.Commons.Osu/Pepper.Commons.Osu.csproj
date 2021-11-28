@@ -6,11 +6,16 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <PackageReference Include="OsuSharp" Version="5.6.0" />
         <PackageReference Include="ppy.osu.Game.Rulesets.Catch" Version="2021.1108.0" />
         <PackageReference Include="ppy.osu.Game.Rulesets.Mania" Version="2021.1108.0" />
         <PackageReference Include="ppy.osu.Game.Rulesets.Osu" Version="2021.1108.0" />
         <PackageReference Include="ppy.osu.Game.Rulesets.Taiko" Version="2021.1108.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="BitFaster.Caching" Version="1.0.3" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="APIClients\Ripple" />
     </ItemGroup>
 </Project>

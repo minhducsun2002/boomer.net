@@ -8,6 +8,7 @@ using Disqord.Gateway;
 using Disqord.Rest;
 using Microsoft.Extensions.DependencyInjection;
 using osu.Game.Rulesets;
+using Pepper.Commons.Osu;
 using Pepper.Services.Osu;
 using Pepper.Structures.Commands;
 using Qmmands;
@@ -18,7 +19,7 @@ namespace Pepper.Commands.Osu
     [RequireGuild]
     public class Rank : BeatmapContextCommand
     {
-        public Rank(APIService service, BeatmapContextProviderService b) : base(service, b) { }
+        public Rank(IAPIClient service, BeatmapContextProviderService b) : base(service, b) { }
 
         [RequireGuildWhitelist("osu-leaderboard")]
         [Command("rank", "ranks")]
@@ -37,7 +38,7 @@ namespace Pepper.Commands.Osu
             );
 
             var pages = profiles
-                .OrderBy(profile => profile.Item2.Item1.Statistics.GlobalRank)
+                .OrderBy(profile => profile.Item2.Statistics.GlobalRank)
                 .Chunk(10)
                 .Select(chunk =>
                 {
@@ -45,8 +46,7 @@ namespace Pepper.Commands.Osu
                     {
                         Fields = chunk.Select(profile =>
                         {
-                            var (key, userTuple) = profile;
-                            var user = userTuple.Item1;
+                            var (key, user) = profile;
                             return new LocalEmbedField
                             {
                                 Name = user.Username,

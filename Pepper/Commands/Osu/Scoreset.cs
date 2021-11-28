@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Disqord;
+using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
-using Pepper.Services.Osu.API;
 
 namespace Pepper.Commands.Osu
 {
     public partial class Scoreset : OsuScoreCommand
     {
         private const int MaxScorePerPage = 5;
-        public Scoreset(APIService s, BeatmapContextProviderService b) : base(s, b) { }
+        public Scoreset(IAPIClient s, BeatmapContextProviderService b) : base(s, b) { }
 
         public static LocalEmbedField SerializeScoreInList(APIScoreInfo score, bool utcHint = false, bool scoreLink = true)
         {

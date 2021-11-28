@@ -1,13 +1,11 @@
 using System.Linq;
 using System.Threading.Tasks;
-using BAMCIS.ChunkExtensionMethod;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu.API;
-using Pepper.Services.Osu.API;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
@@ -24,7 +22,7 @@ namespace Pepper.Commands.Osu
         )
         {
             var rulesetInfo = ruleset.RulesetInfo;
-            var (user, _, _) = await APIService.GetUser(username, rulesetInfo);
+            var user = await APIService.GetUser(username, rulesetInfo);
 
             var scores = await APIService.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo);
 
@@ -57,7 +55,7 @@ namespace Pepper.Commands.Osu
             [Flag("#")][Description("Index from the latest play. 1 indicates the latest.")] int pos = 1)
         {
             var rulesetInfo = ruleset.RulesetInfo;
-            var (user, _, _) = await APIService.GetUser(username, rulesetInfo);
+            var user = await APIService.GetUser(username, rulesetInfo);
 
             var scores = await APIService.GetLegacyUserRecentScores(user.Id, rulesetInfo, pos);
             if (scores.ElementAtOrDefault(pos - 1) != default)

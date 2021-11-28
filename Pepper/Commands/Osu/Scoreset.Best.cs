@@ -9,7 +9,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Mods;
 using Pepper.Commons.Osu.API;
-using Pepper.Services.Osu.API;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
@@ -33,7 +32,7 @@ namespace Pepper.Commands.Osu
             [Flag("#")][Description("Index from the best play. 1 indicates the best play.")] int pos = -1
         )
         {
-            var (user, _, _) = await APIService.GetUser(username, ruleset.RulesetInfo);
+            var user = await APIService.GetUser(username, ruleset.RulesetInfo);
 
             if (pos > 0)
             {

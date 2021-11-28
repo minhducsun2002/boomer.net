@@ -13,6 +13,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
+using OsuSharp;
+using Pepper.Commons.Osu;
+using Pepper.Commons.Osu.APIClients;
+using Pepper.Commons.Osu.APIClients.Default;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Prometheus;
@@ -34,26 +38,6 @@ var hostBuilder = new HostBuilder()
                 )
             )
     )
-    .ConfigureServices(services =>
-    {
-        var enableMetrics = Environment.GetEnvironmentVariable("ENABLE_METRICS");
-        var portEnv = Environment.GetEnvironmentVariable("PORT") ?? "2827";
-        if (enableMetrics == "true" && int.TryParse(portEnv, out var port))
-        {
-            DotNetRuntimeStatsBuilder.Default().StartCollecting();
-            var server = new MetricServer(port).Start();
-            services.AddSingleton(server);
-        }
-
-        services.AddSingleton<HttpClient>();
-        services.Configure<CommandServiceConfiguration>(config =>
-        {
-            config.DefaultRunMode = RunMode.Parallel;
-            config.DefaultArgumentParser = new ArgumentParser();
-            config.IgnoresExtraArguments = true;
-            config.StringComparison = StringComparison.InvariantCultureIgnoreCase;
-        });
-    })
     .ConfigureAppConfiguration(app =>
     {
         app.AddEnvironmentVariables("PEPPER_");
@@ -75,6 +59,33 @@ var hostBuilder = new HostBuilder()
         {
             app.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "config/config.json"));
         }
+    })
+    .ConfigureServices((context, services) =>
+    {
+        var enableMetrics = Environment.GetEnvironmentVariable("ENABLE_METRICS");
+        var portEnv = Environment.GetEnvironmentVariable("PORT") ?? "2827";
+        if (enableMetrics == "true" && int.TryParse(portEnv, out var port))
+        {
+            DotNetRuntimeStatsBuilder.Default().StartCollecting();
+            var server = new MetricServer(port).Start();
+            services.AddSingleton(server);
+        }
+
+        services.AddSingleton(
+            new OsuClient(new OsuSharpConfiguration
+            {
+                ApiKey = context.Configuration["OSU_API_KEY"]
+            })
+        );
+        services.AddSingleton<HttpClient>();
+        services.AddSingleton<IAPIClient, DefaultOsuAPIClient>();
+        services.Configure<CommandServiceConfiguration>(config =>
+        {
+            config.DefaultRunMode = RunMode.Parallel;
+            config.DefaultArgumentParser = new ArgumentParser();
+            config.IgnoresExtraArguments = true;
+            config.StringComparison = StringComparison.InvariantCultureIgnoreCase;
+        });
     })
     .ConfigureDiscordBot<Pepper.Pepper>((context, bot) =>
     {

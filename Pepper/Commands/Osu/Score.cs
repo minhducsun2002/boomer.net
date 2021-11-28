@@ -1,15 +1,12 @@
 using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
 using osu.Game.Beatmaps.Legacy;
-using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using OsuSharp;
+using Pepper.Commons.Osu;
 using Pepper.Services.Osu;
-using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Pepper.Utilities.Osu;
 using Qmmands;
@@ -18,7 +15,7 @@ namespace Pepper.Commands.Osu
 {
     public class Score : OsuScoreCommand
     {
-        public Score(APIService s, BeatmapContextProviderService b) : base(s, b) { }
+        public Score(IAPIClient s, BeatmapContextProviderService b) : base(s, b) { }
 
         [Command("sc", "score", "scores", "c", "check")]
         [Description("View/list scores on a certain map")]
@@ -36,7 +33,7 @@ namespace Pepper.Commands.Osu
                 var ruleset = map.GetDefaultRuleset();
                 SetBeatmapContext(mapId);
 
-                var (user, _, _) = await APIService.GetUser(username, ruleset.RulesetInfo);
+                var user = await APIService.GetUser(username, ruleset.RulesetInfo);
                 var scores = await APIService.GetLegacyBeatmapScores(
                     user.Id,
                     mapId,

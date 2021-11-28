@@ -16,7 +16,6 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.12.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="OsuSharp" Version="5.6.0" />
     <PackageReference Include="Pastel" Version="2.1.0" />
     <PackageReference Include="prometheus-net.DotNetRuntime" Version="4.2.1" />
     <PackageReference Include="Qmmands" Version="4.0.0" />
