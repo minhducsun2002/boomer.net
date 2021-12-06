@@ -12,6 +12,10 @@ namespace Pepper.Structures.External.Osu
     public class Username
     {
         public string Content = "";
+        public override string ToString()
+        {
+            return Content;
+        }
         public static implicit operator string(Username username) => username.Content;
         public static explicit operator Username(string username) => new() { Content = username };
     }

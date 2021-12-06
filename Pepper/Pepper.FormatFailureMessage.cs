@@ -29,6 +29,11 @@ namespace Pepper
             switch (result)
             {
                 case CommandExecutionFailedResult executionFailedResult:
+                    if (executionFailedResult.TryFormatFailure(context, out var formattedMessage))
+                    {
+                        return formattedMessage!;
+                    }
+
                     var exception = executionFailedResult.Exception;
                     var stackTrace = exception.StackTrace!.Split('\n');
 

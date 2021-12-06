@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
@@ -13,6 +15,7 @@ using Qmmands;
 
 namespace Pepper.Commands.Osu
 {
+    [NotFoundHandler]
     public class User : OsuCommand
     {
         public User(IAPIClient service) : base(service) { }
@@ -79,6 +82,25 @@ namespace Pepper.Commands.Osu
             }
 
             return Reply(embed);
+        }
+
+
+        private class NotFoundHandlerAttribute : Attribute, ICommandExecutionFailureFormatter
+        {
+            // handle 404s
+            public LocalMessage? FormatFailure(DiscordCommandContext context, CommandExecutionFailedResult commandExecutionFailedResult)
+            {
+                var exception = commandExecutionFailedResult.Exception;
+                if (exception is HttpRequestException { StatusCode: HttpStatusCode.NotFound })
+                {
+                    var username = context.Arguments.OfType<Username>().First();
+                    return new LocalMessage().WithContent(
+                        $"User **{username}** isn't found. Either the user doesn't exist, or they're under a restriction."
+                    );
+                }
+
+                return null;
+            }
         }
     }
 }
