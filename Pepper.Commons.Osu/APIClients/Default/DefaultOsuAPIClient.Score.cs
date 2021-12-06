@@ -12,14 +12,14 @@ namespace Pepper.Commons.Osu.APIClients.Default
 {
     public partial class DefaultOsuAPIClient
     {
-        public async Task<APIScoreInfo> GetScore(long scoreId, RulesetInfo rulesetInfo)
+        public override async Task<APIScoreInfo> GetScore(long scoreId, RulesetInfo rulesetInfo)
         {
-            var res = await httpClient.GetStringAsync($"https://osu.ppy.sh/scores/{rulesetInfo.ShortName}/{scoreId}");
+            var res = await HttpClient.GetStringAsync($"https://osu.ppy.sh/scores/{rulesetInfo.ShortName}/{scoreId}");
             var doc = new HtmlDocument(); doc.LoadHtml(res);
             return SerializeToAPILegacyScoreInfo(JObject.Parse(doc.GetElementbyId("json-show").InnerText));
         }
 
-        public async Task<APIScoreInfo[]> GetUserScores(int userId, ScoreType scoreType, RulesetInfo rulesetInfo, int count = 100, int offset = 0)
+        public override async Task<APIScoreInfo[]> GetUserScores(int userId, ScoreType scoreType, RulesetInfo rulesetInfo, int count = 100, int offset = 0)
         {
             var scoreCache = new List<APIScoreInfo>();
 
@@ -27,7 +27,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
             while (scoreCache.Count < count)
             {
                 const int maxSingle = 50;
-                var res = await httpClient.GetStringAsync(
+                var res = await HttpClient.GetStringAsync(
                     $"https://osu.ppy.sh/users/{userId}/scores/{scoreType.ToString().ToLowerInvariant()}?mode={rulesetInfo.ShortName}"
                     + $"&offset={init}&limit={Math.Min(maxSingle, count - init)}");
                 init += maxSingle;

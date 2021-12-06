@@ -19,7 +19,7 @@ namespace Pepper.Commands.Osu
 {
     public abstract class OsuScoreCommand : BeatmapContextCommand
     {
-        protected OsuScoreCommand(IAPIClient s, BeatmapContextProviderService b) : base(s, b) { }
+        protected OsuScoreCommand(APIClient s, BeatmapContextProviderService b) : base(s, b) { }
 
         protected async Task<DiscordCommandResult> SingleScore(APIScoreInfo sc)
         {

@@ -27,8 +27,8 @@ namespace Pepper.Commands.Osu
     [Category("osu!")]
     public abstract class OsuCommand : Command
     {
-        public OsuCommand(IAPIClient service) => APIService = service;
-        protected readonly IAPIClient APIService;
+        public OsuCommand(APIClient service) => APIService = service;
+        protected readonly APIClient APIService;
         protected static Ruleset[] Rulesets => RulesetTypeParser.SupportedRulesets;
 
         protected static string ResolveEarthEmoji(string countryCode)

@@ -18,10 +18,10 @@ namespace Pepper.Commands.Osu
     internal class BeatmapPageProvider : PageProvider
     {
         public readonly APIBeatmapSet Beatmapset;
-        private readonly IAPIClient apiService;
+        private readonly APIClient apiService;
         private readonly string imageHost;
         private readonly Dictionary<int, LocalEmbed> beatmapEmbeds = new();
-        public BeatmapPageProvider(APIBeatmapSet beatmapSet, IAPIClient apiService, IConfiguration configuration)
+        public BeatmapPageProvider(APIBeatmapSet beatmapSet, APIClient apiService, IConfiguration configuration)
         {
             Beatmapset = beatmapSet;
             this.apiService = apiService;
@@ -41,7 +41,7 @@ namespace Pepper.Commands.Osu
 
         public override int PageCount => Beatmapset.Beatmaps.Length;
 
-        private async Task<LocalEmbed> PrepareEmbed(APIBeatmapSet beatmapset, IAPIClient service, int beatmapId, Mod[]? mods = null)
+        private async Task<LocalEmbed> PrepareEmbed(APIBeatmapSet beatmapset, APIClient service, int beatmapId, Mod[]? mods = null)
         {
             var beatmap = beatmapset.Beatmaps.First(beatmap => beatmap.OnlineID == beatmapId);
             var ruleset = RulesetTypeParser.SupportedRulesets[beatmap.RulesetID];

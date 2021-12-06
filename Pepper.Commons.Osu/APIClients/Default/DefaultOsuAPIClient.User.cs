@@ -17,10 +17,10 @@ namespace Pepper.Commons.Osu.APIClients.Default
     {
         private readonly FastConcurrentTLru<string, Color> userColorCache = new(200, TimeSpan.FromSeconds(30 * 60));
 
-        public async Task<APIUser> GetUser(string username, RulesetInfo rulesetInfo)
+        public override async Task<APIUser> GetUser(string username, RulesetInfo rulesetInfo)
         {
             var rulesetName = rulesetInfo.ShortName;
-            var html = await httpClient.GetStringAsync($"https://osu.ppy.sh/users/{HttpUtility.UrlPathEncode(username)}/{rulesetName}");
+            var html = await HttpClient.GetStringAsync($"https://osu.ppy.sh/users/{HttpUtility.UrlPathEncode(username)}/{rulesetName}");
             var doc = new HtmlDocument(); doc.LoadHtml(html);
             var user = JsonConvert.DeserializeObject<APIUser>(
                 doc.GetElementbyId("json-user").InnerText,
@@ -29,7 +29,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
             return user;
         }
 
-        public async Task<Color> GetUserColor(APIUser user)
+        public override async Task<Color> GetUserColor(APIUser user)
         {
             var key = $"osu-user-avatar-{user.Id}";
             if (userColorCache.TryGet(key, out var @return))
@@ -37,7 +37,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
                 return @return;
             }
 
-            var avatar = await httpClient.GetByteArrayAsync(user.AvatarUrl);
+            var avatar = await HttpClient.GetByteArrayAsync(user.AvatarUrl);
             var image = Image.Load(avatar);
             image.Mutate(img => img.Quantize(new OctreeQuantizer(new QuantizerOptions { MaxColors = 2 }))
                 .Resize(1, 1, KnownResamplers.Bicubic));

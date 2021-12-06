@@ -15,7 +15,7 @@ namespace Pepper.Commands.Osu
     {
         private readonly IConfiguration configuration;
 
-        public Beatmap(IAPIClient service, BeatmapContextProviderService b, IConfiguration configuration) : base(service, b)
+        public Beatmap(APIClient service, BeatmapContextProviderService b, IConfiguration configuration) : base(service, b)
         {
             this.configuration = configuration;
         }

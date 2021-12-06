@@ -16,7 +16,7 @@ namespace Pepper.Commands.Osu
 {
     public class NetGain : OsuCommand
     {
-        public NetGain(IAPIClient service) : base(service) { }
+        public NetGain(APIClient service) : base(service) { }
 
         private class ScoreComparer : IComparer<APIScoreInfo>
         {

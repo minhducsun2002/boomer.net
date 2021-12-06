@@ -13,7 +13,7 @@ namespace Pepper.Commands.Osu
 
     public class SaveUsername : OsuCommand
     {
-        public SaveUsername(IAPIClient service) : base(service) { }
+        public SaveUsername(APIClient service) : base(service) { }
 
         [SaveUsername]
         [RequireGuildWhitelist("osu-user-set")]

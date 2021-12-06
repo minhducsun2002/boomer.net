@@ -10,19 +10,19 @@ namespace Pepper.Commons.Osu.APIClients.Default
     {
         private readonly FastConcurrentLru<int, byte[]> beatmapCache = new(200);
         private readonly FastConcurrentLru<string, APIBeatmapSet> beatmapsetMetadataCache = new(200);
-        public async Task<WorkingBeatmap> GetBeatmap(int beatmapId)
+        public override async Task<WorkingBeatmap> GetBeatmap(int beatmapId)
         {
             if (beatmapCache.TryGet(beatmapId, out var @return))
             {
                 return WorkingBeatmap.Decode(@return, beatmapId);
             }
 
-            var file = await httpClient.GetByteArrayAsync($"https://osu.ppy.sh/osu/{beatmapId}");
+            var file = await HttpClient.GetByteArrayAsync($"https://osu.ppy.sh/osu/{beatmapId}");
             beatmapCache.AddOrUpdate(beatmapId, file);
             return WorkingBeatmap.Decode(file, beatmapId);
         }
 
-        public async Task<APIBeatmapSet> GetBeatmapsetInfo(long id, bool isBeatmapSetId)
+        public override async Task<APIBeatmapSet> GetBeatmapsetInfo(long id, bool isBeatmapSetId)
         {
             var key = id + "-" + (isBeatmapSetId ? "1" : "0");
             if (beatmapsetMetadataCache.TryGet(key, out var @return))
@@ -30,7 +30,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
                 return @return;
             }
 
-            var res = await httpClient.GetStringAsync(
+            var res = await HttpClient.GetStringAsync(
                 $"https://osu.ppy.sh/{(isBeatmapSetId ? "beatmapsets" : "beatmaps")}/{id}"
             );
 

@@ -3,19 +3,16 @@ using OsuSharp;
 
 namespace Pepper.Commons.Osu.APIClients.Default
 {
-    public partial class DefaultOsuAPIClient : IAPIClient
+    public partial class DefaultOsuAPIClient : APIClient
     {
-        private readonly HttpClient httpClient;
         private readonly OsuClient legacyApiClient;
-        public DefaultOsuAPIClient(HttpClient httpClient, OsuClient legacyApiClient)
+        public DefaultOsuAPIClient(HttpClient httpClient, OsuClient legacyApiClient) : base(httpClient)
         {
-            this.httpClient = httpClient;
             this.legacyApiClient = legacyApiClient;
         }
 
-        public DefaultOsuAPIClient(HttpClient httpClient, string apiv1Key)
+        public DefaultOsuAPIClient(HttpClient httpClient, string apiv1Key) : base(httpClient)
         {
-            this.httpClient = httpClient;
             legacyApiClient = new OsuClient(new OsuSharpConfiguration
             {
                 ApiKey = apiv1Key

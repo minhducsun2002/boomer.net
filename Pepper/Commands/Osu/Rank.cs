@@ -19,7 +19,7 @@ namespace Pepper.Commands.Osu
     [RequireGuild]
     public class Rank : BeatmapContextCommand
     {
-        public Rank(IAPIClient service, BeatmapContextProviderService b) : base(service, b) { }
+        public Rank(APIClient service, BeatmapContextProviderService b) : base(service, b) { }
 
         [RequireGuildWhitelist("osu-leaderboard")]
         [Command("rank", "ranks")]

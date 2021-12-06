@@ -18,7 +18,7 @@ namespace Pepper.Commands.Osu
     [NotFoundHandler]
     public class User : OsuCommand
     {
-        public User(IAPIClient service) : base(service) { }
+        public User(APIClient service) : base(service) { }
 
         [Command("user", "u")]
         [Description("Show statistics of an osu! player.")]

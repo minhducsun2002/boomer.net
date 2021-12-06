@@ -15,7 +15,7 @@ namespace Pepper.Commands.Osu
 {
     public class Score : OsuScoreCommand
     {
-        public Score(IAPIClient s, BeatmapContextProviderService b) : base(s, b) { }
+        public Score(APIClient s, BeatmapContextProviderService b) : base(s, b) { }
 
         [Command("sc", "score", "scores", "c", "check")]
         [Description("View/list scores on a certain map")]

@@ -78,7 +78,7 @@ var hostBuilder = new HostBuilder()
             })
         );
         services.AddSingleton<HttpClient>();
-        services.AddSingleton<IAPIClient, DefaultOsuAPIClient>();
+        services.AddSingleton<APIClient, DefaultOsuAPIClient>();
         services.Configure<CommandServiceConfiguration>(config =>
         {
             config.DefaultRunMode = RunMode.Parallel;
