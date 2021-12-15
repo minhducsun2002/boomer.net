@@ -9,6 +9,7 @@ using APIScoreInfo = Pepper.Commons.Osu.API.APIScoreInfo;
 
 namespace Pepper.Commons.Osu.APIClients.Ripple
 {
+    [GameServer(GameServer.Ripple)]
     public partial class RippleOsuAPIClient : APIClient
     {
         private readonly OsuClient legacyApiClient;

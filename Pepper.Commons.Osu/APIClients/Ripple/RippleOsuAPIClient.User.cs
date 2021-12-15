@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using System.Web;
 using BitFaster.Caching.Lru;
 using Newtonsoft.Json;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using OsuSharp;
+using Pepper.Commons.Osu.API;
 using Pepper.Commons.Osu.API.Ripple;
 
 namespace Pepper.Commons.Osu.APIClients.Ripple

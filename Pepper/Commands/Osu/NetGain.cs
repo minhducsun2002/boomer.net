@@ -8,6 +8,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
+using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
@@ -16,7 +17,7 @@ namespace Pepper.Commands.Osu
 {
     public class NetGain : OsuCommand
     {
-        public NetGain(APIClient service) : base(service) { }
+        public NetGain(APIClientStore apiClientStore) : base(apiClientStore) { }
 
         private class ScoreComparer : IComparer<APIScoreInfo>
         {
@@ -32,12 +33,14 @@ namespace Pepper.Commands.Osu
         [Description("What if you set a score with a certain pp amount?")]
         public async Task<DiscordCommandResult> Exec(
             [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
+            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Description("The amount of pp to check.")] int ppToCheck,
-            [Description("Username to check. Default to your username, if set.")] Username username = null!
+            [Description("Username to check. Default to your username, if set.")] Username username
         )
         {
-            var user = await APIService.GetUser(username, ruleset.RulesetInfo);
-            var scores = await APIService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
+            var apiClient = APIClientStore.GetClient(server);
+            var user = await apiClient.GetUser(username.GetUsername(server)!, ruleset.RulesetInfo);
+            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
             var sortedScores = scores.OrderByDescending(score => score.PP!.Value).ToList();
 
             var pps = sortedScores.Select((score, index) => (score.PP!.Value, index)).ToList();

@@ -19,12 +19,12 @@ namespace Pepper.Commands.Osu
 {
     public abstract class OsuScoreCommand : BeatmapContextCommand
     {
-        protected OsuScoreCommand(APIClient s, BeatmapContextProviderService b) : base(s, b) { }
+        protected OsuScoreCommand(APIClientStore s, BeatmapContextProviderService b) : base(s, b) { }
 
         protected async Task<DiscordCommandResult> SingleScore(APIScoreInfo sc)
         {
             var b = sc.Beatmap!;
-            var workingBeatmap = await APIService.GetBeatmap(b.OnlineID);
+            var workingBeatmap = await APIClientStore.GetClient(GameServer.Osu).GetBeatmap(b.OnlineID);
             var ruleset = Rulesets[sc.RulesetID];
 
             var mods = ResolveMods(ruleset, sc.Mods.Select(mod => mod.Acronym));
@@ -45,7 +45,7 @@ namespace Pepper.Commands.Osu
 
         protected async Task<DiscordCommandResult> SingleScore(APIUser user, OsuSharp.Score sc)
         {
-            var workingBeatmap = await APIService.GetBeatmap((int) sc.BeatmapId);
+            var workingBeatmap = await APIClientStore.GetClient(GameServer.Osu).GetBeatmap((int) sc.BeatmapId);
             var b = workingBeatmap.Beatmap.BeatmapInfo;
             var ruleset = Rulesets[(int) sc.GameMode];
             var mods = ruleset.ConvertFromLegacyMods((LegacyMods) sc.Mods)!.ToArray();

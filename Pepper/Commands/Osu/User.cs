@@ -9,8 +9,8 @@ using Disqord.Bot;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
+using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
-using Pepper.Structures.External.Osu;
 using Qmmands;
 
 namespace Pepper.Commands.Osu
@@ -18,17 +18,19 @@ namespace Pepper.Commands.Osu
     [NotFoundHandler]
     public class User : OsuCommand
     {
-        public User(APIClient service) : base(service) { }
+        public User(APIClientStore apiClientStore) : base(apiClientStore) { }
 
         [Command("user", "u")]
         [Description("Show statistics of an osu! player.")]
         public async Task<DiscordCommandResult> Exec(
             [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
+            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Remainder][Description("Username to check. Default to your username, if set.")] Username username)
         {
-            var user = await APIService.GetUser(username, ruleset.RulesetInfo);
-            var color = await APIService.GetUserColor(user);
-            var scores = await APIService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, 1);
+            var apiClient = APIClientStore.GetClient(server);
+            var user = await apiClient.GetUser(username.GetUsername(server)!, ruleset.RulesetInfo);
+            var color = await apiClient.GetUserColor(user);
+            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, 1);
 
             var stats = user.Statistics;
             var grades = stats.GradesCount;

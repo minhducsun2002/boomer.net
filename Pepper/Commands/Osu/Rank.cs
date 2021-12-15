@@ -9,8 +9,10 @@ using Disqord.Rest;
 using Microsoft.Extensions.DependencyInjection;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
+using Pepper.Database.OsuUsernameProviders;
 using Pepper.Services.Osu;
 using Pepper.Structures.Commands;
+using Pepper.Structures.External.Osu.Extensions;
 using Qmmands;
 using PagedView = Pepper.Structures.PagedView;
 
@@ -19,22 +21,33 @@ namespace Pepper.Commands.Osu
     [RequireGuild]
     public class Rank : BeatmapContextCommand
     {
-        public Rank(APIClient service, BeatmapContextProviderService b) : base(service, b) { }
+        private readonly IOsuUsernameProvider usernameProvider;
+
+        public Rank(APIClientStore s, BeatmapContextProviderService b, IOsuUsernameProvider usernameProvider) : base(s, b)
+        {
+            this.usernameProvider = usernameProvider;
+        }
 
         [RequireGuildWhitelist("osu-leaderboard")]
         [Command("rank", "ranks")]
         [Description("See your ranking compared to other players in this server")]
         public async Task<DiscordCommandResult> Exec([Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset)
         {
-            var service = Context.Services.GetRequiredService<DiscordOsuUsernameLookupService>();
             var context = (DiscordGuildCommandContext) Context;
             var cachedMembers = context.Guild.GetMembers().Values;
 
             var msg = await Reply("Please wait a bit. I'm collecting usernames & stats. Hang tight...");
-            var records = await service.GetManyUsers(cachedMembers.Select(member => (ulong) member.Id).ToArray());
+            var records = await usernameProvider.GetUsernamesBulk(cachedMembers.Select(member => member.Id.ToString()).ToArray());
             var profiles = await Task.WhenAll(
                 records
-                    .Select(async kv => (kv.Key, await APIService.GetUser(kv.Value, ruleset.RulesetInfo)))
+                    .Select(async kv =>
+                    {
+                        var (userId, usernameRecord) = kv;
+                        var server = usernameRecord.DefaultServer;
+                        var apiClient = APIClientStore.GetClient(server);
+                        var user = await apiClient.GetUser(usernameRecord.GetUsername(server)!, ruleset.RulesetInfo);
+                        return (userId, user, server);
+                    })
             );
 
             var pages = profiles
@@ -46,10 +59,10 @@ namespace Pepper.Commands.Osu
                     {
                         Fields = chunk.Select(profile =>
                         {
-                            var (key, user) = profile;
+                            var (key, user, server) = profile;
                             return new LocalEmbedField
                             {
-                                Name = user.Username,
+                                Name = $"{user.Username} ({server.GetDisplayText()}",
                                 Value = $"**{user.Statistics.PP:F2}**pp • **{user.Statistics.Accuracy:F3}**%"
                                         + $" • {ResolveEarthEmoji(user.Country.FlagName)} #{user.Statistics.GlobalRank}"
                                         + $" • :flag_{user.Country.FlagName.ToLowerInvariant()}: #{user.Statistics.CountryRank}"

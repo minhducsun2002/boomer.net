@@ -5,9 +5,10 @@ using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
+using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
-using Pepper.Structures.External.Osu;
 using Qmmands;
 
 namespace Pepper.Commands.Osu
@@ -18,13 +19,15 @@ namespace Pepper.Commands.Osu
         [Description("Show recent plays of a player.")]
         public async Task<DiscordCommandResult> Recent(
             [Flag("/")][Description("Game mode to check. Defaults to osu!.")] Ruleset ruleset,
+            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Description("Username to check. Default to your username, if set.")] Username username
         )
         {
             var rulesetInfo = ruleset.RulesetInfo;
-            var user = await APIService.GetUser(username, rulesetInfo);
+            var apiClient = APIClientStore.GetClient(server);
+            var user = await apiClient.GetUser(username.GetUsername(server)!, rulesetInfo);
 
-            var scores = await APIService.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo);
+            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo);
 
             var pages = new ArrayPageProvider<APIScoreInfo>(
                 scores,
@@ -40,7 +43,7 @@ namespace Pepper.Commands.Osu
             {
                 return Reply(new LocalEmbed()
                     .WithDescription(
-                        $@"No recent play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {rulesetInfo.Name}"
+                        $@"No recent play found for user [{user.Username}]({user.PublicUrl}) on mode {rulesetInfo.Name}"
                     ));
             }
 
@@ -51,13 +54,15 @@ namespace Pepper.Commands.Osu
         [Description("Show the most recent play of a player.")]
         public async Task<DiscordCommandResult> MostRecent(
             [Flag("/")][Description("Game mode to check. Defaults to osu!.")] Ruleset ruleset,
+            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Description("Username to check. Default to your username, if set.")] Username username,
             [Flag("#")][Description("Index from the latest play. 1 indicates the latest.")] int pos = 1)
         {
             var rulesetInfo = ruleset.RulesetInfo;
-            var user = await APIService.GetUser(username, rulesetInfo);
+            var apiClient = APIClientStore.GetClient(server);
+            var user = await apiClient.GetUser(username.GetUsername(server)!, rulesetInfo);
 
-            var scores = await APIService.GetLegacyUserRecentScores(user.Id, rulesetInfo, pos);
+            var scores = await apiClient.GetLegacyUserRecentScores(user.Id, rulesetInfo, pos);
             if (scores.ElementAtOrDefault(pos - 1) != default)
             {
                 return await SingleScore(user, scores[pos - 1]);
@@ -65,7 +70,7 @@ namespace Pepper.Commands.Osu
 
             return Reply(new LocalEmbed()
                 .WithDescription(
-                    $"No recent play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {rulesetInfo.Name} at position #{pos}."
+                    $"No recent play found for user [{user.Username}]({user.PublicUrl}) on mode {rulesetInfo.Name} at position #{pos}."
                 ));
         }
     }

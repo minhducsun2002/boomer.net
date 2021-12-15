@@ -28,7 +28,10 @@ namespace Pepper.Commands.FGO
 
     internal class QuestIdentityCheckFailureFormatterAttribute : Attribute, IParameterCheckFailureFormatter
     {
-        public LocalMessage? FormatFailure(ParameterChecksFailedResult parameterChecksFailedResult)
+        public LocalMessage? FormatFailure(
+            ParameterChecksFailedResult parameterChecksFailedResult,
+            DiscordCommandContext commandContext
+        )
             => new LocalMessage().WithContent(
                 $"ID {parameterChecksFailedResult.Argument} does not resolve to a valid quest."
             );

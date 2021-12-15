@@ -15,7 +15,7 @@ namespace Pepper.Commands.Osu
     {
         private readonly IConfiguration configuration;
 
-        public Beatmap(APIClient service, BeatmapContextProviderService b, IConfiguration configuration) : base(service, b)
+        public Beatmap(APIClientStore apiClientStore, BeatmapContextProviderService b, IConfiguration configuration) : base(apiClientStore, b)
         {
             this.configuration = configuration;
         }
@@ -27,18 +27,19 @@ namespace Pepper.Commands.Osu
             [Description("In case a numeric ID is passed, whether this is a set ID.")][Flag("/")] bool set = false
         )
         {
+            var apiService = APIClientStore.GetClient(GameServer.Osu);
             return beatmapResolvable switch
             {
                 BeatmapsetResolvable beatmapset => Beatmapset(
-                    await APIService.GetBeatmapsetInfo(beatmapset.BeatmapsetId, true)),
+                    await apiService.GetBeatmapsetInfo(beatmapset.BeatmapsetId, true)),
                 BeatmapResolvable beatmap => BeatmapSingle(
-                    await APIService.GetBeatmapsetInfo(beatmap.BeatmapId, false), beatmap.BeatmapId),
+                    await apiService.GetBeatmapsetInfo(beatmap.BeatmapId, false), beatmap.BeatmapId),
                 BeatmapAndSetResolvable beatmapAndSet => BeatmapSingle(
-                    await APIService.GetBeatmapsetInfo(beatmapAndSet.BeatmapsetId, true), beatmapAndSet.BeatmapId),
+                    await apiService.GetBeatmapsetInfo(beatmapAndSet.BeatmapsetId, true), beatmapAndSet.BeatmapId),
                 BeatmapOrSetResolvable beatmapOrSet => set switch
                 {
-                    true => Beatmapset(await APIService.GetBeatmapsetInfo(beatmapOrSet.BeatmapOrSetId, true)),
-                    false => BeatmapSingle(await APIService.GetBeatmapsetInfo(beatmapOrSet.BeatmapOrSetId, false), beatmapOrSet.BeatmapOrSetId)
+                    true => Beatmapset(await apiService.GetBeatmapsetInfo(beatmapOrSet.BeatmapOrSetId, true)),
+                    false => BeatmapSingle(await apiService.GetBeatmapsetInfo(beatmapOrSet.BeatmapOrSetId, false), beatmapOrSet.BeatmapOrSetId)
                 },
                 _ => throw new ArgumentException("A valid URL is not provided!")
             };
@@ -48,7 +49,7 @@ namespace Pepper.Commands.Osu
         private DiscordCommandResult BeatmapSingle(APIBeatmapSet beatmapset, int beatmapId)
         {
             SetBeatmapContext(beatmapId);
-            return View(new BeatmapSingleView(new BeatmapPageProvider(beatmapset, APIService, configuration), beatmapId));
+            return View(new BeatmapSingleView(new BeatmapPageProvider(beatmapset, APIClientStore.GetClient(GameServer.Osu), configuration), beatmapId));
         }
     }
 }

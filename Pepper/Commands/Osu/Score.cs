@@ -6,7 +6,9 @@ using Disqord.Bot;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Scoring;
 using Pepper.Commons.Osu;
+using Pepper.Database.OsuUsernameProviders;
 using Pepper.Services.Osu;
+using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Pepper.Utilities.Osu;
 using Qmmands;
@@ -15,26 +17,27 @@ namespace Pepper.Commands.Osu
 {
     public class Score : OsuScoreCommand
     {
-        public Score(APIClient s, BeatmapContextProviderService b) : base(s, b) { }
+        public Score(APIClientStore s, BeatmapContextProviderService b) : base(s, b) { }
 
         [Command("sc", "score", "scores", "c", "check")]
         [Description("View/list scores on a certain map")]
         [Priority(1)]
         public async Task<DiscordCommandResult> BeatmapBased(
             [Description("A score URL, a beatmap URL, or a beatmap ID.")] IBeatmapResolvable beatmapResolvable,
+            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Remainder][Description("Username to check. Default to your username, if set.")] Username? username = null
         )
         {
-
             var mapId = beatmapResolvable.BeatmapId;
             if (username != null)
             {
-                var map = await APIService.GetBeatmap(mapId);
+                var apiClient = APIClientStore.GetClient(server);
+                var map = await APIClientStore.GetClient(GameServer.Osu).GetBeatmap(mapId);
                 var ruleset = map.GetDefaultRuleset();
                 SetBeatmapContext(mapId);
 
-                var user = await APIService.GetUser(username, ruleset.RulesetInfo);
-                var scores = await APIService.GetLegacyBeatmapScores(
+                var user = await apiClient.GetUser(username.GetUsername(server)!, ruleset.RulesetInfo);
+                var scores = await apiClient.GetLegacyBeatmapScores(
                     user.Id,
                     mapId,
                     ruleset.RulesetInfo
@@ -42,7 +45,7 @@ namespace Pepper.Commands.Osu
 
                 if (scores.Count == 0)
                 {
-                    return Reply($"No score found on that beatmap for user `{username.Content}`.");
+                    return Reply($"No score found on that beatmap for user `{user.Username}`.");
                 }
 
                 var difficulty = map.CalculateDifficulty(ruleset.RulesetInfo.OnlineID);
@@ -95,14 +98,14 @@ namespace Pepper.Commands.Osu
         }
 
         [Command("sc", "score", "scores", "c", "check")]
-        [Description("View/list scores on a certain map")]
+        [Description("View/list scores on a certain map (osu! official servers only)")]
         [Priority(0)]
         public async Task<DiscordCommandResult> ScoreLink([Description("A link to a score.")] string link)
         {
             if (URLParser.CheckScoreUrl(link, out var scoreLink))
             {
                 var (mode, id) = scoreLink;
-                var sc = await APIService.GetScore(
+                var sc = await APIClientStore.GetClient(GameServer.Osu).GetScore(
                     id,
                     Rulesets
                         .First(rulesetCheck => string.Equals(rulesetCheck.ShortName, mode,

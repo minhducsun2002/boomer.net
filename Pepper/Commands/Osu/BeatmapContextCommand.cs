@@ -5,7 +5,7 @@ namespace Pepper.Commands.Osu
 {
     public abstract class BeatmapContextCommand : OsuCommand
     {
-        protected BeatmapContextCommand(APIClient service, BeatmapContextProviderService b) : base(service) => beatmapContext = b;
+        protected BeatmapContextCommand(APIClientStore apiClientStore, BeatmapContextProviderService b) : base(apiClientStore) => beatmapContext = b;
 
         private readonly BeatmapContextProviderService beatmapContext;
         protected void SetBeatmapContext(int beatmapId) => beatmapContext.SetBeatmap(Context.ChannelId.ToString(), beatmapId);

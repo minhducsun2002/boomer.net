@@ -7,6 +7,7 @@ using Disqord;
 using Disqord.Bot;
 using Disqord.Bot.Hosting;
 using dotenv.net;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,8 +16,8 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
 using OsuSharp;
 using Pepper.Commons.Osu;
-using Pepper.Commons.Osu.APIClients;
-using Pepper.Commons.Osu.APIClients.Default;
+using Pepper.Database.OsuUsernameProviders;
+using Pepper.Services;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Prometheus;
@@ -71,6 +72,13 @@ var hostBuilder = new HostBuilder()
             services.AddSingleton(server);
         }
 
+        services.AddScoped<TypeParsedArgumentPersistenceService>();
+        services.AddDbContext<IOsuUsernameProvider, MariaDbOsuUsernameProvider>(builder =>
+        {
+            var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;
+            builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        });
+
         services.AddSingleton(
             new OsuClient(new OsuSharpConfiguration
             {
@@ -78,7 +86,7 @@ var hostBuilder = new HostBuilder()
             })
         );
         services.AddSingleton<HttpClient>();
-        services.AddSingleton<APIClient, DefaultOsuAPIClient>();
+        services.AddSingleton<APIClientStore>();
         services.Configure<CommandServiceConfiguration>(config =>
         {
             config.DefaultRunMode = RunMode.Parallel;

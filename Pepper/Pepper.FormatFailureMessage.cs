@@ -29,6 +29,17 @@ namespace Pepper
             switch (result)
             {
                 case CommandExecutionFailedResult executionFailedResult:
+                    if (executionFailedResult.CommandExecutionStep != CommandExecutionStep.Command)
+                    {
+                        return new LocalMessage()
+                            .WithContent(
+                                "Something really, really bad happened.\nPlease inform my owner that an exception occurred where it should not."
+                                + "```"
+                                + $"Step : {executionFailedResult.CommandExecutionStep}"
+                                + $"\nException : {executionFailedResult.Exception.Message}"
+                                + "```"
+                            );
+                    }
                     if (executionFailedResult.TryFormatFailure(context, out var formattedMessage))
                     {
                         return formattedMessage!;
@@ -73,7 +84,7 @@ namespace Pepper
                     }
                 case ParameterChecksFailedResult parameterChecksFailedResult:
                     {
-                        if (parameterChecksFailedResult.TryFormatFailure(out var formatted))
+                        if (parameterChecksFailedResult.TryFormatFailure(context, out var formatted))
                         {
                             return formatted!;
                         }

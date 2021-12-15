@@ -15,7 +15,10 @@ namespace Pepper.Commands.FGO
 {
     internal class ServantResolvableFailureFormatterAttribute : Attribute, IParameterCheckFailureFormatter
     {
-        public LocalMessage? FormatFailure(ParameterChecksFailedResult parameterChecksFailedResult)
+        public LocalMessage? FormatFailure(
+            ParameterChecksFailedResult parameterChecksFailedResult,
+            DiscordCommandContext commandContext
+        )
             => new LocalMessage().WithContent("Please specify a valid servant alias or ID.");
     }
 

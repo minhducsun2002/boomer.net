@@ -8,7 +8,9 @@ using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Mods;
+using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
+using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
@@ -28,20 +30,22 @@ namespace Pepper.Commands.Osu
         public async Task<DiscordCommandResult> Best(
             [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
             [Description("Username to check. Default to your username, if set.")] Username username,
+            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Flag("/mod=", "/mod:")][Description("Mods to filter top plays with.")] string mods = "",
             [Flag("#")][Description("Index from the best play. 1 indicates the best play.")] int pos = -1
         )
         {
-            var user = await APIService.GetUser(username, ruleset.RulesetInfo);
+            var apiClient = APIClientStore.GetClient(server);
+            var user = await apiClient.GetUser(username.GetUsername(server)!, ruleset.RulesetInfo);
 
             if (pos > 0)
             {
-                var score = await APIService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, 1, pos - 1);
+                var score = await apiClient.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, 1, pos - 1);
                 if (score.Length == 0)
                 {
                     return Reply(new LocalEmbed()
                         .WithDescription(
-                            $"No top play found for player [{user.Username}](https://osu.ppy.sh/users/{user.Id}) at position {pos}."));
+                            $"No top play found for player [{user.Username}]({user.PublicUrl}) at position {pos}."));
                 }
 
                 return await SingleScore(score[0]);
@@ -52,7 +56,7 @@ namespace Pepper.Commands.Osu
                 mods.Chunk(2).Select(chunk => new string(chunk.ToArray()))
             );
 
-            var scores = await APIService.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
+            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
             var filtered = scores
                 .Where(score =>
                 {
@@ -86,7 +90,7 @@ namespace Pepper.Commands.Osu
             {
                 return Reply(new LocalEmbed()
                     .WithDescription(
-                        $"No top play found for user [{user.Username}](https://osu.ppy.sh/users/{user.Id}) on mode {ruleset.RulesetInfo.Name}"));
+                        $"No top play found for user [{user.Username}]({user.PublicUrl}) on mode {ruleset.RulesetInfo.Name}"));
             }
 
             return View(new ScoresetPagedView(pages));
