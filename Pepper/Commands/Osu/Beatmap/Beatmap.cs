@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus;
 using Microsoft.Extensions.Configuration;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
@@ -45,11 +46,18 @@ namespace Pepper.Commands.Osu
             };
         }
 
-        private DiscordCommandResult Beatmapset(APIBeatmapSet beatmapset) => View(new BeatmapsetPagedView(beatmapset));
+        private DiscordCommandResult Beatmapset(APIBeatmapSet beatmapset)
+            => Menu(new DefaultMenu(new BeatmapsetPagedView(beatmapset)));
+
         private DiscordCommandResult BeatmapSingle(APIBeatmapSet beatmapset, int beatmapId)
         {
             SetBeatmapContext(beatmapId);
-            return View(new BeatmapSingleView(new BeatmapPageProvider(beatmapset, APIClientStore.GetClient(GameServer.Osu), configuration), beatmapId));
+
+            return Menu(
+                new DefaultMenu(
+                    new BeatmapSingleView(new BeatmapPageProvider(beatmapset, APIClientStore.GetClient(GameServer.Osu), configuration), beatmapId)
+                )
+            );
         }
     }
 }

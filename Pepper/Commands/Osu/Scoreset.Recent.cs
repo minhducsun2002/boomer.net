@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
@@ -47,7 +48,7 @@ namespace Pepper.Commands.Osu
                     ));
             }
 
-            return View(new ScoresetPagedView(pages));
+            return Menu(new DefaultMenu(new ScoresetPagedView(pages)));
         }
 
         [Command("rs")]

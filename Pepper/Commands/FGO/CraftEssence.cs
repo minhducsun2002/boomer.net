@@ -94,7 +94,7 @@ namespace Pepper.Commands.FGO
                         });
                 }
 
-                return View(new CEView(embeds, Context.Message.Id));
+                return Menu(new DefaultMenu(new CEView(embeds, Context.Message.Id)));
             }
 
             return Reply(new LocalEmbed

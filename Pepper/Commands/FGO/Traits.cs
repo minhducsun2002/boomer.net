@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Pepper.FuzzySearch;
 using Pepper.Services.FGO;
@@ -37,7 +38,7 @@ namespace Pepper.Commands.FGO
                 20
             );
 
-            return View(new PagedView(pageProvider));
+            return Menu(new DefaultMenu(new PagedView(pageProvider)));
         }
     }
 }

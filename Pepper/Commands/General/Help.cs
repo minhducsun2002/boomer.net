@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,7 +49,9 @@ namespace Pepper.Commmands.General
 
                     if (pages.Count > 1)
                     {
-                        return View(new PagedView(new ListPageProvider(pages.Select(embed => new Page().WithEmbeds(embed)))));
+                        return Menu(
+                            new DefaultMenu(new PagedView(new ListPageProvider(pages.Select(embed => new Page().WithEmbeds(embed)))))
+                        );
                     }
 
                     return Reply(pages[0]);

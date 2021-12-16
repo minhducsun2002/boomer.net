@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using FgoExportedConstants;
 using MongoDB.Driver;
@@ -36,7 +37,7 @@ namespace Pepper.Commands.FGO
             var pages = SerializePages(servant, servantName, jp, na);
 
             // TODO : Add buttons to quests
-            return View(new SelectionPagedView(pages));
+            return Menu(new DefaultMenu(new SelectionPagedView(pages)));
         }
 
         private IEnumerable<(LocalSelectionComponentOption selection, Page page)> SerializePages(

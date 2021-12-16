@@ -68,7 +68,7 @@ namespace Pepper.Commands.FGO
                 })
                 .ToArray();
 
-            return View(new SelectionPagedView(pages, new LocalMessage().WithReply(Context.Message.Id)));
+            return Menu(new DefaultMenu(new SelectionPagedView(pages, new LocalMessage().WithReply(Context.Message.Id))));
         }
     }
 }

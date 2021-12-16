@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Services.FGO;
@@ -111,7 +112,7 @@ namespace Pepper.Commands.FGO
                     );
                 });
 
-            return View(new SelectionPagedView(pages));
+            return Menu(new DefaultMenu(new SelectionPagedView(pages)));
         }
     }
 }

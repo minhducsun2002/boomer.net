@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BAMCIS.ChunkExtensionMethod;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Disqord.Gateway;
 using Disqord.Rest;
@@ -82,7 +83,7 @@ namespace Pepper.Commands.Osu
 
             return pages.Count == 1
                 ? Reply(pages[0].Embeds[0])
-                : View(new PagedView(new ListPageProvider(pages)));
+                : Menu(new DefaultMenu(new PagedView(new ListPageProvider(pages))));
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BAMCIS.ChunkExtensionMethod;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
@@ -93,7 +94,7 @@ namespace Pepper.Commands.Osu
                         $"No top play found for user [{user.Username}]({user.PublicUrl}) on mode {ruleset.RulesetInfo.Name}"));
             }
 
-            return View(new ScoresetPagedView(pages));
+            return Menu(new DefaultMenu(new ScoresetPagedView(pages)));
         }
     }
 }

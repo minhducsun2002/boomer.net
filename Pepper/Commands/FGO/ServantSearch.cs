@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Humanizer;
 using Pepper.Services.FGO;
@@ -94,7 +95,7 @@ namespace Pepper.Commands.FGO
                 Math.Min(15, searchResults.Length)
             );
 
-            return View(new PagedView(pageProvider));
+            return Menu(new DefaultMenu(new PagedView(pageProvider)));
         }
     }
 }

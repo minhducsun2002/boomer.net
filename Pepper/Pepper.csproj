@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="BitFaster.Caching" Version="1.0.3" />
     <PackageReference Include="ChunkExtensionMethod" Version="1.0.2" />
-    <PackageReference Include="Disqord.Bot" Version="1.0.0-12062021-159" />
+    <PackageReference Include="Disqord.Bot" Version="1.0.0-12092021-161" />
     <PackageReference Include="dotenv.net" Version="3.0.0" />
     <PackageReference Include="fgo-enums" Version="2.37.1" />
     <PackageReference Include="ISO3166-Mobile" Version="2.1.0" />
