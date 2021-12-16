@@ -40,7 +40,14 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
                     GlobalRank = stats.GlobalLeaderboardRank,
                     CountryRank = stats.CountryLeaderboardRank,
                     Accuracy = stats.Accuracy,
-                    GradesCount = new UserStatistics.Grades(),
+                    GradesCount = new UserStatistics.Grades
+                    {
+                        A = 0,
+                        S = 0,
+                        SPlus = 0,
+                        SS = 0,
+                        SSPlus = 0
+                    },
                     Level = new UserStatistics.LevelInfo
                     {
                         Current = (int) Math.Truncate(stats.Level),
