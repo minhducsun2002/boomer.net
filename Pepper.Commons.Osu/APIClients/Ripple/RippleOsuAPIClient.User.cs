@@ -54,7 +54,7 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
                         Progress = (int) Math.Truncate(stats.Level * 100) % 100
                     },
                     PlayCount = stats.PlayCount,
-                    PlayTime = (int) TimeSpan.FromSeconds(stats.PlayTimeInSeconds).Ticks / (int) 1e7,
+                    PlayTime = stats.PlayTimeInSeconds,
                     PP = stats.PerformancePoints,
                     RankedScore = stats.RankedScore,
                     ReplaysWatched = stats.ReplaysWatched,

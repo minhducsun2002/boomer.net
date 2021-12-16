@@ -34,7 +34,7 @@ namespace Pepper.Commands.Osu
 
             var stats = user.Statistics;
             var grades = stats.GradesCount;
-            var playTime = new TimeSpan((stats.PlayTime ?? 0) * (long) 1e7);
+            var playTime = TimeSpan.FromSeconds(stats.PlayTime!.Value);
             var earthEmoji = ResolveEarthEmoji(user.Country.FlagName);
 
             var embed = new LocalEmbed
