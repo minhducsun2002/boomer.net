@@ -12,9 +12,14 @@ namespace Pepper.Structures.Commands
         /// <summary>
         /// Format a command execution failure result.
         /// </summary>
-        /// <param name="commandExecutionFailedResult">The result to format.</param>
         /// <param name="context">The command context.</param>
-        /// <returns>A message representing the failure, or <c>null</c> to use the global behaviour of the bot.</returns>
-        public LocalMessage? FormatFailure(DiscordCommandContext context, CommandExecutionFailedResult commandExecutionFailedResult);
+        /// <param name="commandExecutionFailedResult">The result to format.</param>
+        /// <param name="outputMessage">Output message if formatting succeeds, <c>null</c> otherwise.</param>
+        /// <returns>Whether formatting succeeded.</returns>
+        public bool TryFormatFailure(
+            DiscordCommandContext context,
+            CommandExecutionFailedResult commandExecutionFailedResult,
+            out LocalMessage? outputMessage
+        );
     }
 }

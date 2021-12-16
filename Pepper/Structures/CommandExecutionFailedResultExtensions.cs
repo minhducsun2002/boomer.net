@@ -18,9 +18,9 @@ namespace Pepper.Structures
         /// and assumes that the formatting was failed instead, as if there was no formatter defined.
         /// </remarks>
         /// <param name="commandExecutionFailedResult">Failed result to try formatting.</param>
-        /// <param name="message">The output formatted message if formatting succeeds; <c>null</c> otherwise.</param>
+        /// <param name="message">The output formatted message, or <c>null</c> if this error is to be ignored.</param>
         /// <param name="context">The command context.</param>
-        /// <returns>Whether the formatting succeeded (i.e.) the <c>message</c> parameter is not null.</returns>
+        /// <returns>Whether the formatting succeeded.</returns>
         public static bool TryFormatFailure(
             this CommandExecutionFailedResult commandExecutionFailedResult,
             DiscordCommandContext context,
@@ -36,8 +36,10 @@ namespace Pepper.Structures
                 var formatter = module.Attributes.OfType<ICommandExecutionFailureFormatter>().FirstOrDefault();
                 if (formatter != default)
                 {
-                    message = formatter.FormatFailure(context, commandExecutionFailedResult);
-                    return true;
+                    if (formatter.TryFormatFailure(context, commandExecutionFailedResult, out message))
+                    {
+                        return true;
+                    }
                 }
 
                 module = module.Parent;

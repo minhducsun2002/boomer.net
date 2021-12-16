@@ -90,18 +90,23 @@ namespace Pepper.Commands.Osu
         private class NotFoundHandlerAttribute : Attribute, ICommandExecutionFailureFormatter
         {
             // handle 404s
-            public LocalMessage? FormatFailure(DiscordCommandContext context, CommandExecutionFailedResult commandExecutionFailedResult)
+            public bool TryFormatFailure(
+                DiscordCommandContext context,
+                CommandExecutionFailedResult commandExecutionFailedResult,
+                out LocalMessage? outputMessage)
             {
                 var exception = commandExecutionFailedResult.Exception;
+                outputMessage = null;
                 if (exception is HttpRequestException { StatusCode: HttpStatusCode.NotFound })
                 {
                     var username = context.Arguments.OfType<Username>().First();
-                    return new LocalMessage().WithContent(
+                    outputMessage = new LocalMessage().WithContent(
                         $"User **{username}** isn't found. Either the user doesn't exist, or they're under a restriction."
                     );
+                    return true;
                 }
 
-                return null;
+                return false;
             }
         }
     }
