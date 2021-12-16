@@ -59,7 +59,17 @@ namespace Pepper.Database.OsuUsernameProviders
         public async Task<Username> StoreUsername(Username record)
         {
             cache.TryRemove(record.DiscordUserId);
-            Update(record);
+            var existingRecord = await DbSet.FirstAsync(rec => rec.DiscordUserId == record.DiscordUserId);
+            if (existingRecord != default)
+            {
+                existingRecord.OsuUsername = record.OsuUsername ?? existingRecord.OsuUsername;
+                existingRecord.RippleUsername = record.RippleUsername ?? existingRecord.RippleUsername;
+                Update(existingRecord);
+            }
+            else
+            {
+                Update(record);
+            }
             await SaveChangesAsync();
             cache.AddOrUpdate(record.DiscordUserId, record);
             return record;
