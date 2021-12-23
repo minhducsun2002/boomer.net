@@ -37,53 +37,5 @@ namespace Pepper.Services.Osu
                 .Select(line => line.Split(" => "))
                 .GroupBy(line => line[0])
                 .ToDictionary(line => line.Key, line => int.Parse(line.First()[1]));
-
-        public override async Task StartAsync(CancellationToken cancellationToken)
-        {
-            if (keyValueUrl != null)
-            {
-                Log.Information("Restoring beatmap context cache...");
-                try
-                {
-                    var text = await httpClient.GetStringAsync($"{keyValueUrl}/Data/Get/{key}", cancellationToken);
-                    var dict = Deserialize(text);
-                    cache = dict;
-                    Log.Information("Restored {0} entries.", dict.Count);
-                }
-                catch (Exception e)
-                {
-                    Log.Warning(e, "Failed to load beatmap context cache. An empty cache will be used.");
-                }
-            }
-            else
-            {
-                Log.Warning("A key-value store was not configured - no beatmap context synchronization will be carried out.");
-            }
-
-            await base.StartAsync(cancellationToken);
-        }
-
-        public override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            if (keyValueUrl != null)
-            {
-                Log.Information("Synchronizing beatmap context cache...");
-                try
-                {
-                    await httpClient.PostAsync($"{keyValueUrl}/Data/Push/{key}", new StringContent(Serialize), cancellationToken);
-                    Log.Information("Synchronization complete.");
-                }
-                catch (Exception e)
-                {
-                    Log.Warning(e, "Failed to sync beatmap context cache.");
-                }
-            }
-            else
-            {
-                Log.Warning("A key-value store was not configured - not synchronizing cache back up.");
-            }
-
-            await base.StopAsync(cancellationToken);
-        }
     }
 }
