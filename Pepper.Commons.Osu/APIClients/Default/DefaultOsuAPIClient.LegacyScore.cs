@@ -11,10 +11,5 @@ namespace Pepper.Commons.Osu.APIClients.Default
         {
             return legacyApiClient.GetScoresByBeatmapIdAndUserIdAsync(beatmapId, userId, (GameMode) rulesetInfo.ID!);
         }
-
-        public override Task<IReadOnlyList<Score>> GetLegacyUserRecentScores(int userId, RulesetInfo rulesetInfo, int limit = 50)
-        {
-            return legacyApiClient.GetUserRecentsByUserIdAsync(userId, (GameMode) rulesetInfo.ID!, limit);
-        }
     }
 }

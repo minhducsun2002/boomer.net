@@ -30,7 +30,7 @@ namespace Pepper.Commands.Osu
             var apiClient = APIClientStore.GetClient(server);
             var user = await apiClient.GetUser(username.GetUsername(server)!, ruleset.RulesetInfo);
             var color = await apiClient.GetUserColor(user);
-            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, 1);
+            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, count: 1);
 
             var stats = user.Statistics;
             var grades = stats.GradesCount;

@@ -41,7 +41,7 @@ namespace Pepper.Commands.Osu
 
             if (pos > 0)
             {
-                var score = await apiClient.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, 1, pos - 1);
+                var score = await apiClient.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo, count: 1, offset: pos - 1);
                 if (score.Length == 0)
                 {
                     return Reply(new LocalEmbed()

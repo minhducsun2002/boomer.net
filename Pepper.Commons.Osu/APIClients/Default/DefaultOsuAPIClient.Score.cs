@@ -19,7 +19,10 @@ namespace Pepper.Commons.Osu.APIClients.Default
             return SerializeToAPILegacyScoreInfo(JObject.Parse(doc.GetElementbyId("json-show").InnerText));
         }
 
-        public override async Task<APIScoreInfo[]> GetUserScores(int userId, ScoreType scoreType, RulesetInfo rulesetInfo, int count = 100, int offset = 0)
+        public override async Task<APIScoreInfo[]> GetUserScores(
+            int userId, ScoreType scoreType,
+            RulesetInfo rulesetInfo, bool includeFails = false, int count = 100, int offset = 0
+        )
         {
             var scoreCache = new List<APIScoreInfo>();
 
@@ -29,7 +32,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
                 const int maxSingle = 50;
                 var res = await HttpClient.GetStringAsync(
                     $"https://osu.ppy.sh/users/{userId}/scores/{scoreType.ToString().ToLowerInvariant()}?mode={rulesetInfo.ShortName}"
-                    + $"&offset={init}&limit={Math.Min(maxSingle, count - init)}");
+                    + $"&offset={init}&limit={Math.Min(maxSingle, count - init)}&include_fails={(includeFails ? 1 : 0)}");
                 init += maxSingle;
                 var scores = JArray.Parse(res).Select(SerializeToAPILegacyScoreInfo).ToArray();
                 scoreCache.AddRange(scores);

@@ -28,7 +28,7 @@ namespace Pepper.Commands.Osu
             var apiClient = APIClientStore.GetClient(server);
             var user = await apiClient.GetUser(username.GetUsername(server)!, rulesetInfo);
 
-            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo);
+            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo, true);
 
             var pages = new ArrayPageProvider<APIScoreInfo>(
                 scores,
@@ -63,10 +63,11 @@ namespace Pepper.Commands.Osu
             var apiClient = APIClientStore.GetClient(server);
             var user = await apiClient.GetUser(username.GetUsername(server)!, rulesetInfo);
 
-            var scores = await apiClient.GetLegacyUserRecentScores(user.Id, rulesetInfo, pos);
-            if (scores.ElementAtOrDefault(pos - 1) != default)
+            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Recent, ruleset.RulesetInfo, true, 1, pos - 1);
+            if (scores.Length != 0)
             {
-                return await SingleScore(user, scores[pos - 1]);
+                scores[0].User = user;
+                return await SingleScore(scores[0]);
             }
 
             return Reply(new LocalEmbed()

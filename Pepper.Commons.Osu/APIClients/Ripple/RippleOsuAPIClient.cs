@@ -38,18 +38,16 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
             throw new NotImplementedException();
         }
 
-        public override Task<APIScoreInfo[]> GetUserScores(int userId, ScoreType scoreType, RulesetInfo rulesetInfo, int count = 100, int offset = 0)
+        public override Task<APIScoreInfo[]> GetUserScores(
+            int userId, ScoreType scoreType, RulesetInfo rulesetInfo,
+            bool includeFails = false, int count = 100, int offset = 0
+        )
         {
             // TODO : Do actual parsing
             return Task.FromResult(Array.Empty<APIScoreInfo>());
         }
 
         public override Task<IReadOnlyList<Score>> GetLegacyBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<IReadOnlyList<Score>> GetLegacyUserRecentScores(int userId, RulesetInfo rulesetInfo, int limit = 50)
         {
             throw new NotImplementedException();
         }
