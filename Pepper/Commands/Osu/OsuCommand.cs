@@ -115,12 +115,20 @@ namespace Pepper.Commands.Osu
                 .ToString($"HH:mm:ss, dd/MM/yyyy{(utcHint ? " 'UTC'" : "")}", CultureInfo.InvariantCulture);
 
         public static LocalEmbedAuthor SerializeAuthorBuilder(APIUser user)
-            => new()
+        {
+            var avatarUrl = user.AvatarUrl;
+            if (user is Commons.Osu.API.APIUser overriddenUserInstance)
             {
-                IconUrl = string.IsNullOrWhiteSpace(user.AvatarUrl) ? $"https://a.ppy.sh/{user.Id}" : user.AvatarUrl,
+                avatarUrl = overriddenUserInstance.AvatarUrl;
+            }
+            var embedAuthor = new LocalEmbedAuthor
+            {
+                IconUrl = avatarUrl,
                 Name = $"{user.Username}" + ((user.Statistics.PP ?? decimal.Zero) == decimal.Zero ? "" : $" ({user.Statistics.PP}pp)"),
                 Url = $"https://osu.ppy.sh/users/{user.Id}"
             };
+            return embedAuthor;
+        }
 
         public static PerformanceCalculator GetPerformanceCalculator(int rulesetId, DifficultyAttributes beatmapAttributes, ScoreInfo score)
         {
