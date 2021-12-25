@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using BitFaster.Caching.Lru;
 using HtmlAgilityPack;
@@ -30,15 +32,18 @@ namespace Pepper.Commons.Osu.APIClients.Default
                 return @return;
             }
 
-            var res = await HttpClient.GetStringAsync(
-                $"https://osu.ppy.sh/{(isBeatmapSetId ? "beatmapsets" : "beatmaps")}/{id}"
-            );
-
-            var doc = new HtmlDocument(); doc.LoadHtml(res);
-            var obj = JsonConvert.DeserializeObject<APIBeatmapSet>(doc.GetElementbyId("json-beatmapset").InnerText)!;
+            var obj = await GetFreshBeatmapsetInfo(HttpClient, id, isBeatmapSetId);
 
             beatmapsetMetadataCache.AddOrUpdate(key, obj);
             return obj;
+        }
+
+        internal static async Task<APIBeatmapSet> GetFreshBeatmapsetInfo(HttpClient httpClient, long id, bool isBeatmapSetId)
+        {
+            var res = await httpClient.GetStringAsync($"https://osu.ppy.sh/{(isBeatmapSetId ? "beatmapsets" : "beatmaps")}/{id}");
+
+            var doc = new HtmlDocument(); doc.LoadHtml(res);
+            return JsonConvert.DeserializeObject<APIBeatmapSet>(doc.GetElementbyId("json-beatmapset").InnerText)!;
         }
     }
 }

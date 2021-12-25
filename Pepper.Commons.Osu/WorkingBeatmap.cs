@@ -22,13 +22,7 @@ namespace Pepper.Commons.Osu
     public partial class WorkingBeatmap : osu.Game.Beatmaps.WorkingBeatmap
     {
         private readonly Beatmap beatmap;
-        private static readonly Ruleset[] BuiltInRulesets =
-        {
-            new OsuRuleset(),
-            new TaikoRuleset(),
-            new CatchRuleset(),
-            new ManiaRuleset()
-        };
+        private static Ruleset[] BuiltInRulesets => APIClient.BuiltInRulesets;
 
         private WorkingBeatmap(Beatmap beatmap, int? beatmapId = null) : base(beatmap.BeatmapInfo, null)
         {

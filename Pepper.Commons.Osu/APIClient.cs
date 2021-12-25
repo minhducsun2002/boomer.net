@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 using BitFaster.Caching.Lru;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using OsuSharp;
 using Pepper.Commons.Osu.API;
 using SixLabors.ImageSharp;
@@ -19,6 +23,14 @@ namespace Pepper.Commons.Osu
     public abstract class APIClient
     {
         private readonly FastConcurrentTLru<string, Color> userColorCache = new(200, TimeSpan.FromSeconds(30 * 60));
+        internal static readonly Ruleset[] BuiltInRulesets =
+        {
+            new OsuRuleset(),
+            new TaikoRuleset(),
+            new CatchRuleset(),
+            new ManiaRuleset()
+        };
+
         protected readonly HttpClient HttpClient;
         protected APIClient(HttpClient httpClient)
         {
@@ -27,7 +39,7 @@ namespace Pepper.Commons.Osu
 
         public abstract Task<APIUser> GetUser(string username, RulesetInfo rulesetInfo);
 
-        public virtual async Task<Color> GetUserColor(APIUser user)
+        public async Task<Color> GetUserColor(APIUser user)
         {
             var key = $"osu-user-avatar-{user.Id}";
             if (userColorCache.TryGet(key, out var @return))

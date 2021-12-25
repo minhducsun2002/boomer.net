@@ -6,9 +6,6 @@ using HtmlAgilityPack;
 using Newtonsoft.Json;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu.API;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Processing.Processors.Quantization;
 using Color = System.Drawing.Color;
 
 namespace Pepper.Commons.Osu.APIClients.Default
@@ -27,25 +24,6 @@ namespace Pepper.Commons.Osu.APIClients.Default
                 new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }
             )!;
             return user;
-        }
-
-        public override async Task<Color> GetUserColor(APIUser user)
-        {
-            var key = $"osu-user-avatar-{user.Id}";
-            if (userColorCache.TryGet(key, out var @return))
-            {
-                return @return;
-            }
-
-            var avatar = await HttpClient.GetByteArrayAsync(user.AvatarUrl);
-            var image = Image.Load(avatar);
-            image.Mutate(img => img.Quantize(new OctreeQuantizer(new QuantizerOptions { MaxColors = 2 }))
-                .Resize(1, 1, KnownResamplers.Bicubic));
-            var color = image[0, 0];
-            var result = Color.FromArgb(color.R, color.G, color.B);
-            userColorCache.AddOrUpdate(key, result);
-
-            return result;
         }
     }
 }

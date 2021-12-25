@@ -8,6 +8,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
+using Pepper.Commons.Osu.APIClients.Ripple;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
 using Qmmands;
@@ -28,7 +29,14 @@ namespace Pepper.Commands.Osu
             var apiClient = APIClientStore.GetClient(server);
             var user = await apiClient.GetUser(username.GetUsername(server)!, rulesetInfo);
 
-            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo, true);
+            var len = 100;
+            // TODO : Remove all of this safety guards
+            if (apiClient is RippleOsuAPIClient)
+            {
+                len = 10;
+            }
+
+            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo, true, len);
 
             var pages = new ArrayPageProvider<APIScoreInfo>(
                 scores,

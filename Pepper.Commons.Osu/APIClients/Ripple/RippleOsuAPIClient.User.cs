@@ -1,27 +1,20 @@
 using System;
-using System.Drawing;
 using System.Threading.Tasks;
 using System.Web;
-using BitFaster.Caching.Lru;
 using Newtonsoft.Json;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using OsuSharp;
 using Pepper.Commons.Osu.API;
 using Pepper.Commons.Osu.API.Ripple;
+using UserStatistics = osu.Game.Users.UserStatistics;
 
 namespace Pepper.Commons.Osu.APIClients.Ripple
 {
     public partial class RippleOsuAPIClient
     {
-        private readonly FastConcurrentTLru<string, Color> userColorCache = new(200, TimeSpan.FromSeconds(30 * 60));
-
-        public override async Task<APIUser> GetUser(string username, RulesetInfo rulesetInfo)
+        private static APIUser DeserializeUserObject(string raw, RulesetInfo rulesetInfo)
         {
-            var raw = await HttpClient.GetStringAsync(
-                $"https://ripple.moe/api/v1/users/full?name={HttpUtility.UrlEncode(username)}"
-            );
-
             var user = JsonConvert.DeserializeObject<RippleUser>(raw)!;
             var stats = user.Statistics[(GameMode) rulesetInfo.OnlineID];
             return new RippleAPIUser
@@ -62,6 +55,21 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
                     TotalHits = stats.TotalHits
                 }
             };
+        }
+
+        public override async Task<APIUser> GetUser(string username, RulesetInfo rulesetInfo)
+        {
+            var raw = await HttpClient.GetStringAsync(
+                $"https://ripple.moe/api/v1/users/full?name={HttpUtility.UrlEncode(username)}"
+            );
+
+            return DeserializeUserObject(raw, rulesetInfo);
+        }
+
+        public async Task<APIUser> GetUser(int id, RulesetInfo rulesetInfo)
+        {
+            var raw = await HttpClient.GetStringAsync($"https://ripple.moe/api/v1/users/full?id={id}");
+            return DeserializeUserObject(raw, rulesetInfo);
         }
     }
 }
