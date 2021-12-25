@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Pepper.Commons.Osu.API
 {
@@ -9,5 +10,9 @@ namespace Pepper.Commons.Osu.API
 
         [JsonProperty("best_id")]
         public long? OnlineBestScoreID { get; set; }
+
+        [JsonProperty("rank")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public new ScoreRank Rank { get; set; }
     }
 }
