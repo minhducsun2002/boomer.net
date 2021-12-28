@@ -11,6 +11,7 @@ using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
+using Pepper.Structures.External.Osu.Extensions;
 using Qmmands;
 
 namespace Pepper.Commands.Osu
@@ -100,8 +101,10 @@ namespace Pepper.Commands.Osu
                 if (exception is HttpRequestException { StatusCode: HttpStatusCode.NotFound })
                 {
                     var username = context.Arguments.OfType<Username>().First();
+                    var server = context.Arguments.OfType<GameServer>().FirstOrDefault();
                     outputMessage = new LocalMessage().WithContent(
-                        $"User **{username}** isn't found. Either the user doesn't exist, or they're under a restriction."
+                        $"User **{username.GetUsername(server)}** isn't found on the **{server.GetDisplayText()}** server. " +
+                        "Either the user doesn't exist, or they're under a restriction."
                     );
                     return true;
                 }
