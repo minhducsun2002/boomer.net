@@ -30,6 +30,7 @@ namespace Pepper.Structures
                 if (character == quote)
                 {
                     isQuoting = !isQuoting;
+                    continue;
                 }
 
                 if (character == whitespace)
