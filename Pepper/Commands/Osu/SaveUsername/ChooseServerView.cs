@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Rest;
@@ -40,6 +41,14 @@ namespace Pepper.Commands.Osu
                     Label = server.GetDisplayText()
                 });
             }
+        }
+
+        public override async ValueTask DisposeAsync()
+        {
+            TemplateMessage.Content = "You didn't choose the server in time. Try again.";
+            ClearComponents();
+            await Menu.ApplyChangesAsync();
+            await base.DisposeAsync();
         }
 
         private static LocalMessage GenerateMessage(string username)
