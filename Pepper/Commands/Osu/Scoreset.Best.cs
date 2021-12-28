@@ -30,8 +30,8 @@ namespace Pepper.Commands.Osu
         [Description("Show top plays of a player.")]
         public async Task<DiscordCommandResult> Best(
             [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
-            [Description("Username to check. Default to your username, if set.")] Username username,
             [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            [Description("Username to check. Default to your username, if set.")] Username username,
             [Flag("/mod=", "/mod:")][Description("Mods to filter top plays with.")] string mods = "",
             [Flag("#")][Description("Index from the best play. 1 indicates the best play.")] int pos = -1
         )
