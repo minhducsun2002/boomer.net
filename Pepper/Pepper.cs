@@ -85,6 +85,11 @@ var hostBuilder = new HostBuilder()
                 ApiKey = context.Configuration["OSU_API_KEY"]
             })
         );
+        services.AddSingleton(new OsuOAuth2Credentials
+        {
+            ClientId = int.Parse(context.Configuration["OSU_OAUTH2_CLIENT_ID"]),
+            ClientSecret = context.Configuration["OSU_OAUTH2_CLIENT_SECRET"]
+        });
         services.AddSingleton<HttpClient>();
         services.AddSingleton<APIClientStore>();
         services.Configure<CommandServiceConfiguration>(config =>

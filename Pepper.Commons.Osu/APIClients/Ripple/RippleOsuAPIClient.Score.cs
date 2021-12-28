@@ -50,10 +50,13 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
             scores = scores.Skip(rem).Take(count).ToArray();
 
             var user = await GetUser(userId, rulesetInfo);
+            var beatmapIds = scores.Select(s => s.Beatmap.Id).ToArray();
+            var beatmaps = (await GetBulkBeatmapData(beatmapIds))
+                .ToDictionary(m => m.OnlineID, m => m);
 
-            var ret = scores.Select(async score =>
+            var ret = scores.Select(score =>
                 {
-                    var setInfo = await GetBeatmapsetInfo(score.Beatmap.Id, false);
+                    var mapInfo = beatmaps[score.Beatmap.Id];
                     var statistics = new Dictionary<string, int>
                     {
                         {"count_300", score.Count300},
@@ -65,9 +68,8 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
                     };
                     return new APIScoreInfo
                     {
-                        Beatmap = setInfo.Beatmaps.Concat(setInfo.Converts)
-                            .First(map => map.OnlineID == score.Beatmap.Id),
-                        BeatmapSet = setInfo,
+                        Beatmap = mapInfo,
+                        BeatmapSet = mapInfo.BeatmapSet,
                         Mods = BuiltInRulesets[rulesetInfo.OnlineID].ConvertFromLegacyMods(score.Mods).Select(mod => new APIMod(mod)),
                         User = user,
                         Accuracy = score.Accuracy / 100,
@@ -83,7 +85,7 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
                     };
                 });
 
-            return await Task.WhenAll(ret);
+            return ret.ToArray();
         }
 
         public override Task<IReadOnlyList<Score>> GetLegacyBeatmapScores(int userId, int beatmapId,

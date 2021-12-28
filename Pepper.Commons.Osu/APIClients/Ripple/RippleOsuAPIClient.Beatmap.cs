@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BitFaster.Caching.Lru;
+using Newtonsoft.Json.Linq;
 using Pepper.Commons.Osu.API;
 using Pepper.Commons.Osu.APIClients.Default;
 
@@ -13,6 +16,23 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
         {
             // just use the default client instead wtf why would you need this call?
             throw new NotImplementedException();
+        }
+
+        private async Task<BeatmapCompact[]> GetBulkBeatmapData(params int[] beatmapIds)
+        {
+            var output = new List<BeatmapCompact>();
+            var mapids = beatmapIds.Distinct().ToArray();
+
+            for (var i = 0; i < mapids.Length; i += 50)
+            {
+                var ids = mapids[i..Math.Min(i + 50, mapids.Length)];
+                var beatmaps = await osuOAuth2Client
+                    .GetAsync($"https://osu.ppy.sh/api/v2/beatmaps?{string.Join('&', ids.Select(id => $"ids[]={id}"))}");
+                var raw = await beatmaps.Content.ReadAsStringAsync();
+                output.AddRange(JObject.Parse(raw)["beatmaps"]!.ToObject<BeatmapCompact[]>()!);
+            }
+
+            return output.ToArray();
         }
 
         public override async Task<APIBeatmapSet> GetBeatmapsetInfo(long id, bool isBeatmapSetId)

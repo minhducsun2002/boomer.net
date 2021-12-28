@@ -29,14 +29,7 @@ namespace Pepper.Commands.Osu
             var apiClient = APIClientStore.GetClient(server);
             var user = await apiClient.GetUser(username.GetUsername(server)!, rulesetInfo);
 
-            var len = 100;
-            // TODO : Remove all of this safety guards
-            if (apiClient is RippleOsuAPIClient)
-            {
-                len = 10;
-            }
-
-            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo, true, len);
+            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo, true, 100);
 
             var pages = new ArrayPageProvider<APIScoreInfo>(
                 scores,
