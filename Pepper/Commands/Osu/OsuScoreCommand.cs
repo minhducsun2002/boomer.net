@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -40,32 +39,6 @@ namespace Pepper.Commands.Osu
                 scoreMaxCombo: sc.MaxCombo, pp: sc.PP,
                 timestamp: sc.Date, ruleset: ruleset,
                 workingBeatmap: workingBeatmap, statistics: sc.Statistics, scoreId: sc.OnlineBestScoreID
-            );
-        }
-
-        protected async Task<DiscordCommandResult> SingleScore(APIUser user, OsuSharp.Score sc)
-        {
-            var workingBeatmap = await APIClientStore.GetClient(GameServer.Osu).GetBeatmap((int) sc.BeatmapId);
-            var b = workingBeatmap.Beatmap.BeatmapInfo;
-            var ruleset = Rulesets[(int) sc.GameMode];
-            var mods = ruleset.ConvertFromLegacyMods((LegacyMods) sc.Mods)!.ToArray();
-            var statistics = new Dictionary<string, int>
-            {
-                {"count_300", sc.Count300},
-                {"count_100", sc.Count100},
-                {"count_50", sc.Count50},
-                {"count_geki", sc.Geki},
-                {"count_katu", sc.Katu},
-                {"count_miss", sc.Miss},
-            };
-            return SingleScoreOutput(
-                user,
-                artist: b.Metadata.Artist, title: b.Metadata.Title, version: b.Version,
-                rank: $"{sc.Rank}",
-                mods: mods, accuracy: sc.Accuracy / 100, perfect: sc.Perfect, totalScore: sc.TotalScore,
-                scoreMaxCombo: sc.MaxCombo ?? 0, pp: sc.PerformancePoints,
-                timestamp: sc.Date!.Value, ruleset: Rulesets[(int) sc.GameMode],
-                workingBeatmap: workingBeatmap, statistics: statistics, scoreId: null
             );
         }
 
