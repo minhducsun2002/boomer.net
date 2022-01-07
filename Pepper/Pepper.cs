@@ -85,6 +85,7 @@ var hostBuilder = new HostBuilder()
                 ApiKey = context.Configuration["OSU_API_KEY"]
             })
         );
+        services.AddSingleton<ModParserService>();
         services.AddSingleton(new OsuOAuth2Credentials
         {
             ClientId = int.Parse(context.Configuration["OSU_OAUTH2_CLIENT_ID"]),

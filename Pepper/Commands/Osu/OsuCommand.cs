@@ -142,15 +142,5 @@ namespace Pepper.Commands.Osu
                 _ => throw new ArgumentException($"{nameof(rulesetId)} must be a supported ruleset ID, {rulesetId} is not one!")
             };
         }
-
-        protected static Mod[] ResolveMods(Ruleset ruleset, IEnumerable<string> modStrings)
-        {
-            var allMods = ruleset.CreateAllMods().ToArray();
-            return modStrings
-                .Select(modString =>
-                    allMods.FirstOrDefault(mod => string.Equals(mod.Acronym, modString, StringComparison.InvariantCultureIgnoreCase)))
-                .Where(mod => mod != null)
-                .ToArray()!;
-        }
     }
 }

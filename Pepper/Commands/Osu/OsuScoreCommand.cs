@@ -18,7 +18,12 @@ namespace Pepper.Commands.Osu
 {
     public abstract class OsuScoreCommand : BeatmapContextCommand
     {
-        protected OsuScoreCommand(APIClientStore s, BeatmapContextProviderService b) : base(s, b) { }
+        protected readonly ModParserService ModParserService;
+
+        protected OsuScoreCommand(APIClientStore s, BeatmapContextProviderService b, ModParserService p) : base(s, b)
+        {
+            ModParserService = p;
+        }
 
         protected async Task<DiscordCommandResult> SingleScore(APIScoreInfo sc)
         {
@@ -26,7 +31,7 @@ namespace Pepper.Commands.Osu
             var workingBeatmap = await APIClientStore.GetClient(GameServer.Osu).GetBeatmap(b.OnlineID);
             var ruleset = Rulesets[sc.RulesetID];
 
-            var mods = ResolveMods(ruleset, sc.Mods.Select(mod => mod.Acronym));
+            var mods = ModParserService.ResolveMods(ruleset, sc.Mods.Select(mod => mod.Acronym));
             var difficulty = workingBeatmap.CalculateDifficulty(sc.RulesetID, mods);
 
             b.StarRating = difficulty.StarRating;

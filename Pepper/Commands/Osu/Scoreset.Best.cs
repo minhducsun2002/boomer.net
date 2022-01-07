@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
@@ -50,10 +51,8 @@ namespace Pepper.Commands.Osu
                 return await SingleScore(score[0]);
             }
 
-            var modFilters = ResolveMods(
-                ruleset,
-                mods.Chunk(2).Select(chunk => new string(chunk.ToArray()))
-            );
+            IEnumerable<string> modStrings = mods.Chunk(2).Select(chunk => new string(chunk.ToArray()));
+            var modFilters = ModParserService.ResolveMods(ruleset, modStrings);
 
             var scores = await apiClient.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
             var filtered = scores
