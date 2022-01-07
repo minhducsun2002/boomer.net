@@ -6,9 +6,9 @@ namespace Pepper.Structures.External.Osu.Extensions
 {
     public static class ScoreInfoExtensions
     {
-        public static void SetStatistics(this ScoreInfo scoreInfo, Dictionary<string, int> Statistics)
+        public static ScoreInfo WithStatistics(this ScoreInfo scoreInfo, Dictionary<string, int> statistics)
         {
-            foreach (var (key, value) in Statistics)
+            foreach (var (key, value) in statistics)
             {
                 switch (key)
                 {
@@ -20,6 +20,8 @@ namespace Pepper.Structures.External.Osu.Extensions
                     case @"count_miss": scoreInfo.SetCountMiss(value); break;
                 }
             }
+
+            return scoreInfo;
         }
     }
 }

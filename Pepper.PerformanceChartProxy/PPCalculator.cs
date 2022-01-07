@@ -19,7 +19,7 @@ namespace Pepper.PerformanceChartProxy
             {
                 var fcScore = new ScoreInfo { MaxCombo = difficulty.MaxCombo, Accuracy = accuracy / 100 };
                 fcScore.SetCountMiss(0);
-                var pp = beatmap.GetPerformanceCalculator(fcScore).Calculate();
+                var pp = beatmap.CalculatePerformance(fcScore);
                 ppByAccuracy.Add((accuracy, pp));
             }
 
@@ -27,7 +27,7 @@ namespace Pepper.PerformanceChartProxy
             {
                 var combo = (int) (maxCombo * comboFraction / (double) ppByAccuracy.Count);
                 var score = new ScoreInfo { MaxCombo = combo, Accuracy = 1.0 };
-                var pp = beatmap.GetPerformanceCalculator(score).Calculate();
+                var pp = beatmap.CalculatePerformance(score);
                 ppByCombo.Add((combo, pp));
             }
 

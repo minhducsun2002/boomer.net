@@ -66,8 +66,7 @@ namespace Pepper.Commands.Osu
                                 try
                                 {
                                     var scoreInfo = new ScoreInfo { Mods = mods, MaxCombo = score.MaxCombo!.Value, Accuracy = score.Accuracy };
-                                    var performanceCalculator = map.GetPerformanceCalculator(scoreInfo);
-                                    pp = (float) performanceCalculator.Calculate();
+                                    pp = (float) map.CalculatePerformance(scoreInfo);
                                     localPP = true;
                                 }
                                 catch { /* ignore */ }

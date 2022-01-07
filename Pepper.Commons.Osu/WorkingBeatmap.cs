@@ -4,15 +4,11 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Difficulty;
-using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
@@ -36,16 +32,16 @@ namespace Pepper.Commons.Osu
         }
 
         /// <summary>
-        /// Retrieve a performance calculator
+        /// Calculate performance points for a score.
         /// </summary>
         /// <param name="score">Score to calculate performance for.</param>
         /// <param name="rulesetOverwrite">Use a custom ruleset to calculate performance. Useful for converts.</param>
-        public PerformanceCalculator GetPerformanceCalculator(ScoreInfo score, Ruleset? rulesetOverwrite = null)
+        public double CalculatePerformance(ScoreInfo score, Ruleset? rulesetOverwrite = null)
         {
             var ruleset = rulesetOverwrite ?? GetDefaultRuleset();
             var rulesetId = ruleset.RulesetInfo.ID;
             var difficultyAttributes = CalculateDifficulty(rulesetId!.Value, score.Mods);
-            return rulesetId switch
+            PerformanceCalculator calculator = rulesetId switch
             {
                 0 => new OsuPerformanceCalculator(ruleset, difficultyAttributes, score),
                 1 => new TaikoPerformanceCalculator(ruleset, difficultyAttributes, score),
@@ -53,6 +49,8 @@ namespace Pepper.Commons.Osu
                 3 => new ManiaPerformanceCalculator(ruleset, difficultyAttributes, score),
                 _ => throw new ArgumentOutOfRangeException($"{nameof(rulesetId)} must be a supported ruleset ID, {rulesetId} is not one!")
             };
+
+            return calculator.Calculate();
         }
 
         public DifficultyAttributes CalculateDifficulty(int rulesetId, params Mod[] mods) => BuiltInRulesets[rulesetId]
