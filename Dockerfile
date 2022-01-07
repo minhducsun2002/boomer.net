@@ -7,6 +7,12 @@ RUN echo $BUILD_HASH
 RUN dotnet publish Pepper -c release --runtime linux-musl-x64 --self-contained -o dist/ 
 
 FROM mcr.microsoft.com/dotnet/runtime-deps:6.0.1-alpine3.14
+RUN apk add --no-cache icu-libs
+
+# Disable the invariant mode
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8
 COPY --from=build /app/dist /app
 WORKDIR /app
 CMD ./Pepper
