@@ -1,13 +1,11 @@
 using System.Linq;
 using System.Threading.Tasks;
-using BAMCIS.ChunkExtensionMethod;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Disqord.Gateway;
 using Disqord.Rest;
-using Microsoft.Extensions.DependencyInjection;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;

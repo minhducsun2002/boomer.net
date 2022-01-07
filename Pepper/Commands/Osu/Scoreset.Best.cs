@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using BAMCIS.ChunkExtensionMethod;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus;
@@ -13,7 +12,6 @@ using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
-using Pepper.Structures.External.Osu;
 using Qmmands;
 using PagedView = Pepper.Structures.PagedView;
 
