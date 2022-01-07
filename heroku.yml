@@ -1,0 +1,6 @@
+build:
+  docker:
+    web: Pepper.PerformanceChartProxy.dockerfile
+run:
+  web:
+    image: web
