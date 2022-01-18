@@ -4,8 +4,8 @@ namespace Pepper.Commons.Osu.API.Ripple
 {
     internal class RippleUserStatistics
     {
-        [JsonProperty("ranked_score")] public int RankedScore { get; set; }
-        [JsonProperty("total_score")] public int TotalScore { get; set; }
+        [JsonProperty("ranked_score")] public long RankedScore { get; set; }
+        [JsonProperty("total_score")] public long TotalScore { get; set; }
         [JsonProperty("playcount")] public int PlayCount { get; set; }
         [JsonProperty("play_time")] public int PlayTimeInSeconds { get; set; }
         [JsonProperty("replays_watched")] public int ReplaysWatched { get; set; }
