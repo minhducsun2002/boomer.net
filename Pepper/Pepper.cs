@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using Disqord;
@@ -103,6 +104,10 @@ var hostBuilder = new HostBuilder()
     })
     .ConfigureDiscordBot<Pepper.Pepper>((context, bot) =>
     {
+        if (context.Configuration["DISCORD_PROXY"] != default)
+        {
+            bot.GatewayProxy = bot.RestProxy = new WebProxy(context.Configuration["DISCORD_PROXY"]);
+        }
         bot.Token = context.Configuration["DISCORD_TOKEN"];
         bot.Prefixes = context.Configuration.GetAllCommandPrefixes()
             .SelectMany(kv => kv.Value);
