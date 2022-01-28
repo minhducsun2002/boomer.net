@@ -5,6 +5,7 @@ using Pepper.Services.FGO;
 
 namespace Pepper.Commands.FGO
 {
+#pragma warning disable CS0649
     public partial class FreeQuest
     {
         private class Svt
@@ -69,4 +70,5 @@ namespace Pepper.Commands.FGO
             [JsonProperty("userSvt")] public UserSvt[] UserSvt = Array.Empty<UserSvt>();
         }
     }
+#pragma warning restore CS0649
 }
