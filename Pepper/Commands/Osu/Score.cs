@@ -21,7 +21,7 @@ namespace Pepper.Commands.Osu
 
         [Command("sc", "score", "scores", "c", "check")]
         [Description("View/list scores on a certain map")]
-        [Priority(1)]
+        [Priority(2)]
         public async Task<DiscordCommandResult> BeatmapBased(
             [Description("A score URL, a beatmap URL, or a beatmap ID.")] IBeatmapResolvable beatmapResolvable,
             [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
@@ -94,6 +94,24 @@ namespace Pepper.Commands.Osu
             }
 
             throw new ArgumentException("A valid beatmap-resolvable must be passed!");
+        }
+
+        [Command("sc", "score", "scores", "c", "check")]
+        [Description("View/list scores on the latest map posted in the current channel")]
+        [Priority(1)]
+        public async Task<DiscordCommandResult> UserOnly(
+            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            [Remainder][Description("Username to check. Default to your username, if set.")] Username? username = null
+        )
+        {
+            var beatmap = BeatmapContext.GetBeatmap(Context.ChannelId.ToString());
+            if (beatmap == null)
+            {
+                return Reply(
+                    "No beatmap was ever sent in this channel. Please use `o!map` with the relevant map link/ID first.");
+            }
+
+            return await BeatmapBased(new BeatmapResolvable(beatmap.Value), server, username);
         }
 
         [Command("sc", "score", "scores", "c", "check")]
