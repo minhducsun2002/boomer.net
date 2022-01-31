@@ -8,7 +8,6 @@ using Pepper.Commands.Osu;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
-using Pepper.Structures.External.FGO.TypeParsers;
 using Pepper.Structures.External.Osu;
 using Qmmands;
 
@@ -91,9 +90,6 @@ namespace Pepper
             Commands.AddTypeParser(new UsernameTypeParser());
             Commands.AddTypeParser(ActivatorUtilities.CreateInstance<BeatmapOrSetResolvableTypeParser>(Services));
             Commands.AddTypeParser(ActivatorUtilities.CreateInstance<BeatmapResolvableTypeParser>(Services));
-            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<ServantIdentityTypeParser>(Services));
-            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<CraftEssenceIdentityTypeParser>(Services));
-            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<QuestNameTypeParser>(Services));
             Commands.AddTypeParser(ActivatorUtilities.CreateInstance<GameServerTypeParser>(Services), true);
 
             return base.AddTypeParsersAsync(cancellationToken);

@@ -9,11 +9,9 @@
     <PackageReference Include="BitFaster.Caching" Version="1.0.3" />
     <PackageReference Include="Disqord.Bot" Version="1.0.0-12302021-165" />
     <PackageReference Include="dotenv.net" Version="3.0.0" />
-    <PackageReference Include="fgo-enums" Version="2.37.1" />
     <PackageReference Include="ISO3166-Mobile" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0-preview.5.21301.5" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.12.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Pastel" Version="2.1.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.3" />
