@@ -19,7 +19,10 @@ namespace Pepper.Commmands.General
             {
                 try
                 {
+                    // TODO : Do something with this? This might break on Macs.
+#pragma warning disable CA1416
                     var interval = DateTime.Now - thread.StartTime;
+#pragma warning restore CA1416
                     var timeComponents = new[]
                         {
                             (interval.Days, "d"),

@@ -7,14 +7,14 @@ namespace Pepper.Database
     [Table("command-whitelist")]
     public class Record
     {
-        [Column("command_id")] public string CommandIdentifier { get; set; }
-        [Column("guild_id")] public string GuildId { get; set; }
+        [Column("command_id")] public string CommandIdentifier { get; set; } = null!;
+        [Column("guild_id")] public string GuildId { get; set; } = null!;
     }
 
     public class RestrictedCommandWhitelistProvider : DbContext
     {
         public RestrictedCommandWhitelistProvider(DbContextOptions<RestrictedCommandWhitelistProvider> options) : base(options) { }
-        public DbSet<Record> Records { get; set; }
+        public DbSet<Record> Records { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

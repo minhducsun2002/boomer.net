@@ -45,8 +45,10 @@ namespace Pepper.Commands.Osu
 
             var pps = sortedScores.Select((score, index) => (score.PP!.Value, index)).ToList();
             var previous = pps.Aggregate(0d, (sum, pair) => sum + pair.Value * Math.Pow(0.95, pair.index));
-            var next = pps.Append((ppToCheck, 0))
-                .OrderByDescending(pair => pair.Value).Select((pair, index) => (pair.Value, index))
+            pps.Add((ppToCheck, 0));
+            var next = pps
+                .OrderByDescending(pair => pair.Value)
+                .Select((pair, index) => (pair.Value, index))
                 .Aggregate(0d, (sum, pair) => sum + pair.Value * Math.Pow(0.95, pair.index));
 
             var bonus = (double) user.Statistics.PP!.Value - previous;

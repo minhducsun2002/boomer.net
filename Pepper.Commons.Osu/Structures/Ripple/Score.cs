@@ -5,6 +5,7 @@ using OsuSharp;
 
 namespace Pepper.Commons.Osu.API.Ripple
 {
+#pragma warning disable CS8618
     internal class Score
     {
         [JsonProperty("id")] public int Id { get; set; }
@@ -36,4 +37,5 @@ namespace Pepper.Commons.Osu.API.Ripple
         [JsonProperty("completed")] public int Completed { get; set; }
         [JsonProperty("beatmap")] public ScoreEmbeddedBeatmap Beatmap { get; set; }
     }
+#pragma warning restore CS8618
 }

@@ -27,7 +27,7 @@ namespace Pepper.Structures.External.Osu
             }
         }
 
-        public override async ValueTask<CheckResult> CheckAsync(object argument, DiscordCommandContext context)
+        public override ValueTask<CheckResult> CheckAsync(object argument, DiscordCommandContext context)
         {
             if (argument is Username username)
             {

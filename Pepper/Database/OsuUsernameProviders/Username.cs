@@ -9,7 +9,7 @@ namespace Pepper.Database.OsuUsernameProviders
     public class Username
     {
         [Key]
-        [Column("discord_user_id")] public string DiscordUserId { get; set; }
+        [Column("discord_user_id")] public string DiscordUserId { get; set; } = null!;
         [Column("osu_username")] public string? OsuUsername { get; set; }
         [Column("ripple_username")] public string? RippleUsername { get; set; }
         [Column("default_mode")] public string? DefaultServerString { get; set; }

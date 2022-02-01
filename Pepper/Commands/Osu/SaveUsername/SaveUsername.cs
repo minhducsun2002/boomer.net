@@ -23,7 +23,7 @@ namespace Pepper.Commands.Osu
         [RequireGuildWhitelist("osu-user-set")]
         [Command("usersave", "save", "userset", "set")]
         [Description("Set the username to default to in your future requests.")]
-        public async Task<DiscordCommandResult> Exec([Remainder][Description("Username to save.")] string username)
+        public DiscordCommandResult Exec([Remainder][Description("Username to save.")] string username)
         {
             return View(new ChooseServerView(
                 Context.Author.Id.ToString(),

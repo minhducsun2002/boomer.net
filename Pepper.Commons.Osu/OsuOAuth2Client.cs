@@ -18,11 +18,13 @@ namespace Pepper.Commons.Osu
             [JsonProperty("scope")] public const string Scope = "public";
         }
 
+#pragma warning disable CS8618
         private class AuthorizationResponse
         {
             [JsonPropertyName("expires_in")] public int ExpireInSeconds { get; set; }
             [JsonPropertyName("access_token")] public string AccessToken { get; set; }
         }
+#pragma warning disable CS8618
 
         private readonly AuthorizationPayload payload;
         private string Token { get; set; }

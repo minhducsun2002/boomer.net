@@ -10,7 +10,7 @@ namespace Pepper.Database.OsuUsernameProviders
         private readonly FastConcurrentLru<string, Username> cache = new(200);
         public MariaDbOsuUsernameProvider(DbContextOptions<MariaDbOsuUsernameProvider> opt) : base(opt) { }
 
-        public DbSet<Username> DbSet { get; set; }
+        public DbSet<Username> DbSet { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
