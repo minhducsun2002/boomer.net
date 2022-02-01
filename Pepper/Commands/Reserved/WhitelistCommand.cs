@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord.Bot;
 using Microsoft.Extensions.DependencyInjection;
+using Pepper.Database;
 using Pepper.Services;
 using Pepper.Structures.Commands;
 using Qmmands;
@@ -34,26 +35,31 @@ namespace Pepper.Commands.Reserved
             }
 
             var checkResult = await restrictionCheckAttribute.CheckAsync(context);
-            var service = Context.Bot.Services.GetRequiredService<RestrictedCommandWhitelistService>();
+            var service = Context.Bot.Services.GetRequiredService<RestrictedCommandWhitelistProvider>();
 
             if (string.IsNullOrWhiteSpace(guildId))
             {
                 guildId = Context.GuildId.ToString()!;
             }
 
+            bool success;
             if (checkResult.IsSuccessful)
             {
-                service.RemoveAllowedGuild(restrictionCheckAttribute.CommandIdentifier, guildId);
+                success = await service.RemoveAllowedGuild(guildId, restrictionCheckAttribute.CommandIdentifier);
                 return Reply(
-                    $"Preventing command `{command.Aliases[0]}` to be called from "
-                    + (guildId == context.GuildId.ToString() ? "this guild." : $"guild ID {guildId}.")
+                     (success ? "Preventing" : "Failed to prevent")
+                    + $" command `{command.Aliases[0]}` to be called from "
+                    + (guildId == context.GuildId.ToString() ? "this guild" : $"guild ID {guildId}")
+                    + (success ? "." : " : something was wrong syncing entries back to database.")
                 );
             }
 
-            service.AddAllowedGuild(restrictionCheckAttribute.CommandIdentifier, guildId);
+            success = await service.AddAllowedGuild(restrictionCheckAttribute.CommandIdentifier, guildId);
             return Reply(
-                $"Allowed command `{command.Aliases[0]}` to be called from "
-                + (guildId == context.GuildId.ToString() ? "this guild." : $"guild ID {guildId}.")
+                (success ? "Allowing" : "Failed to allow")
+                + $" command `{command.Aliases[0]}` to be called from "
+                + (guildId == context.GuildId.ToString() ? "this guild" : $"guild ID {guildId}")
+                + (success ? "." : " : something was wrong syncing entries back to database.")
             );
         }
     }

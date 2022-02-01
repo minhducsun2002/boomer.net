@@ -17,6 +17,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
 using OsuSharp;
 using Pepper.Commons.Osu;
+using Pepper.Database;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Services;
 using Pepper.Structures;
@@ -75,6 +76,11 @@ var hostBuilder = new HostBuilder()
 
         services.AddScoped<TypeParsedArgumentPersistenceService>();
         services.AddDbContext<IOsuUsernameProvider, MariaDbOsuUsernameProvider>(builder =>
+        {
+            var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;
+            builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        });
+        services.AddDbContextPool<RestrictedCommandWhitelistProvider>(builder =>
         {
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;
             builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));

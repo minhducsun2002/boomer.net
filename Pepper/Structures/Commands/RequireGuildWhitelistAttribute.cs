@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Disqord.Bot;
 using Microsoft.Extensions.DependencyInjection;
-using Pepper.Services;
+using Pepper.Database;
 using Qmmands;
 
 namespace Pepper.Structures.Commands
@@ -11,11 +11,11 @@ namespace Pepper.Structures.Commands
         public readonly string CommandIdentifier;
         public RequireGuildWhitelistAttribute(string commandIdentifier) => CommandIdentifier = commandIdentifier;
 
-        public override ValueTask<CheckResult> CheckAsync(DiscordGuildCommandContext context)
+        public override async ValueTask<CheckResult> CheckAsync(DiscordGuildCommandContext context)
         {
-            var allowedServers = context.Services.GetRequiredService<RestrictedCommandWhitelistService>()
-                .GetAllowedGuilds(CommandIdentifier);
-            return allowedServers.Contains(context.GuildId.ToString())
+            var allowed = await context.Services.GetRequiredService<RestrictedCommandWhitelistProvider>()
+                .IsAllowedGuild(context.GuildId.ToString(), CommandIdentifier);
+            return allowed
                 ? Success()
                 : Failure("This guild is not whitelisted to run this command.");
         }
