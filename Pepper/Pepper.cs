@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -27,10 +28,14 @@ using Prometheus.DotNetRuntime;
 using Qmmands;
 using Serilog;
 using Serilog.Templates;
+using Pepper.Logging.Serilog.Sinks.Discord;
 
 DotEnv.Load();
+var webhookLog = Environment.GetEnvironmentVariable("PEPPER_DISCORD_WEBHOOK_LOG");
+
 var hostBuilder = new HostBuilder()
     .UseSerilog((_, configuration) =>
+    {
         configuration
             .MinimumLevel.Information()
             .Enrich.WithThreadId()
@@ -39,8 +44,23 @@ var hostBuilder = new HostBuilder()
                 new ExpressionTemplate(
                     "[{@t:dd-MM-yy HH:mm:ss} {@l:u3}] [Thread {ThreadId,2}]{#if SourceContext is not null} [{Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}]{#end} {@m:lj}\n{@x}{#if Contains(@x, 'Exception')}\n{#end}"
                 )
-            )
-    )
+            );
+
+        if (webhookLog != null)
+        {
+            var uri = new Uri(webhookLog);
+            Debug.Assert(uri.Host.Contains("discord"));
+            var splitted = uri.AbsolutePath.Split('/')
+                .Where(p => !string.IsNullOrWhiteSpace(p))
+                .ToArray();
+
+            configuration.WriteTo.DiscordWebhook(
+                ulong.Parse(splitted[^2]), splitted[^1],
+                formatter: new ExpressionTemplate(
+                    "[{@t:dd-MM-yy HH:mm:ss} {@l:u3}] {@m:lj}\n{@x}{#if Contains(@x, 'Exception')}\n{#end}"
+                ));
+        }
+    })
     .ConfigureAppConfiguration(app =>
     {
         app.AddEnvironmentVariables("PEPPER_");

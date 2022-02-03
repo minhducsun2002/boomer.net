@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Pepper.Commons.Osu\Pepper.Commons.Osu.csproj" />
     <ProjectReference Include="..\Pepper.FuzzySearch\Pepper.FuzzySearch.csproj" />
+    <ProjectReference Include="..\Pepper.Logging.Serilog.Sinks.Discord\Pepper.Logging.Serilog.Sinks.Discord.csproj" />
   </ItemGroup>
   
   
