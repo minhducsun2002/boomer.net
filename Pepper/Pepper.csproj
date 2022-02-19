@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="BitFaster.Caching" Version="1.0.3" />
-    <PackageReference Include="Disqord.Bot" Version="1.0.0-12302021-165" />
+    <PackageReference Include="Disqord.Bot" Version="1.0.0-176" />
     <PackageReference Include="dotenv.net" Version="3.0.0" />
     <PackageReference Include="ISO3166-Mobile" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0-preview.5.21301.5" />
