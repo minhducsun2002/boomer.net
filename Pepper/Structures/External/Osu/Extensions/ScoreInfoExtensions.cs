@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 
@@ -6,6 +7,12 @@ namespace Pepper.Structures.External.Osu.Extensions
 {
     public static class ScoreInfoExtensions
     {
+        public static ScoreInfo WithRulesetID(this ScoreInfo scoreInfo, int rulesetId)
+        {
+            scoreInfo.Ruleset.OnlineID = rulesetId;
+            return scoreInfo;
+        }
+
         public static ScoreInfo WithStatistics(this ScoreInfo scoreInfo, Dictionary<string, int> statistics)
         {
             foreach (var (key, value) in statistics)

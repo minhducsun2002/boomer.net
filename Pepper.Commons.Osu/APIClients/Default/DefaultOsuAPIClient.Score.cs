@@ -12,19 +12,19 @@ namespace Pepper.Commons.Osu.APIClients.Default
 {
     public partial class DefaultOsuAPIClient
     {
-        public override async Task<APIScoreInfo> GetScore(long scoreId, RulesetInfo rulesetInfo)
+        public override async Task<APIScore> GetScore(long scoreId, RulesetInfo rulesetInfo)
         {
             var res = await HttpClient.GetStringAsync($"https://osu.ppy.sh/scores/{rulesetInfo.ShortName}/{scoreId}");
             var doc = new HtmlDocument(); doc.LoadHtml(res);
             return SerializeToAPILegacyScoreInfo(JObject.Parse(doc.GetElementbyId("json-show").InnerText));
         }
 
-        public override async Task<APIScoreInfo[]> GetUserScores(
+        public override async Task<APIScore[]> GetUserScores(
             int userId, ScoreType scoreType,
             RulesetInfo rulesetInfo, bool includeFails = false, int count = 100, int offset = 0
         )
         {
-            var scoreCache = new List<APIScoreInfo>();
+            var scoreCache = new List<APIScore>();
 
             var init = offset;
             while (scoreCache.Count < count)
@@ -45,9 +45,9 @@ namespace Pepper.Commons.Osu.APIClients.Default
             return scoreCache.Count > count ? scoreCache.GetRange(0, count).ToArray() : scoreCache.ToArray();
         }
 
-        private static APIScoreInfo SerializeToAPILegacyScoreInfo(JToken scoreObject)
+        private static APIScore SerializeToAPILegacyScoreInfo(JToken scoreObject)
         {
-            var score = scoreObject.ToObject<APIScoreInfo>()!;
+            var score = scoreObject.ToObject<APIScore>()!;
             var beatmap = scoreObject["beatmap"]!;
             score.Beatmap.BPM = beatmap["bpm"]!.ToObject<double>();
             score.Beatmap.Length = beatmap["hit_length"]!.ToObject<double>() * 1000;

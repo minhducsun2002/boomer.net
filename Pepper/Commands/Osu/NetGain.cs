@@ -19,9 +19,9 @@ namespace Pepper.Commands.Osu
     {
         public NetGain(APIClientStore apiClientStore) : base(apiClientStore) { }
 
-        private class ScoreComparer : IComparer<APIScoreInfo>
+        private class ScoreComparer : IComparer<APIScore>
         {
-            public int Compare(APIScoreInfo? x, APIScoreInfo? y)
+            public int Compare(APIScore? x, APIScore? y)
             {
                 return (y?.PP ?? 0).CompareTo(x?.PP ?? 0);
             }
@@ -71,7 +71,7 @@ namespace Pepper.Commands.Osu
             }
             else
             {
-                var scoreToCompare = new APIScoreInfo { PP = ppToCheck };
+                var scoreToCompare = new APIScore { PP = ppToCheck };
                 var lowerIndex = Array.BinarySearch(scores, scoreToCompare, ScoreComparer.Instance);
                 if (lowerIndex < 0)
                 {

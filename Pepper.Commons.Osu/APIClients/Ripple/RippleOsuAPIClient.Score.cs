@@ -13,12 +13,12 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
 {
     public partial class RippleOsuAPIClient
     {
-        public override Task<APIScoreInfo> GetScore(long scoreId, RulesetInfo rulesetInfo)
+        public override Task<APIScore> GetScore(long scoreId, RulesetInfo rulesetInfo)
         {
             throw new NotImplementedException();
         }
 
-        public override async Task<APIScoreInfo[]> GetUserScores(
+        public override async Task<APIScore[]> GetUserScores(
             int userId, ScoreType scoreType, RulesetInfo rulesetInfo, bool includeFails = false,
             int count = 100, int offset = 0)
         {
@@ -66,7 +66,7 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
                         {"count_katu", score.CountKatu},
                         {"count_miss", score.CountMiss},
                     };
-                    return new APIScoreInfo
+                    return new APIScore
                     {
                         Beatmap = mapInfo,
                         BeatmapSet = mapInfo.BeatmapSet,

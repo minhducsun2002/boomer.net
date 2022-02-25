@@ -6,9 +6,9 @@ using Disqord.Bot;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using Pepper.Commons.Osu;
+using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
 using Pepper.Structures.External.Osu.Extensions;
-using APIScoreInfo = Pepper.Commons.Osu.API.APIScoreInfo;
 
 namespace Pepper.Commands.Osu
 {
@@ -21,7 +21,7 @@ namespace Pepper.Commands.Osu
             ModParserService = p;
         }
 
-        protected async Task<DiscordCommandResult> SingleScore(APIScoreInfo sc)
+        protected async Task<DiscordCommandResult> SingleScore(APIScore sc)
         {
             var b = sc.Beatmap!;
             var workingBeatmap = await APIClientStore.GetClient(GameServer.Osu).GetBeatmap(b.OnlineID);
@@ -30,7 +30,7 @@ namespace Pepper.Commands.Osu
             var mods = ModParserService.ResolveMods(ruleset, sc.Mods.Select(mod => mod.Acronym));
             var difficulty = workingBeatmap.CalculateDifficulty(sc.RulesetID, mods);
 
-            SetBeatmapContext(workingBeatmap.BeatmapInfo.OnlineBeatmapID!.Value);
+            SetBeatmapContext(workingBeatmap.BeatmapInfo.OnlineID);
 
             b.StarRating = difficulty.StarRating;
             double? pp = sc.PP, fullComboPP = pp;
@@ -41,6 +41,7 @@ namespace Pepper.Commands.Osu
                 pp = workingBeatmap.CalculatePerformance(
                     rulesetOverwrite: ruleset,
                     score: new ScoreInfo { Mods = mods, MaxCombo = sc.MaxCombo, Accuracy = sc.Accuracy }
+                        .WithRulesetID(sc.RulesetID)
                         .WithStatistics(sc.Statistics)
                 );
                 calculated = true;
@@ -49,6 +50,7 @@ namespace Pepper.Commands.Osu
             if (!sc.Perfect)
             {
                 var fcScore = new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = sc.Accuracy }
+                    .WithRulesetID(sc.RulesetID)
                     .WithStatistics(sc.Statistics);
                 fcScore.SetCount300((int) (fcScore.GetCount300() + fcScore.GetCountMiss())!);
                 fcScore.SetCountMiss(0);
@@ -57,7 +59,7 @@ namespace Pepper.Commands.Osu
 
             int hitCounts, totalHitCounts = workingBeatmap.Beatmap.HitObjects.Count;
             {
-                var temporaryScore = new ScoreInfo().WithStatistics(sc.Statistics);
+                var temporaryScore = new ScoreInfo().WithRulesetID(sc.RulesetID).WithStatistics(sc.Statistics);
                 hitCounts = (temporaryScore.GetCount50() + temporaryScore.GetCount100() +
                              temporaryScore.GetCount300() + temporaryScore.GetCountMiss())!.Value;
             }
@@ -69,7 +71,7 @@ namespace Pepper.Commands.Osu
                         + (mods.Length != 0 ? "+" + string.Join("", mods.Select(mod => mod.Acronym)) : ""),
                 Url = workingBeatmap.GetOnlineUrl(),
                 ThumbnailUrl =
-                    $"https://b.ppy.sh/thumb/{workingBeatmap.BeatmapSetInfo?.OnlineBeatmapSetID ?? b.OnlineBeatmapSetID}l.jpg",
+                    $"https://b.ppy.sh/thumb/{workingBeatmap.BeatmapSetInfo?.OnlineID ?? b.OnlineBeatmapSetID}l.jpg",
                 Timestamp = sc.Date,
                 Fields = new List<LocalEmbedField>
                 {

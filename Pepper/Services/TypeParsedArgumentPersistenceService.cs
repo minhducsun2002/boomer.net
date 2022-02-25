@@ -14,7 +14,7 @@ namespace Pepper.Services
     /// </remarks>
     public class TypeParsedArgumentPersistenceService
     {
-        private Dictionary<Type, object> storage = new();
+        private readonly Dictionary<Type, object> storage = new();
 
         public T Get<T>() => (T) storage[typeof(T)];
 

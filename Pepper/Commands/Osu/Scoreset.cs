@@ -12,7 +12,7 @@ namespace Pepper.Commands.Osu
         private const int MaxScorePerPage = 5;
         public Scoreset(APIClientStore s, BeatmapContextProviderService b, ModParserService p) : base(s, b, p) { }
 
-        public static LocalEmbedField SerializeScoreInList(APIScoreInfo score, bool utcHint = false, bool scoreLink = true)
+        public static LocalEmbedField SerializeScoreInList(APIScore score, bool utcHint = false, bool scoreLink = true)
         {
             var map = score.Beatmap!;
             var mapset = map.Metadata!;
@@ -32,7 +32,7 @@ namespace Pepper.Commands.Osu
             };
         }
 
-        private static LocalEmbed SerializeScoreset(IEnumerable<APIScoreInfo> scores, bool utcHint = false, bool scoreLink = true)
+        private static LocalEmbed SerializeScoreset(IEnumerable<APIScore> scores, bool utcHint = false, bool scoreLink = true)
             => new()
             {
                 Fields = scores.Select(score => SerializeScoreInList(score, utcHint, scoreLink)).ToList()

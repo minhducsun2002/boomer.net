@@ -9,7 +9,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
     {
         public override Task<IReadOnlyList<Score>> GetLegacyBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo)
         {
-            return legacyApiClient.GetScoresByBeatmapIdAndUserIdAsync(beatmapId, userId, (GameMode) rulesetInfo.ID!);
+            return legacyApiClient.GetScoresByBeatmapIdAndUserIdAsync(beatmapId, userId, (GameMode) rulesetInfo.OnlineID!);
         }
     }
 }

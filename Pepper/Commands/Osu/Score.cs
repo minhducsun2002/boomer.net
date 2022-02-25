@@ -53,7 +53,7 @@ namespace Pepper.Commands.Osu
                 return Reply(new LocalEmbed
                 {
                     Author = SerializeAuthorBuilder(user),
-                    Title = $"**{map.Beatmap.Metadata.Artist}** - **{map.Beatmap.Metadata.Title}** [{map.BeatmapInfo.Version}]",
+                    Title = $"**{map.Beatmap.Metadata.Artist}** - **{map.Beatmap.Metadata.Title}** [{map.BeatmapInfo.DifficultyName}]",
                     Url = map.GetOnlineUrl(),
                     Description = $"{SerializeBeatmapStats(map.BeatmapInfo, difficulty, map.Beatmap.ControlPointInfo)}\n\n"
                         + string.Join("\n\n", scores.Select(score =>

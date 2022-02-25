@@ -74,7 +74,7 @@ namespace Pepper.Commands.Osu
                 })
                 .ToArray();
 
-            var pages = new ArrayPageProvider<APIScoreInfo>(
+            var pages = new ArrayPageProvider<APIScore>(
                 filtered,
                 (_, chunk) => new Page().WithEmbeds(
                     SerializeScoreset(chunk, scoreLink: false)

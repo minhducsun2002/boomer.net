@@ -20,6 +20,7 @@ using OsuSharp;
 using Pepper.Commons.Osu;
 using Pepper.Database;
 using Pepper.Database.OsuUsernameProviders;
+using Pepper.Logging.Serilog.Sinks.Discord;
 using Pepper.Services;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
@@ -28,7 +29,6 @@ using Prometheus.DotNetRuntime;
 using Qmmands;
 using Serilog;
 using Serilog.Templates;
-using Pepper.Logging.Serilog.Sinks.Discord;
 
 DotEnv.Load();
 var webhookLog = Environment.GetEnvironmentVariable("PEPPER_DISCORD_WEBHOOK_LOG");

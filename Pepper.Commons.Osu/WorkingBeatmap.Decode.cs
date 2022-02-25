@@ -17,8 +17,11 @@ namespace Pepper.Commons.Osu
                 workingBeatmap.BeatmapInfo.Length = workingBeatmap.Beatmap.HitObjects[^1].StartTime;
             }
 
-            workingBeatmap.BeatmapInfo.Ruleset = BuiltInRulesets[workingBeatmap.BeatmapInfo.RulesetID].RulesetInfo;
-            workingBeatmap.BeatmapInfo.OnlineBeatmapID ??= beatmapId;
+            workingBeatmap.BeatmapInfo.Ruleset = BuiltInRulesets[workingBeatmap.BeatmapInfo.Ruleset.OnlineID].RulesetInfo;
+            if (beatmapId.HasValue)
+            {
+                workingBeatmap.BeatmapInfo.OnlineID = beatmapId.Value;
+            }
 
             return workingBeatmap;
         }

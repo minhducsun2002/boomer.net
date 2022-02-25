@@ -12,7 +12,7 @@ namespace Pepper.Services.Osu
 {
     public class BeatmapContextProviderService : Service
     {
-        private Dictionary<string, int> cache = new();
+        private readonly Dictionary<string, int> cache = new();
         private static readonly ILogger Log = Serilog.Log.Logger.ForContext<BeatmapContextProviderService>();
 
         public void SetBeatmap(string channelId, int beatmapId)

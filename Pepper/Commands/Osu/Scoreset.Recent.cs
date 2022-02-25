@@ -31,7 +31,7 @@ namespace Pepper.Commands.Osu
 
             var scores = await apiClient.GetUserScores(user.Id, ScoreType.Recent, rulesetInfo, true, 100);
 
-            var pages = new ArrayPageProvider<APIScoreInfo>(
+            var pages = new ArrayPageProvider<APIScore>(
                 scores,
                 (_, chunk) => new Page().WithEmbeds(
                     SerializeScoreset(chunk, scoreLink: false)

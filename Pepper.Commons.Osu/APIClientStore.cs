@@ -7,7 +7,7 @@ namespace Pepper.Commons.Osu
 {
     public class APIClientStore
     {
-        private Dictionary<GameServer, APIClient> apiClients = new();
+        private readonly Dictionary<GameServer, APIClient> apiClients = new();
         public APIClientStore(IServiceProvider serviceProvider)
         {
             var assembly = typeof(APIClient).Assembly;

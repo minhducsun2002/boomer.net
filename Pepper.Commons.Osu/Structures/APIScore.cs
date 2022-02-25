@@ -3,7 +3,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Pepper.Commons.Osu.API
 {
-    public class APIScoreInfo : osu.Game.Online.API.Requests.Responses.APIScoreInfo
+    public class APIScore : osu.Game.Online.API.Requests.Responses.APIScore
     {
         [JsonProperty("perfect")]
         public bool Perfect { get; set; }

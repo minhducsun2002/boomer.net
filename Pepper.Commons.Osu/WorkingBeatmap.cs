@@ -27,7 +27,7 @@ namespace Pepper.Commons.Osu
 
             if (beatmapId.HasValue)
             {
-                beatmap.BeatmapInfo.OnlineBeatmapID = beatmapId;
+                beatmap.BeatmapInfo.OnlineID = beatmapId.Value;
             }
         }
 
@@ -39,8 +39,8 @@ namespace Pepper.Commons.Osu
         public double CalculatePerformance(ScoreInfo score, Ruleset? rulesetOverwrite = null)
         {
             var ruleset = rulesetOverwrite ?? GetDefaultRuleset();
-            var rulesetId = ruleset.RulesetInfo.ID;
-            var difficultyAttributes = CalculateDifficulty(rulesetId!.Value, score.Mods);
+            var rulesetId = ruleset.RulesetInfo.OnlineID;
+            var difficultyAttributes = CalculateDifficulty(rulesetId, score.Mods);
             PerformanceCalculator calculator = rulesetId switch
             {
                 0 => new OsuPerformanceCalculator(ruleset, difficultyAttributes, score),
@@ -50,7 +50,8 @@ namespace Pepper.Commons.Osu
                 _ => throw new ArgumentOutOfRangeException($"{nameof(rulesetId)} must be a supported ruleset ID, {rulesetId} is not one!")
             };
 
-            return calculator.Calculate();
+            var calc = calculator.Calculate();
+            return calc.Total;
         }
 
         public DifficultyAttributes CalculateDifficulty(int rulesetId, params Mod[] mods) => BuiltInRulesets[rulesetId]
@@ -59,11 +60,11 @@ namespace Pepper.Commons.Osu
 
         public string GetOnlineUrl(bool forceFullUrl = false, Ruleset? rulesetOverwrite = null)
         {
-            var ruleset = rulesetOverwrite ?? BuiltInRulesets[BeatmapInfo.RulesetID];
+            var ruleset = rulesetOverwrite ?? BuiltInRulesets[BeatmapInfo.Ruleset.OnlineID];
             try
             {
-                return $"https://osu.ppy.sh/beatmapsets/{BeatmapInfo.BeatmapSet.OnlineBeatmapSetID}"
-                       + $"#{ruleset.ShortName}/{beatmap.BeatmapInfo.OnlineBeatmapID}";
+                return $"https://osu.ppy.sh/beatmapsets/{BeatmapInfo.BeatmapSet?.OnlineID}"
+                       + $"#{ruleset.ShortName}/{beatmap.BeatmapInfo?.OnlineID}";
             }
             catch
             {
@@ -72,11 +73,11 @@ namespace Pepper.Commons.Osu
                     throw;
                 }
 
-                return $"https://osu.ppy.sh/b/{beatmap.BeatmapInfo.OnlineBeatmapID}";
+                return $"https://osu.ppy.sh/b/{beatmap.BeatmapInfo?.OnlineID}";
             }
         }
 
-        public Ruleset GetDefaultRuleset() => BuiltInRulesets[beatmap.BeatmapInfo.RulesetID];
+        public Ruleset GetDefaultRuleset() => BuiltInRulesets[beatmap.BeatmapInfo.Ruleset.OnlineID];
         protected override IBeatmap GetBeatmap() => beatmap;
         protected override Texture GetBackground() => null!;
         protected override Track GetBeatmapTrack() => null!;

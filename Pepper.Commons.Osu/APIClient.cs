@@ -15,7 +15,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Quantization;
 using APIBeatmapSet = Pepper.Commons.Osu.API.APIBeatmapSet;
-using APIScoreInfo = Pepper.Commons.Osu.API.APIScoreInfo;
 using Color = System.Drawing.Color;
 
 namespace Pepper.Commons.Osu
@@ -61,8 +60,8 @@ namespace Pepper.Commons.Osu
         public abstract Task<WorkingBeatmap> GetBeatmap(int beatmapId);
         public abstract Task<APIBeatmapSet> GetBeatmapsetInfo(long id, bool isBeatmapSetId);
 
-        public abstract Task<APIScoreInfo> GetScore(long scoreId, RulesetInfo rulesetInfo);
-        public abstract Task<APIScoreInfo[]> GetUserScores(int userId, ScoreType scoreType, RulesetInfo rulesetInfo, bool includeFails = false, int count = 100, int offset = 0);
+        public abstract Task<APIScore> GetScore(long scoreId, RulesetInfo rulesetInfo);
+        public abstract Task<APIScore[]> GetUserScores(int userId, ScoreType scoreType, RulesetInfo rulesetInfo, bool includeFails = false, int count = 100, int offset = 0);
 
         public abstract Task<IReadOnlyList<Score>> GetLegacyBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo);
     }
