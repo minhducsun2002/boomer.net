@@ -12,6 +12,7 @@ namespace Pepper.Commands.Osu
 {
     public class ChooseServerView : ViewBase
     {
+        private bool success;
         public ChooseServerView(string discordId, string username, IServiceProvider serviceProvider) : base(GenerateMessage(username))
         {
             foreach (var server in Enum.GetValues<GameServer>())
@@ -33,6 +34,7 @@ namespace Pepper.Commands.Osu
                     var usernameProvider = serviceProvider.GetRequiredService<IOsuUsernameProvider>();
                     await usernameProvider.StoreUsername(record);
                     TemplateMessage.Content = $"<@{e.AuthorId}> is now bound to **{username}** on the {server.GetDisplayText()} server.";
+                    success = true;
                     Menu.Stop();
                     ClearComponents();
                     await Menu.ApplyChangesAsync();
@@ -45,7 +47,10 @@ namespace Pepper.Commands.Osu
 
         public override async ValueTask DisposeAsync()
         {
-            TemplateMessage.Content = "You didn't choose the server in time. Try again.";
+            if (!success)
+            {
+                TemplateMessage.Content = "You didn't choose the server in time. Try again.";
+            }
             ClearComponents();
             await Menu.ApplyChangesAsync();
             await base.DisposeAsync();
