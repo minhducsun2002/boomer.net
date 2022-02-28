@@ -61,7 +61,7 @@ namespace Pepper.Commands.Osu
                             var (key, user, server) = profile;
                             return new LocalEmbedField
                             {
-                                Name = $"{user.Username} ({server.GetDisplayText()}",
+                                Name = $"{user.Username} ({server.GetDisplayText()})",
                                 Value = $"**{user.Statistics.PP:F2}**pp • **{user.Statistics.Accuracy:F3}**%"
                                         + $" • {ResolveEarthEmoji(user.Country.FlagName)} #{user.Statistics.GlobalRank}"
                                         + $" • :flag_{user.Country.FlagName.ToLowerInvariant()}: #{user.Statistics.CountryRank}"
