@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using OsuSharp;
 
 namespace Pepper.Commons.Osu.API.Ripple
 {

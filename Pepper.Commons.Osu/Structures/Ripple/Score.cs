@@ -1,7 +1,6 @@
 using System;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps.Legacy;
-using OsuSharp;
 
 namespace Pepper.Commons.Osu.API.Ripple
 {

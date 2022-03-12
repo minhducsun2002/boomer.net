@@ -7,7 +7,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu.API;
-using Score = OsuSharp.Score;
 
 namespace Pepper.Commons.Osu.APIClients.Ripple
 {
@@ -88,8 +87,7 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
             return ret.ToArray();
         }
 
-        public override Task<IReadOnlyList<Score>> GetLegacyBeatmapScores(int userId, int beatmapId,
-            RulesetInfo rulesetInfo)
+        public override async Task<APIScore[]> GetUserBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo)
         {
             throw new NotImplementedException();
         }

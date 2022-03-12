@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
-using OsuSharp;
 using Pepper.Commons.Osu.API;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
@@ -62,7 +61,6 @@ namespace Pepper.Commons.Osu
 
         public abstract Task<APIScore> GetScore(long scoreId, RulesetInfo rulesetInfo);
         public abstract Task<APIScore[]> GetUserScores(int userId, ScoreType scoreType, RulesetInfo rulesetInfo, bool includeFails = false, int count = 100, int offset = 0);
-
-        public abstract Task<IReadOnlyList<Score>> GetLegacyBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo);
+        public abstract Task<APIScore[]> GetUserBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo);
     }
 }

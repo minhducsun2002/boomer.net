@@ -28,6 +28,11 @@ namespace Pepper.Commands.Osu
             [Remainder][Description("Username to check. Default to your username, if set.")] Username? username = null
         )
         {
+            // TODO: Implement score listing for Ripple
+            if (server != GameServer.Osu)
+            {
+                return Reply("Sorry, this is only implemented for osu! for now");
+            }
             var mapId = beatmapResolvable.BeatmapId;
             if (username != null)
             {
@@ -37,13 +42,13 @@ namespace Pepper.Commands.Osu
                 SetBeatmapContext(mapId);
 
                 var user = await apiClient.GetUser(username.GetUsername(server)!, ruleset.RulesetInfo);
-                var scores = await apiClient.GetLegacyBeatmapScores(
+                var scores = await apiClient.GetUserBeatmapScores(
                     user.Id,
                     mapId,
                     ruleset.RulesetInfo
                 );
 
-                if (scores.Count == 0)
+                if (scores.Length == 0)
                 {
                     return Reply($"No score found on that beatmap for user `{user.Username}`.");
                 }
@@ -59,13 +64,13 @@ namespace Pepper.Commands.Osu
                         + string.Join("\n\n", scores.Select(score =>
                         {
                             var localPP = false;
-                            var mods = ruleset.ConvertFromLegacyMods((LegacyMods) score.Mods)!.ToArray();
-                            var pp = score.PerformancePoints;
+                            var mods = ModParserService.ResolveMods(ruleset, score.Mods);
+                            var pp = score.PP;
                             if (!pp.HasValue)
                             {
                                 try
                                 {
-                                    var scoreInfo = new ScoreInfo { Mods = mods, MaxCombo = score.MaxCombo!.Value, Accuracy = score.Accuracy };
+                                    var scoreInfo = new ScoreInfo { Mods = mods, MaxCombo = score.MaxCombo, Accuracy = score.Accuracy };
                                     pp = (float) map.CalculatePerformance(scoreInfo);
                                     localPP = true;
                                 }
@@ -76,9 +81,9 @@ namespace Pepper.Commands.Osu
                                 $"[**{score.Rank}**] **{pp}**pp{(localPP ? " (?)" : "")} (**{score.MaxCombo}**x | **{score.Accuracy:F3}**%)"
                                 + $" {(score.Perfect ? "(FC)" : "")}"
                                 + (mods.Length != 0 ? $"+**{string.Join("", mods.Select(mod => mod.Acronym))}**" : "")
-                                + $"\n[**{score.Count300}**/**{score.Count100}**/**{score.Count50}**/**{score.Miss}**]"
-                                + $" @ **{SerializeTimestamp(score.Date!.Value, false)}**"
-                                + $"\n[**Score link**](https://osu.ppy.sh/scores/{ruleset.ShortName}/{score.ScoreId})";
+                                + $"\n" + SerializeHitStats(score.Statistics)
+                                + $" @ **{SerializeTimestamp(score.Date, false)}**"
+                                + $"\n[**Score link**](https://osu.ppy.sh/scores/{ruleset.ShortName}/{score.OnlineID})";
                         })),
                     Timestamp = DateTimeOffset.Now,
                     Footer = new LocalEmbedFooter

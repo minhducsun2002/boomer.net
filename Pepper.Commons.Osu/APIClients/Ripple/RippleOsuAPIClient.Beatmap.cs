@@ -6,6 +6,7 @@ using BitFaster.Caching.Lru;
 using Newtonsoft.Json.Linq;
 using Pepper.Commons.Osu.API;
 using Pepper.Commons.Osu.APIClients.Default;
+using RestSharp;
 
 namespace Pepper.Commons.Osu.APIClients.Ripple
 {
@@ -26,10 +27,10 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
             for (var i = 0; i < mapids.Length; i += 50)
             {
                 var ids = mapids[i..Math.Min(i + 50, mapids.Length)];
-                var beatmaps = await osuOAuth2Client
-                    .GetAsync($"https://osu.ppy.sh/api/v2/beatmaps?{string.Join('&', ids.Select(id => $"ids[]={id}"))}");
-                var raw = await beatmaps.Content.ReadAsStringAsync();
-                output.AddRange(JObject.Parse(raw)["beatmaps"]!.ToObject<BeatmapCompact[]>()!);
+                var response = await restClient.GetJsonAsync<APIBeatmapList>(
+                    $"beatmaps?{string.Join('&', ids.Select(id => $"ids[]={id}"))}"
+                );
+                output.AddRange(response!.Beatmaps);
             }
 
             return output.ToArray();

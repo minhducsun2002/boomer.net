@@ -106,18 +106,16 @@ var hostBuilder = new HostBuilder()
             builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         });
 
-        services.AddSingleton(
-            new OsuClient(new OsuSharpConfiguration
-            {
-                ApiKey = context.Configuration["OSU_API_KEY"]
-            })
-        );
         services.AddSingleton<ModParserService>();
-        services.AddSingleton(new OsuOAuth2Credentials
+        services.AddSingleton(OsuRestClientBuilder.Build(
+            int.Parse(context.Configuration["OSU_OAUTH2_CLIENT_ID"]),
+            context.Configuration["OSU_OAUTH2_CLIENT_SECRET"]
+        ));
+
+        services.AddSingleton(new OsuClient(new OsuSharpConfiguration
         {
-            ClientId = int.Parse(context.Configuration["OSU_OAUTH2_CLIENT_ID"]),
-            ClientSecret = context.Configuration["OSU_OAUTH2_CLIENT_SECRET"]
-        });
+            ApiKey = "1"
+        }));
         services.AddSingleton<HttpClient>();
         services.AddSingleton<APIClientStore>();
         services.Configure<CommandServiceConfiguration>(config =>

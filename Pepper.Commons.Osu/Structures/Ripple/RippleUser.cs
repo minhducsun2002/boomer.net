@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json;
-using OsuSharp;
 
 namespace Pepper.Commons.Osu.API.Ripple
 {

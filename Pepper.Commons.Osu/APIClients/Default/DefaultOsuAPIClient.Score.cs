@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu.API;
+using RestSharp;
 
 namespace Pepper.Commons.Osu.APIClients.Default
 {
@@ -43,6 +44,20 @@ namespace Pepper.Commons.Osu.APIClients.Default
             }
 
             return scoreCache.Count > count ? scoreCache.GetRange(0, count).ToArray() : scoreCache.ToArray();
+        }
+
+        public override async Task<APIScore[]> GetUserBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo)
+        {
+            var response = await restClient.GetJsonAsync<APIScoreList>(
+                $"/beatmaps/{beatmapId}/scores/users/{userId}/all"
+            );
+            return response!.Scores
+                .Select(score =>
+                {
+                    score.Accuracy *= 100;
+                    return score;
+                })
+                .ToArray();
         }
 
         private static APIScore SerializeToAPILegacyScoreInfo(JToken scoreObject)

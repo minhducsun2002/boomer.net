@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 
@@ -24,6 +25,9 @@ namespace Pepper.Commons.Osu
                 }
             }
         }
+
+        public Mod[] ResolveMods(Ruleset ruleset, IEnumerable<APIMod> mods)
+            => ResolveMods(ruleset, mods.Select(m => m.Acronym));
 
         public Mod[] ResolveMods(Ruleset ruleset, IEnumerable<string> modStrings)
         {
