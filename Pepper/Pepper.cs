@@ -24,8 +24,6 @@ using Pepper.Logging.Serilog.Sinks.Discord;
 using Pepper.Services;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
-using Prometheus;
-using Prometheus.DotNetRuntime;
 using Qmmands;
 using Serilog;
 using Serilog.Templates;
@@ -85,15 +83,6 @@ var hostBuilder = new HostBuilder()
     })
     .ConfigureServices((context, services) =>
     {
-        var enableMetrics = Environment.GetEnvironmentVariable("ENABLE_METRICS");
-        var portEnv = Environment.GetEnvironmentVariable("PORT") ?? "2827";
-        if (enableMetrics == "true" && int.TryParse(portEnv, out var port))
-        {
-            DotNetRuntimeStatsBuilder.Default().StartCollecting();
-            var server = new MetricServer(port).Start();
-            services.AddSingleton(server);
-        }
-
         services.AddScoped<TypeParsedArgumentPersistenceService>();
         services.AddDbContext<IOsuUsernameProvider, MariaDbOsuUsernameProvider>(builder =>
         {
