@@ -3,7 +3,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Pepper.Commons.Osu.API
 {
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptIn, ItemNullValueHandling = NullValueHandling.Ignore)]
     public class APIScore : osu.Game.Online.API.Requests.Responses.APIScore
     {
         [JsonProperty("perfect")]
