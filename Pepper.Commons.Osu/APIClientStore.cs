@@ -13,7 +13,7 @@ namespace Pepper.Commons.Osu
             var assembly = typeof(APIClient).Assembly;
             foreach (var type in assembly.ExportedTypes)
             {
-                if (typeof(APIClient).IsAssignableFrom(type))
+                if (typeof(APIClient).IsAssignableFrom(type) && type.IsPublic)
                 {
                     var attribs = type.GetCustomAttribute<GameServerAttribute>();
                     if (attribs != null)
