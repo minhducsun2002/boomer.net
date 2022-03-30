@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 
@@ -17,7 +18,10 @@ namespace Pepper.Commons.Osu
                     clientSecret
                 )
             };
-            return (OsuRestClient) client.UseNewtonsoftJson();
+            return (OsuRestClient) client.UseNewtonsoftJson(new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Error
+            });
         }
     }
 }
