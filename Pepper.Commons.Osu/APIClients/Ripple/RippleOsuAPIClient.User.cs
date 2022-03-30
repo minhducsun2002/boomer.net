@@ -4,7 +4,6 @@ using System.Web;
 using Newtonsoft.Json;
 using osu.Game.Rulesets;
 using osu.Game.Users;
-using OsuSharp;
 using Pepper.Commons.Osu.API;
 using Pepper.Commons.Osu.API.Ripple;
 using UserStatistics = osu.Game.Users.UserStatistics;

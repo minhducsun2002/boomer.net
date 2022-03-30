@@ -1,4 +1,5 @@
 using System.Net.Http;
+using Pepper.Commons.Osu.APIClients.Default.Subclients;
 
 namespace Pepper.Commons.Osu.APIClients.Default
 {
@@ -6,9 +7,16 @@ namespace Pepper.Commons.Osu.APIClients.Default
     public partial class DefaultOsuAPIClient : APIClient
     {
         private readonly OsuRestClient restClient;
-        public DefaultOsuAPIClient(HttpClient httpClient, OsuRestClient restClient) : base(httpClient)
+        private readonly ScrapingClient scrapingClient;
+        private readonly LegacyClient? legacyClient;
+        public DefaultOsuAPIClient(HttpClient httpClient, OsuRestClient restClient, LegacyAPIToken? legacyAPIToken = null) : base(httpClient)
         {
             this.restClient = restClient;
+            scrapingClient = new ScrapingClient(httpClient);
+            if (legacyAPIToken != null)
+            {
+                legacyClient = new LegacyClient(legacyAPIToken, httpClient);
+            }
         }
     }
 }

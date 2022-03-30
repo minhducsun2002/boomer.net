@@ -9,6 +9,7 @@ using Disqord.Bot;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
+using Pepper.Commons.Osu.Exceptions;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu.Extensions;
@@ -98,7 +99,7 @@ namespace Pepper.Commands.Osu
             {
                 var exception = commandExecutionFailedResult.Exception;
                 outputMessage = null;
-                if (exception is HttpRequestException { StatusCode: HttpStatusCode.NotFound })
+                if (exception is HttpRequestException { StatusCode: HttpStatusCode.NotFound } or UserNotFoundException)
                 {
                     var username = context.Arguments.OfType<Username>().First();
                     var server = context.Arguments.OfType<GameServer>().FirstOrDefault();

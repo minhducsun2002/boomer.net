@@ -16,8 +16,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
-using OsuSharp;
 using Pepper.Commons.Osu;
+using Pepper.Commons.Osu.APIClients.Default;
 using Pepper.Database;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Logging.Serilog.Sinks.Discord;
@@ -100,11 +100,10 @@ var hostBuilder = new HostBuilder()
             int.Parse(context.Configuration["OSU_OAUTH2_CLIENT_ID"]),
             context.Configuration["OSU_OAUTH2_CLIENT_SECRET"]
         ));
-
-        services.AddSingleton(new OsuClient(new OsuSharpConfiguration
+        if (context.Configuration["OSU_API_KEY"] != null)
         {
-            ApiKey = "1"
-        }));
+            services.AddSingleton(new DefaultOsuAPIClient.LegacyAPIToken(context.Configuration["OSU_API_KEY"]));
+        }
         services.AddSingleton<HttpClient>();
         services.AddSingleton<APIClientStore>();
         services.Configure<CommandServiceConfiguration>(config =>
