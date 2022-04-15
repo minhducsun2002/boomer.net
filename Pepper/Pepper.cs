@@ -84,16 +84,16 @@ var hostBuilder = new HostBuilder()
     .ConfigureServices((context, services) =>
     {
         services.AddScoped<TypeParsedArgumentPersistenceService>();
-        services.AddDbContext<IOsuUsernameProvider, MariaDbOsuUsernameProvider>(builder =>
+        services.AddDbContextPool<IOsuUsernameProvider, MariaDbOsuUsernameProvider>(builder =>
         {
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;
             builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        });
+        }, 16);
         services.AddDbContextPool<RestrictedCommandWhitelistProvider>(builder =>
         {
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;
             builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        });
+        }, 16);
 
         services.AddSingleton<ModParserService>();
         services.AddSingleton(OsuRestClientBuilder.Build(
