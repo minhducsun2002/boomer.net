@@ -1,4 +1,5 @@
 using System.Net.Http;
+using OsuSharp;
 
 namespace Pepper.Commons.Osu.APIClients.Ripple
 {
@@ -6,6 +7,7 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
     public partial class RippleOsuAPIClient : APIClient
     {
         private readonly OsuRestClient restClient;
+        private readonly OsuClient legacyClient;
 
         /// <summary>
         /// Create an <see cref="APIClient"/> for Ripple server.
@@ -15,6 +17,12 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
         public RippleOsuAPIClient(HttpClient httpClient, OsuRestClient restClient) : base(httpClient)
         {
             this.restClient = restClient;
+            legacyClient = new OsuClient(new OsuSharpConfiguration
+            {
+                HttpClient = httpClient,
+                ApiKey = "1",
+                BaseUrl = "https://ripple.moe/api/"
+            });
         }
     }
 }

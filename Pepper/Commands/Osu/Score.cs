@@ -28,11 +28,6 @@ namespace Pepper.Commands.Osu
             [Remainder][Description("Username to check. Default to your username, if set.")] Username? username = null
         )
         {
-            // TODO: Implement score listing for Ripple
-            if (server != GameServer.Osu)
-            {
-                return Reply("Sorry, this is only implemented for osu! for now");
-            }
             var mapId = beatmapResolvable.BeatmapId;
             if (username != null)
             {
