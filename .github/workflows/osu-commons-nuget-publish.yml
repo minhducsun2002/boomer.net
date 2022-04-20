@@ -1,0 +1,28 @@
+name: Publish osu! common utils
+
+on:
+  push:
+    paths:
+      - 'Pepper.Commons.Osu/**'
+      - '.github/workflows/osu-commons-nuget-publish.yml'  
+  repository_dispatch:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Publish to feed
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - name: Publish
+        env:
+          API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_SOURCE: ${{ secrets.NUGET_FEED }}
+        run: |
+          dotnet pack Pepper.Commons.Osu -o dist/ --version-suffix "$(date +%Y%m%d-%H%M)";
+          dotnet nuget push dist/*.nupkg --api-key "$API_KEY" --source "$NUGET_SOURCE";
+          
