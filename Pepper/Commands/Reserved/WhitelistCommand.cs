@@ -54,7 +54,7 @@ namespace Pepper.Commands.Reserved
                 );
             }
 
-            success = await service.AddAllowedGuild(restrictionCheckAttribute.CommandIdentifier, guildId);
+            success = await service.AddAllowedGuild(guildId, restrictionCheckAttribute.CommandIdentifier);
             return Reply(
                 (success ? "Allowing" : "Failed to allow")
                 + $" command `{command.Aliases[0]}` to be called from "
