@@ -50,7 +50,7 @@ namespace Pepper.Commons.Osu
                     });
                 var response = await RestClient.PostAsync<AuthorizationResponse>(request);
                 expiration = DateTimeOffset.Now + TimeSpan.FromSeconds(response!.ExpireInSeconds - 30);
-                result = response.AccessToken;
+                result = token = response.AccessToken;
             }
 
             return new HeaderParameter(KnownHeaders.Authorization, "Bearer " + result);
