@@ -96,16 +96,13 @@ var hostBuilder = new HostBuilder()
         }, 16);
 
         services.AddSingleton<ModParserService>();
-        services.AddSingleton(OsuRestClientBuilder.Build(
-            int.Parse(context.Configuration["OSU_OAUTH2_CLIENT_ID"]),
-            context.Configuration["OSU_OAUTH2_CLIENT_SECRET"]
-        ));
-        if (context.Configuration["OSU_API_KEY"] != null)
-        {
-            services.AddSingleton(new DefaultOsuAPIClient.LegacyAPIToken(context.Configuration["OSU_API_KEY"]));
-        }
         services.AddSingleton<HttpClient>();
-        services.AddSingleton<APIClientStore>();
+        services.AddAPIClientStore(credentials =>
+        {
+            credentials.OAuth2ClientId = int.Parse(context.Configuration["OSU_OAUTH2_CLIENT_ID"]);
+            credentials.OAuth2ClientSecret = context.Configuration["OSU_OAUTH2_CLIENT_SECRET"];
+            credentials.LegacyAPIKey = context.Configuration["OSU_API_KEY"];
+        });
         services.Configure<CommandServiceConfiguration>(config =>
         {
             config.DefaultRunMode = RunMode.Parallel;
