@@ -17,7 +17,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
         {
             var res = await HttpClient.GetStringAsync($"https://osu.ppy.sh/scores/{rulesetInfo.ShortName}/{scoreId}");
             var doc = new HtmlDocument(); doc.LoadHtml(res);
-            return SerializeToAPILegacyScoreInfo(JObject.Parse(doc.GetElementbyId("json-show").InnerText));
+            return DeserializeToAPILegacyScoreInfo(JObject.Parse(doc.GetElementbyId("json-show").InnerText));
         }
 
         public override async Task<APIScore[]> GetUserScores(
@@ -25,25 +25,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
             RulesetInfo rulesetInfo, bool includeFails = false, int count = 100, int offset = 0
         )
         {
-            var scoreCache = new List<APIScore>();
-
-            var init = offset;
-            while (scoreCache.Count < count)
-            {
-                const int maxSingle = 50;
-                var res = await HttpClient.GetStringAsync(
-                    $"https://osu.ppy.sh/users/{userId}/scores/{scoreType.ToString().ToLowerInvariant()}?mode={rulesetInfo.ShortName}"
-                    + $"&offset={init}&limit={Math.Min(maxSingle, count - init)}&include_fails={(includeFails ? 1 : 0)}");
-                init += maxSingle;
-                var scores = JArray.Parse(res).Select(SerializeToAPILegacyScoreInfo).ToArray();
-                scoreCache.AddRange(scores);
-                if (scores.Length == 0)
-                {
-                    break;
-                }
-            }
-
-            return scoreCache.Count > count ? scoreCache.GetRange(0, count).ToArray() : scoreCache.ToArray();
+            return await scrapingClient.GetUserScoresAsync(userId, scoreType, rulesetInfo, includeFails, count, offset);
         }
 
         public override async Task<APIScore[]> GetUserBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo)
@@ -60,7 +42,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
                 .ToArray();
         }
 
-        private static APIScore SerializeToAPILegacyScoreInfo(JToken scoreObject)
+        internal static APIScore DeserializeToAPILegacyScoreInfo(JToken scoreObject)
         {
             var score = scoreObject.ToObject<APIScore>()!;
             var beatmap = scoreObject["beatmap"]!;
