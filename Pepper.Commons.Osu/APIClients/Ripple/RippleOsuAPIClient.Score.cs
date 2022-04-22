@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
@@ -89,7 +90,49 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
 
         public override async Task<APIScore[]> GetUserBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo)
         {
-            throw new NotImplementedException();
+            var scores = await legacyClient.GetScoresByBeatmapIdAndUserIdAsync(
+                beatmapId,
+                userId,
+                (OsuSharp.GameMode) rulesetInfo.OnlineID
+            );
+
+            var user = await GetUser(userId, rulesetInfo);
+
+            var beatmapIds = scores.Select(score => (int) score.BeatmapId).Distinct();
+            var beatmaps = (await GetBulkBeatmapData(beatmapIds.ToArray()))
+                .ToDictionary(map => map.OnlineID, map => map);
+
+            return scores.Select(score =>
+                {
+                    var mapInfo = beatmaps[(int) score.BeatmapId];
+                    var statistics = new Dictionary<string, int>
+                    {
+                        {"count_300", score.Count300},
+                        {"count_100", score.Count100},
+                        {"count_50", score.Count50},
+                        {"count_geki", score.Geki},
+                        {"count_katu", score.Katu},
+                        {"count_miss", score.Miss},
+                    };
+                    return new APIScore
+                    {
+                        Beatmap = mapInfo,
+                        BeatmapSet = mapInfo.BeatmapSet,
+                        Mods = BuiltInRulesets[rulesetInfo.OnlineID].ConvertFromLegacyMods((LegacyMods) score.Mods).Select(mod => new APIMod(mod)),
+                        User = user,
+                        Accuracy = score.Accuracy / 100,
+                        Date = score.Date!.Value,
+                        Perfect = score.Perfect,
+                        TotalScore = score.TotalScore,
+                        MaxCombo = score.MaxCombo!.Value,
+                        PP = score.PerformancePoints,
+                        Statistics = statistics,
+                        RulesetID = rulesetInfo.OnlineID,
+                        OnlineID = score.ScoreId!.Value,
+                        Rank = Enum.Parse<ScoreRank>(score.Rank)
+                    };
+                })
+                .ToArray();
         }
     }
 }
