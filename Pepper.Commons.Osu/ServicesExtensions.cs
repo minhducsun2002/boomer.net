@@ -15,11 +15,18 @@ namespace Pepper.Commons.Osu
                 throw new ArgumentNullException(nameof(configureCredentials));
             }
 
-            var credentials = new Credentials
-            {
-                OAuth2ClientSecret = ""
-            };
+            var credentials = new Credentials();
             configureCredentials.Invoke(credentials);
+
+            if (credentials.OAuth2ClientId == default)
+            {
+                throw new InvalidOperationException($"Value of {nameof(credentials.OAuth2ClientId)} is invalid.");
+            }
+
+            if (credentials.OAuth2ClientSecret == null)
+            {
+                throw new InvalidOperationException($"{nameof(credentials.OAuth2ClientSecret)} is null.");
+            }
 
             services.AddSingleton(OsuRestClientBuilder.Build(
                 credentials.OAuth2ClientId,
