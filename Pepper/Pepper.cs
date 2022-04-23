@@ -35,7 +35,7 @@ var hostBuilder = new HostBuilder()
     .UseSerilog((_, configuration) =>
     {
         configuration
-            .MinimumLevel.Information()
+            .MinimumLevel.Warning()
             .Enrich.WithThreadId()
             .Enrich.FromLogContext()
             .WriteTo.Console(
