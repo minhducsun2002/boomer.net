@@ -12,6 +12,12 @@ namespace Pepper.Database.OsuUsernameProviders
 
         public DbSet<Username> DbSet { get; set; } = null!;
 
+        private void Cache(string discordId, Username record)
+        {
+            Entry(record).State = EntityState.Detached;
+            cache.AddOrUpdate(discordId, record);
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Username>(b =>
@@ -31,6 +37,10 @@ namespace Pepper.Database.OsuUsernameProviders
             }
 
             var record = await DbSet.FirstOrDefaultAsync(rec => rec.DiscordUserId == discordId);
+            if (record != default)
+            {
+                Cache(discordId, record);
+            }
             return record;
         }
 
@@ -48,6 +58,7 @@ namespace Pepper.Database.OsuUsernameProviders
                     var record = await DbSet.FirstOrDefaultAsync(rec => rec.DiscordUserId == uid);
                     if (record != default)
                     {
+                        Cache(uid, record);
                         result[uid] = record;
                     }
                 }
@@ -68,10 +79,10 @@ namespace Pepper.Database.OsuUsernameProviders
             }
             else
             {
-                Update(record);
+                Add(record);
             }
             await SaveChangesAsync();
-            cache.AddOrUpdate(record.DiscordUserId, record);
+            Cache(record.DiscordUserId, record);
             return record;
         }
     }
