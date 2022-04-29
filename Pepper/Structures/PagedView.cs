@@ -46,7 +46,7 @@ namespace Pepper.Structures
             details = pageDetails;
             var selection = new SelectionViewComponent(e =>
             {
-                var index = int.Parse(e.SelectedOptions[0].Value);
+                var index = int.Parse(e.SelectedOptions[0].Value.Value);
                 CurrentPageIndex = index;
                 e.Selection.Options = GetCurrentOptions();
                 return UpdateAsync();

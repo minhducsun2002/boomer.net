@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Mods;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Structures.External.Osu;
+using Limits = Disqord.Discord.Limits;
 
 namespace Pepper.Commands.Osu
 {
@@ -84,7 +85,7 @@ namespace Pepper.Commands.Osu
             CurrentPageIndex = beatmapIdToIndex[initialBeatmapId];
             var select = new SelectionViewComponent(async e =>
             {
-                CurrentPageIndex = beatmapIdToIndex[int.Parse(e.SelectedOptions[0].Value)];
+                CurrentPageIndex = beatmapIdToIndex[int.Parse(e.SelectedOptions[0].Value.Value)];
                 await e.Interaction.Response().DeferAsync();
                 e.Selection.Options = GetCurrentOptionList();
             })
@@ -99,13 +100,13 @@ namespace Pepper.Commands.Osu
 
         private List<LocalSelectionComponentOption> GetCurrentOptionList()
         {
-            return beatmapset.Beatmaps.Take(LocalSelectionComponent.MaxOptionsAmount)
+            return beatmapset.Beatmaps.Take(Limits.ApplicationCommands.MaxOptionAmount)
                 .OrderBy(beatmap => beatmap.StarRating)
                 .Select(beatmap => new LocalSelectionComponentOption
                 {
-                    Label = beatmap.DifficultyName.Length < LocalSelectionComponentOption.MaxLabelLength
+                    Label = beatmap.DifficultyName.Length < Limits.Components.Selection.Option.MaxLabelLength
                         ? beatmap.DifficultyName
-                        : beatmap.DifficultyName[..22] + "...",
+                        : beatmap.DifficultyName[..(Limits.Components.Selection.Option.MaxLabelLength - 3)] + "...",
                     Description = OsuCommand.SerializeBeatmapStats(beatmapset, beatmap, false, false),
                     Value = $"{beatmap.OnlineID}",
                     IsDefault = CurrentPageIndex == beatmapIdToIndex[beatmap.OnlineID]
