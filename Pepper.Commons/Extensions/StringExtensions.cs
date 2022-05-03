@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
-namespace Pepper.Structures
+namespace Pepper.Commons.Extensions
 {
     public static class StringExtensions
     {
-        public static string[] SmartSplit(this string content, char quote, char whitespace = ' ',
+        public static string[] SplitWithQuotes(this string content, char quote, char delimiter = ' ',
             char escape = '\\')
         {
             var output = new List<string>();
@@ -33,7 +32,7 @@ namespace Pepper.Structures
                     continue;
                 }
 
-                if (character == whitespace)
+                if (character == delimiter)
                 {
                     // chunk
                     output.Add(piece.ToString());

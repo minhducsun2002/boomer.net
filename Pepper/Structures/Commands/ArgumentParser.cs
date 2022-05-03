@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Pepper.Commons.Extensions;
 using Qmmands;
 
 namespace Pepper.Structures.Commands
@@ -51,7 +52,7 @@ namespace Pepper.Structures.Commands
 
             // sort parameters into two types : matches flags and doesn't
             HashSet<string> flagArguments = new(); List<string> remainingArguments = new();
-            foreach (var argument in rawArguments.SmartSplit(Quote))
+            foreach (var argument in rawArguments.SplitWithQuotes(Quote))
             {
                 if (flagParameters.Any(f => argument.StartsWith(f.Key)))
                 {

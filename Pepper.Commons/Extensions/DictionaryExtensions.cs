@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace Pepper.Structures
+namespace Pepper.Commons.Extensions
 {
     public static class DictionaryExtensions
     {
