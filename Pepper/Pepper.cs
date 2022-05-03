@@ -62,12 +62,6 @@ var hostBuilder = new HostBuilder()
     .ConfigureAppConfiguration(app =>
     {
         app.AddEnvironmentVariables("PEPPER_");
-        ConventionRegistry.Register(
-            "IgnoreExtraElements",
-            new ConventionPack { new IgnoreExtraElementsConvention(true) },
-            _ => true
-        );
-
         var configUrl = Environment.GetEnvironmentVariable("PEPPER_CONFIG_URL");
         if (!string.IsNullOrWhiteSpace(configUrl))
         {
