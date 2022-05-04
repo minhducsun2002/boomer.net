@@ -36,6 +36,7 @@ namespace Pepper.Commons.Osu
         }
 
         public abstract Task<APIUser> GetUser(string username, RulesetInfo rulesetInfo);
+        public abstract Task<APIUser> GetUser(int id, RulesetInfo rulesetInfo);
 
         public async Task<Color> GetUserColor(APIUser user)
         {

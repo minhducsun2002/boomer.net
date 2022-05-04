@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using OsuSharp;
 using Pepper.Commons.Osu.API;
 using Pepper.Commons.Osu.Exceptions;
 
@@ -10,9 +11,8 @@ namespace Pepper.Commons.Osu.APIClients.Default.Subclients
 {
     internal partial class LegacyClient
     {
-        public async Task<APIUser> GetUserAsync(string username, RulesetInfo rulesetInfo, CancellationToken cancellationToken)
+        private static APIUser ConvertFromLegacyUser(string username, User? user)
         {
-            var user = await osuClient.GetUserByUsernameAsync(username, (OsuSharp.GameMode) rulesetInfo.OnlineID, cancellationToken);
             if (user == null)
             {
                 throw new UserNotFoundException { Username = username };
@@ -57,6 +57,20 @@ namespace Pepper.Commons.Osu.APIClients.Default.Subclients
                     TotalHits = (int) (user.Count300 + user.Count100 + user.Count50)!
                 }
             };
+        }
+
+        public async Task<APIUser> GetUserAsync(string username, RulesetInfo rulesetInfo, CancellationToken cancellationToken)
+        {
+            var user = await osuClient.GetUserByUsernameAsync(username, (OsuSharp.GameMode) rulesetInfo.OnlineID, cancellationToken);
+
+            return ConvertFromLegacyUser(username, user);
+        }
+
+        public async Task<APIUser> GetUserAsync(int userId, RulesetInfo rulesetInfo, CancellationToken cancellationToken)
+        {
+            var user = await osuClient.GetUserByUserIdAsync(userId, (OsuSharp.GameMode) rulesetInfo.OnlineID, cancellationToken);
+
+            return ConvertFromLegacyUser(userId.ToString(), user);
         }
     }
 }

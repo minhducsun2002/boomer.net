@@ -65,7 +65,7 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
             return DeserializeUserObject(raw, rulesetInfo);
         }
 
-        public async Task<APIUser> GetUser(int id, RulesetInfo rulesetInfo)
+        public override async Task<APIUser> GetUser(int id, RulesetInfo rulesetInfo)
         {
             var raw = await HttpClient.GetStringAsync($"https://ripple.moe/api/v1/users/full?id={id}");
             return DeserializeUserObject(raw, rulesetInfo);
