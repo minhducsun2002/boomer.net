@@ -13,10 +13,6 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-20.04
-    strategy:
-      matrix: 
-        filters: ['AllCommandsFullyDescribed']
-      fail-fast: false
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -24,4 +20,4 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Test
-      run: dotnet test Pepper.Test --filter ${{ matrix.filters }}
+      run: dotnet test Pepper.Test
