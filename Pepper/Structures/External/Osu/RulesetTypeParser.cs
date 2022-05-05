@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Disqord.Bot;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
@@ -11,7 +10,7 @@ using Qmmands;
 
 namespace Pepper.Structures.External.Osu
 {
-    public class RulesetTypeParser : DiscordTypeParser<Ruleset>
+    public class RulesetTypeParser : TypeParser<Ruleset>
     {
         public static readonly Ruleset[] SupportedRulesets =
         {
@@ -21,7 +20,7 @@ namespace Pepper.Structures.External.Osu
             new ManiaRuleset()
         };
 
-        public override ValueTask<TypeParserResult<Ruleset>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
+        public override ValueTask<TypeParserResult<Ruleset>> ParseAsync(Parameter parameter, string value, CommandContext context)
         {
             Ruleset defaultRuleset = new OsuRuleset();
             try
