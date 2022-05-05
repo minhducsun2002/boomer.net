@@ -13,7 +13,9 @@ namespace Pepper.Commmands.General
 
         [Command("rate")]
         [Description("Rate something on a scale from 0 to 10.")]
-        public DiscordCommandResult Exec([Remainder] string whatToRate = "")
+        public DiscordCommandResult Exec(
+            [Remainder][Description("What do you want me to rate?")] string whatToRate = ""
+        )
         {
             var obj = string.IsNullOrWhiteSpace(whatToRate)
                 ? "you"

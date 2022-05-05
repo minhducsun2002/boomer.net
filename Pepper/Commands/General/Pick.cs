@@ -18,7 +18,9 @@ namespace Pepper.Commmands.General
 
         [Command("pick", "choose")]
         [Description("Helps you throw a dice.")]
-        public async Task<DiscordCommandResult> Exec([Remainder] string query = "")
+        public async Task<DiscordCommandResult> Exec(
+            [Remainder][Description("What to choose from? Separate by `/`s.")] string query = ""
+        )
         {
             var choices = query.Split("/").Where(_ => !string.IsNullOrWhiteSpace(_)).ToArray();
             if (choices.Length == 0)
