@@ -71,6 +71,14 @@ namespace Pepper.Commands.Osu
                 return await SingleScore(scores[0]);
             }
 
+            if (user.Id == 16212851 || Context.Author.Id == 490107873834303488)
+            {
+                return Reply("đm xoài ngu", new LocalEmbed()
+                    .WithDescription(
+                        $"No recent play found for user [{user.Username}]({user.PublicUrl}) on mode {rulesetInfo.Name} at position #{pos}."
+                    ));
+            }
+
             return Reply(new LocalEmbed()
                 .WithDescription(
                     $"No recent play found for user [{user.Username}]({user.PublicUrl}) on mode {rulesetInfo.Name} at position #{pos}."

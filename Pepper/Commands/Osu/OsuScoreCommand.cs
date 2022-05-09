@@ -64,7 +64,7 @@ namespace Pepper.Commands.Osu
                              temporaryScore.GetCount300() + temporaryScore.GetCountMiss())!.Value;
             }
 
-            return Reply(new LocalEmbed
+            var embed = new LocalEmbed
             {
                 Author = SerializeAuthorBuilder(sc.User),
                 Title = $"[**{sc.Rank}**] {b.Metadata.Artist} - {b.Metadata.Title} [{b.DifficultyName}]"
@@ -90,13 +90,21 @@ namespace Pepper.Commands.Osu
                     new()
                     {
                         Name = "Beatmap information",
-                        Value = SerializeBeatmapStats(workingBeatmap.BeatmapInfo, difficulty, workingBeatmap.Beatmap.ControlPointInfo)
+                        Value = SerializeBeatmapStats(workingBeatmap.BeatmapInfo, difficulty,
+                            workingBeatmap.Beatmap.ControlPointInfo)
                     }
                 },
                 Footer = totalHitCounts > hitCounts
                     ? new LocalEmbedFooter().WithText($"{hitCounts / (float) totalHitCounts * 100:F2}% completed")
                     : null
-            });
+            };
+
+            if (sc.User.Id == 16212851 || Context.Author.Id == 490107873834303488)
+            {
+                return Reply("đm xoài ngu", embed);
+            }
+
+            return Reply(embed);
         }
     }
 }
