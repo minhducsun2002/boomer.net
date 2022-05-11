@@ -25,7 +25,11 @@ namespace Pepper.Commons.Osu.APIClients.Default
             RulesetInfo rulesetInfo, bool includeFails = false, int count = 100, int offset = 0
         )
         {
-            return await scrapingClient.GetUserScoresAsync(userId, scoreType, rulesetInfo, includeFails, count, offset);
+            // return await scrapingClient.GetUserScoresAsync(userId, scoreType, rulesetInfo, includeFails, count, offset);
+            return (await restClient.GetJsonAsync<APIScore[]>(
+                $"users/{userId}/scores/{scoreType.ToString().ToLowerInvariant()}?mode={rulesetInfo.ShortName}"
+                + $"&include_fails={(includeFails ? 1 : 0)}&limit={count}&offset={offset}"
+            ))!;
         }
 
         public override async Task<APIScore[]> GetUserBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo)
