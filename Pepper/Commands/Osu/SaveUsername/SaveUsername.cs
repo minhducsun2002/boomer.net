@@ -25,6 +25,11 @@ namespace Pepper.Commands.Osu
         [Description("Set the username to default to in your future requests.")]
         public DiscordCommandResult Exec([Remainder][Description("Username to save.")] string username)
         {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return Reply("Please specify an username!");
+            }
+
             return View(new ChooseServerView(
                 Context.Author.Id.ToString(),
                 username,
