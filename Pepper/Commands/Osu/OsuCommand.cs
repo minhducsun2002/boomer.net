@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Scoring;
 using Pepper.Commons.Osu;
@@ -45,11 +46,28 @@ namespace Pepper.Commands.Osu
         }
 
         public static string SerializeBeatmapStats(
-            IBeatmapInfo map, DifficultyAttributes? difficultyOverwrite = null,
+            IBeatmapInfo map,
+            IEnumerable<Mod>? mods = null,
+            DifficultyAttributes? difficultyOverwrite = null,
             ControlPointInfo? controlPointInfo = null,
             bool showLength = true, char delimiter = '•')
         {
             var diff = new BeatmapDifficulty(map.Difficulty);
+
+            var speedChange = 1.0;
+            foreach (var mod in mods ?? Array.Empty<Mod>())
+            {
+                if (mod is IApplicableToDifficulty m)
+                {
+                    m.ApplyToDifficulty(diff);
+                }
+
+                if (mod is ModRateAdjust rateAdjustment)
+                {
+                    speedChange *= rateAdjustment.SpeedChange.Value;
+                }
+            }
+
             switch (difficultyOverwrite)
             {
                 case OsuDifficultyAttributes osuDifficulty:
@@ -64,18 +82,6 @@ namespace Pepper.Commands.Osu
                     break;
             }
 
-            var speedChange = 1.0;
-            if (difficultyOverwrite != null)
-            {
-                foreach (var mod in difficultyOverwrite.Mods)
-                {
-                    if (mod is ModRateAdjust rateAdjustment)
-                    {
-                        speedChange *= rateAdjustment.SpeedChange.Value;
-                    }
-                }
-            }
-
             var mapLength = map.Length / speedChange;
 
             var bpm = $"**{map.BPM * speedChange:0.##}**";
@@ -87,7 +93,7 @@ namespace Pepper.Commands.Osu
 
             return
                 $"{difficultyOverwrite?.StarRating ?? map.StarRating:F2} :star: "
-                + $" {delimiter} `CS`**{diff.CircleSize}** `AR`**{diff.ApproachRate}** `OD`**{diff.OverallDifficulty}** `HP`**{diff.DrainRate}**"
+                + $" {delimiter} `CS`**{diff.CircleSize:0.##}** `AR`**{diff.ApproachRate:0.##}** `OD`**{diff.OverallDifficulty:0.##}** `HP`**{diff.DrainRate:0.##}**"
                 + $" {delimiter} {bpm} BPM"
                 + (showLength
                     ? $@" {delimiter} :clock3: {

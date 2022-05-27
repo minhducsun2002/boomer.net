@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using Pepper.Commons.Osu;
@@ -90,7 +91,10 @@ namespace Pepper.Commands.Osu
                     new()
                     {
                         Name = "Beatmap information",
-                        Value = SerializeBeatmapStats(workingBeatmap.BeatmapInfo, difficulty,
+                        Value = SerializeBeatmapStats(
+                            workingBeatmap.BeatmapInfo,
+                            mods,
+                            difficulty,
                             workingBeatmap.Beatmap.ControlPointInfo)
                     }
                 },

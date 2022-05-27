@@ -63,7 +63,7 @@ namespace Pepper.Commands.Osu
                     new()
                     {
                         Name = "Difficulty",
-                        Value = OsuCommand.SerializeBeatmapStats(workingBeatmap.BeatmapInfo, difficulty, workingBeatmap.Beatmap.ControlPointInfo, false)
+                        Value = OsuCommand.SerializeBeatmapStats(workingBeatmap.BeatmapInfo, null, difficulty, workingBeatmap.Beatmap.ControlPointInfo, false)
                     }
                 },
                 Footer = new LocalEmbedFooter().WithText(ruleset.RulesetInfo.Name),
