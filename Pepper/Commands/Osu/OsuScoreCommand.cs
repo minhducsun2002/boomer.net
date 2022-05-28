@@ -105,7 +105,19 @@ namespace Pepper.Commands.Osu
 
             if (sc.User.Id == 16212851 || Context.Author.Id == 490107873834303488)
             {
-                return Reply("đm xoài ngu", embed);
+                var baseMsg = "đm xoài, ngu";
+                if ((workingBeatmap.BeatmapSetInfo?.OnlineID ?? b.OnlineBeatmapSetID) == 497942)
+                {
+                    baseMsg += ", farm harebare fanfare lắm vl";
+                }
+
+                if (mods.Any(m => m.Acronym.ToUpperInvariant() == "DT") &&
+                    mods.Any(m => m.Acronym.ToUpperInvariant() == "HD"))
+                {
+                    baseMsg += " lại còn farm HDDT";
+                }
+
+                return Reply(baseMsg, embed);
             }
 
             return Reply(embed);
