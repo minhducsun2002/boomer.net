@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus;
-using Microsoft.Extensions.Configuration;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
@@ -14,12 +13,8 @@ namespace Pepper.Commands.Osu
 {
     public class Beatmap : BeatmapContextCommand
     {
-        private readonly IConfiguration configuration;
 
-        public Beatmap(APIClientStore apiClientStore, BeatmapContextProviderService b, IConfiguration configuration) : base(apiClientStore, b)
-        {
-            this.configuration = configuration;
-        }
+        public Beatmap(APIClientStore apiClientStore, BeatmapContextProviderService b) : base(apiClientStore, b) { }
 
         [Command("map", "beatmap")]
         [Description("View information about a beatmap(set).")]
@@ -55,7 +50,7 @@ namespace Pepper.Commands.Osu
 
             return Menu(
                 new DefaultMenu(
-                    new BeatmapSingleView(new BeatmapPageProvider(beatmapset, APIClientStore.GetClient(GameServer.Osu), configuration), beatmapId)
+                    new BeatmapSingleView(new BeatmapPageProvider(beatmapset, APIClientStore.GetClient(GameServer.Osu)), beatmapId)
                 )
             );
         }

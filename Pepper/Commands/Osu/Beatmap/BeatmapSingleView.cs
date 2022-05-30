@@ -9,9 +9,11 @@ using Disqord.Rest;
 using Microsoft.Extensions.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Structures.External.Osu;
+using Pepper.Structures.External.Osu.Extensions;
 using Limits = Disqord.Discord.Limits;
 
 namespace Pepper.Commands.Osu
@@ -20,13 +22,11 @@ namespace Pepper.Commands.Osu
     {
         public readonly APIBeatmapSet Beatmapset;
         private readonly APIClient apiService;
-        private readonly string imageHost;
         private readonly Dictionary<int, LocalEmbed> beatmapEmbeds = new();
-        public BeatmapPageProvider(APIBeatmapSet beatmapSet, APIClient apiService, IConfiguration configuration)
+        public BeatmapPageProvider(APIBeatmapSet beatmapSet, APIClient apiService)
         {
             Beatmapset = beatmapSet;
             this.apiService = apiService;
-            imageHost = configuration.GetSection("osu:pp_chart_host").Get<string[]>()[0];
         }
 
         public override async ValueTask<Page> GetPageAsync(PagedViewBase view)
@@ -44,10 +44,24 @@ namespace Pepper.Commands.Osu
 
         private async Task<LocalEmbed> PrepareEmbed(APIBeatmapSet beatmapset, APIClient service, int beatmapId, Mod[]? mods = null)
         {
+            mods ??= Array.Empty<Mod>();
             var beatmap = beatmapset.Beatmaps.First(beatmap => beatmap.OnlineID == beatmapId);
             var ruleset = RulesetTypeParser.SupportedRulesets[beatmap.RulesetID];
             var workingBeatmap = await service.GetBeatmap(beatmapId);
-            var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(mods ?? Array.Empty<Mod>());
+            var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(mods);
+            var pp = new[] { 95, 97, 98, 99, 100 }
+                .ToDictionary(
+                    acc => acc,
+                    acc =>
+                    {
+                        var pp = workingBeatmap.CalculatePerformance(
+                            rulesetOverwrite: ruleset,
+                            score: new ScoreInfo
+                            { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = (double) acc / 100 }
+                        );
+                        return pp;
+                    }
+                );
 
             return new LocalEmbed
             {
@@ -64,10 +78,25 @@ namespace Pepper.Commands.Osu
                     {
                         Name = "Difficulty",
                         Value = OsuCommand.SerializeBeatmapStats(workingBeatmap.BeatmapInfo, null, difficulty, workingBeatmap.Beatmap.ControlPointInfo, false)
+                    },
+                    new()
+                    {
+                        Name = "PP if FC",
+                        Value = string.Join(
+                            '\n',
+                            pp
+                                .Chunk(3)
+                                .Select(
+                                    line =>
+                                        string.Join(
+                                            " • ",
+                                            line.Select(p => $"**{p.Key}**% : **{p.Value:F2}**pp")
+                                        )
+                                )
+                        )
                     }
                 },
-                Footer = new LocalEmbedFooter().WithText(ruleset.RulesetInfo.Name),
-                ImageUrl = $"https://{imageHost}/performance/chart/{beatmap.OnlineID}.png"
+                Footer = new LocalEmbedFooter().WithText(ruleset.RulesetInfo.Name)
             };
         }
     }
