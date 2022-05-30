@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepper.FuzzySearch", "Peppe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepper.FuzzySearch.Test", "Pepper.FuzzySearch.Test\Pepper.FuzzySearch.Test.csproj", "{A13B9936-8CAA-44BD-80F9-F250F067BD43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepper.PerformanceChartProxy", "Pepper.PerformanceChartProxy\Pepper.PerformanceChartProxy.csproj", "{34CACDF0-5EF7-497B-8431-9B37C8EA173F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepper.Commons.Osu", "Pepper.Commons.Osu\Pepper.Commons.Osu.csproj", "{179D5778-C69A-4DDA-A420-67AB11B42F84}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepper.Logging.Serilog.Sinks.Discord", "Pepper.Logging.Serilog.Sinks.Discord\Pepper.Logging.Serilog.Sinks.Discord.csproj", "{A510DB74-056B-4C85-BBE5-5A57F4AC4FF7}"
@@ -80,18 +78,6 @@ Global
 		{A13B9936-8CAA-44BD-80F9-F250F067BD43}.Release|x64.Build.0 = Release|Any CPU
 		{A13B9936-8CAA-44BD-80F9-F250F067BD43}.Release|x86.ActiveCfg = Release|Any CPU
 		{A13B9936-8CAA-44BD-80F9-F250F067BD43}.Release|x86.Build.0 = Release|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Debug|x64.Build.0 = Debug|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Debug|x86.Build.0 = Debug|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Release|x64.ActiveCfg = Release|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Release|x64.Build.0 = Release|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Release|x86.ActiveCfg = Release|Any CPU
-		{34CACDF0-5EF7-497B-8431-9B37C8EA173F}.Release|x86.Build.0 = Release|Any CPU
 		{179D5778-C69A-4DDA-A420-67AB11B42F84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{179D5778-C69A-4DDA-A420-67AB11B42F84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{179D5778-C69A-4DDA-A420-67AB11B42F84}.Debug|x64.ActiveCfg = Debug|Any CPU
