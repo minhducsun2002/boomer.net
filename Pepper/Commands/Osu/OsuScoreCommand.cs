@@ -111,10 +111,11 @@ namespace Pepper.Commands.Osu
                     baseMsg += ", farm harebare fanfare lắm vl";
                 }
 
-                if (mods.Any(m => m.Acronym.ToUpperInvariant() == "DT") &&
+                var isNc = false;
+                if (mods.Any(m => m.Acronym.ToUpperInvariant() == "DT" || (isNc = m.Acronym.ToUpperInvariant() == "NC")) &&
                     mods.Any(m => m.Acronym.ToUpperInvariant() == "HD"))
                 {
-                    baseMsg += " lại còn farm HDDT";
+                    baseMsg += " lại còn farm HD" + (isNc ? " rồi còn bày đặt NC" : "DT");
                 }
 
                 return Reply(baseMsg, embed);
