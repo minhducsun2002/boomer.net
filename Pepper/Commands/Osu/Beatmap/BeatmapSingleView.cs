@@ -120,7 +120,8 @@ namespace Pepper.Commands.Osu
                         )
                     }
                 },
-                Footer = new LocalEmbedFooter().WithText(ruleset.RulesetInfo.Name)
+                Footer = new LocalEmbedFooter().WithText(ruleset.RulesetInfo.Name),
+                ThumbnailUrl = $"https://b.ppy.sh/thumb/{beatmapset.OnlineID}l.jpg"
             };
         }
     }
