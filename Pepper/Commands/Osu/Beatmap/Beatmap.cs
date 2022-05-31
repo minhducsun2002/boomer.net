@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus;
@@ -13,8 +14,15 @@ namespace Pepper.Commands.Osu
 {
     public class Beatmap : BeatmapContextCommand
     {
-
-        public Beatmap(APIClientStore apiClientStore, BeatmapContextProviderService b) : base(apiClientStore, b) { }
+        private readonly ModParserService modParserService;
+        public Beatmap(
+            APIClientStore apiClientStore,
+            BeatmapContextProviderService b,
+            ModParserService modParserService
+        ) : base(apiClientStore, b)
+        {
+            this.modParserService = modParserService;
+        }
 
         [Command("map", "beatmap")]
         [Description("View information about a beatmap(set).")]
@@ -48,9 +56,15 @@ namespace Pepper.Commands.Osu
         {
             SetBeatmapContext(beatmapId);
 
+            var pageProvider = new BeatmapPageProvider(
+                beatmapset,
+                APIClientStore.GetClient(GameServer.Osu),
+                modParserService,
+                RulesetTypeParser.SupportedRulesets[beatmapset.Beatmaps.First(b => b.OnlineID == beatmapId).RulesetID]
+            );
             return Menu(
                 new DefaultMenu(
-                    new BeatmapSingleView(new BeatmapPageProvider(beatmapset, APIClientStore.GetClient(GameServer.Osu)), beatmapId)
+                    new BeatmapSingleView(pageProvider, beatmapId)
                 )
             );
         }
