@@ -51,7 +51,7 @@ namespace Pepper.Commands.Osu
             mods = mods.OrderBy(m => m.Acronym).ToArray();
 
             var key = currentIndex + string.Join("", mods.Select(m => m.Acronym));
-            
+
             if (!cachedBeatmapEmbeds.TryGetValue(key, out var embed))
             {
                 embed = cachedBeatmapEmbeds[key] = await PrepareEmbed(Beatmapset, apiService, Beatmapset.Beatmaps[currentIndex].OnlineID, mods);
@@ -84,7 +84,7 @@ namespace Pepper.Commands.Osu
             return new LocalEmbed
             {
                 Title = $"{beatmapset.Artist} - {beatmapset.Title} [{beatmap.DifficultyName}]"
-                    + (mods.Length != 0 
+                    + (mods.Length != 0
                         ? "+" + string.Join("", mods.Select(m => m.Acronym))
                         : ""),
                 Author = OsuCommand.SerializeAuthorBuilder(beatmapset.Author),
@@ -162,7 +162,7 @@ namespace Pepper.Commands.Osu
                     CurrentMods = CurrentMods.Contains(mod)
                         ? CurrentMods.Remove(mod)
                         : CurrentMods.Add(mod);
-                    
+
                     // HR and EZ is exclusive
                     switch (mod)
                     {
@@ -186,7 +186,7 @@ namespace Pepper.Commands.Osu
                             ? LocalButtonComponentStyle.Success
                             : LocalButtonComponentStyle.Secondary;
                     }
-                    
+
                     ReportPageChanges();
                 })
                 {
@@ -211,6 +211,28 @@ namespace Pepper.Commands.Osu
                     IsDefault = CurrentPageIndex == beatmapIdToIndex[beatmap.OnlineID]
                 })
                 .ToList();
+        }
+
+        public override async ValueTask DisposeAsync()
+        {
+            foreach (var component in EnumerateComponents())
+            {
+                switch (component)
+                {
+                    case ButtonViewComponent buttonViewComponent:
+                        {
+                            buttonViewComponent.IsDisabled = true;
+                            break;
+                        }
+                    case SelectionViewComponent selectionViewComponent:
+                        {
+                            selectionViewComponent.IsDisabled = true;
+                            break;
+                        }
+                }
+            }
+            await Menu.ApplyChangesAsync();
+            await base.DisposeAsync();
         }
     }
 }
