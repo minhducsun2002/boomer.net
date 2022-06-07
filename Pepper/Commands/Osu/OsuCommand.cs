@@ -135,18 +135,5 @@ namespace Pepper.Commands.Osu
             };
             return embedAuthor;
         }
-
-        public static PerformanceCalculator GetPerformanceCalculator(int rulesetId, DifficultyAttributes beatmapAttributes, ScoreInfo score)
-        {
-            var ruleset = Rulesets[rulesetId];
-            return rulesetId switch
-            {
-                0 => new OsuPerformanceCalculator(ruleset, beatmapAttributes, score),
-                1 => new TaikoPerformanceCalculator(ruleset, beatmapAttributes, score),
-                2 => new CatchPerformanceCalculator(ruleset, beatmapAttributes, score),
-                3 => new ManiaPerformanceCalculator(ruleset, beatmapAttributes, score),
-                _ => throw new ArgumentException($"{nameof(rulesetId)} must be a supported ruleset ID, {rulesetId} is not one!")
-            };
-        }
     }
 }

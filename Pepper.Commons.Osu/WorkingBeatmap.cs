@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
@@ -36,27 +37,37 @@ namespace Pepper.Commons.Osu
         /// </summary>
         /// <param name="score">Score to calculate performance for.</param>
         /// <param name="rulesetOverwrite">Use a custom ruleset to calculate performance. Useful for converts.</param>
-        public double CalculatePerformance(ScoreInfo score, Ruleset? rulesetOverwrite = null)
+        /// <param name="isClassic">Whether to calculate with classic mods.</param>
+        public double CalculatePerformance(ScoreInfo score, Ruleset? rulesetOverwrite = null, bool isClassic = true)
         {
             var ruleset = rulesetOverwrite ?? GetDefaultRuleset();
             var rulesetId = ruleset.RulesetInfo.OnlineID;
-            var difficultyAttributes = CalculateDifficulty(rulesetId, score.Mods);
+            var difficultyAttributes = CalculateDifficulty(rulesetId, isClassic, score.Mods);
             PerformanceCalculator calculator = rulesetId switch
             {
-                0 => new OsuPerformanceCalculator(ruleset, difficultyAttributes, score),
-                1 => new TaikoPerformanceCalculator(ruleset, difficultyAttributes, score),
-                2 => new CatchPerformanceCalculator(ruleset, difficultyAttributes, score),
-                3 => new ManiaPerformanceCalculator(ruleset, difficultyAttributes, score),
+                0 => new OsuPerformanceCalculator(),
+                1 => new TaikoPerformanceCalculator(),
+                2 => new CatchPerformanceCalculator(),
+                3 => new ManiaPerformanceCalculator(),
                 _ => throw new ArgumentOutOfRangeException($"{nameof(rulesetId)} must be a supported ruleset ID, {rulesetId} is not one!")
             };
 
-            var calc = calculator.Calculate();
+            var calc = calculator.Calculate(score, difficultyAttributes);
             return calc.Total;
         }
 
-        public DifficultyAttributes CalculateDifficulty(int rulesetId, params Mod[] mods) => BuiltInRulesets[rulesetId]
-            .CreateDifficultyCalculator(this)
-            .Calculate(mods);
+        public DifficultyAttributes CalculateDifficulty(int rulesetId, bool isClassic = true, params Mod[] mods)
+        {
+            var modToCalc = mods.AsEnumerable();
+            if (isClassic && !mods.Any(m => m is ModClassic))
+            {
+                modToCalc = modToCalc.Append(APIClient.BuiltInMods[rulesetId].OfType<ModClassic>().First());
+            }
+
+            return BuiltInRulesets[rulesetId]
+                .CreateDifficultyCalculator(this)
+                .Calculate(modToCalc);
+        }
 
         public string GetOnlineUrl(bool forceFullUrl = false, Ruleset? rulesetOverwrite = null)
         {

@@ -11,6 +11,7 @@ namespace Pepper.Commons.Osu
         {
             using var stream = new MemoryStream(beatmap);
             using var streamReader = new LineBufferedReader(stream);
+            Decoder.RegisterDependencies(new RulesetStore());
             var workingBeatmap = new WorkingBeatmap(Decoder.GetDecoder<Beatmap>(streamReader).Decode(streamReader));
             if (workingBeatmap.BeatmapInfo.Length.Equals(default))
             {

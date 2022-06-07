@@ -29,7 +29,7 @@ namespace Pepper.Commands.Osu
             var ruleset = Rulesets[sc.RulesetID];
 
             var mods = ModParserService.ResolveMods(ruleset, sc.Mods.Select(mod => mod.Acronym));
-            var difficulty = workingBeatmap.CalculateDifficulty(sc.RulesetID, mods);
+            var difficulty = workingBeatmap.CalculateDifficulty(sc.RulesetID, true, mods);
 
             SetBeatmapContext(workingBeatmap.BeatmapInfo.OnlineID);
 

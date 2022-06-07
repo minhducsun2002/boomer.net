@@ -67,7 +67,7 @@ namespace Pepper.Commands.Osu
             mods ??= Array.Empty<Mod>();
             var beatmap = beatmapset.Beatmaps.First(beatmap => beatmap.OnlineID == beatmapId);
             var workingBeatmap = await service.GetBeatmap(beatmapId);
-            var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(mods);
+            var difficulty = workingBeatmap.CalculateDifficulty(ruleset.RulesetInfo.OnlineID, true, mods);
             var pp = new[] { 95, 97, 98, 99, 100 }
                 .ToDictionary(
                     acc => acc,

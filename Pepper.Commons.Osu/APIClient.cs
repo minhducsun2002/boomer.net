@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BitFaster.Caching.Lru;
@@ -7,10 +9,12 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
 using Pepper.Commons.Osu.API;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Quantization;
 using APIBeatmapSet = Pepper.Commons.Osu.API.APIBeatmapSet;
@@ -28,6 +32,12 @@ namespace Pepper.Commons.Osu
             new CatchRuleset(),
             new ManiaRuleset()
         };
+
+        internal static readonly Dictionary<int, ImmutableArray<Mod>> BuiltInMods = BuiltInRulesets
+            .ToDictionary(
+                ruleset => ruleset.RulesetInfo.OnlineID,
+                ruleset => ruleset.CreateAllMods().ToImmutableArray()
+            );
 
         protected readonly HttpClient HttpClient;
         protected APIClient(HttpClient httpClient)
@@ -47,7 +57,7 @@ namespace Pepper.Commons.Osu
             }
 
             var avatar = await HttpClient.GetByteArrayAsync(user.AvatarUrl);
-            var image = Image.Load(avatar);
+            var image = Image.Load<Argb32>(avatar);
             image.Mutate(img => img.Quantize(new OctreeQuantizer(new QuantizerOptions { MaxColors = 2 }))
                 .Resize(1, 1, KnownResamplers.Bicubic));
             var color = image[0, 0];
