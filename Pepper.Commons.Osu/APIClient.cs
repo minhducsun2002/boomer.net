@@ -25,19 +25,8 @@ namespace Pepper.Commons.Osu
     public abstract class APIClient
     {
         private readonly FastConcurrentTLru<string, Color> userColorCache = new(200, TimeSpan.FromSeconds(30 * 60));
-        internal static readonly Ruleset[] BuiltInRulesets =
-        {
-            new OsuRuleset(),
-            new TaikoRuleset(),
-            new CatchRuleset(),
-            new ManiaRuleset()
-        };
-
-        internal static readonly Dictionary<int, ImmutableArray<Mod>> BuiltInMods = BuiltInRulesets
-            .ToDictionary(
-                ruleset => ruleset.RulesetInfo.OnlineID,
-                ruleset => ruleset.CreateAllMods().ToImmutableArray()
-            );
+        internal static Ruleset[] BuiltInRulesets => SharedConstants.BuiltInRulesets;
+        internal static Dictionary<int, ImmutableArray<Mod>> BuiltInMods => SharedConstants.BuiltInMods;
 
         protected readonly HttpClient HttpClient;
         protected APIClient(HttpClient httpClient)

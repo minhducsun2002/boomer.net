@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using Pepper.Commons.Osu;
@@ -65,6 +64,17 @@ namespace Pepper.Commands.Osu
                              temporaryScore.GetCount300() + temporaryScore.GetCountMiss())!.Value;
             }
 
+            var footer = "";
+            var version = SharedConstants.OsuVersion?.ToString();
+            if (totalHitCounts > hitCounts)
+            {
+                footer = $"{hitCounts / (float) totalHitCounts * 100:F2}% completed";
+            }
+            if (version is not null)
+            {
+                footer += (string.IsNullOrEmpty(footer) ? "" : "  •  ") + $"osu!lazer {version}";
+            }
+
             var embed = new LocalEmbed
             {
                 Author = SerializeAuthorBuilder(sc.User),
@@ -98,9 +108,8 @@ namespace Pepper.Commands.Osu
                             workingBeatmap.Beatmap.ControlPointInfo)
                     }
                 },
-                Footer = totalHitCounts > hitCounts
-                    ? new LocalEmbedFooter().WithText($"{hitCounts / (float) totalHitCounts * 100:F2}% completed")
-                    : null
+                Footer = string.IsNullOrEmpty(footer) ? null : new LocalEmbedFooter().WithText(footer)
+
             };
 
             if (sc.User.Id == 16212851 || Context.Author.Id == 490107873834303488)
