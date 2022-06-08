@@ -105,7 +105,7 @@ namespace Pepper.Commands.Osu
                     },
                     new()
                     {
-                        Name = "PP if FC" + (mods.Length != 0 ? " (with mods applied)" : ""),
+                        Name = $"PP if FC ({$"{difficulty.MaxCombo}x" + (mods.Length != 0 ? ", with mods applied" : "")})",
                         Value = string.Join(
                             '\n',
                             pp
