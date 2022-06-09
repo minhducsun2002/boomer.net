@@ -7,6 +7,7 @@ using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Disqord.Rest;
+using Humanizer;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -81,6 +82,20 @@ namespace Pepper.Commands.Osu
                     }
                 );
 
+            var hitTypes = new Dictionary<string, int>();
+            foreach (var hitobject in workingBeatmap.Beatmap.HitObjects)
+            {
+                var type = hitobject.GetType().Name;
+                if (type.StartsWith("Convert"))
+                {
+                    type = type["Convert".Length..];
+                }
+
+                type = type.ToLowerInvariant();
+
+                hitTypes[type] = hitTypes.TryGetValue(type, out var value) ? value + 1 : 1;
+            }
+
             return new LocalEmbed
             {
                 Title = $"{beatmapset.Artist} - {beatmapset.Title} [{beatmap.DifficultyName}]"
@@ -102,10 +117,17 @@ namespace Pepper.Commands.Osu
                             workingBeatmap.BeatmapInfo, mods, difficulty,
                             workingBeatmap.Beatmap.ControlPointInfo, false
                         )
+                        + $"\n**{difficulty.MaxCombo}**x"
+                        + string.Join(
+                            "",
+                            hitTypes
+                                .OrderBy(p => p.Key)
+                                .Select(pair => $" • {pair.Value} {(pair.Value > 1 ? pair.Key.Pluralize() : pair.Key)}")
+                        )
                     },
                     new()
                     {
-                        Name = $"PP if FC ({$"{difficulty.MaxCombo}x" + (mods.Length != 0 ? ", with mods applied" : "")})",
+                        Name = "PP if FC" + (mods.Length != 0 ? " (with mods applied)" : ""),
                         Value = string.Join(
                             '\n',
                             pp
