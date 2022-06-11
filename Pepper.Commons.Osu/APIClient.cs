@@ -45,6 +45,12 @@ namespace Pepper.Commons.Osu
                 return @return;
             }
 
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (user.AvatarUrl == null)
+            {
+                return Color.White;
+            }
+
             var avatar = await HttpClient.GetByteArrayAsync(user.AvatarUrl);
             var image = Image.Load<Argb32>(avatar);
             image.Mutate(img => img.Quantize(new OctreeQuantizer(new QuantizerOptions { MaxColors = 2 }))
