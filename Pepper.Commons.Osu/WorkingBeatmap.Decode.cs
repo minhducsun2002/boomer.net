@@ -15,7 +15,11 @@ namespace Pepper.Commons.Osu
             var workingBeatmap = new WorkingBeatmap(Decoder.GetDecoder<Beatmap>(streamReader).Decode(streamReader));
             if (workingBeatmap.BeatmapInfo.Length.Equals(default))
             {
-                workingBeatmap.BeatmapInfo.Length = workingBeatmap.Beatmap.HitObjects[^1].StartTime;
+                var hitObjects = workingBeatmap.Beatmap.HitObjects;
+                if (hitObjects.Count > 0)
+                {
+                    workingBeatmap.BeatmapInfo.Length = hitObjects[^1].StartTime;
+                }
             }
 
             workingBeatmap.BeatmapInfo.Ruleset = BuiltInRulesets[workingBeatmap.BeatmapInfo.Ruleset.OnlineID].RulesetInfo;
