@@ -1,9 +1,9 @@
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BitFaster.Caching.Lru;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
+using osu.Game.Beatmaps;
 using Pepper.Commons.Osu.API;
 
 namespace Pepper.Commons.Osu.APIClients.Default
@@ -21,7 +21,17 @@ namespace Pepper.Commons.Osu.APIClients.Default
 
             var file = await HttpClient.GetByteArrayAsync($"https://osu.ppy.sh/osu/{beatmapId}");
             beatmapCache.AddOrUpdate(beatmapId, file);
-            return WorkingBeatmap.Decode(file, beatmapId);
+            var result = WorkingBeatmap.Decode(file, beatmapId);
+
+            if (result.BeatmapInfo.BeatmapSet?.OnlineID is null)
+            {
+                var beatmapsetInfo = await GetBeatmapsetInfo(result.BeatmapInfo.OnlineID, false);
+
+                result.BeatmapInfo.BeatmapSet ??= new BeatmapSetInfo();
+                result.BeatmapInfo.BeatmapSet.OnlineID = beatmapsetInfo.OnlineID;
+            }
+
+            return result;
         }
 
         public override async Task<APIBeatmapSet> GetBeatmapsetInfo(long id, bool isBeatmapSetId)
