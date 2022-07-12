@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Pepper.Commands.Osu;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
@@ -11,9 +10,9 @@ using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
 
-namespace Pepper
+namespace Pepper.Structures
 {
-    public partial class Pepper
+    public partial class Bot
     {
         private static readonly Type[] DownleveledAttributes = { typeof(CategoryAttribute), typeof(PrefixCategoryAttribute) };
 
@@ -58,9 +57,6 @@ namespace Pepper
                 if (!(lastNotFlag == null || lastNotFlag.IsRemainder))
                 {
                     lastNotFlag.IsRemainder = true;
-                    Logger.LogDebug(
-                        "Parameter \"{0}\" in command \"{1}\" is the last parameter - setting remainder attribute to True.",
-                        lastNotFlag.Name, command.Aliases.First());
                 }
 
                 // for commands accepting username & game servers, add checks
@@ -71,10 +67,6 @@ namespace Pepper
                         var param = command.Parameters.FirstOrDefault(param => param.Type == typeof(Username));
                         param?.Checks.Add(new EnsureUsernamePresentCheckAttribute());
                         param?.Attributes.Add(new EnsureUsernamePresentCheckAttribute.FailureFormatterAttribute());
-                        Logger.LogDebug(
-                            "Command \"{0}\" has server-dependent argument \"{1}\" of type {2}. Attempting to add check & failure formatter.",
-                            command.Aliases.First(), param?.Name, param?.Type
-                        );
                     }
                 }
             }

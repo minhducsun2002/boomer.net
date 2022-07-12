@@ -21,13 +21,13 @@ namespace Pepper.Test.Commands
         public CommandDataAttribute(Data type) => this.type = type;
         public override IEnumerable<object[]> GetData(MethodInfo testMethod)
         {
-            var _ = Pepper.VersionHash;
+            var _ = Structures.Bot.VersionHash;
             var commandService = new CommandService();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 if (assembly.FullName.StartsWith("Pepper"))
                 {
-                    commandService.AddModules(assembly, null, Pepper.DownlevelAttributes);
+                    commandService.AddModules(assembly, null, Structures.Bot.DownlevelAttributes);
                 }
             }
 

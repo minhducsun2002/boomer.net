@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Disqord;
 using Disqord.Bot;
-using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Qmmands;
 
-namespace Pepper
+namespace Pepper.Structures
 {
-    public partial class Pepper
+    public partial class Bot
     {
         protected override LocalMessage FormatFailureMessage(DiscordCommandContext context, FailedResult result)
         {

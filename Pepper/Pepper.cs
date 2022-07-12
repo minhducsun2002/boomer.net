@@ -1,23 +1,16 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
-using Disqord;
-using Disqord.Bot;
 using Disqord.Bot.Hosting;
 using dotenv.net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using MongoDB.Bson.Serialization.Conventions;
 using Pepper.Commons.Osu;
-using Pepper.Commons.Osu.APIClients.Default;
 using Pepper.Database;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Logging.Serilog.Sinks.Discord;
@@ -35,7 +28,7 @@ var hostBuilder = new HostBuilder()
     .UseSerilog((_, configuration) =>
     {
         configuration
-            .MinimumLevel.Warning()
+            .MinimumLevel.Information()
             .Enrich.WithThreadId()
             .Enrich.FromLogContext()
             .WriteTo.Console(
@@ -105,7 +98,7 @@ var hostBuilder = new HostBuilder()
             config.StringComparison = StringComparison.InvariantCultureIgnoreCase;
         });
     })
-    .ConfigureDiscordBot<Pepper.Pepper>((context, bot) =>
+    .ConfigureDiscordBot<Bot>((context, bot) =>
     {
         if (context.Configuration["DISCORD_PROXY"] != default)
         {
@@ -118,20 +111,3 @@ var hostBuilder = new HostBuilder()
     .UseDefaultServiceProvider(option => option.ValidateOnBuild = true);
 
 await hostBuilder.RunConsoleAsync();
-
-namespace Pepper
-{
-    public partial class Pepper : DiscordBot
-    {
-        public static readonly string VersionHash = typeof(Pepper)
-            .Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
-            .FirstOrDefault(a => a.Key == "GitHash")?.Value ?? "unknown";
-
-        public Pepper(
-            IOptions<DiscordBotConfiguration> options,
-            ILogger<Pepper> logger,
-            IServiceProvider services,
-            DiscordClient client
-        ) : base(options, logger, services, client) { }
-    }
-}
