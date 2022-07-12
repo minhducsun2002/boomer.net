@@ -123,15 +123,17 @@ namespace Pepper.Commands.Osu
         public static LocalEmbedAuthor SerializeAuthorBuilder(APIUser user)
         {
             var avatarUrl = user.AvatarUrl;
+            var userUrl = $"https://osu.ppy.sh/users/{user.Id}";
             if (user is Commons.Osu.API.APIUser overriddenUserInstance)
             {
                 avatarUrl = overriddenUserInstance.AvatarUrl;
+                userUrl = overriddenUserInstance.PublicUrl;
             }
             var embedAuthor = new LocalEmbedAuthor
             {
                 IconUrl = avatarUrl,
                 Name = $"{user.Username}" + ((user.Statistics.PP ?? decimal.Zero) == decimal.Zero ? "" : $" ({user.Statistics.PP}pp)"),
-                Url = $"https://osu.ppy.sh/users/{user.Id}"
+                Url = userUrl
             };
             return embedAuthor;
         }

@@ -42,7 +42,7 @@ namespace Pepper.Commands.Osu
             var embed = new LocalEmbed
             {
                 Title = user.Username,
-                Url = $"https://osu.ppy.sh/users/{user.Id}",
+                Url = user.PublicUrl,
                 ThumbnailUrl = user.AvatarUrl,
                 Description = (
                     stats.GlobalRank.Equals(default)
