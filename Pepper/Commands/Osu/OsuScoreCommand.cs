@@ -70,7 +70,7 @@ namespace Pepper.Commands.Osu
             {
                 footer = $"{hitCounts / (float) totalHitCounts * 100:F2}% completed";
             }
-            if (version is not null)
+            if (version is not null && (calculated || !sc.Perfect))
             {
                 footer += (string.IsNullOrEmpty(footer) ? "" : "  •  ") + $"osu!lazer {version}";
             }
