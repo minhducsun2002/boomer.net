@@ -60,8 +60,7 @@ namespace Pepper.Commands.Osu
             int hitCounts, totalHitCounts = workingBeatmap.Beatmap.HitObjects.Count;
             {
                 var temporaryScore = new ScoreInfo().WithRulesetID(sc.RulesetID).WithStatistics(sc.Statistics);
-                hitCounts = (temporaryScore.GetCount50() + temporaryScore.GetCount100() +
-                             temporaryScore.GetCount300() + temporaryScore.GetCountMiss())!.Value;
+                hitCounts = temporaryScore.Statistics.Values.Sum();
             }
 
             var footer = "";
@@ -90,7 +89,7 @@ namespace Pepper.Commands.Osu
                     {
                         Name = "Statistics",
                         Value =
-                            $"**{sc.MaxCombo}**x/**{difficulty.MaxCombo}**x • [{SerializeHitStats(sc.Statistics)}] • **{sc.Accuracy * 100:F3}**%"
+                            $"**{sc.MaxCombo}**x/**{difficulty.MaxCombo}**x • [{SerializeHitStats(sc.Statistics, ruleset.RulesetInfo)}] • **{sc.Accuracy * 100:F3}**%"
                             + $"\n**{pp:F2}**pp {(calculated ? " (?)" : "")}"
                             + (sc.Perfect ? "" : $" / **{fullComboPP:F3}**pp (?)")
                             + $" • **`{sc.TotalScore:n0}`**"

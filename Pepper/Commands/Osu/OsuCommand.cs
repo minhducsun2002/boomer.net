@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using AJ.Code;
 using Disqord;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Online.API.Requests.Responses;
@@ -20,6 +21,7 @@ using Pepper.Commons.Osu;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
+using Pepper.Structures.External.Osu.Extensions;
 using APIBeatmapSet = Pepper.Commons.Osu.API.APIBeatmapSet;
 
 namespace Pepper.Commands.Osu
@@ -112,8 +114,18 @@ namespace Pepper.Commands.Osu
                    }:{((long) diff.Length % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
                    : "");
 
-        protected static string SerializeHitStats(Dictionary<string, int> statistics)
-            => $"**{statistics["count_300"]}**/**{statistics["count_100"]}**/**{statistics["count_50"]}**/**{statistics["count_miss"]}**";
+        protected static string SerializeHitStats(Dictionary<string, int> statistics, RulesetInfo rulesetInfo)
+        {
+            var sc = new ScoreInfo
+            {
+                Ruleset = rulesetInfo
+            }.WithStatistics(statistics);
+            var displayStats = sc.Statistics
+                .Keys
+                .GetValuesInOrder()
+                .Select(hitResult => $"**{sc.Statistics[hitResult]}**");
+            return string.Join('/', displayStats);
+        }
 
         public static string SerializeTimestamp(DateTimeOffset? timestamp, bool utcHint = true)
             => (timestamp ?? DateTimeOffset.UnixEpoch)

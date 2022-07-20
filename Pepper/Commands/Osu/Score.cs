@@ -76,7 +76,7 @@ namespace Pepper.Commands.Osu
                                 $"[**{score.Rank}**] **{pp}**pp{(localPP ? " (?)" : "")} (**{score.MaxCombo}**x | **{score.Accuracy:F3}**%)"
                                 + $" {(score.Perfect ? "(FC)" : "")}"
                                 + (mods.Length != 0 ? $"+**{string.Join("", mods.Select(mod => mod.Acronym))}**" : "")
-                                + $"\n" + SerializeHitStats(score.Statistics)
+                                + $"\n" + SerializeHitStats(score.Statistics, Rulesets[score.RulesetID].RulesetInfo)
                                 + $" @ **{SerializeTimestamp(score.Date, false)}**"
                                 + $"\n[**Score link**](https://osu.ppy.sh/scores/{ruleset.ShortName}/{score.OnlineID})";
                         })),

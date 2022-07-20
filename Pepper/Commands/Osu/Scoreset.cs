@@ -26,7 +26,7 @@ namespace Pepper.Commands.Osu
                             : $"**{score.Accuracy * 100:F3}**% - **{score.MaxCombo}**x")
                         + (score.Perfect ? " (FC)" : "")
                         + $"\n{SerializeBeatmapStats(map, showLength: false, delimiter: '-')}"
-                        + $"\n[{SerializeHitStats(score.Statistics)}] @ **{SerializeTimestamp(score.Date, false)}**{(utcHint ? " `UTC`" : "")}"
+                        + $"\n[{SerializeHitStats(score.Statistics, Rulesets[score.RulesetID].RulesetInfo)}] @ **{SerializeTimestamp(score.Date, false)}**{(utcHint ? " `UTC`" : "")}"
                         + $"\n[[**Beatmap**]](https://osu.ppy.sh/b/{map.OnlineID})"
                         + (scoreLink ? $" [[**Score**]](https://osu.ppy.sh/scores/{Rulesets[score.RulesetID].ShortName}/{score.OnlineID})" : "")
             };
