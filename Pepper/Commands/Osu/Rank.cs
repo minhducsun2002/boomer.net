@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
-using Disqord.Bot;
+using Disqord.Bot.Commands;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Disqord.Gateway;
@@ -13,6 +13,7 @@ using Pepper.Services.Osu;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu.Extensions;
 using Qmmands;
+using Qmmands.Text;
 using PagedView = Pepper.Structures.PagedView;
 
 namespace Pepper.Commands.Osu
@@ -28,15 +29,22 @@ namespace Pepper.Commands.Osu
         }
 
         [RequireGuildWhitelist("osu-leaderboard")]
-        [Command("rank", "ranks")]
+        [TextCommand("rank", "ranks")]
         [Description("See your ranking compared to other players in this server")]
-        public async Task<DiscordCommandResult> Exec([Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset)
+        public async Task<IDiscordCommandResult> Exec([Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset)
         {
-            var context = (DiscordGuildCommandContext) Context;
-            var cachedMembers = context.Guild.GetMembers().Values;
+            var context = (IDiscordGuildCommandContext) Context;
+            var guild = await context.Bot.FetchGuildAsync(context.GuildId);
+            var cachedMembers = guild!.GetMembers().Values;
 
             var msg = await Reply("Please wait a bit. I'm collecting usernames & stats. Hang tight...");
             var records = await usernameProvider.GetUsernamesBulk(cachedMembers.Select(member => member.Id.ToString()).ToArray());
+
+            if (records.Count == 0)
+            {
+                return Reply("No registered users in this guild.");
+            }
+
             var profiles = await Task.WhenAll(
                 records
                     .Select(async kv =>
@@ -74,14 +82,9 @@ namespace Pepper.Commands.Osu
 
             await msg.DeleteAsync();
 
-            if (pages.Count == 0)
-            {
-                return Reply("No registered users in this guild.");
-            }
-
             return pages.Count == 1
-                ? Reply(pages[0].Embeds[0])
-                : Menu(new DefaultMenu(new PagedView(new ListPageProvider(pages))));
+                ? Reply(pages[0].Embeds.Value[0])
+                : Menu(new DefaultTextMenu(new PagedView(new ListPageProvider(pages))));
         }
     }
 }

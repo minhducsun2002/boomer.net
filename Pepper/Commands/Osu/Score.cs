@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Bot.Commands;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Scoring;
 using Pepper.Commons.Osu;
@@ -12,6 +13,7 @@ using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Pepper.Utilities.Osu;
 using Qmmands;
+using Qmmands.Text;
 
 namespace Pepper.Commands.Osu
 {
@@ -19,10 +21,10 @@ namespace Pepper.Commands.Osu
     {
         public Score(APIClientStore s, BeatmapContextProviderService b, ModParserService p) : base(s, b, p) { }
 
-        [Command("sc", "score", "scores", "c", "check")]
+        [TextCommand("sc", "score", "scores", "c", "check")]
         [Description("View/list scores on a certain map")]
-        [Priority(2)]
-        public async Task<DiscordCommandResult> BeatmapBased(
+        [OverloadPriority(2)]
+        public async Task<IDiscordCommandResult> BeatmapBased(
             [Description("A score URL, a beatmap URL, or a beatmap ID.")] IBeatmapResolvable beatmapResolvable,
             [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Remainder][Description("Username to check. Default to your username, if set.")] Username? username = null
@@ -105,10 +107,10 @@ namespace Pepper.Commands.Osu
             throw new ArgumentException("A valid beatmap-resolvable must be passed!");
         }
 
-        [Command("sc", "score", "scores", "c", "check")]
+        [TextCommand("sc", "score", "scores", "c", "check")]
         [Description("View/list scores on the latest map posted in the current channel")]
-        [Priority(1)]
-        public async Task<DiscordCommandResult> UserOnly(
+        [OverloadPriority(1)]
+        public async Task<IDiscordCommandResult> UserOnly(
             [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Remainder][Description("Username to check. Default to your username, if set.")] Username? username = null
         )
@@ -123,10 +125,10 @@ namespace Pepper.Commands.Osu
             return await BeatmapBased(new BeatmapResolvable(beatmap.Value), server, username);
         }
 
-        [Command("sc", "score", "scores", "c", "check")]
+        [TextCommand("sc", "score", "scores", "c", "check")]
         [Description("View/list scores on a certain map (osu! official servers only)")]
-        [Priority(0)]
-        public async Task<DiscordCommandResult> ScoreLink([Description("A link to a score.")] string link)
+        [OverloadPriority(0)]
+        public async Task<IDiscordCommandResult> ScoreLink([Description("A link to a score.")] string link)
         {
             if (URLParser.CheckScoreUrl(link, out var scoreLink))
             {

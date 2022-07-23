@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
-using Disqord.Bot;
+using Disqord.Bot.Commands;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
@@ -12,6 +12,7 @@ using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
+using Qmmands.Text;
 
 namespace Pepper.Commands.Osu
 {
@@ -29,9 +30,9 @@ namespace Pepper.Commands.Osu
             public static ScoreComparer Instance = new();
         }
 
-        [Command("whatif", "if", "netgain")]
+        [TextCommand("whatif", "if", "netgain")]
         [Description("What if you set a score with a certain pp amount?")]
-        public async Task<DiscordCommandResult> Exec(
+        public async Task<IDiscordCommandResult> Exec(
             [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
             [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Description("The amount of pp to check.")] int ppToCheck,

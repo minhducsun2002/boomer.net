@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using commandContextType = Disqord.Bot.DiscordCommandContext;
+using commandContextType = Disqord.Bot.Commands.IDiscordCommandContext;
 
 namespace Pepper.Services
 {

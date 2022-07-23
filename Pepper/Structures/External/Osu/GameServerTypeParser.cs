@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Disqord.Bot;
+using Disqord.Bot.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commons.Osu;
 using Pepper.Services;
@@ -10,12 +11,12 @@ namespace Pepper.Structures.External.Osu
 {
     public class GameServerTypeParser : DiscordTypeParser<GameServer>
     {
-        public override ValueTask<TypeParserResult<GameServer>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
+        public override ValueTask<ITypeParserResult<GameServer>> ParseAsync(IDiscordCommandContext context, IParameter parameter, ReadOnlyMemory<char> input)
         {
             GameServer result;
             try
             {
-                result = Enum.Parse<GameServer>(value, true);
+                result = Enum.Parse<GameServer>(input.Span, true);
             }
             catch
             {

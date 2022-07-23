@@ -1,9 +1,12 @@
+using System;
 using System.Threading.Tasks;
 using Disqord.Bot;
+using Disqord.Bot.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Services.Osu;
 using Pepper.Utilities.Osu;
 using Qmmands;
+using Qmmands.Default;
 
 namespace Pepper.Structures.External.Osu
 {
@@ -48,9 +51,9 @@ namespace Pepper.Structures.External.Osu
             contextProviderService = contextProvider;
         }
 
-        public override ValueTask<TypeParserResult<IBeatmapResolvable>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
+        public override ValueTask<ITypeParserResult<IBeatmapResolvable>> ParseAsync(IDiscordCommandContext context, IParameter parameter, ReadOnlyMemory<char> input)
         {
-            var isEmpty = string.IsNullOrWhiteSpace(value);
+            var isEmpty = input.Length == 0;
             if (isEmpty)
             {
                 var beatmapId = contextProviderService.GetBeatmap(context.ChannelId.ToString());
@@ -60,6 +63,7 @@ namespace Pepper.Structures.External.Osu
                 }
             }
 
+            var value = input.ToString();
             if (URLParser.CheckMapUrl(value, out _, out var id, out _) && id != null)
             {
                 return Success(new BeatmapResolvable(id.Value));
@@ -83,9 +87,9 @@ namespace Pepper.Structures.External.Osu
             contextProviderService = contextProvider;
         }
 
-        public override ValueTask<TypeParserResult<IBeatmapOrSetResolvable>> ParseAsync(Parameter parameter, string value, DiscordCommandContext context)
+        public override ValueTask<ITypeParserResult<IBeatmapOrSetResolvable>> ParseAsync(IDiscordCommandContext context, IParameter parameter, ReadOnlyMemory<char> input)
         {
-            var isEmpty = string.IsNullOrWhiteSpace(value);
+            var isEmpty = input.Length == 0;
             if (isEmpty)
             {
                 var beatmapId = contextProviderService.GetBeatmap(context.ChannelId.ToString());
@@ -95,6 +99,7 @@ namespace Pepper.Structures.External.Osu
                 }
             }
 
+            var value = input.ToString();
             if (URLParser.CheckMapUrl(value, out _, out var id, out var setId))
             {
                 if (setId != null)

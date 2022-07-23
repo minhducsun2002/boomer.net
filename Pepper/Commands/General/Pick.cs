@@ -3,7 +3,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Bot.Commands;
 using Qmmands;
+using Qmmands.Text;
 
 namespace Pepper.Commmands.General
 {
@@ -16,9 +18,9 @@ namespace Pepper.Commmands.General
             this.httpClient = httpClient;
         }
 
-        [Command("pick", "choose")]
+        [TextCommand("pick", "choose")]
         [Description("Helps you throw a dice.")]
-        public async Task<DiscordCommandResult> Exec(
+        public async Task<IDiscordCommandResult> Exec(
             [Remainder][Description("What to choose from? Separate by `/`s.")] string query = ""
         )
         {

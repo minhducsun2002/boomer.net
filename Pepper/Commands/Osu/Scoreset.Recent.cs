@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Bot.Commands;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
@@ -12,14 +13,15 @@ using Pepper.Commons.Osu.APIClients.Ripple;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
 using Qmmands;
+using Qmmands.Text;
 
 namespace Pepper.Commands.Osu
 {
     public partial class Scoreset
     {
-        [Command("recent", "recentplay", "rp")]
+        [TextCommand("recent", "recentplay", "rp")]
         [Description("Show recent plays of a player.")]
-        public async Task<DiscordCommandResult> Recent(
+        public async Task<IDiscordCommandResult> Recent(
             [Flag("/")][Description("Game mode to check. Defaults to osu!.")] Ruleset ruleset,
             [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Description("Username to check. Default to your username, if set.")] Username username
@@ -49,12 +51,12 @@ namespace Pepper.Commands.Osu
                     ));
             }
 
-            return Menu(new DefaultMenu(new ScoresetPagedView(pages)));
+            return Menu(new DefaultTextMenu(new ScoresetPagedView(pages)));
         }
 
-        [Command("rs")]
+        [TextCommand("rs")]
         [Description("Show the most recent play of a player.")]
-        public async Task<DiscordCommandResult> MostRecent(
+        public async Task<IDiscordCommandResult> MostRecent(
             [Flag("/")][Description("Game mode to check. Defaults to osu!.")] Ruleset ruleset,
             [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Description("Username to check. Default to your username, if set.")] Username username,

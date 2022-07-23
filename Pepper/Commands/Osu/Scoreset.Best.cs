@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Bot.Commands;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
@@ -14,6 +15,7 @@ using Pepper.Commons.Osu.API;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
 using Qmmands;
+using Qmmands.Text;
 using PagedView = Pepper.Structures.PagedView;
 
 namespace Pepper.Commands.Osu
@@ -25,9 +27,9 @@ namespace Pepper.Commands.Osu
 
     public partial class Scoreset
     {
-        [Command("top", "best")]
+        [TextCommand("top", "best")]
         [Description("Show top plays of a player.")]
-        public async Task<DiscordCommandResult> Best(
+        public async Task<IDiscordCommandResult> Best(
             [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
             [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Description("Username to check. Default to your username, if set.")] Username username,
@@ -91,7 +93,7 @@ namespace Pepper.Commands.Osu
                         $"No top play found for user [{user.Username}]({user.PublicUrl}) on mode {ruleset.RulesetInfo.Name}"));
             }
 
-            return Menu(new DefaultMenu(new ScoresetPagedView(pages)));
+            return Menu(new DefaultTextMenu(new ScoresetPagedView(pages)));
         }
     }
 }

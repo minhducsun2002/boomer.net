@@ -13,7 +13,7 @@ namespace Pepper.Commands.Osu
     public class ChooseServerView : ViewBase
     {
         private bool success;
-        public ChooseServerView(string discordId, string username, IServiceProvider serviceProvider) : base(GenerateMessage(username))
+        public ChooseServerView(string discordId, string username, IServiceProvider serviceProvider) : base(GenerateTemplateAction(username))
         {
             foreach (var server in Enum.GetValues<GameServer>())
             {
@@ -33,7 +33,8 @@ namespace Pepper.Commands.Osu
 
                     var usernameProvider = serviceProvider.GetRequiredService<IOsuUsernameProvider>();
                     await usernameProvider.StoreUsername(record);
-                    TemplateMessage.Content = $"<@{e.AuthorId}> is now bound to **{username}** on the {server.GetDisplayText()} server.";
+                    MessageTemplate = msg =>
+                        msg.Content = $"<@{e.AuthorId}> is now bound to **{username}** on the {server.GetDisplayText()} server.";
                     success = true;
                     Menu.Stop();
                     ClearComponents();
@@ -49,16 +50,19 @@ namespace Pepper.Commands.Osu
         {
             if (!success)
             {
-                TemplateMessage.Content = "You didn't choose the server in time. Try again.";
+                MessageTemplate = msg => msg.Content = "You didn't choose the server in time. Try again.";
             }
             ClearComponents();
             await Menu.ApplyChangesAsync();
             await base.DisposeAsync();
         }
 
-        private static LocalMessage GenerateMessage(string username)
+        private static Action<LocalMessageBase> GenerateTemplateAction(string username)
         {
-            return new LocalMessage().WithContent($"On which server is **{username}** your username?\nYou have 30 seconds to choose one.");
+            return msgBase =>
+            {
+                msgBase.Content = $"On which server is **{username}** your username?\nYou have 30 seconds to choose one.";
+            };
         }
     }
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
-using Disqord.Bot;
+using Disqord.Bot.Commands;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using Pepper.Commons.Osu;
@@ -21,7 +21,7 @@ namespace Pepper.Commands.Osu
             ModParserService = p;
         }
 
-        protected async Task<DiscordCommandResult> SingleScore(APIScore sc)
+        protected async Task<IDiscordCommandResult> SingleScore(APIScore sc)
         {
             var b = sc.Beatmap!;
             var workingBeatmap = await APIClientStore.GetClient(GameServer.Osu).GetBeatmap(b.OnlineID);

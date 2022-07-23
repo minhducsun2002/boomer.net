@@ -1,11 +1,13 @@
 using System.Linq;
 using System.Threading.Tasks;
-using Disqord.Bot;
+using Disqord.Bot.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Database;
 using Pepper.Services;
+using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Qmmands;
+using Qmmands.Text;
 using Command = Pepper.Structures.Command;
 
 namespace Pepper.Commands.Reserved
@@ -13,15 +15,15 @@ namespace Pepper.Commands.Reserved
     [RequireGuild]
     public class WhitelistCommand : ReservedCommand
     {
-        [Command("toggle-cmd")]
+        [TextCommand("toggle-cmd")]
         [Description("Toggle the locking state of a command.")]
-        public async Task<DiscordCommandResult> Exec(
+        public async Task<IDiscordCommandResult> Exec(
             [Description("An alias of the command toggle.")] string alias,
             [Description("Guild ID to toggle. Default to the current guild.")] string guildId = ""
         )
         {
-            var context = (DiscordGuildCommandContext) Context;
-            var searchResults = context.Bot.Commands.FindCommands(alias);
+            var context = (IDiscordGuildCommandContext) Context;
+            var searchResults = context.Bot.Commands.FindCommands(alias.ToCharArray());
             if (searchResults.Count == 0)
             {
                 return Reply("Sorry, couldn't found a matching command.");

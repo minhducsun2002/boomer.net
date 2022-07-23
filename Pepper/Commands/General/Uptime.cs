@@ -4,16 +4,18 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Disqord;
 using Disqord.Bot;
+using Disqord.Bot.Commands;
 using Pepper.Utilities;
 using Qmmands;
+using Qmmands.Text;
 
 namespace Pepper.Commmands.General
 {
     public class Uptime : GeneralCommand
     {
-        [Command("uptime")]
+        [TextCommand("uptime")]
         [Description("How long has I been running?")]
-        public DiscordCommandResult Exec()
+        public IDiscordCommandResult Exec()
         {
             var threads = Process.GetCurrentProcess().Threads.Cast<ProcessThread>().Select(thread =>
             {

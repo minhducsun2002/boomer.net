@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Disqord;
@@ -8,7 +9,7 @@ namespace Pepper.Structures
 {
     public class PagedView : Disqord.Extensions.Interactivity.Menus.Paged.PagedView
     {
-        public PagedView(PageProvider pageProvider, LocalMessage? templateMessage = null) : base(pageProvider, templateMessage)
+        public PagedView(PageProvider pageProvider, Action<LocalMessageBase>? messageTemplate = null) : base(pageProvider, messageTemplate)
         {
             if (pageProvider.PageCount <= 1)
             {
@@ -40,8 +41,8 @@ namespace Pepper.Structures
     public class SelectionPagedView : PagedViewBase
     {
         private readonly Dictionary<int, LocalSelectionComponentOption> details;
-        public SelectionPagedView(IEnumerable<(LocalSelectionComponentOption, Page)> pages, LocalMessage? templateMessage = null)
-            : base(PreparePages(pages, out var pageDetails), templateMessage ?? new LocalMessage())
+        public SelectionPagedView(IEnumerable<(LocalSelectionComponentOption, Page)> pages, Action<LocalMessageBase>? messageTemplate = null)
+            : base(PreparePages(pages, out var pageDetails), messageTemplate)
         {
             details = pageDetails;
             var selection = new SelectionViewComponent(e =>

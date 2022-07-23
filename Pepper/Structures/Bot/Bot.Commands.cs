@@ -9,29 +9,32 @@ using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
+using Qmmands.Default;
+using Qmmands.Text;
+using Qmmands.Text.Default;
 
 namespace Pepper.Structures
 {
     public partial class Bot
     {
-        private static readonly Type[] DownleveledAttributes = { typeof(CategoryAttribute), typeof(PrefixCategoryAttribute) };
+        private static readonly Type[] DownleveledAttributeTypes = { typeof(CategoryAttribute), typeof(PrefixCategoryAttribute) };
 
         // expose this for tests
-        public static void DownlevelAttributes(ModuleBuilder moduleBuilder)
+        public static void DownlevelAttributes(IModuleBuilder moduleBuilder)
         {
-            foreach (var command in CommandUtilities.EnumerateAllCommands(moduleBuilder))
+            foreach (var command in CommandUtilities.EnumerateAllCommands(moduleBuilder).OfType<ITextCommandBuilder>())
             {
-                foreach (var attribute in DownleveledAttributes)
+                foreach (var attributeType in DownleveledAttributeTypes)
                 {
-                    if (command.Attributes.All(attrib => attrib.GetType() != attribute))
+                    if (command.CustomAttributes.All(attrib => attrib.GetType() != attributeType))
                     {
                         var module = command.Module;
                         while (module != null)
                         {
-                            var category = module.Attributes.FirstOrDefault(attrib => attrib.GetType() == attribute);
+                            var category = module.CustomAttributes.FirstOrDefault(attrib => attrib.GetType() == attributeType);
                             if (category != null)
                             {
-                                command.AddAttribute(category);
+                                command.CustomAttributes.Add(category);
                                 break;
                             }
 
@@ -41,10 +44,11 @@ namespace Pepper.Structures
                 }
             }
         }
-        protected override void MutateModule(ModuleBuilder moduleBuilder)
+
+        protected override void MutateTopLevelModule(IModuleBuilder moduleBuilder)
         {
             DownlevelAttributes(moduleBuilder);
-            foreach (var command in CommandUtilities.EnumerateAllCommands(moduleBuilder))
+            foreach (var command in CommandUtilities.EnumerateAllCommands(moduleBuilder).OfType<ITextCommandBuilder>())
             {
                 if (command.Parameters.Count == 0)
                 {
@@ -53,38 +57,41 @@ namespace Pepper.Structures
 
                 // make last non-flag parameters of every command a remainder one
                 var lastNotFlag = command.Parameters
-                    .LastOrDefault(param => !param.Attributes.OfType<FlagAttribute>().Any());
-                if (!(lastNotFlag == null || lastNotFlag.IsRemainder))
+                    .LastOrDefault(param => !param.CustomAttributes.OfType<FlagAttribute>().Any());
+                if (lastNotFlag is IPositionalParameterBuilder positionalBuilder)
                 {
-                    lastNotFlag.IsRemainder = true;
+                    positionalBuilder.IsRemainder = true;
                 }
 
                 // for commands accepting username & game servers, add checks
-                if (typeof(OsuCommand).IsAssignableFrom(command.Module.Type))
+                if (typeof(OsuCommand).IsAssignableFrom(command.Module.TypeInfo))
                 {
-                    if (command.Parameters.Any(param => param.Type == typeof(GameServer)))
+                    if (command.Parameters.Any(param => param.ReflectedType == typeof(GameServer)))
                     {
-                        var param = command.Parameters.FirstOrDefault(param => param.Type == typeof(Username));
+                        var param = command.Parameters.FirstOrDefault(param => param.ReflectedType == typeof(Username));
                         param?.Checks.Add(new EnsureUsernamePresentCheckAttribute());
-                        param?.Attributes.Add(new EnsureUsernamePresentCheckAttribute.FailureFormatterAttribute());
                     }
                 }
             }
 
-
-
             base.MutateModule(moduleBuilder);
         }
 
-        protected override ValueTask AddTypeParsersAsync(CancellationToken cancellationToken = default)
+        protected override ValueTask AddTypeParsers(DefaultTypeParserProvider typeParserProvider, CancellationToken cancellationToken)
         {
-            Commands.AddTypeParser(new RulesetTypeParser());
-            Commands.AddTypeParser(new UsernameTypeParser());
-            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<BeatmapOrSetResolvableTypeParser>(Services));
-            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<BeatmapResolvableTypeParser>(Services));
-            Commands.AddTypeParser(ActivatorUtilities.CreateInstance<GameServerTypeParser>(Services), true);
+            typeParserProvider.AddParserAsDefault(new RulesetTypeParser());
+            typeParserProvider.AddParserAsDefault(new UsernameTypeParser());
+            typeParserProvider.AddParserAsDefault(ActivatorUtilities.CreateInstance<BeatmapOrSetResolvableTypeParser>(Services));
+            typeParserProvider.AddParserAsDefault(ActivatorUtilities.CreateInstance<BeatmapResolvableTypeParser>(Services));
+            typeParserProvider.AddParserAsDefault(ActivatorUtilities.CreateInstance<GameServerTypeParser>(Services));
+            return base.AddTypeParsers(typeParserProvider, cancellationToken);
+        }
 
-            return base.AddTypeParsersAsync(cancellationToken);
+        public override ValueTask InitializeAsync(CancellationToken cancellationToken)
+        {
+            var argumentParserProvider = (DefaultArgumentParserProvider) Services.GetRequiredService<IArgumentParserProvider>();
+            argumentParserProvider.SetDefaultParser(typeof(ArgumentParser));
+            return base.InitializeAsync(cancellationToken);
         }
     }
 }

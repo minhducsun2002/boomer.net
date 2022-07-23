@@ -3,8 +3,12 @@ using System.Linq;
 using System.Reflection;
 using Disqord;
 using Disqord.Bot;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Pepper.Structures.Commands;
+using Qmmands.Text;
+using Qmmands.Text.Default;
 
 namespace Pepper.Structures
 {
@@ -19,6 +23,7 @@ namespace Pepper.Structures
             ILogger<Bot> logger,
             IServiceProvider services,
             DiscordClient client
-        ) : base(options, logger, services, client) { }
+        ) : base(options, logger, services, client)
+        { }
     }
 }

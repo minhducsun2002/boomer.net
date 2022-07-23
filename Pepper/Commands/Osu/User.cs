@@ -1,30 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Disqord;
-using Disqord.Bot;
+using Disqord.Bot.Commands;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
-using Pepper.Commons.Osu.Exceptions;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.Commands;
-using Pepper.Structures.External.Osu.Extensions;
 using Qmmands;
+using Qmmands.Text;
 
 namespace Pepper.Commands.Osu
 {
-    [NotFoundHandler]
     public class User : OsuCommand
     {
         public User(APIClientStore apiClientStore) : base(apiClientStore) { }
 
-        [Command("user", "u")]
+        [TextCommand("user", "u")]
         [Description("Show statistics of an osu! player.")]
-        public async Task<DiscordCommandResult> Exec(
+        public async Task<IDiscordCommandResult> Exec(
             [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
             [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Remainder][Description("Username to check. Default to your username, if set.")] Username username)
@@ -74,7 +70,7 @@ namespace Pepper.Commands.Osu
                 var score = scores[0];
                 var map = score.Beatmap;
                 var mapset = map.Metadata;
-                embed.Fields.Add(new LocalEmbedField
+                embed.AddField(new LocalEmbedField
                 {
                     Name = "Best performance",
                     Value = $"[**{score.Rank}**] **{score.PP}**pp "
@@ -86,32 +82,6 @@ namespace Pepper.Commands.Osu
             }
 
             return Reply(embed);
-        }
-
-
-        private class NotFoundHandlerAttribute : Attribute, ICommandExecutionFailureFormatter
-        {
-            // handle 404s
-            public bool TryFormatFailure(
-                DiscordCommandContext context,
-                CommandExecutionFailedResult commandExecutionFailedResult,
-                out LocalMessage? outputMessage)
-            {
-                var exception = commandExecutionFailedResult.Exception;
-                outputMessage = null;
-                if (exception is HttpRequestException { StatusCode: HttpStatusCode.NotFound } or UserNotFoundException)
-                {
-                    var username = context.Arguments.OfType<Username>().First();
-                    var server = context.Arguments.OfType<GameServer>().FirstOrDefault();
-                    outputMessage = new LocalMessage().WithContent(
-                        $"User **{username.GetUsername(server)}** isn't found on the **{server.GetDisplayText()}** server. " +
-                        "Either the user doesn't exist, or they're under a restriction."
-                    );
-                    return true;
-                }
-
-                return false;
-            }
         }
     }
 }

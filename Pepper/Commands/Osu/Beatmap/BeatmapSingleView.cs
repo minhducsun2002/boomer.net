@@ -223,13 +223,13 @@ namespace Pepper.Commands.Osu
 
         private List<LocalSelectionComponentOption> GetCurrentOptionList()
         {
-            return beatmapset.Beatmaps.Take(Limits.ApplicationCommands.MaxOptionAmount)
+            return beatmapset.Beatmaps.Take(Limits.Component.Selection.MaxOptionAmount)
                 .OrderBy(beatmap => beatmap.StarRating)
                 .Select(beatmap => new LocalSelectionComponentOption
                 {
-                    Label = beatmap.DifficultyName.Length < Limits.Components.Selection.Option.MaxLabelLength
+                    Label = beatmap.DifficultyName.Length < Limits.Component.Selection.Option.MaxLabelLength
                         ? beatmap.DifficultyName
-                        : beatmap.DifficultyName[..(Limits.Components.Selection.Option.MaxLabelLength - 3)] + "...",
+                        : beatmap.DifficultyName[..(Limits.Component.Selection.Option.MaxLabelLength - 3)] + "...",
                     Description = OsuCommand.SerializeBeatmapStats(beatmapset, beatmap, false, false),
                     Value = $"{beatmap.OnlineID}",
                     IsDefault = CurrentPageIndex == beatmapIdToIndex[beatmap.OnlineID]

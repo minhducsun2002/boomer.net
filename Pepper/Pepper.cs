@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Disqord;
 using Disqord.Bot.Hosting;
 using dotenv.net;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,8 @@ using Pepper.Services;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Qmmands;
+using Qmmands.Text;
+using Qmmands.Text.Default;
 using Serilog;
 using Serilog.Templates;
 
@@ -89,13 +92,6 @@ var hostBuilder = new HostBuilder()
             credentials.OAuth2ClientId = int.Parse(context.Configuration["OSU_OAUTH2_CLIENT_ID"]);
             credentials.OAuth2ClientSecret = context.Configuration["OSU_OAUTH2_CLIENT_SECRET"];
             credentials.LegacyAPIKey = context.Configuration["OSU_API_KEY"];
-        });
-        services.Configure<CommandServiceConfiguration>(config =>
-        {
-            config.DefaultRunMode = RunMode.Parallel;
-            config.DefaultArgumentParser = new ArgumentParser();
-            config.IgnoresExtraArguments = true;
-            config.StringComparison = StringComparison.InvariantCultureIgnoreCase;
         });
     })
     .ConfigureDiscordBot<Bot>((context, bot) =>

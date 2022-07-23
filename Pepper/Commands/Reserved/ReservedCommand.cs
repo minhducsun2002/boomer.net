@@ -1,4 +1,4 @@
-using Disqord.Bot;
+using Disqord.Bot.Commands;
 using Pepper.Structures;
 using Pepper.Structures.Commands;
 

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Disqord.Bot;
+using Disqord.Bot.Commands;
 using Disqord.Extensions.Interactivity.Menus;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
@@ -9,6 +10,7 @@ using Pepper.Services.Osu;
 using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu;
 using Qmmands;
+using Qmmands.Text;
 
 namespace Pepper.Commands.Osu
 {
@@ -24,9 +26,9 @@ namespace Pepper.Commands.Osu
             this.modParserService = modParserService;
         }
 
-        [Command("map", "beatmap")]
+        [TextCommand("map", "beatmap")]
         [Description("View information about a beatmap(set).")]
-        public async Task<DiscordCommandResult> Exec(
+        public async Task<IDiscordCommandResult> Exec(
             [Description("Beatmap(set) ID, or an URL.")] IBeatmapOrSetResolvable beatmapResolvable,
             [Description("In case a numeric ID is passed, whether this is a set ID.")][Flag("/")] bool set = false
         )
@@ -49,10 +51,10 @@ namespace Pepper.Commands.Osu
             };
         }
 
-        private DiscordCommandResult Beatmapset(APIBeatmapSet beatmapset)
-            => Menu(new DefaultMenu(new BeatmapsetPagedView(beatmapset)));
+        private IDiscordCommandResult Beatmapset(APIBeatmapSet beatmapset)
+            => Menu(new DefaultTextMenu(new BeatmapsetPagedView(beatmapset)));
 
-        private DiscordCommandResult BeatmapSingle(APIBeatmapSet beatmapset, int beatmapId)
+        private IDiscordCommandResult BeatmapSingle(APIBeatmapSet beatmapset, int beatmapId)
         {
             SetBeatmapContext(beatmapId);
 
@@ -63,7 +65,7 @@ namespace Pepper.Commands.Osu
                 RulesetTypeParser.SupportedRulesets[beatmapset.Beatmaps.First(b => b.OnlineID == beatmapId).RulesetID]
             );
             return Menu(
-                new DefaultMenu(
+                new DefaultTextMenu(
                     new BeatmapSingleView(pageProvider, beatmapId)
                 )
             );

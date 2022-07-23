@@ -3,7 +3,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using Disqord.Bot;
+using Disqord.Bot.Commands;
 using Qmmands;
+using Qmmands.Text;
 
 namespace Pepper.Commmands.General
 {
@@ -11,9 +13,9 @@ namespace Pepper.Commmands.General
     {
         private static readonly SHA256 Hasher = SHA256.Create();
 
-        [Command("rate")]
+        [TextCommand("rate")]
         [Description("Rate something on a scale from 0 to 10.")]
-        public DiscordCommandResult Exec(
+        public IDiscordCommandResult Exec(
             [Remainder][Description("What do you want me to rate?")] string whatToRate = ""
         )
         {

@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Disqord;
-using Disqord.Bot;
+using Disqord.Bot.Commands;
+using Disqord.Bot.Commands.Text;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Microsoft.Extensions.Configuration;
@@ -11,38 +13,38 @@ using Pepper.Structures;
 using Pepper.Structures.Commands;
 using Pepper.Utilities;
 using Qmmands;
-using Command = Qmmands.Command;
+using Qmmands.Text;
 using PagedView = Pepper.Structures.PagedView;
 
 namespace Pepper.Commmands.General
 {
     public class Help : GeneralCommand
     {
-        [Command("help")]
+        [TextCommand("help")]
         [Description("Everything starts here.")]
-        public DiscordCommandResult Exec(
+        public IDiscordCommandResult Exec(
             [Description("A command or a category to show respective help entry.")] string query = ""
             )
         {
             var self = Context.Bot.CurrentUser;
-            var service = Context.Command.Service;
-            var commands = service.GetAllCommands()!;
+            var service = Context.GetCommandService();
+            var commands = service.EnumerateTextCommands();
             var categories = commands
                 .GroupBy(
-                    command => command.Attributes.OfType<CategoryAttribute>().FirstOrDefault()?.Category ?? "",
+                    command => command.CustomAttributes.OfType<CategoryAttribute>().FirstOrDefault()?.Category ?? "",
                     command => command
                 )
                 .ToDictionary(group => group.Key, group => group.ToArray());
 
             var embedAuthor = new LocalEmbedAuthor
             {
-                Name = $"{self.Tag}",
+                Name = $"{self!.Tag}",
                 IconUrl = self.GetAvatarUrl(CdnAssetFormat.Png, 1024)
             };
 
             if (!string.IsNullOrWhiteSpace(query))
             {
-                var commandMatches = service.FindCommands(query);
+                var commandMatches = service.FindCommands(query.ToCharArray());
                 if (commandMatches.Count != 0)
                 {
                     var pages = HandleCommand(commandMatches.Select(match => match.Command).ToArray()).ToList();
@@ -50,7 +52,7 @@ namespace Pepper.Commmands.General
                     if (pages.Count > 1)
                     {
                         return Menu(
-                            new DefaultMenu(new PagedView(new ListPageProvider(pages.Select(embed => new Page().WithEmbeds(embed)))))
+                            new DefaultTextMenu(new PagedView(new ListPageProvider(pages.Select(embed => new Page().WithEmbeds(embed)))))
                         );
                     }
 
@@ -80,9 +82,9 @@ namespace Pepper.Commmands.General
                     + $"\nCall {SelfInvocation()} `<category>` for commands belonging to a certain category."));
         }
 
-        private List<LocalEmbed> HandleCommand(Command[] commands)
+        private List<LocalEmbed> HandleCommand(ITextCommand[] commands)
         {
-            var prefixCategory = commands[0].Attributes.OfType<PrefixCategoryAttribute>().FirstOrDefault()?.PrefixCategory;
+            var prefixCategory = commands[0].CustomAttributes.OfType<PrefixCategoryAttribute>().FirstOrDefault()?.PrefixCategory;
             var config = Context.Services.GetRequiredService<IConfiguration>();
             var prefixes = string.IsNullOrWhiteSpace(prefixCategory)
                 ? ((DefaultPrefixProvider) Context.Bot.Prefixes).Prefixes.Select(prefix => prefix.ToString()!).ToArray()
@@ -95,8 +97,8 @@ namespace Pepper.Commmands.General
             {
                 var overload = commands.Length > 1 ? $" (overload {index + 1})" : "";
                 var flagParams = command.Parameters
-                    .Where(param => param.Attributes.OfType<FlagAttribute>().Any())
-                    .Select(param => (param, param.Attributes.OfType<FlagAttribute>().First()))
+                    .Where(param => param.CustomAttributes.OfType<FlagAttribute>().Any())
+                    .Select(param => (param, param.CustomAttributes.OfType<FlagAttribute>().First()))
                     .ToList();
 
                 var fields = new List<LocalEmbedField>
@@ -108,10 +110,10 @@ namespace Pepper.Commmands.General
                             string.Join(
                                 ' ',
                                 command.Parameters.Select(param => {
-                                    var flags = param.Attributes.OfType<FlagAttribute>().FirstOrDefault()?.Flags;
+                                    var flags = param.CustomAttributes.OfType<FlagAttribute>().FirstOrDefault()?.Flags;
                                     // TODO we are assuming flag parameters are always optional
-                                    var quotes = (flags == null ? "" : "f") + (param.IsOptional || flags != null ? "[]" : "<>");
-                                    return param.IsMultiple
+                                    var quotes = (flags == null ? "" : "f") + (param.GetTypeInformation().IsOptional || flags != null ? "[]" : "<>");
+                                    return param.GetTypeInformation().IsEnumerable
                                         ? quotes[..^1] + param.Name + "1" + quotes[^1] + "..." + quotes[..^1] + param.Name + "N" + quotes[^1]
                                         : quotes[..^1] + param.Name + quotes[^1];
                                 }))
@@ -151,7 +153,9 @@ namespace Pepper.Commmands.General
                             ? $"({string.Join(", ", commands[0].Aliases.Skip(1).Select(alias => $"`{basePrefix}{alias}`"))})"
                             : ""
                     ),
-                    Description = string.IsNullOrWhiteSpace(commands[0].Description) ? "No description." : commands[0].Description,
+                    Description = string.IsNullOrWhiteSpace(commands[0].Description)
+                        ? "No description."
+                        : commands[0].Description,
                     Fields = fields,
                     Footer = otherPrefixes.Length != 0
                         ? new LocalEmbedFooter().WithText(
@@ -166,7 +170,7 @@ namespace Pepper.Commmands.General
             return embeds.ToList();
         }
 
-        private LocalEmbed HandleCategory(string category, IReadOnlyCollection<Command> commands)
+        private LocalEmbed HandleCategory(string category, IReadOnlyCollection<ITextCommand> commands)
         {
             var restricted = false;
             var embed = new LocalEmbed
@@ -202,6 +206,6 @@ namespace Pepper.Commmands.General
             return embed;
         }
 
-        private string SelfInvocation() => $"{Context.Prefix}{Context.Command.Aliases[0]}";
+        private string SelfInvocation() => $"{Context.Prefix}{Context.Command!.Aliases[0]}";
     }
 }
