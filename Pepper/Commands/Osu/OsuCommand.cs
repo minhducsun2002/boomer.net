@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Scoring;
 using Pepper.Commons.Osu;
@@ -120,10 +121,10 @@ namespace Pepper.Commands.Osu
             {
                 Ruleset = rulesetInfo
             }.WithStatistics(statistics);
-            var displayStats = sc.Statistics
-                .Keys
-                .GetValuesInOrder()
-                .Select(hitResult => $"**{sc.Statistics[hitResult]}**");
+            var displayStats = sc.GetStatisticsForDisplay()
+                .Select(s => s.Result)
+                .Where(r => !r.IsBonus())
+                .Select(hitResult => $"**{(sc.Statistics.TryGetValue(hitResult, out var value) ? value : 0)}**");
             return string.Join('/', displayStats);
         }
 
