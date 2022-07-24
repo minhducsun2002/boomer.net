@@ -93,5 +93,10 @@ namespace Pepper.Structures
             argumentParserProvider.SetDefaultParser(typeof(ArgumentParser));
             return base.InitializeAsync(cancellationToken);
         }
+
+        public override ValueTask InitializeApplicationCommandsAsync(CancellationToken cancellationToken = default)
+        {
+            return ValueTask.CompletedTask;
+        }
     }
 }
