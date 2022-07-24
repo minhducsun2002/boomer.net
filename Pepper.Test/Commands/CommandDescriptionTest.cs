@@ -2,7 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using Pepper.Structures;
 using Qmmands;
+using Qmmands.Text;
+using Qmmands.Text.Default;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -21,20 +25,25 @@ namespace Pepper.Test.Commands
         public CommandDataAttribute(Data type) => this.type = type;
         public override IEnumerable<object[]> GetData(MethodInfo testMethod)
         {
-            var _ = Structures.Bot.VersionHash;
-            var commandService = new CommandService();
+            var _ = Bot.VersionHash;
+            var services = new ServiceCollection()
+                .AddLogging()
+                .AddTextCommandService()
+                .BuildServiceProvider();
+            var commandService = services.GetRequiredService<ICommandService>();
+            DefaultTextSetup.Initialize(commandService);
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 if (assembly.FullName.StartsWith("Pepper"))
                 {
-                    commandService.AddModules(assembly, null, Structures.Bot.DownlevelAttributes);
+                    commandService.AddModules(assembly, Bot.DownlevelAttributes);
                 }
             }
 
             return type switch
             {
-                Data.Command => commandService.GetAllCommands().Select(command => new object[] { command }),
-                Data.Parameter => commandService.GetAllCommands()
+                Data.Command => commandService.EnumerateTextCommands().Select(command => new object[] { command }),
+                Data.Parameter => commandService.EnumerateTextCommands()
                     .SelectMany(command => command.Parameters)
                     .Select(parameter => new object[] { parameter }),
                 _ => throw new ArgumentException($"Invalid data type for {nameof(type)}")
@@ -53,7 +62,7 @@ namespace Pepper.Test.Commands
 
         [Theory]
         [CommandData(CommandDataAttribute.Data.Command)]
-        public void AllCommandsFullyDescribed(Command command)
+        public void AllCommandsFullyDescribed(ITextCommand command)
         {
             Assert.NotEqual("", command.Description);
             Assert.NotNull(command.Description);
@@ -61,7 +70,7 @@ namespace Pepper.Test.Commands
 
         [Theory]
         [CommandData(CommandDataAttribute.Data.Parameter)]
-        public void AllParametersFullyDescribed(Parameter parameter)
+        public void AllParametersFullyDescribed(ITextParameter parameter)
         {
             try
             {
