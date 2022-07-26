@@ -29,7 +29,7 @@ namespace Pepper.Commons.Osu.Test
         }
 
         [Theory]
-        [AccuracyData(0.10)]
+        [AccuracyData(0.05)]
         public void TestSynthesizedEnoughHits(double accuracy, Ruleset ruleset)
         {
             var result = synthesizer.Synthesize(ruleset, accuracy);
@@ -39,7 +39,8 @@ namespace Pepper.Commons.Osu.Test
         }
 
         [Theory]
-        [AccuracyData(0.10)]
+        [AccuracyData(0.05, 0.70, 0.01)]
+        [AccuracyData(0.70)]
         public void TestSynthesizedPossibleHits(double accuracy, Ruleset ruleset)
         {
             var result = synthesizer.Synthesize(ruleset, accuracy);
@@ -48,7 +49,8 @@ namespace Pepper.Commons.Osu.Test
         }
 
         [Theory]
-        [AccuracyData(0.10)]
+        [AccuracyData(0.10, 0.70, 0.02)]
+        [AccuracyData(0.70)]
         public void TestSynthesizedAccurateResult(double accuracy, Ruleset ruleset)
         {
             var result = synthesizer.Synthesize(ruleset, accuracy);
@@ -69,7 +71,7 @@ namespace Pepper.Commons.Osu.Test
                     scoreProcessor.ApplyResult(judgement);
                 }
             }
-            Assert.Equal(scoreProcessor.Accuracy.Value, accuracy, 4);
+            Assert.Equal(scoreProcessor.Accuracy.Value, accuracy, 3);
         }
 
         private class AccuracyDataAttribute : DataAttribute
@@ -83,7 +85,7 @@ namespace Pepper.Commons.Osu.Test
                 new ManiaRuleset()
             };
 
-            public AccuracyDataAttribute(double start = 0.9, double end = 1.0, double step = 0.01)
+            public AccuracyDataAttribute(double start = 0.9, double end = 1.0, double step = 0.05)
             {
                 this.start = start; this.end = end; this.step = step;
             }
