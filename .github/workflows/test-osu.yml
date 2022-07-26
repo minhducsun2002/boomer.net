@@ -1,0 +1,23 @@
+name: Run osu! common utils test
+
+on:
+  push:
+    paths:
+      - 'Pepper.Commons.Osu/**'
+      - '.github/workflows/test-osu.yml'
+      - 'Pepper.Commons.Osu.Test/**'
+  repository_dispatch:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.101
+      - name: Test
+        run: dotnet test Pepper.Commons.Osu.Test
