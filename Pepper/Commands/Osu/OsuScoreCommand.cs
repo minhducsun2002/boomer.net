@@ -40,7 +40,7 @@ namespace Pepper.Commands.Osu
             {
                 pp = workingBeatmap.CalculatePerformance(
                     rulesetOverwrite: ruleset,
-                    score: new ScoreInfo { Mods = mods, MaxCombo = sc.MaxCombo, Accuracy = sc.Accuracy }
+                    score: new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = sc.Accuracy }
                         .WithRulesetID(sc.RulesetID)
                         .WithStatistics(sc.Statistics)
                 );
@@ -49,11 +49,10 @@ namespace Pepper.Commands.Osu
 
             if (!sc.Perfect)
             {
-                var fcScore = new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = sc.Accuracy }
-                    .WithRulesetID(sc.RulesetID)
-                    .WithStatistics(sc.Statistics);
-                fcScore.SetCount300((int) (fcScore.GetCount300() + fcScore.GetCountMiss())!);
-                fcScore.SetCountMiss(0);
+                var statistics = new HitStatisticsSynthesizer(workingBeatmap.Beatmap.HitObjects.Count)
+                    .Synthesize(ruleset, sc.Accuracy);
+                var fcScore = new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = sc.Accuracy, Statistics = statistics }
+                    .WithRulesetID(sc.RulesetID);
                 fullComboPP = workingBeatmap.CalculatePerformance(fcScore, ruleset);
             }
 

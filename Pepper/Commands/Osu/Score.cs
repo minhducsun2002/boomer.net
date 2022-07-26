@@ -48,7 +48,9 @@ namespace Pepper.Commands.Osu
                     return Reply($"No score found on that beatmap for user `{user.Username}`.");
                 }
 
+
                 var difficulty = map.CalculateDifficulty(ruleset.RulesetInfo.OnlineID);
+                HitStatisticsSynthesizer? synthesizer = null;
 
                 return Reply(new LocalEmbed
                 {
@@ -65,7 +67,14 @@ namespace Pepper.Commands.Osu
                             {
                                 try
                                 {
-                                    var scoreInfo = new ScoreInfo { Mods = mods, MaxCombo = score.MaxCombo, Accuracy = score.Accuracy };
+                                    synthesizer ??= new HitStatisticsSynthesizer(map.Beatmap.HitObjects.Count);
+                                    var scoreInfo = new ScoreInfo
+                                    {
+                                        Mods = mods,
+                                        MaxCombo = difficulty.MaxCombo,
+                                        Accuracy = score.Accuracy,
+                                        Statistics = synthesizer.Synthesize(ruleset, score.Accuracy)
+                                    };
                                     pp = (float) map.CalculatePerformance(scoreInfo);
                                     localPP = true;
                                 }

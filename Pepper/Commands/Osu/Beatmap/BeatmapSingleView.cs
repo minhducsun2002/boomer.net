@@ -69,14 +69,16 @@ namespace Pepper.Commands.Osu
             var beatmap = beatmapset.Beatmaps.First(beatmap => beatmap.OnlineID == beatmapId);
             var workingBeatmap = await service.GetBeatmap(beatmapId);
             var difficulty = workingBeatmap.CalculateDifficulty(ruleset.RulesetInfo.OnlineID, true, mods);
+            var synthesizer = new HitStatisticsSynthesizer(workingBeatmap.Beatmap.HitObjects.Count);
             var pp = new[] { 95, 97, 98, 99, 100 }
                 .ToDictionary(
                     acc => acc,
                     acc =>
                     {
+                        var stats = synthesizer.Synthesize(ruleset, (double) acc / 100);
                         var pp = workingBeatmap.CalculatePerformance(
                             rulesetOverwrite: ruleset,
-                            score: new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = (double) acc / 100 }
+                            score: new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = (double) acc / 100, Statistics = stats }
                         );
                         return pp;
                     }
