@@ -22,7 +22,7 @@ namespace Pepper.Utilities.Osu
         );
 
         private static readonly Regex BeatmapAndBeatmapsetRegex = new(
-            @"http(?:s)*:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)#(osu|taiko|fruits|mania)\/(\d+)",
+            @"http(?:s)*:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)#(osu|taiko|fruits|mania|)\/(\d+)",
             RegexOptions.Compiled | RegexOptions.ECMAScript | RegexOptions.CultureInvariant
         );
 
