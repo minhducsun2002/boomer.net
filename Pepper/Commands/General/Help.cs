@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Bot.Commands.Text;
@@ -22,13 +23,18 @@ namespace Pepper.Commands.General
     {
         [TextCommand("help")]
         [Description("Everything starts here.")]
-        public IDiscordCommandResult Exec(
+        public async Task<IDiscordCommandResult> Exec(
             [Description("A command or a category to show respective help entry.")] string query = ""
             )
         {
             var self = Context.Bot.CurrentUser;
             var service = Context.GetCommandService();
             var commands = service.EnumerateTextCommands();
+            if (!await Context.Bot.IsOwnerAsync(Context.AuthorId))
+            {
+                commands = commands.Where(c => !c.CustomAttributes.OfType<HiddenAttribute>().Any());
+            }
+
             var categories = commands
                 .GroupBy(
                     command => command.CustomAttributes.OfType<CategoryAttribute>().FirstOrDefault()?.Category ?? "",
