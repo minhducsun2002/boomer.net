@@ -90,6 +90,7 @@ namespace Pepper.Structures
         public override ValueTask InitializeAsync(CancellationToken cancellationToken)
         {
             var argumentParserProvider = (DefaultArgumentParserProvider) Services.GetRequiredService<IArgumentParserProvider>();
+            argumentParserProvider.Add(new ArgumentParser());
             argumentParserProvider.SetDefaultParser(typeof(ArgumentParser));
             return base.InitializeAsync(cancellationToken);
         }
