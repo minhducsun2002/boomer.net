@@ -167,7 +167,7 @@ namespace Pepper.Structures.Commands
             // Initialize to default value if needed.
             foreach (var param in command.Parameters)
             {
-                if (!parameters.ContainsKey(param) && param.GetTypeInformation().IsOptional)
+                if (!parameters.ContainsKey(param) && !param.GetTypeInformation().IsOptional)
                 {
                     parameters[param] = new List<string> { "" };
                 }
