@@ -16,7 +16,7 @@ using Qmmands;
 using Qmmands.Text;
 using PagedView = Pepper.Structures.PagedView;
 
-namespace Pepper.Commmands.General
+namespace Pepper.Commands.General
 {
     public class Help : GeneralCommand
     {

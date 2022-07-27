@@ -7,7 +7,7 @@ using Disqord.Bot.Commands;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Commmands.General
+namespace Pepper.Commands.General
 {
     public class Pick : GeneralCommand
     {

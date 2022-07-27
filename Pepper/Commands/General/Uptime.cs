@@ -9,7 +9,7 @@ using Pepper.Utilities;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Commmands.General
+namespace Pepper.Commands.General
 {
     public class Uptime : GeneralCommand
     {

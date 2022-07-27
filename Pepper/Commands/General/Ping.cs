@@ -11,7 +11,7 @@ using Humanizer.Localisation;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Commmands.General
+namespace Pepper.Commands.General
 {
     public class Ping : GeneralCommand
     {

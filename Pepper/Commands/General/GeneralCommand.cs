@@ -1,7 +1,7 @@
 using Pepper.Structures;
 using Pepper.Structures.Commands;
 
-namespace Pepper.Commmands.General
+namespace Pepper.Commands.General
 {
     [Category("General")]
     public abstract class GeneralCommand : Command { }
