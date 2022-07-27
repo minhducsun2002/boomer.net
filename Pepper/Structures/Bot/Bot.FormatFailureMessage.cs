@@ -1,8 +1,10 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Bot.Commands.Text;
+using Pepper.Structures.Commands;
 using Qmmands;
 
 namespace Pepper.Structures
@@ -60,6 +62,35 @@ namespace Pepper.Structures
                     },
                     Footer = new LocalEmbedFooter { Text = $"Command : {context.Command!.Name} | Prefix : {context.Prefix}" },
                 });
+                return true;
+            }
+
+            if (result is ChecksFailedResult checksFailedResult)
+            {
+                var checks = checksFailedResult.FailedChecks;
+                var types = checks.Keys.ToDictionary(c => c.GetType());
+
+                if (types.ContainsKey(typeof(RequireBotOwnerAttribute)))
+                {
+                    messageBase.Content = "Sorry, only my owner can do that.";
+                    return true;
+                }
+
+                if (types.ContainsKey(typeof(RequireGuildWhitelistAttribute)))
+                {
+                    messageBase.Content = "Guild-restricted command.";
+                    return true;
+                }
+
+                var prefixCheckType = typeof(PrefixCheckAttribute);
+                if (types.Count == 1 && types.First().Key == prefixCheckType)
+                {
+                    return false;
+                }
+
+                var firstValidCheck = checks.First(c => c.GetType() != prefixCheckType).Key;
+                messageBase.Content = @$"A secret check named {
+                    firstValidCheck.GetType().Name.Replace("Attribute", "", StringComparison.InvariantCultureIgnoreCase)} failed.";
                 return true;
             }
 
