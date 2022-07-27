@@ -4,7 +4,7 @@ using Disqord.Bot;
 using Disqord.Bot.Commands;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
-using Pepper.Structures.Commands;
+using Pepper.Structures.CommandAttributes.Checks;
 using Qmmands;
 using Qmmands.Text;
 

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Pepper.Database;
 using Qmmands;
 
-namespace Pepper.Structures.Commands
+namespace Pepper.Structures.CommandAttributes.Checks
 {
     public class RequireGuildWhitelistAttribute : DiscordGuildCheckAttribute
     {

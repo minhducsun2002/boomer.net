@@ -4,7 +4,8 @@ using System.Linq;
 using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Bot.Commands.Text;
-using Pepper.Structures.Commands;
+using Pepper.Structures.CommandAttributes.Checks;
+using Pepper.Structures.CommandAttributes.Metadata;
 using Qmmands;
 
 namespace Pepper.Structures

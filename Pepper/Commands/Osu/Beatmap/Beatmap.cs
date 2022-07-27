@@ -7,7 +7,7 @@ using Disqord.Extensions.Interactivity.Menus;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
-using Pepper.Structures.Commands;
+using Pepper.Structures;
 using Pepper.Structures.External.Osu;
 using Qmmands;
 using Qmmands.Text;

@@ -1,5 +1,5 @@
 using Disqord.Bot.Commands.Text;
-using Pepper.Structures.Commands;
+using Pepper.Structures.CommandAttributes.Checks;
 
 namespace Pepper.Structures
 {

@@ -8,7 +8,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
-using Pepper.Structures.Commands;
+using Pepper.Structures;
 using Qmmands;
 using Qmmands.Text;
 

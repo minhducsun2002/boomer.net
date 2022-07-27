@@ -17,7 +17,6 @@ using Pepper.Database.OsuUsernameProviders;
 using Pepper.Logging.Serilog.Sinks.Discord;
 using Pepper.Services;
 using Pepper.Structures;
-using Pepper.Structures.Commands;
 using Qmmands;
 using Qmmands.Text;
 using Qmmands.Text.Default;

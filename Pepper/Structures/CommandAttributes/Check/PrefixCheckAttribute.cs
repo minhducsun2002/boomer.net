@@ -6,9 +6,10 @@ using Disqord.Bot.Commands;
 using Disqord.Bot.Commands.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pepper.Structures.CommandAttributes.Metadata;
 using Qmmands;
 
-namespace Pepper.Structures.Commands
+namespace Pepper.Structures.CommandAttributes.Checks
 {
     public class PrefixCheckAttribute : DiscordCheckAttribute
     {

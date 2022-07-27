@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.FuzzySearch;
 using Pepper.Structures;
-using Pepper.Structures.Commands;
+using Pepper.Structures.CommandAttributes.Metadata;
 using Pepper.Utilities;
 using Qmmands;
 using Qmmands.Text;

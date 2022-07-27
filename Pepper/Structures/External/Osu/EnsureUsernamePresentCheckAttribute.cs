@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Services;
-using Pepper.Structures.Commands;
 using Pepper.Structures.External.Osu.Extensions;
 using Qmmands;
 

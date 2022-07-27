@@ -20,7 +20,7 @@ using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Scoring;
 using Pepper.Commons.Osu;
 using Pepper.Structures;
-using Pepper.Structures.Commands;
+using Pepper.Structures.CommandAttributes.Metadata;
 using Pepper.Structures.External.Osu;
 using Pepper.Structures.External.Osu.Extensions;
 using APIBeatmapSet = Pepper.Commons.Osu.API.APIBeatmapSet;

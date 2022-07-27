@@ -3,7 +3,7 @@ using Disqord.Bot;
 using Disqord.Bot.Commands.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Pepper.Structures.Commands;
+using Pepper.Structures.CommandAttributes.Metadata;
 using Qmmands.Text;
 
 namespace Pepper.Structures

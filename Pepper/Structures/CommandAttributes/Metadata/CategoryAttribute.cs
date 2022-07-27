@@ -1,6 +1,6 @@
 using System;
 
-namespace Pepper.Structures.Commands
+namespace Pepper.Structures.CommandAttributes.Metadata
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class CategoryAttribute : Attribute

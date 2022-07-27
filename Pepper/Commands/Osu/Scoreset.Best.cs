@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Database.OsuUsernameProviders;
-using Pepper.Structures.Commands;
+using Pepper.Structures;
 using Qmmands;
 using Qmmands.Text;
 using PagedView = Pepper.Structures.PagedView;

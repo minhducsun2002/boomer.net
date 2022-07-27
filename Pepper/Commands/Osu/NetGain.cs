@@ -9,7 +9,7 @@ using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Database.OsuUsernameProviders;
-using Pepper.Structures.Commands;
+using Pepper.Structures;
 using Pepper.Structures.External.Osu;
 using Qmmands;
 using Qmmands.Text;

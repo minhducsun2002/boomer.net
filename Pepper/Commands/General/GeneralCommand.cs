@@ -1,5 +1,5 @@
 using Pepper.Structures;
-using Pepper.Structures.Commands;
+using Pepper.Structures.CommandAttributes.Metadata;
 
 namespace Pepper.Commands.General
 {
