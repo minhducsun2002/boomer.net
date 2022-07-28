@@ -2,9 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Disqord.Bot;
 using Disqord.Bot.Commands;
-using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commons.Osu;
-using Pepper.Services;
 using Qmmands;
 
 namespace Pepper.Structures.External.Osu
@@ -22,8 +20,6 @@ namespace Pepper.Structures.External.Osu
             {
                 result = GameServer.Osu;
             }
-            var s = context.Services.GetRequiredService<TypeParsedArgumentPersistenceService>();
-            s.Set(result);
             return Success(result);
         }
     }

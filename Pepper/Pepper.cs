@@ -72,7 +72,6 @@ var hostBuilder = new HostBuilder()
     })
     .ConfigureServices((context, services) =>
     {
-        services.AddScoped<TypeParsedArgumentPersistenceService>();
         services.AddDbContextPool<IOsuUsernameProvider, MariaDbOsuUsernameProvider>(builder =>
         {
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;

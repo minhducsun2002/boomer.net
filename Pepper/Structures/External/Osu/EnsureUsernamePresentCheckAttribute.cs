@@ -1,11 +1,10 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot.Commands;
-using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
-using Pepper.Services;
 using Pepper.Structures.External.Osu.Extensions;
 using Qmmands;
 
@@ -17,7 +16,7 @@ namespace Pepper.Structures.External.Osu
         {
             if (argument is Username username)
             {
-                var server = context.Services.GetRequiredService<TypeParsedArgumentPersistenceService>().Get<GameServer>();
+                var server = context.Arguments!.Values.OfType<GameServer>().FirstOrDefault();
                 if (username.GetUsername(server) == null)
                 {
                     return Results.Failure(
