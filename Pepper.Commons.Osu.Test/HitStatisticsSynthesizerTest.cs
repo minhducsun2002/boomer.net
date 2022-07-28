@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -12,7 +10,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Taiko;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Pepper.Commons.Osu.Test
 {
@@ -21,6 +18,7 @@ namespace Pepper.Commons.Osu.Test
         private const int HitObjectCount = 10000;
         private readonly HitStatisticsSynthesizer synthesizer;
         private readonly ITestOutputHelper output;
+        private static readonly Ruleset[] Rulesets = { new OsuRuleset(), new TaikoRuleset(), new CatchRuleset(), new ManiaRuleset() };
 
         public HitStatisticsSynthesizerTest(ITestOutputHelper output)
         {
@@ -29,76 +27,45 @@ namespace Pepper.Commons.Osu.Test
         }
 
         [Theory]
-        [AccuracyData(0.05)]
-        public void TestSynthesizedEnoughHits(double accuracy, Ruleset ruleset)
+        [InlineData(0.05)]
+        [InlineData(0.15)]
+        [InlineData(0.166666)]
+        [InlineData(0.2)]
+        [InlineData(0.333333)]
+        [InlineData(0.4)]
+        [InlineData(0.666666)]
+        [InlineData(0.82)]
+        [InlineData(0.9)]
+        [InlineData((double) 300 / 305)]
+        public void TestSynthesizedAccurateHits(double accuracy)
         {
-            var result = synthesizer.Synthesize(ruleset, accuracy);
-            output.WriteLine(string.Join(", ", result.Select(kv => $"{kv.Key} : {kv.Value}")));
-            // 0.1%, or 0.001 in difference
-            Assert.InRange(result.Values.Sum(), (int) (HitObjectCount * 0.999), (int) (HitObjectCount * 1.001));
-        }
-
-        [Theory]
-        [AccuracyData(0.05, 0.70, 0.01)]
-        [AccuracyData(0.70)]
-        public void TestSynthesizedPossibleHits(double accuracy, Ruleset ruleset)
-        {
-            var result = synthesizer.Synthesize(ruleset, accuracy);
-            output.WriteLine(string.Join(", ", result.Select(kv => $"{kv.Key} : {kv.Value}")));
-            Assert.All(result, kv => Assert.InRange(kv.Value, 0, HitObjectCount));
-        }
-
-        [Theory]
-        [AccuracyData(0.10, 0.70, 0.02)]
-        [AccuracyData(0.70)]
-        public void TestSynthesizedAccurateResult(double accuracy, Ruleset ruleset)
-        {
-            var result = synthesizer.Synthesize(ruleset, accuracy);
-            var beatmap = new Beatmap<HitObject>
+            foreach (var ruleset in Rulesets)
             {
-                HitObjects = Enumerable.Range(0, HitObjectCount).Select(_ => new HitCircle() as HitObject).ToList()
-            };
-            var scoreProcessor = ruleset.CreateScoreProcessor();
-            scoreProcessor.ApplyBeatmap(beatmap);
-            foreach (var (hitResult, times) in result)
-            {
-                for (var i = 0; i < times; i++)
+                var result = synthesizer.Synthesize(ruleset, accuracy);
+                output.WriteLine(string.Join(", ", result.Select(kv => $"{kv.Key} : {kv.Value}")));
+
+                // 0.1%, or 0.001 in difference
+                Assert.InRange(result.Values.Sum(), (int) (HitObjectCount * 0.999), (int) (HitObjectCount * 1.001));
+                Assert.All(result, kv => Assert.InRange(kv.Value, 0, HitObjectCount));
+
+                var beatmap = new Beatmap<HitObject>
                 {
-                    var judgement = new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement())
-                    {
-                        Type = hitResult
-                    };
-                    scoreProcessor.ApplyResult(judgement);
-                }
-            }
-            Assert.Equal(scoreProcessor.Accuracy.Value, accuracy, 3);
-        }
-
-        private class AccuracyDataAttribute : DataAttribute
-        {
-            private readonly double start, end, step;
-            private static readonly Ruleset[] Rulesets =
-            {
-                new OsuRuleset(),
-                new TaikoRuleset(),
-                new CatchRuleset(),
-                new ManiaRuleset()
-            };
-
-            public AccuracyDataAttribute(double start = 0.9, double end = 1.0, double step = 0.05)
-            {
-                this.start = start; this.end = end; this.step = step;
-            }
-
-            public override IEnumerable<object[]> GetData(MethodInfo _)
-            {
-                foreach (var ruleset in Rulesets)
+                    HitObjects = Enumerable.Range(0, HitObjectCount).Select(_ => new HitCircle() as HitObject).ToList()
+                };
+                var scoreProcessor = ruleset.CreateScoreProcessor();
+                scoreProcessor.ApplyBeatmap(beatmap);
+                foreach (var (hitResult, times) in result)
                 {
-                    for (var i = start; i <= end; i += step)
+                    for (var i = 0; i < times; i++)
                     {
-                        yield return new object[] { i, ruleset };
+                        var judgement = new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement())
+                        {
+                            Type = hitResult
+                        };
+                        scoreProcessor.ApplyResult(judgement);
                     }
                 }
+                Assert.Equal(scoreProcessor.Accuracy.Value, accuracy, 3);
             }
         }
     }

@@ -34,7 +34,8 @@ namespace Pepper.Test.Commands
             DefaultTextSetup.Initialize(commandService);
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (assembly.FullName.StartsWith("Pepper"))
+                var name = assembly.FullName!;
+                if (name.StartsWith("Pepper") && !name.Contains("Test", StringComparison.InvariantCultureIgnoreCase))
                 {
                     commandService.AddModules(assembly, Bot.DownlevelAttributes);
                 }
