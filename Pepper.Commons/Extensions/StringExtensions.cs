@@ -32,7 +32,7 @@ namespace Pepper.Commons.Extensions
                     continue;
                 }
 
-                if (character == delimiter)
+                if (character == delimiter && !isQuoting)
                 {
                     // chunk
                     output.Add(piece.ToString());
