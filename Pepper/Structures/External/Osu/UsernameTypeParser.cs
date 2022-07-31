@@ -56,7 +56,7 @@ namespace Pepper.Structures.External.Osu
             if (saveCommand != default && await saveCommand.RunChecksAsync(context) is SuccessfulResult)
             {
                 saveHintText =
-                    $"\nUse \"{saveCommand.GetPrimaryInvocation(context.Bot)}\" to set it up.";
+                    $" Use \"{saveCommand.GetPrimaryInvocation(context.Bot)}\" to set it up.";
             }
 
             return Failure(
