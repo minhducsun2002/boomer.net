@@ -10,7 +10,7 @@ using Qmmands;
 
 namespace Pepper.Structures.External.Osu
 {
-    public class UsernameTypeParser : DiscordTypeParser<Username>
+    public class UsernameTypeParser : DiscordTypeParser<Username>, IFailureFormattableTypeParser
     {
         public override async ValueTask<ITypeParserResult<Username>> ParseAsync(IDiscordCommandContext context, IParameter parameter, ReadOnlyMemory<char> input)
         {
@@ -56,7 +56,7 @@ namespace Pepper.Structures.External.Osu
             if (saveCommand != default && await saveCommand.RunChecksAsync(context) is SuccessfulResult)
             {
                 saveHintText =
-                    $"\nUse \"{saveCommand.GetPrefixes(context.Bot).First()}{saveCommand.Aliases[0]}\" to set it up.";
+                    $"\nUse \"{saveCommand.GetPrimaryInvocation(context.Bot)}\" to set it up.";
             }
 
             return Failure(

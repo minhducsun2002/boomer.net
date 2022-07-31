@@ -19,5 +19,12 @@ namespace Pepper.Structures
                 : config.GetCommandPrefixes(prefixCategory);
             return prefixes.ToArray();
         }
+
+        public static string GetPrimaryInvocation(this ITextCommand command, DiscordBotBase bot)
+        {
+            var prefix = command.GetPrefixes(bot).MinBy(s => s.Length);
+            var name = command.Aliases.MinBy(s => s.Length);
+            return prefix + name;
+        }
     }
 }

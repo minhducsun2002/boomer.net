@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot.Commands;
+using Pepper.Commands.Osu;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.External.Osu.Extensions;
@@ -10,7 +11,7 @@ using Qmmands;
 
 namespace Pepper.Structures.External.Osu
 {
-    public class EnsureUsernamePresentCheckAttribute : DiscordParameterCheckAttribute
+    public class EnsureUsernamePresentCheckAttribute : DiscordParameterCheckAttribute, IFailureFormattableParameterCheck
     {
         public override ValueTask<IResult> CheckAsync(IDiscordCommandContext context, IParameter parameter, object? argument)
         {
@@ -28,6 +29,18 @@ namespace Pepper.Structures.External.Osu
             }
 
             return Results.Failure($"The argument is not of type {nameof(Username)}");
+        }
+
+        public bool Format(LocalMessageBase localMessageBase, IDiscordCommandContext context, IResult _)
+        {
+            var saveCommand = context.GetCommandService()
+                .EnumerateTextCommands()
+                .FirstOrDefault(f => f.CustomAttributes.OfType<SaveUsernameAttribute>().Any());
+
+            localMessageBase.Content = saveCommand != default
+                ? $"You didn't save an username. Save one using `{saveCommand.GetPrimaryInvocation(context.Bot)}` your_username`."
+                : "You didn't save an username.";
+            return true;
         }
 
         public override bool CanCheck(IParameter parameter, object? value) =>

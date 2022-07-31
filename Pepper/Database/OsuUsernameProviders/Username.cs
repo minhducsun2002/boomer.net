@@ -26,12 +26,13 @@ namespace Pepper.Database.OsuUsernameProviders
             }
         }
 
-        public string? GetUsername(GameServer server)
+        public string? GetUsername(GameServer? server)
         {
             return server switch
             {
                 GameServer.Osu => OsuUsername,
                 GameServer.Ripple => RippleUsername,
+                null => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(server), server, null)
             };
         }
