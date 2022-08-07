@@ -106,7 +106,7 @@ namespace Pepper.Commands.Osu
                         : ""),
                 Author = OsuCommand.SerializeAuthorBuilder(beatmapset.Author),
                 Url = $"https://osu.ppy.sh/beatmapsets/{beatmapset.OnlineID}#{ruleset.ShortName}/{beatmap.OnlineID}",
-                Description = (int) beatmapset.Status < 0
+                Description = (int) beatmapset.Status <= 0
                     ? (beatmapset.Status == BeatmapOnlineStatus.WIP ? "WIP." : $"{beatmapset.Status}.")
                       + $" Last updated **{OsuCommand.SerializeTimestamp(beatmapset.LastUpdated)}**."
                     : $"Ranked **{OsuCommand.SerializeTimestamp(beatmapset.Ranked!.Value)}**.",
