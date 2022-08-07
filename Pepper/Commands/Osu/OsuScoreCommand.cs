@@ -49,7 +49,7 @@ namespace Pepper.Commands.Osu
 
             if (!sc.Perfect)
             {
-                var statistics = new HitStatisticsSynthesizer(workingBeatmap.Beatmap.HitObjects.Count)
+                var statistics = new HitStatisticsSynthesizer(sc.Statistics.Values.Sum())
                     .Synthesize(ruleset, sc.Accuracy);
                 var fcScore = new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = sc.Accuracy, Statistics = statistics }
                     .WithRulesetID(sc.RulesetID);
