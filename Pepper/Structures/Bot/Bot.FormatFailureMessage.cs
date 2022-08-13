@@ -1,7 +1,9 @@
+using System.Linq;
 using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Bot.Commands.Text;
 using Qmmands;
+using Qmmands.Text;
 
 namespace Pepper.Structures
 {
@@ -19,6 +21,10 @@ namespace Pepper.Structures
 
         private bool FormatTextCommandFailureMessage(IDiscordTextCommandContext context, LocalMessageBase messageBase, IResult result)
         {
+            if (result is OverloadsFailedResult failedResult)
+            {
+                result = failedResult.FailedOverloads.Values.First();
+            }
             return result switch
             {
                 CommandNotFoundResult => false,
