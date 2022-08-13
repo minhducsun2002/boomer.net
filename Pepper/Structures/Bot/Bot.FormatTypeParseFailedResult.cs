@@ -21,7 +21,9 @@ namespace Pepper.Structures
                 return formattable.Format(messageBase, context, result);
             }
 
-            return false;
+            messageBase.Content = result.FailureReason;
+
+            return true;
         }
     }
 }
