@@ -126,7 +126,6 @@ namespace Pepper.Structures
                 }
             }
 
-
             foreach (var (positionalArgument, index) in positionalArguments.Select((arg, i) => (arg, i)))
             {
                 if (!positionalParameters.Any())
@@ -141,6 +140,10 @@ namespace Pepper.Structures
                 if (param is IPositionalParameter { IsRemainder: true })
                 {
                     parameters[param] = positionalArguments.Skip(index).ToList();
+                    if (!param.GetTypeInformation().IsEnumerable)
+                    {
+                        parameters[param] = new List<string> { string.Join(' ', parameters[param]) };
+                    }
                     break;
                 }
 
