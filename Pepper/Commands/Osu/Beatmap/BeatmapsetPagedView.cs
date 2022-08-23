@@ -116,7 +116,7 @@ namespace Pepper.Commands.Osu
                                     + $" • **{beatmapset.BPM:0.}** BPM"
                                     + $@" • :clock3: {
                                         (((long) map.Length / 60000)).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                                    }:{((long) map.Length % 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
+                                    }:{((long) map.Length % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
                         }).ToList(),
                         Footer = new LocalEmbedFooter
                         {
