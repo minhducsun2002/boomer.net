@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
+using Pepper.Structures.External.Osu;
 using Limits = Disqord.Discord.Limits;
 
 namespace Pepper.Commands.Osu
@@ -230,7 +231,12 @@ namespace Pepper.Commands.Osu
                     Label = beatmap.DifficultyName.Length < Limits.Component.Selection.Option.MaxLabelLength
                         ? beatmap.DifficultyName
                         : beatmap.DifficultyName[..(Limits.Component.Selection.Option.MaxLabelLength - 3)] + "...",
-                    Description = OsuCommand.SerializeBeatmapStats(beatmapset, beatmap, false, false),
+                    Description = OsuCommand.SerializeBeatmapStats(
+                        beatmap,
+                        formatted: false,
+                        serializationOptions: BeatmapSerializationOptions.StarRating |
+                                              BeatmapSerializationOptions.Statistics
+                    ),
                     Value = $"{beatmap.OnlineID}",
                     IsDefault = CurrentPageIndex == beatmapIdToIndex[beatmap.OnlineID]
                 })

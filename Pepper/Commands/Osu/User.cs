@@ -9,6 +9,7 @@ using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures;
+using Pepper.Structures.External.Osu;
 using Qmmands;
 using Qmmands.Text;
 
@@ -77,7 +78,15 @@ namespace Pepper.Commands.Osu
                             + $"(**{(score.Accuracy * 100):F3}**% | **{score.MaxCombo}**x)" + (score.Perfect ? " (FC)" : "")
                             + $"\n[{mapset.Artist} - {mapset.Title} [{map.DifficultyName}]](https://osu.ppy.sh/beatmaps/{map.OnlineID})"
                             + (score.Mods.Any() ? $"+{string.Join("", score.Mods)}" : "")
-                            + $"\n{SerializeBeatmapStats(map)}"
+                            + "\n"
+                            + SerializeBeatmapStats(
+                                map,
+                                formatted: true,
+                                serializationOptions: BeatmapSerializationOptions.StarRating |
+                                                      BeatmapSerializationOptions.Statistics |
+                                                      BeatmapSerializationOptions.BPM |
+                                                      BeatmapSerializationOptions.Length
+                            )
                 });
             }
 

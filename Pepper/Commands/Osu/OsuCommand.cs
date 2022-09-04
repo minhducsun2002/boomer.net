@@ -2,19 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using AJ.Code;
 using Disqord;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Scoring;
@@ -105,15 +103,74 @@ namespace Pepper.Commands.Osu
                     : "");
         }
 
-        public static string SerializeBeatmapStats(APIBeatmapSet set, APIBeatmap diff, bool showLength = true, bool showBPM = true, char delimiter = '•')
-            => $"{diff.StarRating:F2}⭐ "
-               + $" {delimiter} CS{diff.CircleSize} AR{diff.ApproachRate} OD{diff.OverallDifficulty} HP{diff.DrainRate}"
-               + (showBPM ? $" {delimiter} {diff.BPM} BPM" : "")
-               + (showLength
-                   ? $@" {delimiter} :clock3: {
-                       ((long) diff.Length / 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                   }:{((long) diff.Length % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
-                   : "");
+        public static string SerializeBeatmapStats(
+            APIBeatmap diff,
+            bool formatted,
+            APIBeatmapSet? beatmapset = null,
+            string delimiter = " • ",
+            BeatmapSerializationOptions serializationOptions = BeatmapSerializationOptions.Length |
+                                                               BeatmapSerializationOptions.Statistics |
+                                                               BeatmapSerializationOptions.BPM |
+                                                               BeatmapSerializationOptions.StarRating
+        )
+        {
+            var builder = new StringBuilder();
+            if ((serializationOptions & BeatmapSerializationOptions.StarRating) == BeatmapSerializationOptions.StarRating)
+            {
+                builder.Append($"{diff.StarRating:F2}⭐ ");
+            }
+
+            if ((serializationOptions & BeatmapSerializationOptions.Combo) == BeatmapSerializationOptions.Combo)
+            {
+                if (diff.MaxCombo is not null)
+                {
+                    if (builder.Length != 0)
+                    {
+                        builder.Append(delimiter);
+                    }
+                    builder.Append(formatted ? $"**{diff.MaxCombo}**x" : $"{diff.MaxCombo}x");
+                }
+            }
+
+            if ((serializationOptions & BeatmapSerializationOptions.Statistics) == BeatmapSerializationOptions.Statistics)
+            {
+                if (builder.Length != 0)
+                {
+                    builder.Append(delimiter);
+                }
+                builder.Append(
+                    formatted
+                    ? $"`CS`**{diff.CircleSize:0.##}** `AR`**{diff.ApproachRate:0.##}** `OD`**{diff.OverallDifficulty:0.##}** `HP`**{diff.DrainRate:0.##}**"
+                    : $"CS{diff.CircleSize:0.##} AR{diff.ApproachRate:0.##} OD{diff.OverallDifficulty:0.##} HP{diff.DrainRate:0.##}");
+            }
+
+            if ((serializationOptions & BeatmapSerializationOptions.BPM) == BeatmapSerializationOptions.BPM)
+            {
+                if (builder.Length != 0)
+                {
+                    builder.Append(delimiter);
+                }
+
+                var bpm = Math.Max(diff.BPM, beatmapset?.BPM ?? 0);
+                builder.Append(formatted ? $"**{bpm}** BPM" : $"{bpm} BPM");
+            }
+
+
+            if ((serializationOptions & BeatmapSerializationOptions.Length) == BeatmapSerializationOptions.Length)
+            {
+                if (builder.Length != 0)
+                {
+                    builder.Append(delimiter);
+                }
+                builder.Append(
+                        $@":clock3: {
+                            ((long) diff.Length / 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
+                        }:{((long) diff.Length % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
+                );
+            }
+
+            return builder.ToString();
+        }
 
         protected static string SerializeHitStats(Dictionary<string, int> statistics, RulesetInfo rulesetInfo)
         {

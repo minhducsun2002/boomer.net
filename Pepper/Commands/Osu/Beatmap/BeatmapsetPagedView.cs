@@ -111,12 +111,14 @@ namespace Pepper.Commands.Osu
                         Fields = mapChunk.Select(map => new LocalEmbedField
                         {
                             Name = $"[{map.StarRating:F2}⭐] {map.DifficultyName}",
-                            Value = (map.MaxCombo != null ? $"**{map.MaxCombo}**x • " : "")
-                                    + $"`CS`**{map.CircleSize}** `AR`**{map.ApproachRate}** `OD`**{map.OverallDifficulty}** `HP`**{map.DrainRate}**"
-                                    + $" • **{beatmapset.BPM:0.}** BPM"
-                                    + $@" • :clock3: {
-                                        (((long) map.Length / 60000)).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                                    }:{((long) map.Length % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
+                            Value = OsuCommand.SerializeBeatmapStats(
+                                map,
+                                formatted: true,
+                                serializationOptions: BeatmapSerializationOptions.Combo |
+                                                      BeatmapSerializationOptions.Statistics |
+                                                      BeatmapSerializationOptions.BPM |
+                                                      BeatmapSerializationOptions.Length
+                            )
                         }).ToList(),
                         Footer = new LocalEmbedFooter
                         {
