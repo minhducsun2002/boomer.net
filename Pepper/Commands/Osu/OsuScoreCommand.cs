@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot.Commands;
 using osu.Game.Scoring;
-using osu.Game.Scoring.Legacy;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
+using Pepper.Structures.External.Osu;
 using Pepper.Structures.External.Osu.Extensions;
 
 namespace Pepper.Commands.Osu
@@ -99,16 +99,26 @@ namespace Pepper.Commands.Osu
                     new()
                     {
                         Name = "Beatmap information",
-                        Value = SerializeBeatmapStats(
-                            workingBeatmap.BeatmapInfo,
-                            mods,
-                            difficulty,
-                            workingBeatmap.Beatmap.ControlPointInfo)
+                        Value = new BeatmapStatsSerializer(workingBeatmap.BeatmapInfo)
+                        {
+                            Mods = mods,
+                            ControlPointInfo = workingBeatmap.Beatmap.ControlPointInfo,
+                            DifficultyOverwrite = difficulty
+                        }.Serialize(
+                            formatted: true,
+                            serializationOptions: StatFilter.Statistics |
+                                                  StatFilter.BPM |
+                                                  StatFilter.StarRating |
+                                                  (true ? StatFilter.Length : 0)
+                        )
                     }
                 },
-                Footer = string.IsNullOrEmpty(footer) ? null : new LocalEmbedFooter().WithText(footer)
-
             };
+
+            if (!string.IsNullOrEmpty(footer))
+            {
+                embed.Footer = new LocalEmbedFooter().WithText(footer);
+            }
 
             if (sc.User.Id == 16212851 || Context.Author.Id == 490107873834303488)
             {

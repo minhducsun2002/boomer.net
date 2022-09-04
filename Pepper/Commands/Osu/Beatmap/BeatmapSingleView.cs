@@ -9,12 +9,15 @@ using Disqord.Extensions.Interactivity.Menus.Paged;
 using Disqord.Rest;
 using Humanizer;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using Pepper.Commons.Osu;
-using Pepper.Commons.Osu.API;
 using Pepper.Structures.External.Osu;
+using APIBeatmapSet = Pepper.Commons.Osu.API.APIBeatmapSet;
 using Limits = Disqord.Discord.Limits;
 
 namespace Pepper.Commands.Osu
@@ -116,10 +119,18 @@ namespace Pepper.Commands.Osu
                     new()
                     {
                         Name = "Difficulty",
-                        Value = OsuCommand.SerializeBeatmapStats(
-                            workingBeatmap.BeatmapInfo, mods, difficulty,
-                            workingBeatmap.Beatmap.ControlPointInfo, false
-                        )
+                        Value = new BeatmapStatsSerializer(workingBeatmap.BeatmapInfo)
+                                {
+                                    Mods = mods,
+                                    ControlPointInfo = workingBeatmap.Beatmap.ControlPointInfo,
+                                    DifficultyOverwrite = difficulty
+                                }.Serialize(
+                                    formatted: true,
+                                    serializationOptions: StatFilter.Statistics |
+                                                          StatFilter.BPM |
+                                                          StatFilter.StarRating |
+                                                          (false ? StatFilter.Length : 0)
+                                )
                         + $"\n**{difficulty.MaxCombo}**x"
                         + string.Join(
                             "",
@@ -130,7 +141,7 @@ namespace Pepper.Commands.Osu
                         + " • "
                         + new BeatmapStatsSerializer(workingBeatmap.BeatmapInfo).Serialize(
                             formatted: true,
-                            serializationOptions: BeatmapSerializationOptions.Length
+                            serializationOptions: StatFilter.Length
                         )
                     },
                     new()
@@ -236,12 +247,8 @@ namespace Pepper.Commands.Osu
                     Label = beatmap.DifficultyName.Length < Limits.Component.Selection.Option.MaxLabelLength
                         ? beatmap.DifficultyName
                         : beatmap.DifficultyName[..(Limits.Component.Selection.Option.MaxLabelLength - 3)] + "...",
-                    Description = OsuCommand.SerializeBeatmapStats(
-                        beatmap,
-                        formatted: false,
-                        serializationOptions: BeatmapSerializationOptions.StarRating |
-                                              BeatmapSerializationOptions.Statistics
-                    ),
+                    Description = new BeatmapStatsSerializer(beatmap)
+                        .Serialize(formatted: false, serializationOptions: StatFilter.StarRating | StatFilter.Statistics),
                     Value = $"{beatmap.OnlineID}",
                     IsDefault = CurrentPageIndex == beatmapIdToIndex[beatmap.OnlineID]
                 })

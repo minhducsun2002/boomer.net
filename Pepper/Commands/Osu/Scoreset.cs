@@ -1,9 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Disqord;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mods;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
+using Pepper.Structures.External.Osu;
 
 namespace Pepper.Commands.Osu
 {
@@ -25,8 +30,10 @@ namespace Pepper.Commands.Osu
                             ? $"**{score.PP}**pp (**{score.Accuracy * 100:F3}**% | **{score.MaxCombo}**x)"
                             : $"**{score.Accuracy * 100:F3}**% - **{score.MaxCombo}**x")
                         + (score.Perfect ? " (FC)" : "")
-                        + $"\n{SerializeBeatmapStats(map, showLength: false, delimiter: '-')}"
-                        + $"\n[{SerializeHitStats(score.Statistics, Rulesets[score.RulesetID].RulesetInfo)}] @ **{SerializeTimestamp(score.Date, false)}**{(utcHint ? " `UTC`" : "")}"
+                        + "\n"
+                        + new BeatmapStatsSerializer(map).Serialize(formatted: true, serializationOptions: StatFilter.Statistics | StatFilter.BPM | StatFilter.StarRating)
+                        + $"\n[{SerializeHitStats(score.Statistics, Rulesets[score.RulesetID].RulesetInfo)}]"
+                        + $" @ **{SerializeTimestamp(score.Date, false)}**{(utcHint ? " `UTC`" : "")}"
                         + $"\n[[**Beatmap**]](https://osu.ppy.sh/b/{map.OnlineID})"
                         + (scoreLink ? $" [[**Score**]](https://osu.ppy.sh/scores/{Rulesets[score.RulesetID].ShortName}/{score.OnlineID})" : "")
             };

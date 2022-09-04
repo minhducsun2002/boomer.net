@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot.Commands;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
@@ -79,13 +80,9 @@ namespace Pepper.Commands.Osu
                             + $"\n[{mapset.Artist} - {mapset.Title} [{map.DifficultyName}]](https://osu.ppy.sh/beatmaps/{map.OnlineID})"
                             + (score.Mods.Any() ? $"+{string.Join("", score.Mods)}" : "")
                             + "\n"
-                            + SerializeBeatmapStats(
-                                map,
+                            + new BeatmapStatsSerializer(map).Serialize(
                                 formatted: true,
-                                serializationOptions: BeatmapSerializationOptions.StarRating |
-                                                      BeatmapSerializationOptions.Statistics |
-                                                      BeatmapSerializationOptions.BPM |
-                                                      BeatmapSerializationOptions.Length
+                                serializationOptions: StatFilter.StarRating | StatFilter.Statistics | StatFilter.BPM | StatFilter.Length
                             )
                 });
             }

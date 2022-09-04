@@ -3,7 +3,7 @@ using System;
 namespace Pepper.Structures.External.Osu
 {
     [Flags]
-    public enum BeatmapSerializationOptions
+    public enum StatFilter
     {
         StarRating = 1 << 1,
         Statistics = 1 << 2,

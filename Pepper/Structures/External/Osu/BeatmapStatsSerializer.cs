@@ -45,21 +45,18 @@ namespace Pepper.Structures.External.Osu
         public string Serialize(
             bool formatted,
             string delimiter = " • ",
-            BeatmapSerializationOptions serializationOptions = BeatmapSerializationOptions.Length |
-                                                               BeatmapSerializationOptions.Statistics |
-                                                               BeatmapSerializationOptions.BPM |
-                                                               BeatmapSerializationOptions.StarRating)
+            StatFilter serializationOptions = StatFilter.Length | StatFilter.Statistics | StatFilter.BPM | StatFilter.StarRating)
         {
             var builder = new StringBuilder();
             var speedChange = GetMapSpeed();
 
-            if ((serializationOptions & BeatmapSerializationOptions.StarRating) == BeatmapSerializationOptions.StarRating)
+            if ((serializationOptions & StatFilter.StarRating) == StatFilter.StarRating)
             {
                 var starRating = DifficultyOverwrite?.StarRating ?? beatmapInfo.StarRating;
                 builder.Append($"{starRating:F2}⭐ ");
             }
 
-            if ((serializationOptions & BeatmapSerializationOptions.Combo) == BeatmapSerializationOptions.Combo)
+            if ((serializationOptions & StatFilter.Combo) == StatFilter.Combo)
             {
                 var maxCombo = DifficultyOverwrite?.MaxCombo ?? (beatmapInfo as APIBeatmap)?.MaxCombo;
                 if (maxCombo is not null)
@@ -72,7 +69,7 @@ namespace Pepper.Structures.External.Osu
                 }
             }
 
-            if ((serializationOptions & BeatmapSerializationOptions.Statistics) == BeatmapSerializationOptions.Statistics)
+            if ((serializationOptions & StatFilter.Statistics) == StatFilter.Statistics)
             {
                 if (builder.Length != 0)
                 {
@@ -107,7 +104,7 @@ namespace Pepper.Structures.External.Osu
                     : $"CS{difficulty.CircleSize:0.##} AR{difficulty.ApproachRate:0.##} OD{difficulty.OverallDifficulty:0.##} HP{difficulty.DrainRate:0.##}");
             }
 
-            if ((serializationOptions & BeatmapSerializationOptions.BPM) == BeatmapSerializationOptions.BPM)
+            if ((serializationOptions & StatFilter.BPM) == StatFilter.BPM)
             {
                 if (builder.Length != 0)
                 {
@@ -131,7 +128,7 @@ namespace Pepper.Structures.External.Osu
             }
 
 
-            if ((serializationOptions & BeatmapSerializationOptions.Length) == BeatmapSerializationOptions.Length)
+            if ((serializationOptions & StatFilter.Length) == StatFilter.Length)
             {
                 if (builder.Length != 0)
                 {

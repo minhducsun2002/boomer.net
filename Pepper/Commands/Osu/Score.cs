@@ -1,10 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot;
 using Disqord.Bot.Commands;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
@@ -58,7 +63,15 @@ namespace Pepper.Commands.Osu
                 Author = SerializeAuthorBuilder(user),
                 Title = $"**{map.Beatmap.Metadata.Artist}** - **{map.Beatmap.Metadata.Title}** [{map.BeatmapInfo.DifficultyName}]",
                 Url = map.GetOnlineUrl(),
-                Description = $"{SerializeBeatmapStats(map.BeatmapInfo, null, difficulty, map.Beatmap.ControlPointInfo)}\n\n"
+                Description = new BeatmapStatsSerializer(map.BeatmapInfo)
+                {
+                    ControlPointInfo = map.Beatmap.ControlPointInfo,
+                    DifficultyOverwrite = difficulty
+                }.Serialize(
+                                  formatted: true,
+                                  serializationOptions: StatFilter.Statistics | StatFilter.BPM | StatFilter.StarRating | StatFilter.Length
+                              )
+                              + "\n\n"
                               + string.Join("\n\n", scores.Select(score =>
                               {
                                   var localPP = false;
@@ -86,7 +99,7 @@ namespace Pepper.Commands.Osu
                                       $"[**{score.Rank}**] **{pp}**pp{(localPP ? " (?)" : "")} (**{score.MaxCombo}**x | **{score.Accuracy:F3}**%)"
                                       + $" {(score.Perfect ? "(FC)" : "")}"
                                       + (mods.Length != 0 ? $"+**{string.Join("", mods.Select(mod => mod.Acronym))}**" : "")
-                                      + $"\n" + SerializeHitStats(score.Statistics, Rulesets[score.RulesetID].RulesetInfo)
+                                      + "\n" + SerializeHitStats(score.Statistics, Rulesets[score.RulesetID].RulesetInfo)
                                       + $" @ **{SerializeTimestamp(score.Date, false)}**"
                                       + $"\n[**Score link**](https://osu.ppy.sh/scores/{ruleset.ShortName}/{score.OnlineID})";
                               })),

@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Beatmaps;
-using Pepper.Commons.Osu.API;
 using Pepper.Structures.External.Osu;
+using APIBeatmapSet = Pepper.Commons.Osu.API.APIBeatmapSet;
 
 namespace Pepper.Commands.Osu
 {
@@ -111,14 +110,11 @@ namespace Pepper.Commands.Osu
                         Fields = mapChunk.Select(map => new LocalEmbedField
                         {
                             Name = $"[{map.StarRating:F2}⭐] {map.DifficultyName}",
-                            Value = OsuCommand.SerializeBeatmapStats(
-                                map,
-                                formatted: true,
-                                serializationOptions: BeatmapSerializationOptions.Combo |
-                                                      BeatmapSerializationOptions.Statistics |
-                                                      BeatmapSerializationOptions.BPM |
-                                                      BeatmapSerializationOptions.Length
-                            )
+                            Value = new BeatmapStatsSerializer(map)
+                                .Serialize(
+                                    formatted: true,
+                                    serializationOptions: StatFilter.Combo | StatFilter.Statistics | StatFilter.BPM | StatFilter.Length
+                                )
                         }).ToList(),
                         Footer = new LocalEmbedFooter
                         {
