@@ -127,6 +127,11 @@ namespace Pepper.Commands.Osu
                                 .OrderBy(p => p.Key)
                                 .Select(pair => $" • {pair.Value} {(pair.Value > 1 ? pair.Key.Pluralize() : pair.Key)}")
                         )
+                        + " • "
+                        + new BeatmapStatsSerializer(workingBeatmap.BeatmapInfo).Serialize(
+                            formatted: true,
+                            serializationOptions: BeatmapSerializationOptions.Length
+                        )
                     },
                     new()
                     {

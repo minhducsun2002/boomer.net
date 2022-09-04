@@ -53,54 +53,18 @@ namespace Pepper.Commands.Osu
             ControlPointInfo? controlPointInfo = null,
             bool showLength = true, char delimiter = '•')
         {
-            var diff = new BeatmapDifficulty(map.Difficulty);
-
-            var speedChange = 1.0;
-            foreach (var mod in mods ?? Array.Empty<Mod>())
+            return new BeatmapStatsSerializer(map)
             {
-                if (mod is IApplicableToDifficulty m)
-                {
-                    m.ApplyToDifficulty(diff);
-                }
-
-                if (mod is ModRateAdjust rateAdjustment)
-                {
-                    speedChange *= rateAdjustment.SpeedChange.Value;
-                }
-            }
-
-            switch (difficultyOverwrite)
-            {
-                case OsuDifficultyAttributes osuDifficulty:
-                    diff.ApproachRate = (float) Math.Round(osuDifficulty.ApproachRate, 2);
-                    diff.OverallDifficulty = (float) Math.Round(osuDifficulty.OverallDifficulty, 2);
-                    break;
-                case TaikoDifficultyAttributes taikoDifficulty:
-                    diff.ApproachRate = (float) Math.Round(taikoDifficulty.ApproachRate, 2);
-                    break;
-                case CatchDifficultyAttributes catchDifficulty:
-                    diff.ApproachRate = (float) Math.Round(catchDifficulty.ApproachRate, 2);
-                    break;
-            }
-
-            var mapLength = map.Length / speedChange;
-
-            var bpm = $"**{map.BPM * speedChange:0.##}**";
-            if (controlPointInfo != null)
-            {
-                double min = controlPointInfo.BPMMinimum, max = controlPointInfo.BPMMaximum;
-                bpm = max - min < 2.0 ? $"**{min * speedChange:0.##}**" : $"**{min * speedChange:0.##}**-**{max * speedChange:0.##}**";
-            }
-
-            return
-                $"{difficultyOverwrite?.StarRating ?? map.StarRating:F2} :star: "
-                + $" {delimiter} `CS`**{diff.CircleSize:0.##}** `AR`**{diff.ApproachRate:0.##}** `OD`**{diff.OverallDifficulty:0.##}** `HP`**{diff.DrainRate:0.##}**"
-                + $" {delimiter} {bpm} BPM"
-                + (showLength
-                    ? $@" {delimiter} :clock3: {
-                        Math.Floor(mapLength / 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                    }:{((long) mapLength % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
-                    : "");
+                Mods = mods,
+                ControlPointInfo = controlPointInfo,
+                DifficultyOverwrite = difficultyOverwrite
+            }.Serialize(
+                formatted: true,
+                serializationOptions: BeatmapSerializationOptions.Statistics |
+                                      BeatmapSerializationOptions.BPM |
+                                      BeatmapSerializationOptions.StarRating |
+                                      (showLength ? BeatmapSerializationOptions.Length : 0)
+            );
         }
 
         public static string SerializeBeatmapStats(
@@ -114,62 +78,12 @@ namespace Pepper.Commands.Osu
                                                                BeatmapSerializationOptions.StarRating
         )
         {
-            var builder = new StringBuilder();
-            if ((serializationOptions & BeatmapSerializationOptions.StarRating) == BeatmapSerializationOptions.StarRating)
+            return new BeatmapStatsSerializer(diff)
             {
-                builder.Append($"{diff.StarRating:F2}⭐ ");
-            }
-
-            if ((serializationOptions & BeatmapSerializationOptions.Combo) == BeatmapSerializationOptions.Combo)
-            {
-                if (diff.MaxCombo is not null)
-                {
-                    if (builder.Length != 0)
-                    {
-                        builder.Append(delimiter);
-                    }
-                    builder.Append(formatted ? $"**{diff.MaxCombo}**x" : $"{diff.MaxCombo}x");
-                }
-            }
-
-            if ((serializationOptions & BeatmapSerializationOptions.Statistics) == BeatmapSerializationOptions.Statistics)
-            {
-                if (builder.Length != 0)
-                {
-                    builder.Append(delimiter);
-                }
-                builder.Append(
-                    formatted
-                    ? $"`CS`**{diff.CircleSize:0.##}** `AR`**{diff.ApproachRate:0.##}** `OD`**{diff.OverallDifficulty:0.##}** `HP`**{diff.DrainRate:0.##}**"
-                    : $"CS{diff.CircleSize:0.##} AR{diff.ApproachRate:0.##} OD{diff.OverallDifficulty:0.##} HP{diff.DrainRate:0.##}");
-            }
-
-            if ((serializationOptions & BeatmapSerializationOptions.BPM) == BeatmapSerializationOptions.BPM)
-            {
-                if (builder.Length != 0)
-                {
-                    builder.Append(delimiter);
-                }
-
-                var bpm = Math.Max(diff.BPM, beatmapset?.BPM ?? 0);
-                builder.Append(formatted ? $"**{bpm}** BPM" : $"{bpm} BPM");
-            }
-
-
-            if ((serializationOptions & BeatmapSerializationOptions.Length) == BeatmapSerializationOptions.Length)
-            {
-                if (builder.Length != 0)
-                {
-                    builder.Append(delimiter);
-                }
-                builder.Append(
-                        $@":clock3: {
-                            ((long) diff.Length / 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                        }:{((long) diff.Length % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
-                );
-            }
-
-            return builder.ToString();
+                ControlPointInfo = null,
+                DifficultyOverwrite = null,
+                Mods = null
+            }.Serialize(formatted, serializationOptions: serializationOptions);
         }
 
         protected static string SerializeHitStats(Dictionary<string, int> statistics, RulesetInfo rulesetInfo)
