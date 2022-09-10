@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot.Commands;
 using osu.Game.Scoring;
+using Pepper.Commons.Extensions;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Services.Osu;
@@ -66,7 +67,8 @@ namespace Pepper.Commands.Osu
             var version = SharedConstants.OsuVersion?.ToString();
             if (totalHitCounts > hitCounts)
             {
-                footer = $"{hitCounts / (float) totalHitCounts * 100:F2}% completed";
+                var time = workingBeatmap.Beatmap.HitObjects[hitCounts - 1].StartTime;
+                footer = $"{hitCounts / (float) totalHitCounts * 100:F2}% completed (around {time.SerializeAsMiliseconds()})";
             }
             if (version is not null && (calculated || !sc.Perfect))
             {
@@ -109,7 +111,7 @@ namespace Pepper.Commands.Osu
                             serializationOptions: StatFilter.Statistics |
                                                   StatFilter.BPM |
                                                   StatFilter.StarRating |
-                                                  (true ? StatFilter.Length : 0)
+                                                  StatFilter.Length
                         )
                     }
                 },

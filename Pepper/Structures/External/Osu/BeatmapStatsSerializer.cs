@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Rulesets.Taiko.Difficulty;
+using Pepper.Commons.Extensions;
 
 namespace Pepper.Structures.External.Osu
 {
@@ -135,11 +136,9 @@ namespace Pepper.Structures.External.Osu
                     builder.Append(delimiter);
                 }
 
-                var length = (long) (beatmapInfo.Length / speedChange);
+                var length = (beatmapInfo.Length / speedChange);
                 builder.Append(
-                        $@":clock3: {
-                            (length / 60000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')
-                        }:{(length % 60000 / 1000).ToString(CultureInfo.InvariantCulture).PadLeft(2, '0')}"
+                        $@":clock3: {length.SerializeAsMiliseconds()}"
                 );
             }
 
