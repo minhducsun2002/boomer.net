@@ -92,7 +92,7 @@ namespace Pepper.Structures.External.Osu
                         difficulty.OverallDifficulty = (float) Math.Round(osuDifficulty.OverallDifficulty, 2);
                         break;
                     case TaikoDifficultyAttributes taikoDifficulty:
-                        difficulty.ApproachRate = (float) Math.Round(taikoDifficulty.ApproachRate, 2);
+                        // difficulty.ApproachRate = (float) Math.Round(taikoDifficulty, 2);
                         break;
                     case CatchDifficultyAttributes catchDifficulty:
                         difficulty.ApproachRate = (float) Math.Round(catchDifficulty.ApproachRate, 2);

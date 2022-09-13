@@ -37,12 +37,13 @@ namespace Pepper.Commands.Osu
             };
         }
 
-        protected static string SerializeHitStats(Dictionary<string, int> statistics, RulesetInfo rulesetInfo)
+        protected static string SerializeHitStats(Dictionary<HitResult, int> statistics, RulesetInfo rulesetInfo)
         {
             var sc = new ScoreInfo
             {
-                Ruleset = rulesetInfo
-            }.WithStatistics(statistics);
+                Ruleset = rulesetInfo,
+                Statistics = statistics
+            };
             var displayStats = sc.GetStatisticsForDisplay()
                 .Select(s => s.Result)
                 .Where(r => !r.IsBonus())

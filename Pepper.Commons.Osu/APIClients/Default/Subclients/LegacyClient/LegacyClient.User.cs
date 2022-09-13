@@ -23,11 +23,7 @@ namespace Pepper.Commons.Osu.APIClients.Default.Subclients
                 Id = (int) user.UserId,
                 Username = user.Username,
                 JoinDate = user.JoinDate!.Value,
-                Country = new Country
-                {
-                    FlagName = user.Country.TwoLetterISORegionName,
-                    FullName = user.Country.EnglishName
-                },
+                CountryCode = Enum.Parse<CountryCode>(user.Country.TwoLetterISORegionName),
                 Statistics = new UserStatistics
                 {
                     GlobalRank = (int) user.Rank!.Value,

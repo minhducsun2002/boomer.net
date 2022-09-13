@@ -72,8 +72,8 @@ namespace Pepper.Commands.Osu
                             {
                                 Name = $"{user.Username} ({server.GetDisplayText()})",
                                 Value = $"**{user.Statistics.PP:F2}**pp • **{user.Statistics.Accuracy:F3}**%"
-                                        + $" • {ResolveEarthEmoji(user.Country.FlagName)} #{user.Statistics.GlobalRank}"
-                                        + $" • :flag_{user.Country.FlagName.ToLowerInvariant()}: #{user.Statistics.CountryRank}"
+                                        + $" • {ResolveEarthEmoji(user.CountryCode.ToString())} #{user.Statistics.GlobalRank}"
+                                        + $" • :flag_{user.CountryCode.ToString().ToLowerInvariant()}: #{user.Statistics.CountryRank}"
                                         + $"\n<@{key}>"
                             };
                         }).ToList()

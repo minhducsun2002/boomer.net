@@ -35,7 +35,7 @@ namespace Pepper.Commands.Osu
             var stats = user.Statistics;
             var grades = stats.GradesCount;
             var playTime = TimeSpan.FromSeconds(stats.PlayTime!.Value);
-            var earthEmoji = ResolveEarthEmoji(user.Country.FlagName);
+            var earthEmoji = ResolveEarthEmoji(user.CountryCode.ToString());
 
             var embed = new LocalEmbed
             {
@@ -45,7 +45,7 @@ namespace Pepper.Commands.Osu
                 Description = (
                     stats.GlobalRank.Equals(default)
                         ? "Unranked"
-                        : $"**{stats.PP}**pp ({earthEmoji} #**{stats.GlobalRank}** | :flag_{user.Country.FlagName.ToLowerInvariant()}: #**{stats.CountryRank}**)"
+                        : $"**{stats.PP}**pp ({earthEmoji} #**{stats.GlobalRank}** | :flag_{user.CountryCode.ToString().ToLowerInvariant()}: #**{stats.CountryRank}**)"
                     ) + $".\n**{stats.Accuracy:F3}**% accuracy - **{stats.MaxCombo}**x max combo.",
                 Fields = new List<LocalEmbedField>
                 {
@@ -70,7 +70,7 @@ namespace Pepper.Commands.Osu
             if (scores.Length > 0)
             {
                 var score = scores[0];
-                var map = score.Beatmap;
+                var map = score.Beatmap!;
                 var mapset = map.Metadata;
                 embed.AddField(new LocalEmbedField
                 {
@@ -78,7 +78,7 @@ namespace Pepper.Commands.Osu
                     Value = $"[**{score.Rank}**] **{score.PP}**pp "
                             + $"(**{(score.Accuracy * 100):F3}**% | **{score.MaxCombo}**x)" + (score.Perfect ? " (FC)" : "")
                             + $"\n[{mapset.Artist} - {mapset.Title} [{map.DifficultyName}]](https://osu.ppy.sh/beatmaps/{map.OnlineID})"
-                            + (score.Mods.Any() ? $"+{string.Join("", score.Mods)}" : "")
+                            + (score.Mods.Any() ? $"+{string.Join("", score.Mods.Select(m => m.Acronym))}" : "")
                             + "\n"
                             + new BeatmapStatsSerializer(map).Serialize(
                                 formatted: true,

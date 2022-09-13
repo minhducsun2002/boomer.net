@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
@@ -26,10 +27,13 @@ namespace Pepper.Commons.Osu.APIClients.Default
         )
         {
             // return await scrapingClient.GetUserScoresAsync(userId, scoreType, rulesetInfo, includeFails, count, offset);
-            return (await restClient.GetJsonAsync<APIScore[]>(
-                $"users/{userId}/scores/{scoreType.ToString().ToLowerInvariant()}?mode={rulesetInfo.ShortName}"
-                + $"&include_fails={(includeFails ? 1 : 0)}&limit={count}&offset={offset}"
-            ))!;
+            var path = $"users/{userId}/scores/{scoreType.ToString().ToLowerInvariant()}?mode={rulesetInfo.ShortName}"
+                       + $"&include_fails={(includeFails ? 1 : 0)}&limit={count}&offset={offset}";
+            var request = new RestRequest(path);
+            request.AddHeader("x-api-version", "20227270");
+            var response = await restClient.GetAsync(request);
+            var deserializedResponse = JsonConvert.DeserializeObject<APIScore[]>(response.Content!);
+            return deserializedResponse!;
         }
 
         public override async Task<APIScore[]> GetUserBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo)

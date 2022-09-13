@@ -22,11 +22,7 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
                 Username = user.Username,
                 JoinDate = user.RegisteredOn,
                 LastVisit = user.LastActive,
-                Country = new Country
-                {
-                    FlagName = user.Country.TwoLetterISORegionName,
-                    FullName = user.Country.EnglishName
-                },
+                CountryCode = Enum.Parse<CountryCode>(user.Country.TwoLetterISORegionName),
                 Statistics = new UserStatistics
                 {
                     GlobalRank = stats.GlobalLeaderboardRank,

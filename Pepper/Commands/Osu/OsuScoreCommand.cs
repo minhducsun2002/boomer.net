@@ -41,9 +41,8 @@ namespace Pepper.Commands.Osu
             {
                 pp = workingBeatmap.CalculatePerformance(
                     rulesetOverwrite: ruleset,
-                    score: new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = sc.Accuracy }
+                    score: new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = sc.Accuracy, Statistics = sc.Statistics }
                         .WithRulesetID(sc.RulesetID)
-                        .WithStatistics(sc.Statistics)
                 );
                 calculated = true;
             }
@@ -59,7 +58,11 @@ namespace Pepper.Commands.Osu
 
             int hitCounts, totalHitCounts = workingBeatmap.Beatmap.HitObjects.Count;
             {
-                var temporaryScore = new ScoreInfo().WithRulesetID(sc.RulesetID).WithStatistics(sc.Statistics);
+                var temporaryScore = new ScoreInfo
+                {
+                    Statistics = sc.Statistics
+                }
+                    .WithRulesetID(sc.RulesetID);
                 hitCounts = temporaryScore.Statistics.Values.Sum();
             }
 
@@ -77,7 +80,7 @@ namespace Pepper.Commands.Osu
 
             var embed = new LocalEmbed
             {
-                Author = SerializeAuthorBuilder(sc.User),
+                Author = SerializeAuthorBuilder(sc.User!),
                 Title = $"[**{sc.Rank}**] {b.Metadata.Artist} - {b.Metadata.Title} [{b.DifficultyName}]"
                         + (mods.Length != 0 ? "+" + string.Join("", mods.Select(mod => mod.Acronym)) : ""),
                 Url = workingBeatmap.GetOnlineUrl(),

@@ -6,7 +6,10 @@ using Newtonsoft.Json.Linq;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring.Legacy;
 using Pepper.Commons.Osu.API;
 
 namespace Pepper.Commons.Osu.APIClients.Ripple
@@ -57,30 +60,32 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
             var ret = scores.Select(score =>
                 {
                     var mapInfo = beatmaps[score.Beatmap.Id];
-                    var statistics = new Dictionary<string, int>
+                    var mockScore = new SoloScoreInfo
                     {
-                        {"count_300", score.Count300},
-                        {"count_100", score.Count100},
-                        {"count_50", score.Count50},
-                        {"count_geki", score.CountGeki},
-                        {"count_katu", score.CountKatu},
-                        {"count_miss", score.CountMiss},
-                    };
+                        RulesetID = rulesetInfo.OnlineID
+                    }.ToScoreInfo(Array.Empty<Mod>());
+                    mockScore.SetCount50(score.Count50);
+                    mockScore.SetCount100(score.Count100);
+                    mockScore.SetCount300(score.Count300);
+                    mockScore.SetCountGeki(score.CountGeki);
+                    mockScore.SetCountKatu(score.CountKatu);
+                    mockScore.SetCountMiss(score.CountMiss);
+
                     return new APIScore
                     {
                         Beatmap = mapInfo,
                         BeatmapSet = mapInfo.BeatmapSet,
-                        Mods = BuiltInRulesets[rulesetInfo.OnlineID].ConvertFromLegacyMods(score.Mods).Select(mod => new APIMod(mod)),
+                        Mods = BuiltInRulesets[rulesetInfo.OnlineID].ConvertFromLegacyMods(score.Mods).Select(mod => new APIMod(mod)).ToArray(),
                         User = user,
                         Accuracy = score.Accuracy / 100,
-                        Date = score.Time,
+                        EndedAt = score.Time,
                         Perfect = score.FullCombo,
                         TotalScore = score.TotalScore,
                         MaxCombo = score.MaxCombo,
                         PP = score.PerformancePoints,
-                        Statistics = statistics,
+                        Statistics = mockScore.Statistics,
                         RulesetID = rulesetInfo.OnlineID,
-                        OnlineID = score.Id,
+                        ID = (ulong) score.Id,
                         Rank = score.Rank
                     };
                 });
@@ -105,30 +110,32 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
             return scores.Select(score =>
                 {
                     var mapInfo = beatmaps[(int) score.BeatmapId];
-                    var statistics = new Dictionary<string, int>
+                    var mockScore = new SoloScoreInfo
                     {
-                        {"count_300", score.Count300},
-                        {"count_100", score.Count100},
-                        {"count_50", score.Count50},
-                        {"count_geki", score.Geki},
-                        {"count_katu", score.Katu},
-                        {"count_miss", score.Miss},
-                    };
+                        RulesetID = rulesetInfo.OnlineID
+                    }.ToScoreInfo(Array.Empty<Mod>());
+                    mockScore.SetCount50(score.Count50);
+                    mockScore.SetCount100(score.Count100);
+                    mockScore.SetCount300(score.Count300);
+                    mockScore.SetCountGeki(score.Geki);
+                    mockScore.SetCountKatu(score.Katu);
+                    mockScore.SetCountMiss(score.Miss);
+
                     return new APIScore
                     {
                         Beatmap = mapInfo,
                         BeatmapSet = mapInfo.BeatmapSet,
-                        Mods = BuiltInRulesets[rulesetInfo.OnlineID].ConvertFromLegacyMods((LegacyMods) score.Mods).Select(mod => new APIMod(mod)),
+                        Mods = BuiltInRulesets[rulesetInfo.OnlineID].ConvertFromLegacyMods((LegacyMods) score.Mods).Select(mod => new APIMod(mod)).ToArray(),
                         User = user,
                         Accuracy = score.Accuracy / 100,
-                        Date = score.Date!.Value,
+                        EndedAt = score.Date!.Value,
                         Perfect = score.Perfect,
-                        TotalScore = score.TotalScore,
+                        TotalScore = (int) score.TotalScore,
                         MaxCombo = score.MaxCombo!.Value,
                         PP = score.PerformancePoints,
-                        Statistics = statistics,
+                        Statistics = mockScore.Statistics,
                         RulesetID = rulesetInfo.OnlineID,
-                        OnlineID = score.ScoreId!.Value,
+                        ID = (ulong?) score.ScoreId,
                         Rank = Enum.Parse<ScoreRank>(score.Rank)
                     };
                 })
