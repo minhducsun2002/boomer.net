@@ -106,6 +106,13 @@ namespace Pepper.Commons.Osu
                 remaining -= output[currentHit.result];
             }
 
+            // due to inaccuracies there might be missing hits. at this point let's just assume they were best hits possible.
+            var missingHits = beatmap.HitObjects.Count - output.Values.Sum();
+            if (missingHits > 0)
+            {
+                output[resultContributions[0].result] += missingHits;
+            }
+
             return output;
         }
 

@@ -44,8 +44,7 @@ namespace Pepper.Commons.Osu.Test
                 var result = synthesizer.Synthesize(ruleset, accuracy);
                 output.WriteLine(string.Join(", ", result.Select(kv => $"{kv.Key} : {kv.Value}")));
 
-                // 0.1%, or 0.001 in difference
-                Assert.InRange(result.Values.Sum(), (int) (HitObjectCount * 0.999), (int) (HitObjectCount * 1.001));
+                Assert.Equal(result.Values.Sum(), HitObjectCount);
                 Assert.All(result, kv => Assert.InRange(kv.Value, 0, HitObjectCount));
 
                 var beatmap = new Beatmap<HitObject>
