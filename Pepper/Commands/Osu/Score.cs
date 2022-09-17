@@ -72,41 +72,41 @@ namespace Pepper.Commands.Osu
                     ControlPointInfo = map.Beatmap.ControlPointInfo,
                     DifficultyOverwrite = difficulty
                 }.Serialize(
-                                  formatted: true,
-                                  serializationOptions: StatFilter.Statistics | StatFilter.BPM | StatFilter.StarRating | StatFilter.Length
-                              )
-                              + "\n\n"
-                              + string.Join("\n\n", scores.Select(score =>
-                              {
-                                  var localPP = false;
-                                  var mods = ModParserService.ResolveMods(ruleset, score.Mods);
-                                  var pp = score.PP;
-                                  if (!pp.HasValue)
-                                  {
-                                      try
-                                      {
-                                          synthesizer ??= new HitStatisticsSynthesizer(map.Beatmap.HitObjects.Count);
-                                          var scoreInfo = new ScoreInfo
-                                          {
-                                              Mods = mods,
-                                              MaxCombo = difficulty.MaxCombo,
-                                              Accuracy = score.Accuracy,
-                                              Statistics = synthesizer.Synthesize(ruleset, score.Accuracy)
-                                          };
-                                          pp = (float) map.CalculatePerformance(scoreInfo);
-                                          localPP = true;
-                                      }
-                                      catch { /* ignore */ }
-                                  }
+                      formatted: true,
+                      serializationOptions: StatFilter.Statistics | StatFilter.BPM | StatFilter.StarRating | StatFilter.Length
+                )
+                + "\n\n"
+                + string.Join("\n\n", scores.Select(score =>
+                {
+                    var localPP = false;
+                    var mods = ModParserService.ResolveMods(ruleset, score.Mods);
+                    var pp = score.PP;
+                    if (!pp.HasValue)
+                    {
+                        try
+                        {
+                            synthesizer ??= new HitStatisticsSynthesizer(map.Beatmap.HitObjects.Count);
+                            var scoreInfo = new ScoreInfo
+                            {
+                                Mods = mods,
+                                MaxCombo = difficulty.MaxCombo,
+                                Accuracy = score.Accuracy,
+                                Statistics = synthesizer.Synthesize(ruleset, score.Accuracy)
+                            };
+                            pp = (float) map.CalculatePerformance(scoreInfo);
+                            localPP = true;
+                        }
+                        catch { /* ignore */ }
+                    }
 
-                                  return
-                                      $"[**{score.Rank}**] **{pp}**pp{(localPP ? " (?)" : "")} (**{score.MaxCombo}**x | **{score.Accuracy:F3}**%)"
-                                      + $" {(score.Perfect ? "(FC)" : "")}"
-                                      + (mods.Length != 0 ? $"+**{string.Join("", mods.Select(mod => mod.Acronym))}**" : "")
-                                      + "\n" + SerializeHitStats(score.Statistics, Rulesets[score.RulesetID].RulesetInfo)
-                                      + $" @ **{SerializeTimestamp(score.Date, false)}**"
-                                      + $"\n[**Score link**](https://osu.ppy.sh/scores/{ruleset.ShortName}/{score.OnlineID})";
-                              })),
+                    return
+                        $"[**{score.Rank}**] **{pp}**pp{(localPP ? " (?)" : "")} (**{score.MaxCombo}**x | **{score.Accuracy:F3}**%)"
+                        + $" {(score.Perfect ? "(FC)" : "")}"
+                        + (mods.Length != 0 ? $"+**{string.Join("", mods.Select(mod => mod.Acronym))}**" : "")
+                        + "\n" + SerializeHitStats(score.Statistics, Rulesets[score.RulesetID].RulesetInfo)
+                        + $" @ **{SerializeTimestamp(score.Date, false)}**"
+                        + $"\n[**Score link**](https://osu.ppy.sh/scores/{ruleset.ShortName}/{score.OnlineID})";
+                })),
                 Timestamp = DateTimeOffset.Now,
                 Footer = new LocalEmbedFooter
                 {
