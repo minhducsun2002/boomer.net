@@ -38,10 +38,12 @@ namespace Pepper.Commons.Osu.APIClients.Default
 
         public override async Task<APIScore[]> GetUserBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo)
         {
-            var response = await restClient.GetJsonAsync<APIScoreList>(
-                $"/beatmaps/{beatmapId}/scores/users/{userId}/all"
-            );
-            return response!.Scores
+            var path = $"/beatmaps/{beatmapId}/scores/users/{userId}/all";
+            var request = new RestRequest(path);
+            request.AddHeader("x-api-version", "20227270");
+            var response = await restClient.GetAsync(request);
+            var deserializedResponse = JsonConvert.DeserializeObject<APIScoreList>(response.Content!);
+            return deserializedResponse!.Scores
                 .Select(score =>
                 {
                     score.Accuracy *= 100;
