@@ -51,7 +51,11 @@ namespace Pepper.Commands.Osu
 
             if (scores.Length == 0)
             {
-                return Reply($"No score found on that beatmap for user `{user.Username}`.");
+                return Reply(
+                    new LocalEmbed()
+                        .WithDescription($"No score found for user `{user.Username}` on beatmap " +
+                                         $"[**{map.Metadata.Title}** [**{map.BeatmapInfo.DifficultyName}**]](https://osu.ppy.sh/b/{mapId}).")
+                );
             }
 
 
