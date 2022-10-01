@@ -43,13 +43,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
             request.AddHeader("x-api-version", "20227270");
             var response = await restClient.GetAsync(request);
             var deserializedResponse = JsonConvert.DeserializeObject<APIScoreList>(response.Content!);
-            return deserializedResponse!.Scores
-                .Select(score =>
-                {
-                    score.Accuracy *= 100;
-                    return score;
-                })
-                .ToArray();
+            return deserializedResponse!.Scores.ToArray();
         }
 
         internal static APIScore DeserializeToAPILegacyScoreInfo(JToken scoreObject)

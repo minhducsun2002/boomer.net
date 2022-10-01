@@ -93,14 +93,14 @@ namespace Pepper.Commands.Osu
                                 Accuracy = score.Accuracy,
                                 Statistics = synthesizer.Synthesize(ruleset, score.Accuracy)
                             };
-                            pp = (float) map.CalculatePerformance(scoreInfo);
+                            pp = map.CalculatePerformance(scoreInfo);
                             localPP = true;
                         }
                         catch { /* ignore */ }
                     }
 
                     return
-                        $"[**{score.Rank}**] **{pp}**pp{(localPP ? " (?)" : "")} (**{score.MaxCombo}**x | **{score.Accuracy:F3}**%)"
+                        $"[**{score.Rank}**] **{pp:F2}**pp{(localPP ? " (?)" : "")} (**{score.MaxCombo}**x | **{score.Accuracy * 100:F3}**%)"
                         + $" {(score.Perfect ? "(FC)" : "")}"
                         + (mods.Length != 0 ? $"+**{string.Join("", mods.Select(mod => mod.Acronym))}**" : "")
                         + "\n" + SerializeHitStats(score.Statistics, Rulesets[score.RulesetID].RulesetInfo)
