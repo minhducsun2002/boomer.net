@@ -21,6 +21,7 @@ using Qmmands;
 using Qmmands.Text;
 using Qmmands.Text.Default;
 using Serilog;
+using Serilog.Events;
 using Serilog.Templates;
 
 DotEnv.Load();
@@ -31,6 +32,7 @@ var hostBuilder = new HostBuilder()
     {
         configuration
             .MinimumLevel.Information()
+            .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
             .Enrich.WithThreadId()
             .Enrich.FromLogContext()
             .WriteTo.Console(
