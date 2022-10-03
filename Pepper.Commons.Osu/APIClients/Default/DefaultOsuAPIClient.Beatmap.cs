@@ -10,17 +10,16 @@ namespace Pepper.Commons.Osu.APIClients.Default
 {
     public partial class DefaultOsuAPIClient
     {
-        private readonly FastConcurrentLru<int, byte[]> beatmapCache = new(200);
+        private readonly FastConcurrentLru<int, WorkingBeatmap> beatmapCache = new(200);
         private readonly FastConcurrentLru<string, APIBeatmapSet> beatmapsetMetadataCache = new(200);
         public override async Task<WorkingBeatmap> GetBeatmap(int beatmapId)
         {
             if (beatmapCache.TryGet(beatmapId, out var @return))
             {
-                return WorkingBeatmap.Decode(@return, beatmapId);
+                return @return;
             }
 
             var file = await HttpClient.GetByteArrayAsync($"https://osu.ppy.sh/osu/{beatmapId}");
-            beatmapCache.AddOrUpdate(beatmapId, file);
             var result = WorkingBeatmap.Decode(file, beatmapId);
 
             if (result.BeatmapInfo.BeatmapSet?.OnlineID is null)
@@ -31,6 +30,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
                 result.BeatmapInfo.BeatmapSet.OnlineID = beatmapsetInfo.OnlineID;
             }
 
+            beatmapCache.TryUpdate(beatmapId, result);
             return result;
         }
 
