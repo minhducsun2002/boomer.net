@@ -33,6 +33,7 @@ var hostBuilder = new HostBuilder()
         configuration
             .MinimumLevel.Information()
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Infrastructure", LogEventLevel.Warning)
             .Enrich.WithThreadId()
             .Enrich.FromLogContext()
             .WriteTo.Console(
