@@ -2,12 +2,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BitFaster.Caching.Lru;
 using Microsoft.EntityFrameworkCore;
+using ILogger = Serilog.ILogger;
 
 namespace Pepper.Database.OsuUsernameProviders
 {
     public class MariaDbOsuUsernameProvider : DbContext, IOsuUsernameProvider
     {
         private readonly FastConcurrentLru<string, Username> cache = new(200);
+
+        private static readonly ILogger Log = Serilog.Log.Logger.ForContext<MariaDbOsuUsernameProvider>();
         public MariaDbOsuUsernameProvider(DbContextOptions<MariaDbOsuUsernameProvider> opt) : base(opt) { }
 
         public DbSet<Username> DbSet { get; set; } = null!;
@@ -36,6 +39,7 @@ namespace Pepper.Database.OsuUsernameProviders
                 return @return;
             }
 
+            Log.Information("Didn't found a record for user {0}. Querying.", discordId);
             var record = await DbSet.FirstOrDefaultAsync(rec => rec.DiscordUserId == discordId);
             if (record != default)
             {
