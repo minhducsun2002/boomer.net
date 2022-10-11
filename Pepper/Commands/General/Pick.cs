@@ -39,7 +39,7 @@ namespace Pepper.Commands.General
                 $"https://www.random.org/integers/?num=1&min=1&max={choices.Length}&col=1&base=10&format=plain&rnd=new"
             );
 
-            if (!int.TryParse(pick, out var result))
+            if (int.TryParse(pick, out var result))
             {
                 return Reply(new LocalEmbed
                 {
