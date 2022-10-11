@@ -89,7 +89,7 @@ namespace Pepper.Commands.Osu
                             var scoreInfo = new ScoreInfo
                             {
                                 Mods = mods,
-                                MaxCombo = difficulty.MaxCombo,
+                                MaxCombo = score.MaxCombo,
                                 Accuracy = score.Accuracy,
                                 Statistics = synthesizer.Synthesize(ruleset, score.Accuracy)
                             };

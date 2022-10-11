@@ -41,7 +41,7 @@ namespace Pepper.Commands.Osu
             {
                 pp = workingBeatmap.CalculatePerformance(
                     rulesetOverwrite: ruleset,
-                    score: new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = sc.Accuracy, Statistics = sc.Statistics }
+                    score: new ScoreInfo { Mods = mods, MaxCombo = sc.MaxCombo, Accuracy = sc.Accuracy, Statistics = sc.Statistics }
                         .WithRulesetID(sc.RulesetID)
                 );
                 calculated = true;
