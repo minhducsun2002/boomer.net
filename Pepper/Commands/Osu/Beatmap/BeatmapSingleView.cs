@@ -68,7 +68,7 @@ namespace Pepper.Commands.Osu
 
                     foreach (var button in EnumerateComponents().OfType<ButtonViewComponent>())
                     {
-                        button.Style = CurrentMods.Contains(button.Label)
+                        button.Style = CurrentMods.Contains(button.Label ?? "")
                             ? LocalButtonComponentStyle.Success
                             : LocalButtonComponentStyle.Secondary;
                     }
