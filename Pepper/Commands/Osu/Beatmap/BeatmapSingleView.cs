@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
-using Disqord.Extensions.Interactivity.Menus.Paged;
 using Disqord.Rest;
 using Pepper.Structures.External.Osu;
 using APIBeatmapSet = Pepper.Commons.Osu.API.APIBeatmapSet;
 using Limits = Disqord.Discord.Limits;
+using PagedViewBase = Pepper.Structures.PagedViewBase;
 
 namespace Pepper.Commands.Osu
 {
@@ -98,28 +98,6 @@ namespace Pepper.Commands.Osu
                     IsDefault = CurrentPageIndex == beatmapIdToIndex[beatmap.OnlineID]
                 })
                 .ToList();
-        }
-
-        public override async ValueTask DisposeAsync()
-        {
-            foreach (var component in EnumerateComponents())
-            {
-                switch (component)
-                {
-                    case ButtonViewComponent buttonViewComponent:
-                        {
-                            buttonViewComponent.IsDisabled = true;
-                            break;
-                        }
-                    case SelectionViewComponent selectionViewComponent:
-                        {
-                            selectionViewComponent.IsDisabled = true;
-                            break;
-                        }
-                }
-            }
-            await Menu.ApplyChangesAsync();
-            await base.DisposeAsync();
         }
     }
 }
