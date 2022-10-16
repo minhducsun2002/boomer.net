@@ -7,6 +7,7 @@ using Disqord.Bot.Commands;
 using Disqord.Bot.Commands.Text;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
+using Humanizer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.FuzzySearch;
@@ -15,19 +16,21 @@ using Pepper.Structures.CommandAttributes.Metadata;
 using Pepper.Utilities;
 using Qmmands;
 using Qmmands.Text;
+using Qommon;
 using PagedView = Pepper.Structures.PagedView;
 
 namespace Pepper.Commands.General
 {
     public class Help : GeneralCommand
     {
+        private readonly TimeSpan timeout = TimeSpan.FromSeconds(30);
+
         [TextCommand("help")]
         [Description("Everything starts here.")]
         public async Task<IDiscordCommandResult> Exec(
             [Description("A command or a category to show respective help entry.")] string query = ""
             )
         {
-            var self = Context.Bot.CurrentUser;
             var service = Context.GetCommandService();
             var commands = service.EnumerateTextCommands();
             if (!await Context.Bot.IsOwnerAsync(Context.AuthorId))
@@ -40,13 +43,20 @@ namespace Pepper.Commands.General
                     command => command.CustomAttributes.OfType<CategoryAttribute>().FirstOrDefault()?.Category ?? "",
                     command => command
                 )
-                .ToDictionary(group => group.Key, group => group.ToArray());
+                .Select(g => new KeyValuePair<string, ITextCommand[]>(g.Key, g.ToArray()))
+                .OrderBy(g => g.Value.Length)
+                .ToList();
 
-            var embedAuthor = new LocalEmbedAuthor
-            {
-                Name = $"{self!.Tag}",
-                IconUrl = self.GetAvatarUrl(CdnAssetFormat.Png, 1024)
-            };
+            var cat = categories
+                .Select(p =>
+                {
+                    var selectionLabel = $"{p.Key} ({p.Value.Length} {(p.Value.Length == 1 ? "command" : "command".Pluralize())})";
+                    var opt = new LocalSelectionComponentOption().WithLabel(selectionLabel);
+                    var embed = HandleCategory(p.Value);
+                    var page = new Page().WithEmbeds(embed);
+                    return (opt, page);
+                })
+                .ToList();
 
             if (!string.IsNullOrWhiteSpace(query))
             {
@@ -66,7 +76,7 @@ namespace Pepper.Commands.General
                 }
 
                 var categoryMatch = new Fuse<string>(
-                        categories.Keys,
+                        categories.Select(p => p.Key),
                         false,
                         new StringFuseField<string>(s => s))
                     .Search(query.ToLowerInvariant())
@@ -74,18 +84,15 @@ namespace Pepper.Commands.General
 
                 if (categoryMatch.Score <= 0.6)
                 {
-                    return Reply(HandleCategory(categoryMatch.Element, categories[categoryMatch.Element]));
+                    var match = categories
+                        .Select((kv, index) => (kv, index))
+                        .First(cat => cat.kv.Key == categoryMatch.Element);
+
+                    return View(new SelectionPagedView(cat, match.index), timeout);
                 }
             }
 
-            return Reply(new LocalEmbed()
-                .WithAuthor(embedAuthor)
-                .WithDescription(
-                    "The following categories are available :"
-                    + "```"
-                    + string.Join("\n", categories.Select(category => $"* {category.Key}"))
-                    + "```"
-                    + $"\nCall {SelfInvocation()} `<category>` for commands belonging to a certain category."));
+            return View(new SelectionPagedView(cat), timeout);
         }
 
         private List<LocalEmbed> HandleCommand(ITextCommand[] commands)
@@ -161,12 +168,12 @@ namespace Pepper.Commands.General
                     ),
                     Description = string.IsNullOrWhiteSpace(commands[0].Description)
                         ? "No description."
-                        : commands[0].Description,
+                        : Optional<string>.Empty,
                     Fields = fields,
                     Footer = otherPrefixes.Length != 0
                         ? new LocalEmbedFooter().WithText(
                             $"Also callable under prefix {string.Join("/", otherPrefixes.Select(_ => $"\"{_}\""))}")
-                        : default
+                        : Optional<LocalEmbedFooter>.Empty
                 };
 
                 return embed;
@@ -176,12 +183,11 @@ namespace Pepper.Commands.General
             return embeds.ToList();
         }
 
-        private LocalEmbed HandleCategory(string category, IReadOnlyCollection<ITextCommand> commands)
+        private LocalEmbed HandleCategory(IReadOnlyCollection<ITextCommand> commands)
         {
             var restricted = false;
             var embed = new LocalEmbed
             {
-                Description = $"The following command{StringUtilities.Plural(commands.Count)} belong to the **{category}** category :",
                 Fields = commands.Select(command =>
                 {
                     var prefixes = command.GetPrefixes(Context.Bot);

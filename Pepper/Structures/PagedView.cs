@@ -41,10 +41,14 @@ namespace Pepper.Structures
     public class SelectionPagedView : PagedViewBase
     {
         private readonly Dictionary<int, LocalSelectionComponentOption> details;
-        public SelectionPagedView(IEnumerable<(LocalSelectionComponentOption, Page)> pages, Action<LocalMessageBase>? messageTemplate = null)
+        public SelectionPagedView(
+            IReadOnlyList<(LocalSelectionComponentOption, Page)> pages,
+            int initialPageIndex = 0,
+            Action<LocalMessageBase>? messageTemplate = null)
             : base(PreparePages(pages, out var pageDetails), messageTemplate)
         {
             details = pageDetails;
+            CurrentPageIndex = initialPageIndex;
             var selection = new SelectionViewComponent(e =>
             {
                 var index = int.Parse(e.SelectedOptions[0].Value.Value);
