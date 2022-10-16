@@ -17,7 +17,12 @@ namespace Pepper.Structures
 {
     public partial class Bot
     {
-        private static readonly Type[] DownleveledAttributeTypes = { typeof(CategoryAttribute), typeof(PrefixCategoryAttribute) };
+        private static readonly Type[] DownleveledAttributeTypes =
+        {
+            typeof(CategoryAttribute),
+            typeof(PrefixCategoryAttribute),
+            typeof(HiddenAttribute)
+        };
 
         // expose this for tests
         public static void DownlevelAttributes(IModuleBuilder moduleBuilder)
