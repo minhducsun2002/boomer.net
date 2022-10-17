@@ -1,35 +1,17 @@
 using System;
-using System.Threading.Tasks;
 using Disqord;
-using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 
 namespace Pepper.Structures
 {
-    public class PagedViewBase : Disqord.Extensions.Interactivity.Menus.Paged.PagedViewBase
+    // Override the default behaviour of PagedView.
+    public class PagedViewBase : PagedView
     {
-        protected PagedViewBase(PageProvider pageProvider, Action<LocalMessageBase>? messageTemplate = null) : base(pageProvider, messageTemplate) { }
-
-        public override async ValueTask DisposeAsync()
+        protected PagedViewBase(PageProvider pageProvider, Action<LocalMessageBase>? messageTemplate = null) : base(pageProvider, messageTemplate)
         {
-            foreach (var component in EnumerateComponents())
-            {
-                switch (component)
-                {
-                    case ButtonViewComponent buttonViewComponent:
-                        {
-                            buttonViewComponent.IsDisabled = true;
-                            break;
-                        }
-                    case SelectionViewComponent selectionViewComponent:
-                        {
-                            selectionViewComponent.IsDisabled = true;
-                            break;
-                        }
-                }
-            }
-            await Menu.ApplyChangesAsync();
-            await base.DisposeAsync();
+            ClearComponents();
         }
+
+        protected override void ApplyPageIndex(Page page) { }
     }
 }
