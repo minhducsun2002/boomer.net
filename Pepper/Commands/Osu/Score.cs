@@ -123,7 +123,7 @@ namespace Pepper.Commands.Osu
             [Remainder][Description("Username to check. Default to your username, if set.")] Username username
         )
         {
-            var beatmap = BeatmapContext.GetBeatmap(Context.ChannelId.ToString());
+            var beatmap = GetBeatmapIdFromContext();
             if (beatmap == null)
             {
                 return Reply(

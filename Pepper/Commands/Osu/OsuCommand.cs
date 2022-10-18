@@ -12,7 +12,7 @@ using Pepper.Commons.Osu;
 using Pepper.Structures;
 using Pepper.Structures.CommandAttributes.Metadata;
 using Pepper.Structures.External.Osu;
-using Pepper.Structures.External.Osu.Extensions;
+using Pepper.Utilities.Osu;
 
 namespace Pepper.Commands.Osu
 {
