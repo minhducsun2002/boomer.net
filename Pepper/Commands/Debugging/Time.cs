@@ -21,7 +21,7 @@ namespace Pepper.Commands.Debugging
             var prefixes = await Bot.Prefixes.GetPrefixesAsync(Context.Message);
 
             var foundPrefix = prefixes!.FirstOrDefault(
-                prefix => input.StartsWith(prefix.ToString()!, StringComparison.InvariantCultureIgnoreCase)
+                prefix => input.StartsWith(prefix.ToString()!, StringComparison.OrdinalIgnoreCase)
             );
             if (foundPrefix == null)
             {

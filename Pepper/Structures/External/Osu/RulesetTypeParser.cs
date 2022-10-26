@@ -28,7 +28,7 @@ namespace Pepper.Structures.External.Osu
             try
             {
                 defaultRuleset = SupportedRulesets
-                    .First(ruleset => string.Equals(ruleset.ShortName, new string(input.Span), StringComparison.InvariantCultureIgnoreCase));
+                    .First(ruleset => string.Equals(ruleset.ShortName, new string(input.Span), StringComparison.OrdinalIgnoreCase));
 
             }
             catch { /* ignored, defaults to osu! */ }

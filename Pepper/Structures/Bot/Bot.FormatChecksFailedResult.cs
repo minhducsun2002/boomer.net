@@ -35,7 +35,7 @@ namespace Pepper.Structures
 
             var firstValidCheck = checks.First(c => c.GetType() != prefixCheckType).Key;
             messageBase.Content = @$"A secret check named {
-                firstValidCheck.GetType().Name.Replace("Attribute", "", StringComparison.InvariantCultureIgnoreCase)} failed.";
+                firstValidCheck.GetType().Name.Replace("Attribute", "", StringComparison.OrdinalIgnoreCase)} failed.";
             return true;
         }
     }
