@@ -1,20 +1,23 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace Pepper.Database
 {
-    [Table("command-whitelist")]
-    public class Record
-    {
-        [Column("command_id")] public string CommandIdentifier { get; set; } = null!;
-        [Column("guild_id")] public string GuildId { get; set; } = null!;
-    }
-
     public class RestrictedCommandWhitelistProvider : DbContext
     {
+        [Table("command-whitelist")]
+        private class Record
+        {
+            [Column("command_id")] public string CommandIdentifier { get; set; } = null!;
+            [Column("guild_id")] public string GuildId { get; set; } = null!;
+        }
+
         public RestrictedCommandWhitelistProvider(DbContextOptions<RestrictedCommandWhitelistProvider> options) : base(options) { }
-        public DbSet<Record> Records { get; set; } = null!;
+        private DbSet<Record> Records { get; set; } = null!;
+
+        private static readonly ILogger Log = Serilog.Log.Logger.ForContext<RestrictedCommandWhitelistProvider>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,9 +29,11 @@ namespace Pepper.Database
             });
         }
 
-        public Task<bool> IsAllowedGuild(string guildId, string commandIdentifier)
+        public async Task<bool> IsAllowedGuild(string guildId, string commandIdentifier)
         {
-            return Records.AnyAsync(r => r.CommandIdentifier == commandIdentifier && r.GuildId == guildId);
+            var res = await Records.AnyAsync(r => r.CommandIdentifier == commandIdentifier && r.GuildId == guildId);
+            Log.Information("Checking if {0} could be called in guild {1} : {2}", commandIdentifier, guildId, res);
+            return res;
         }
 
         public async Task<bool> RemoveAllowedGuild(string guildId, string commandIdentifier)
@@ -37,6 +42,7 @@ namespace Pepper.Database
             if (entity != null)
             {
                 Records.Remove(entity);
+                Log.Information("Disabling command {0} in guild {1}", commandIdentifier, guildId);
                 return await SaveChangesAsync() != 0;
             }
 
@@ -56,6 +62,7 @@ namespace Pepper.Database
                 GuildId = guildId
             });
 
+            Log.Information("Allowing command {0} in guild {1}", commandIdentifier, guildId);
             return await SaveChangesAsync() != 0;
         }
     }
