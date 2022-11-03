@@ -11,8 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Pepper.Commons.Maimai;
 using Pepper.Commons.Osu;
 using Pepper.Database;
+using Pepper.Database.MaimaiDxNetCookieProviders;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Logging.Serilog.Sinks.Discord;
 using Pepper.Services;
@@ -78,6 +80,16 @@ var hostBuilder = new HostBuilder()
         services.AddDbContextPool<IOsuUsernameProvider, MariaDbOsuUsernameProvider>(builder =>
         {
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;
+            builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        }, 16);
+        services.AddDbContextPool<IMaimaiDxNetCookieProvider, MariaDbMaimaiDxNetCookieProvider>(builder =>
+        {
+            var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;
+            builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        }, 16);
+        services.AddDbContextPool<MaimaiDbContext>(builder =>
+        {
+            var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING_MAIMAI")!;
             builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         }, 16);
         services.AddDbContextPool<RestrictedCommandWhitelistProvider>(builder =>
