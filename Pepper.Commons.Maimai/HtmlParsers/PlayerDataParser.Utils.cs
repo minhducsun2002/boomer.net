@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Pepper.Commons.Maimai.Structures;
 
 namespace Pepper.Commons.Maimai.HtmlParsers
@@ -57,12 +58,14 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             };
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int SplitStatRecord(string s)
         {
             var a = s.Split('/', 2);
             return int.Parse(a[0]);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static (int, int)? GetTwoDigitsData(string prefix, string data)
         {
             var index = data.IndexOf(prefix, StringComparison.OrdinalIgnoreCase);
@@ -77,6 +80,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             return (c1 - '0', c2 - '0');
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ReadOnlySpan<char> GetIntFromString(ReadOnlySpan<char> s)
         {
             var len = s.Length;
