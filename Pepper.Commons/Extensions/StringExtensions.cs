@@ -43,7 +43,7 @@ namespace Pepper.Commons.Extensions
                 piece.Append(character);
             }
 
-            if (piece.Length >= 0)
+            if (piece.Length > 0)
             {
                 output.Add(piece.ToString());
             }
