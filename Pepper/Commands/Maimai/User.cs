@@ -6,6 +6,7 @@ using Disqord.Bot.Commands;
 using Humanizer;
 using Pepper.Commons.Maimai;
 using Pepper.Database.MaimaiDxNetCookieProviders;
+using Qmmands;
 using Qmmands.Text;
 
 namespace Pepper.Commands.Maimai
@@ -16,7 +17,10 @@ namespace Pepper.Commands.Maimai
             : base(httpClient, dbContext, cookieProvider) {}
 
         [TextCommand("maiuser")]
-        public async Task<IDiscordCommandResult> Exec(IMember? player = null)
+        [Description("Show info of an user.")]
+        public async Task<IDiscordCommandResult> Exec(
+            [Description("User in question")] IMember? player = null
+        )
         {
             var cookie = await CookieProvider.GetCookie(player?.Id ?? Context.AuthorId);
             var client = new MaimaiDxNetClient(HttpClient, cookie!);

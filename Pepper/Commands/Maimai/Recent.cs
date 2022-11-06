@@ -8,6 +8,7 @@ using Disqord.Extensions.Interactivity.Menus.Paged;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Structures;
 using Pepper.Database.MaimaiDxNetCookieProviders;
+using Qmmands;
 using Qmmands.Text;
 using Qommon;
 using PagedView = Pepper.Structures.PagedView;
@@ -20,9 +21,12 @@ namespace Pepper.Commands.Maimai
             : base(http, db, cookieProvider) {}
         
         [TextCommand("mairecent")]
-        public async Task<IDiscordCommandResult> Exec()
+        [Description("Show recent plays of an user.")]
+        public async Task<IDiscordCommandResult> Exec(
+            [Description("User in question")] IMember? player = null
+        )
         {
-            var cookie = await CookieProvider.GetCookie(Context.AuthorId);
+            var cookie = await CookieProvider.GetCookie(player?.Id ?? Context.AuthorId);
             var client = new MaimaiDxNetClient(HttpClient, cookie!);
             var recent = await client.GetUserRecentRecord();
 
