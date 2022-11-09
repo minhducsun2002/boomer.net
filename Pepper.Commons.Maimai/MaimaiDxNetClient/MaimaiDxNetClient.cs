@@ -1,3 +1,5 @@
+using Pepper.Commons.Maimai.Structures;
+
 namespace Pepper.Commons.Maimai
 {
     public partial class MaimaiDxNetClient
@@ -20,6 +22,10 @@ namespace Pepper.Commons.Maimai
         private async Task<string> GetHtml(string url)
         {
             var uid = await GetAuthUserId();
+            if (uid == null)
+            {
+                throw new LoginFailedException();
+            }
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.TryAddWithoutValidation("Cookie", $"userId={uid}");
             var file = await httpClient.SendAsync(request);
