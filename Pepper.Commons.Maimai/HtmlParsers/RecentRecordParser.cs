@@ -52,7 +52,20 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                 var fsStatus = ParseSyncStatus(fsImageSrc);
 
                 var jacketImageUrl = content.QuerySelector(".music_img").GetAttributeValue("src", "");
-                
+
+                var challengeNode = content.QuerySelector(".p_r.m_t_5.f_l.f_0");
+                var challengeType = ChallengeType.None;
+                int health = 0, maxHealth = 0;
+                if (challengeNode != null)
+                {
+                    var challengeImage = challengeNode.QuerySelector(".h_30.p_l_5");
+                    var challengeImageSrc = challengeImage.GetAttributeValue("src", "");
+                    challengeType = ParseChallengeType(challengeImageSrc);
+                    var challengeHealthNode = challengeNode.QuerySelector(".playlog_life_block");
+                    var challengeHealthText = challengeHealthNode.InnerText;
+                    (health, maxHealth) = AllRecordParser.ParseSlashedVsMaxStats(challengeHealthText);
+                }
+
                 return new RecentRecord
                 {
                     Track = track,
@@ -65,7 +78,10 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                     MultiplayerRank = multiplayerRank,
                     SyncStatus = fsStatus,
                     Difficulty = difficulty,
-                    ImageUrl = jacketImageUrl
+                    ImageUrl = jacketImageUrl,
+                    ChallengeType = challengeType,
+                    ChallengeMaxHealth = maxHealth,
+                    ChallengeRemainingHealth = health
                 };
             });
             return data;

@@ -87,7 +87,7 @@ var hostBuilder = new HostBuilder()
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;
             builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         }, 16);
-        services.AddDbContextPool<MaimaiDbContext>(builder =>
+        services.AddDbContextPool<MaimaiDataDbContext>(builder =>
         {
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING_MAIMAI")!;
             builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));

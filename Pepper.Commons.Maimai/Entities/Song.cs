@@ -16,7 +16,7 @@ namespace Pepper.Commons.Maimai.Entities
         [Column("sortName")]
         public string? SortName { get; set; }
         [Column("name")]
-        public string? Name { get; set; }
+        public string Name { get; set; } = null!;
         [Column("rightsInfoId")]
         public int? RightsInfoId { get; set; }
         [Column("artistId")]
@@ -26,7 +26,7 @@ namespace Pepper.Commons.Maimai.Entities
         [Column("bpm")]
         public int? Bpm { get; set; }
         [Column("addVersionId")]
-        public int? AddVersionId { get; set; }
+        public int AddVersionId { get; set; }
 
         [ForeignKey("AddVersionId")]
         [InverseProperty("Songs")]
@@ -39,6 +39,6 @@ namespace Pepper.Commons.Maimai.Entities
         public virtual Genre? Genre { get; set; }
 
         [InverseProperty(nameof(Difficulty.Song))]
-        public virtual ICollection<Difficulty>? Difficulties { get; set; } = null!;
+        public IReadOnlyList<Difficulty> Difficulties { get; set; } = new List<Difficulty>();
     }
 }

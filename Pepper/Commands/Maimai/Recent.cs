@@ -8,6 +8,7 @@ using Disqord.Extensions.Interactivity.Menus.Paged;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Structures;
 using Pepper.Database.MaimaiDxNetCookieProviders;
+using Pepper.Services.Maimai;
 using Qmmands;
 using Qmmands.Text;
 using Qommon;
@@ -17,8 +18,8 @@ namespace Pepper.Commands.Maimai
 {
     public class Recent : MaimaiCommand
     {
-        public Recent(HttpClient http, MaimaiDbContext db, IMaimaiDxNetCookieProvider cookieProvider)
-            : base(http, db, cookieProvider) {}
+        public Recent(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
+            : base(http, data, cookieProvider) {}
         
         [TextCommand("mairecent")]
         [Description("Show recent plays of an user.")]
@@ -80,6 +81,23 @@ namespace Pepper.Commands.Maimai
                             Timestamp = record.Timestamp,
                             Color = color
                         };
+                        
+                        if (record.ChallengeType != ChallengeType.None)
+                        {
+                            var hp = record.ChallengeRemainingHealth;
+                            var maxHp = record.ChallengeMaxHealth;
+#pragma warning disable CS8509
+                            var text = record.ChallengeType switch
+#pragma warning restore CS8509
+                            {
+                                ChallengeType.PerfectChallenge => $"Perfect Challenge : {hp}/{maxHp}",
+                                ChallengeType.Course => $"Course : {hp}/{maxHp}"
+                            };
+                            r.Footer = new LocalEmbedFooter
+                            {
+                                Text = text
+                            };
+                        }
                         return r;
                     });
                     return new Page().WithEmbeds(embeds);

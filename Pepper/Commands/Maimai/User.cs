@@ -6,6 +6,7 @@ using Disqord.Bot.Commands;
 using Humanizer;
 using Pepper.Commons.Maimai;
 using Pepper.Database.MaimaiDxNetCookieProviders;
+using Pepper.Services.Maimai;
 using Qmmands;
 using Qmmands.Text;
 
@@ -13,8 +14,8 @@ namespace Pepper.Commands.Maimai
 {
     public class User : MaimaiCommand
     {
-        public User(HttpClient httpClient, MaimaiDbContext dbContext, IMaimaiDxNetCookieProvider cookieProvider) 
-            : base(httpClient, dbContext, cookieProvider) {}
+        public User(HttpClient httpClient, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider) 
+            : base(httpClient, data, cookieProvider) {}
 
         [TextCommand("maiuser")]
         [Description("Show info of an user.")]

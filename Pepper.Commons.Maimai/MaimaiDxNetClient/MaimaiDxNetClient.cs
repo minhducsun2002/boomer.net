@@ -16,5 +16,14 @@ namespace Pepper.Commons.Maimai
             clal = clalCookie;
             this.httpClient = httpClient;
         }
+        
+        private async Task<string> GetHtml(string url)
+        {
+            var uid = await GetAuthUserId();
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.TryAddWithoutValidation("Cookie", $"userId={uid}");
+            var file = await httpClient.SendAsync(request);
+            return await file.Content.ReadAsStringAsync();
+        }
     }
 }

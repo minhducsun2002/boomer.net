@@ -18,7 +18,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int ParseAccuracy(ReadOnlySpan<char> raw)
+        internal static int ParseAccuracy(ReadOnlySpan<char> raw)
         {
             // form: AB.CDEF%
             var markerIndex = raw.Length == 9 ? 3 : 2;
@@ -28,7 +28,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ParseRank(ReadOnlySpan<char> raw)
+        internal static string ParseRank(ReadOnlySpan<char> raw)
         {
             var len = raw.Length;
             for (var i = 51; i < len; i++)
@@ -42,7 +42,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ChartVersion ParseVersion(ReadOnlySpan<char> raw) =>
+        internal static ChartVersion ParseVersion(ReadOnlySpan<char> raw) =>
             // https://maimaidx-eng.com/maimai-mobile/img/music_(dx,standard).png
             raw[49] == 'd'
                 ? ChartVersion.Deluxe
@@ -89,8 +89,9 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             };
         }
 
-        private static Difficulty ParseDifficulty(ReadOnlySpan<char> raw)
+        internal static Difficulty ParseDifficulty(ReadOnlySpan<char> raw)
         {
+            // https://maimaidx-eng.com/maimai-mobile/img/diff_expert.png
             return raw[48] switch
             {
                 'b' => Difficulty.Basic,
@@ -101,5 +102,18 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                 _ => Difficulty.None
             };
         }
+
+        private static ChallengeType ParseChallengeType(ReadOnlySpan<char> raw)
+        {
+            // https://maimaidx-eng.com/maimai-mobile/img/icon_perfectchallenge.png
+            // https://maimaidx-eng.com/maimai-mobile/img/course/icon_course.png
+            return raw[43] switch
+            {
+                'c' => ChallengeType.Course,
+                'i' => ChallengeType.PerfectChallenge,
+                _ => ChallengeType.None
+            };
+        }
+        
     }
 }

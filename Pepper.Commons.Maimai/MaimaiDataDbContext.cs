@@ -3,9 +3,9 @@ using Pepper.Commons.Maimai.Entities;
 
 namespace Pepper.Commons.Maimai
 {
-    public class MaimaiDbContext : DbContext
+    public class MaimaiDataDbContext : DbContext
     {
-        public MaimaiDbContext(DbContextOptions<MaimaiDbContext> options) : base(options) { }
+        public MaimaiDataDbContext(DbContextOptions<MaimaiDataDbContext> options) : base(options) { }
 
         public virtual DbSet<AddVersion> AddVersions { get; set; } = null!;
         public virtual DbSet<Artist> Artists { get; set; } = null!;

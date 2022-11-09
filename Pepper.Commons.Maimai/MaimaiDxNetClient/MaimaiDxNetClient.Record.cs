@@ -13,5 +13,13 @@ namespace Pepper.Commons.Maimai
             var file = await httpClient.SendAsync(request);
             return RecentRecordParser.Parse(await file.Content.ReadAsStringAsync());
         }
+
+        public async Task<IEnumerable<ScoreRecord>> GetUserDifficultyRecord(Difficulty difficulty)
+        {
+            var url =
+                $"https://maimaidx-eng.com/maimai-mobile/record/musicGenre/search/?genre=99&diff={(int) difficulty}";
+            var html = await GetHtml(url);
+            return AllRecordParser.Parse(html);
+        }
     }
 }
