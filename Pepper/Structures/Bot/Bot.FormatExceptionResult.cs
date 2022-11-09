@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Linq;
 using Disqord;
 using Disqord.Bot.Commands.Text;
+using Pepper.Commons;
 using Qmmands;
 
 namespace Pepper.Structures
@@ -10,6 +11,12 @@ namespace Pepper.Structures
     {
         private bool FormatExceptionResult(IDiscordTextCommandContext context, LocalMessageBase messageBase, ExceptionResult result)
         {
+            if (result.Exception is IFriendlyException friendlyException)
+            {
+                messageBase.Content = friendlyException.FriendlyMessage;
+                return true;
+            }
+            
             var stackTrace = new StackTrace(result.Exception);
             var frames = stackTrace.GetFrames()
                 .Take(4)
