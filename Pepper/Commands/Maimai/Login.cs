@@ -17,9 +17,9 @@ namespace Pepper.Commands.Maimai
         public Login(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
             : base(http, data, cookieProvider) {}
 
-        private readonly LocalEmoji Hourglass = new ("⏳");
-        private readonly LocalEmoji Failed = new ("❌");
-        private readonly LocalEmoji Success = new ("✅");
+        private static readonly LocalEmoji Hourglass = new("⏳");
+        private static readonly LocalEmoji Failed = new("❌");
+        private static readonly LocalEmoji Success = new("✅");
 
         [TextCommand("mailogin")]
         [Description("Provide your cookie here.")]
