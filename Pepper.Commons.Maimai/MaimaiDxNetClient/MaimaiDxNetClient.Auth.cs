@@ -7,7 +7,7 @@ namespace Pepper.Commons.Maimai
         private const string AuthUrl = "https://lng-tgk-aime-gw.am-all.net/common_auth/login" +
                                        "?site_id=maimaidxex" +
                                        "&redirect_url=https://maimaidx-eng.com/maimai-mobile/&back_url=https://maimai.sega.com/";
-        public async Task<string?> GetAuthUserId()
+        private async Task<string?> GetAuthUserId()
         {
             var maimaiSsidRedemptionUrl = await VerifyCookie();
             if (maimaiSsidRedemptionUrl == null)
@@ -28,7 +28,7 @@ namespace Pepper.Commons.Maimai
             return cookieValue;
         }
 
-        private async Task<string?> VerifyCookie()
+        public async Task<string?> VerifyCookie()
         {
             var amAllReq = new HttpRequestMessage(HttpMethod.Get, AuthUrl);
             amAllReq.Headers.Add("Cookie", $"clal={clal}");

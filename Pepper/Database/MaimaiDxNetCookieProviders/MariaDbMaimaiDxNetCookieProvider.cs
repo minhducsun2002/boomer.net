@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Security.AccessControl;
 using System.Threading.Tasks;
 using BitFaster.Caching.Lru;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +38,6 @@ namespace Pepper.Database
                 cache.AddOrUpdate(discordId, res.Cookie);
                 return res.Cookie;
             }
-
             return null;
         }
 
