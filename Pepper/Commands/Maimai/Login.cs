@@ -4,6 +4,7 @@ using Disqord.Bot.Commands;
 using Pepper.Commons.Maimai;
 using Pepper.Database.MaimaiDxNetCookieProviders;
 using Pepper.Services.Maimai;
+using Qmmands;
 using Qmmands.Text;
 
 namespace Pepper.Commands.Maimai
@@ -14,8 +15,9 @@ namespace Pepper.Commands.Maimai
             : base(http, data, cookieProvider) {}
 
         [TextCommand("mailogin")]
+        [Description("Provide your cookie here.")]
         [RequirePrivate]
-        public async Task<IDiscordCommandResult> Exec(string? cookie = null)
+        public async Task<IDiscordCommandResult> Exec([Description("Self-explanatory")] string? cookie = null)
         {
             if (cookie == null)
             {

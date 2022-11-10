@@ -27,6 +27,7 @@ namespace Pepper.Commands.Maimai
         };
         
         [TextCommand("maitop")]
+        [Description("Show top rated plays of an user.")]
         public async Task<IDiscordCommandResult> Exec(
             [Description("User in question")] IMember? player = null
         )
