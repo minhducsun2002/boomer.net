@@ -27,6 +27,12 @@ namespace Pepper.Structures
                 return true;
             }
 
+            if (types.ContainsKey(typeof(RequirePrivateAttribute)))
+            {
+                messageBase.Content = "Please send this via DM instead.";
+                return true;
+            }
+
             var prefixCheckType = typeof(PrefixCheckAttribute);
             if (types.Count == 1 && types.First().Key == prefixCheckType)
             {
