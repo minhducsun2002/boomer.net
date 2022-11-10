@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -21,9 +22,14 @@ namespace Pepper.Commands.Maimai
     {
         public Top(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider) : base(http, data, cookieProvider) {}
 
-        private readonly Difficulty[] difficulties =
+        private static readonly Difficulty[] Difficulties =
         {
             Difficulty.Basic, Difficulty.Advanced, Difficulty.Expert, Difficulty.Master, Difficulty.ReMaster
+        };
+
+        private static readonly string[] DifficultyStrings =
+        {
+            "BASIC", "ADVANCED", "EXPERT", "MASTER", "Re:MASTER"
         };
         
         [TextCommand("maitop")]
@@ -35,12 +41,12 @@ namespace Pepper.Commands.Maimai
             var cookie = await CookieProvider.GetCookie(player?.Id ?? Context.AuthorId);
             var client = new MaimaiDxNetClient(HttpClient, cookie!);
             
-            var msg = await Reply($"A few seconds please, loading {difficulties.Length} pages...");
+            var msg = await Reply($"A few seconds please, loading {Difficulties.Length} pages...");
             
             // Universe PLUS
             var latestVersion = GameDataService.NewestVersion == 0 ? 18 : GameDataService.NewestVersion;
             var records = Enumerable.Empty<ScoreRecord>();
-            foreach (var diff in difficulties)
+            foreach (var diff in Difficulties)
             {
                 records = records.Concat(await client.GetUserDifficultyRecord(diff));
             }
@@ -53,7 +59,6 @@ namespace Pepper.Commands.Maimai
                     int chartConstant;
                     var searchRes = GameDataService.ResolveSong(score.Name, score.Difficulty, score.Level);
                     var version = GameDataService.NewestVersion;
-                    var difficulty = score.Difficulty;
                     if (searchRes.HasValue)
                     {
                         var (diff, song) = searchRes.Value;
@@ -67,7 +72,7 @@ namespace Pepper.Commands.Maimai
                     }
 
                     var total = GetFinalScore(score.Accuracy, chartConstant);
-                    return (score.Name, chartConstant, difficulty, version, total);
+                    return (score, version, chartConstant, total);
                 })
                 .OrderByDescending(p => p.total)
                 .ToList();
@@ -91,38 +96,24 @@ namespace Pepper.Commands.Maimai
             var oldFooter = new LocalEmbedFooter()
                 .WithText($"Total Old rating : {NormalizeRating(oldScores.Select(s => s.total).Sum())}");
 
-            var newEmbedFields = newScores
-                .Chunk(2)
-                .Select(pair =>
+            var newEmbed = newScores
+                .Chunk(10)
+                .Select(entries =>
                 {
-                    var field = new LocalEmbedField()
-                        .WithName(FormatScore(pair[0]));
-                    return pair.Length > 1
-                        ? field.WithValue(FormatScore(pair[1]))
-                        : field.WithBlankValue();
-                })
-                .ToList();
-            var newEmbed = new LocalEmbed
-            {
-                Title = "New charts - top rated plays",
-                Fields = newEmbedFields,
-                Footer = newFooter
-            };
+                    var fields = CreateFields(entries);
+                    return new LocalEmbed
+                    {
+                        Title = "New charts - top rated plays",
+                        Fields = fields.ToList(),
+                        Footer = newFooter
+                    };
+                });
 
             var oldEmbed = oldScores
-                .Chunk(20)
-                .Select(page =>
+                .Chunk(10)
+                .Select(entries =>
                 {
-                    var entries = page.Chunk(2);
-                    var fields = entries
-                        .Select(pair =>
-                        {
-                            var field = new LocalEmbedField()
-                                .WithName(FormatScore(pair[0]));
-                            return pair.Length > 1
-                                ? field.WithValue(FormatScore(pair[1]))
-                                : field.WithBlankValue();
-                        });
+                    var fields = CreateFields(entries);
                     return new LocalEmbed
                     {
                         Title = "Old charts - top rated plays",
@@ -132,20 +123,32 @@ namespace Pepper.Commands.Maimai
                 });
 
             var embeds = Enumerable.Empty<LocalEmbed>()
-                .Append(newEmbed)
+                .Concat(newEmbed)
                 .Concat(oldEmbed)
-                .Select(embed => new Page().WithEmbeds(embed).WithContent("These calculations are estimate."));
+                .Select(embed => new Page().WithEmbeds(embed).WithContent("These calculations are estimated."));
 
             
             await msg.DeleteAsync();
             return View(new PagedView(new ListPageProvider(embeds)), TimeSpan.FromSeconds(30));
         }
 
-        private static string FormatScore((string Name, int chartConstant, Difficulty difficulty, int version, long total) score)
+        private static IEnumerable<LocalEmbedField> CreateFields(
+            IEnumerable<(ScoreRecord score, int version, int chartConstant, long total)> entries
+        )
         {
-            var (name, constant, diff, _, total) = score;
-            var diffText = diff.ToString()[..3].ToUpperInvariant();
-            return $"[**{NormalizeRating(total), 3}**] ({diffText} {constant / 10, 2}.{constant % 10}) {name}";
+            return entries
+                .Select(entry =>
+                {
+                    var (score, _, constant, total) = entry;
+                    var accuracy = score.Accuracy;
+                    var diffText = DifficultyStrings[(int) score.Difficulty];
+                    var field = new LocalEmbedField()
+                        .WithName(
+                            $"{score.Name}  [{diffText} {constant / 10}.{constant % 10}]")
+                        .WithValue($"**{NormalizeRating(total),3}** rating - " +
+                                   $"**{accuracy / 10000}**.**{(accuracy % 10000).ToString().PadRight(0, '0')}**%");
+                    return field;
+                });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]

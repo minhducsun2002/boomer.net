@@ -50,24 +50,9 @@ namespace Pepper.Commands.Maimai
                             _ => new Color(0x45c124)
                         };
                         var rankEndingInPlus = record.Rank.EndsWith("plus");
-                        var comboText = record.FcStatus switch
-                        {
-                            FcStatus.FC => "FC",
-                            FcStatus.FCPlus => "FC+",
-                            FcStatus.AllPerfect => "AP",
-                            FcStatus.AllPerfectPlus => "AP+",
-                            _ => ""
-                        };
+                        var comboText = GetStatusString(record.FcStatus);
+                        var syncText = GetStatusString(record.SyncStatus);
 
-                        var syncText = record.SyncStatus switch
-                        {
-                            SyncStatus.FullSyncDx => "FS DX",
-                            SyncStatus.FullSyncDxPlus => "FS DX+",
-                            SyncStatus.FullSync => "FS",
-                            SyncStatus.FullSyncPlus => "FS+",
-                            _ => ""
-                        };
-                        
                         var r = new LocalEmbed
                         {
                             Author = new LocalEmbedAuthor().WithName($"Track {record.Track} - {diff}"),

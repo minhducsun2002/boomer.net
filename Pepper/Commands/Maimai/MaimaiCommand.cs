@@ -1,5 +1,5 @@
 using System.Net.Http;
-using Pepper.Commons.Maimai;
+using Pepper.Commons.Maimai.Structures;
 using Pepper.Database.MaimaiDxNetCookieProviders;
 using Pepper.Services.Maimai;
 using Pepper.Structures;
@@ -60,6 +60,32 @@ namespace Pepper.Commands.Maimai
             }
 
             return 0;
+        }
+
+        protected static string GetStatusString(FcStatus fcStatus)
+        {
+            var comboText = fcStatus switch
+            {
+                FcStatus.FC => "FC",
+                FcStatus.FCPlus => "FC+",
+                FcStatus.AllPerfect => "AP",
+                FcStatus.AllPerfectPlus => "AP+",
+                _ => ""
+            };
+            return comboText;
+        }
+        
+        protected static string GetStatusString(SyncStatus syncStatus)
+        {
+            var syncText = syncStatus switch
+            {
+                SyncStatus.FullSyncDx => "FS DX",
+                SyncStatus.FullSyncDxPlus => "FS DX+",
+                SyncStatus.FullSync => "FS",
+                SyncStatus.FullSyncPlus => "FS+",
+                _ => ""
+            };
+            return syncText;
         }
     }
 }
