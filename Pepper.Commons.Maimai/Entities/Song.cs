@@ -38,7 +38,7 @@ namespace Pepper.Commons.Maimai.Entities
         [InverseProperty("Songs")]
         public virtual Genre? Genre { get; set; }
 
-        [InverseProperty(nameof(Difficulty.Song))]
+        // [InverseProperty(nameof(Difficulty.Song))]
         public IReadOnlyList<Difficulty> Difficulties { get; set; } = new List<Difficulty>();
     }
 }

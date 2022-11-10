@@ -20,7 +20,7 @@ namespace Pepper.Commands.Maimai
 {
     public class Top : MaimaiCommand
     {
-        public Top(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider) : base(http, data, cookieProvider) {}
+        public Top(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider) : base(http, data, cookieProvider) { }
 
         private static readonly Difficulty[] Difficulties =
         {
@@ -31,7 +31,7 @@ namespace Pepper.Commands.Maimai
         {
             "BASIC", "ADVANCED", "EXPERT", "MASTER", "Re:MASTER"
         };
-        
+
         [TextCommand("maitop")]
         [Description("Show top rated plays of an user.")]
         public async Task<IDiscordCommandResult> Exec(
@@ -40,9 +40,9 @@ namespace Pepper.Commands.Maimai
         {
             var cookie = await CookieProvider.GetCookie(player?.Id ?? Context.AuthorId);
             var client = new MaimaiDxNetClient(HttpClient, cookie!);
-            
+
             var msg = await Reply($"A few seconds please, loading {Difficulties.Length} pages...");
-            
+
             // Universe PLUS
             var latestVersion = GameDataService.NewestVersion == 0 ? 18 : GameDataService.NewestVersion;
             var records = Enumerable.Empty<ScoreRecord>();
@@ -82,7 +82,7 @@ namespace Pepper.Commands.Maimai
                 await msg.DeleteAsync();
                 return Reply("No score was found!");
             }
-            
+
             var newScores = scores
                 .Where(s => s.version == latestVersion)
                 .Take(15)
@@ -127,7 +127,7 @@ namespace Pepper.Commands.Maimai
                 .Concat(oldEmbed)
                 .Select(embed => new Page().WithEmbeds(embed).WithContent("These calculations are estimated."));
 
-            
+
             await msg.DeleteAsync();
             return View(new PagedView(new ListPageProvider(embeds)), TimeSpan.FromSeconds(30));
         }

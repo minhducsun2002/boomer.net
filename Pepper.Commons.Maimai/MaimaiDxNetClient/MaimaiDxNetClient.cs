@@ -18,7 +18,7 @@ namespace Pepper.Commons.Maimai
             clal = clalCookie;
             this.httpClient = httpClient;
         }
-        
+
         private async Task<string> GetHtml(string url)
         {
             var uid = await GetAuthUserId();

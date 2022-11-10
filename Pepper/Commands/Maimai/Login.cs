@@ -2,7 +2,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot.Commands;
-using Disqord.Gateway;
 using Disqord.Rest;
 using Pepper.Commons.Maimai;
 using Pepper.Database.MaimaiDxNetCookieProviders;
@@ -15,7 +14,7 @@ namespace Pepper.Commands.Maimai
     public class Login : MaimaiCommand
     {
         public Login(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
-            : base(http, data, cookieProvider) {}
+            : base(http, data, cookieProvider) { }
 
         private static readonly LocalEmoji Hourglass = new("⏳");
         private static readonly LocalEmoji Failed = new("❌");

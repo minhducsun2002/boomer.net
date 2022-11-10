@@ -16,7 +16,7 @@ namespace Pepper.Structures
                 messageBase.Content = friendlyException.FriendlyMessage;
                 return true;
             }
-            
+
             var stackTrace = new StackTrace(result.Exception);
             var frames = stackTrace.GetFrames()
                 .Take(4)

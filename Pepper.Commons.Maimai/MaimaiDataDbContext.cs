@@ -29,15 +29,15 @@ namespace Pepper.Commons.Maimai
                     .WithMany(p => p.Songs)
                     .HasForeignKey(d => d.GenreId);
 
-                entity.HasMany(s => s.Difficulties)
-                    .WithOne(p => p.Song);
+                // entity.HasMany(s => s.Difficulties)
+                //     .WithOne(p => p.Song);
             });
 
             modelBuilder.Entity<Difficulty>(entity =>
             {
-                entity.HasOne(d => d.Song)
-                    .WithMany(s => s.Difficulties)
-                    .HasForeignKey(d => d.SongId);
+                // entity.HasOne(d => d.Song)
+                //     .WithMany(s => s.Difficulties)
+                //     .HasForeignKey(d => d.SongId);
             });
         }
     }

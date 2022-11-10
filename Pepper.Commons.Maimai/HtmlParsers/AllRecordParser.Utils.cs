@@ -26,13 +26,13 @@ namespace Pepper.Commons.Maimai.HtmlParsers
 
                 if (blown)
                 {
-                    f2 = f2 == 0 
+                    f2 = f2 == 0
                         ? raw[i] - '0'
                         : 10 * f2 + (raw[i] - '0');
                 }
                 else
                 {
-                    f1 = f1 == 0 
+                    f1 = f1 == 0
                         ? raw[i] - '0'
                         : 10 * f1 + (raw[i] - '0');
                 }

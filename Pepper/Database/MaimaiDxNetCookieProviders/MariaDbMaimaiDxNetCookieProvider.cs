@@ -15,22 +15,22 @@ namespace Pepper.Database
         {
             [Key]
             [Column("discord_id")] public ulong DiscordId { get; set; }
-            [Column("cookie")] public string Cookie { get; set; }
+            [Column("cookie")] public string Cookie { get; set; } = "";
         }
-        
+
         private static readonly ILogger Log = Serilog.Log.Logger.ForContext<MariaDbMaimaiDxNetCookieProvider>();
-        
+
         public MariaDbMaimaiDxNetCookieProvider(DbContextOptions<MariaDbMaimaiDxNetCookieProvider> options) : base(options) { }
         private readonly FastConcurrentLru<ulong, string> cache = new(200);
         private DbSet<Record> DbSet { get; set; } = null!;
-        
+
         public async ValueTask<string?> GetCookie(ulong discordId)
         {
             if (cache.TryGet(discordId, out var ret))
             {
                 return ret;
             }
-            
+
             Log.Information("Didn't found a record for user {0}. Querying.", discordId);
             var res = await DbSet.FirstOrDefaultAsync(r => r.DiscordId == discordId);
             if (res != null)

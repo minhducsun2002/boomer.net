@@ -39,7 +39,7 @@ namespace Pepper.Services.Maimai
                 foreach (var diff in diffs)
                 {
                     if (diff.Level == level.Item1 &&
-                        (diff.LevelDecimal >= 7 == level.Item2) && 
+                        (diff.LevelDecimal >= 7 == level.Item2) &&
                         ((int) difficulty == diff.Order))
                     {
                         return (diff, songCache[id]);
@@ -72,7 +72,7 @@ namespace Pepper.Services.Maimai
                     .ToDictionary(e => e.Key, e => e.Select(e => e.Id).ToList());
                 Log.Information("Loaded {0} songs", songCache.Count);
             }
-            
+
             await base.ExecuteAsync(stoppingToken);
         }
     }

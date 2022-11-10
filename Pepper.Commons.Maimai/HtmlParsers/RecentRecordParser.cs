@@ -45,7 +45,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                 if (multiplayerRankImage != null)
                 {
                     var multiplayerRankImageSrc = multiplayerRankImage.GetAttributeValue("src", "");
-                    multiplayerRank = ParseMultiplayerRank(multiplayerRankImageSrc);   
+                    multiplayerRank = ParseMultiplayerRank(multiplayerRankImageSrc);
                 }
                 var fsImage = fcImage.NextSiblingElement();
                 var fsImageSrc = fsImage.GetAttributeValue("src", "");

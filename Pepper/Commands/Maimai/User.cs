@@ -14,8 +14,8 @@ namespace Pepper.Commands.Maimai
 {
     public class User : MaimaiCommand
     {
-        public User(HttpClient httpClient, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider) 
-            : base(httpClient, data, cookieProvider) {}
+        public User(HttpClient httpClient, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
+            : base(httpClient, data, cookieProvider) { }
 
         [TextCommand("maiuser")]
         [Description("Show info of an user.")]

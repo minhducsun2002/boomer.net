@@ -48,7 +48,7 @@ namespace Pepper.Commands.Maimai
             (0200000, 020),
             (0100000, 010)
         };
-        
+
         private static int GetRankCoeff(long accuracy)
         {
             for (var i = 0; i < Coeff.Length; i++)
@@ -74,7 +74,7 @@ namespace Pepper.Commands.Maimai
             };
             return comboText;
         }
-        
+
         protected static string GetStatusString(SyncStatus syncStatus)
         {
             var syncText = syncStatus switch

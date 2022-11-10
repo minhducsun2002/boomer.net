@@ -114,6 +114,6 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                 _ => ChallengeType.None
             };
         }
-        
+
     }
 }

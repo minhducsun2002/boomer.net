@@ -13,6 +13,6 @@ namespace Pepper.Commons.Maimai.Entities
         public string? Name { get; set; }
 
         [InverseProperty("AddVersion")]
-        public virtual ICollection<Song> Songs { get; set; }
+        public virtual ICollection<Song>? Songs { get; set; }
     }
 }
