@@ -21,11 +21,15 @@ namespace Pepper.Commands.Maimai
             GameDataService = dataService;
         }
 
-        /// <param name="accuracy">Accuracy, in range [0, 1M]</param>
+        /// <param name="accuracy">Accuracy, in range [0, 1005000]</param>
         /// <param name="chartConstant">Chart constant, in range [10, 150]</param>
         /// <returns></returns>
         protected static long GetFinalScore(long accuracy, long chartConstant)
         {
+            if (accuracy > 1005000)
+            {
+                accuracy = 1005000;
+            }
             return accuracy * chartConstant * GetRankCoeff(accuracy);
         }
 
