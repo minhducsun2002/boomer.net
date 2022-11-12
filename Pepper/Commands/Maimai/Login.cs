@@ -29,20 +29,39 @@ namespace Pepper.Commands.Maimai
             {
                 return Reply("Please provide a cookie.");
             }
-            var client = new MaimaiDxNetClient(HttpClient, cookie);
             await Context.Message.AddReactionAsync(Hourglass);
-            var uid = await client.VerifyCookie();
-            if (uid == null)
+            if (!await TryCookie(cookie))
             {
-                await Context.Message.AddReactionAsync(Failed);
-                await Context.Message.RemoveOwnReactionAsync(Hourglass);
-                return null;
+                if (cookie.StartsWith("clal="))
+                {
+                    if (!await TryCookie(cookie[5..]))
+                    {
+                        return await ReactFailed();
+                    }
+                }
+                else
+                {
+                    return await ReactFailed();
+                }
             }
 
             await CookieProvider.StoreCookie(Context.AuthorId, cookie);
             await Context.Message.AddReactionAsync(Success);
             await Context.Message.RemoveOwnReactionAsync(Hourglass);
             return null;
+        }
+
+        private async Task<IDiscordCommandResult?> ReactFailed()
+        {
+            await Context.Message.AddReactionAsync(Failed);
+            await Context.Message.RemoveOwnReactionAsync(Hourglass);
+            return null;
+        }
+
+        private async Task<bool> TryCookie(string cookie)
+        {
+            var client = new MaimaiDxNetClient(HttpClient, cookie);
+            return await client.VerifyCookie() != null;
         }
     }
 }
