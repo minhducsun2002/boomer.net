@@ -38,6 +38,7 @@ namespace Pepper.Commands.Maimai
                     {
                         return await ReactFailed();
                     }
+                    cookie = cookie[5..];
                 }
                 else
                 {
