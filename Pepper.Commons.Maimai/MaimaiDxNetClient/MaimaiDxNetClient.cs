@@ -1,10 +1,11 @@
 using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Maimai.Structures.Exception;
 
 namespace Pepper.Commons.Maimai
 {
     public partial class MaimaiDxNetClient
     {
-        private readonly string clal;
+        private readonly string? clal;
         private static readonly HttpClient AuthHttpClient = new(new SocketsHttpHandler
         {
             AllowAutoRedirect = false
@@ -13,7 +14,7 @@ namespace Pepper.Commons.Maimai
 
         /// <param name="clalCookie">clal cookie without the <c>clal=</c> prefix</param>
         // ReSharper disable once InvalidXmlDocComment
-        public MaimaiDxNetClient(HttpClient httpClient, string clalCookie)
+        public MaimaiDxNetClient(HttpClient httpClient, string? clalCookie)
         {
             clal = clalCookie;
             this.httpClient = httpClient;

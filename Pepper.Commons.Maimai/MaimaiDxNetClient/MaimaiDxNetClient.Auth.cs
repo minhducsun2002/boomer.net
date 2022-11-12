@@ -1,4 +1,5 @@
 using System.Net;
+using Pepper.Commons.Maimai.Structures.Exception;
 
 namespace Pepper.Commons.Maimai
 {
@@ -30,6 +31,11 @@ namespace Pepper.Commons.Maimai
 
         public async Task<string?> VerifyCookie()
         {
+            if (clal == null)
+            {
+                throw new MissingCookieException();
+            }
+
             var amAllReq = new HttpRequestMessage(HttpMethod.Get, AuthUrl);
             amAllReq.Headers.Add("Cookie", $"clal={clal}");
             var amAllRes = await AuthHttpClient.SendAsync(amAllReq);
