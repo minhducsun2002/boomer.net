@@ -40,15 +40,7 @@ namespace Pepper.Commands.Maimai
                         var diff = record.Difficulty == Difficulty.ReMaster
                             ? "Re:MASTER"
                             : record.Difficulty.ToString().ToUpperInvariant();
-                        var color = record.Difficulty switch
-                        {
-                            Difficulty.Basic => new Color(0x45c124),
-                            Difficulty.Advanced => new Color(0xffba01),
-                            Difficulty.Expert => new Color(0xff7b7b),
-                            Difficulty.Master => new Color(0x9f51dc),
-                            Difficulty.ReMaster => new Color(0xdbaaff),
-                            _ => new Color(0x45c124)
-                        };
+
                         var song = GameDataService.ResolveSongLoosely(record.Name, record.Difficulty, record.Version);
                         var level = song.HasValue
                             ? song?.Item1.Level + "." + song?.Item1.LevelDecimal
@@ -69,7 +61,7 @@ namespace Pepper.Commands.Maimai
                                           + (syncText == "" ? syncText : $" [**{syncText}**]"),
                             ThumbnailUrl = record.ImageUrl ?? Optional<string>.Empty,
                             Timestamp = record.Timestamp,
-                            Color = color
+                            Color = GetColor(record.Difficulty)
                         };
 
                         if (record.ChallengeType != ChallengeType.None)

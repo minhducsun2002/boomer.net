@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures;
@@ -16,8 +18,17 @@ namespace Pepper.Services.Maimai
 {
     public class MaimaiDataService : Service
     {
+        private class SongImageData
+        {
+#pragma warning disable CS8618
+            [JsonProperty("title")] public string Name { get; set; } = null!;
+            [JsonProperty("image_url")] public string ImageFileName { get; set; } = null!;
+#pragma warning restore CS8618
+        }
+
         private static readonly ILogger Log = Serilog.Log.Logger.ForContext<MaimaiDataService>();
         private readonly IServiceProvider serviceProvider;
+        private Dictionary<string, string> imageNameCache = new();
         private Dictionary<int, Song> songCache = new();
         private Dictionary<string, List<int>> nameCache = new();
         public int NewestVersion { get; private set; }
@@ -25,6 +36,16 @@ namespace Pepper.Services.Maimai
         public MaimaiDataService(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
+        }
+
+        public string? GetImageUrl(string songName)
+        {
+            if (imageNameCache.TryGetValue(songName, out var fileName))
+            {
+                return "https://maimaidx-eng.com/maimai-mobile/img/Music/" + fileName;
+            }
+
+            return null;
         }
 
         public (Difficulty, Song)? ResolveSongExact(string name, Pepper.Commons.Maimai.Structures.Difficulty difficulty, (int, bool) level)
@@ -85,13 +106,17 @@ namespace Pepper.Services.Maimai
             {
                 var dataDb = scope.ServiceProvider.GetRequiredService<MaimaiDataDbContext>();
                 Log.Information("Loading song data...");
-                var difficulty = await dataDb.AddVersions.OrderByDescending(a => a.Id).FirstOrDefaultAsync();
+                var difficulty = await dataDb.AddVersions.OrderByDescending(a => a.Id)
+                    .FirstOrDefaultAsync(cancellationToken: stoppingToken);
                 if (difficulty != null)
                 {
                     NewestVersion = difficulty.Id;
                 }
                 var songEntries = await dataDb.Songs
                     .Include(s => s.Difficulties.Where(d => d.Enabled))
+                    .Include(s => s.Artist)
+                    .Include(s => s.Genre)
+                    .Include(s => s.AddVersion)
                     .ToListAsync(cancellationToken: stoppingToken);
 
                 songCache = songEntries.ToDictionary(e => e.Id, e => e);
@@ -100,6 +125,15 @@ namespace Pepper.Services.Maimai
                     .GroupBy(e => e.Name)
                     .ToDictionary(e => e.Key, e => e.Select(e => e.Id).ToList());
                 Log.Information("Loaded {0} songs", songCache.Count);
+
+                Log.Information("Loading image data");
+                var httpClient = scope.ServiceProvider.GetRequiredService<HttpClient>();
+                var s = await httpClient.GetStringAsync("https://maimai.sega.jp/data/maimai_songs.json", stoppingToken);
+                var parsed = JsonConvert.DeserializeObject<SongImageData[]>(s);
+                var mapped = parsed!
+                    .DistinctBy(s => s.Name)
+                    .ToDictionary(s => s.Name, s => s.ImageFileName);
+                imageNameCache = mapped;
             }
 
             await base.ExecuteAsync(stoppingToken);

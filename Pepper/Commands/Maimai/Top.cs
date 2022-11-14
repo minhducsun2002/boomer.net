@@ -9,11 +9,13 @@ using Disqord.Bot.Commands;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Disqord.Rest;
 using Pepper.Commons.Maimai;
+using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures;
 using Pepper.Database.MaimaiDxNetCookieProviders;
 using Pepper.Services.Maimai;
 using Qmmands;
 using Qmmands.Text;
+using Difficulty = Pepper.Commons.Maimai.Structures.Difficulty;
 using PagedView = Pepper.Structures.PagedView;
 
 namespace Pepper.Commands.Maimai
@@ -72,7 +74,15 @@ namespace Pepper.Commands.Maimai
                     }
 
                     var total = GetFinalScore(score.Accuracy, chartConstant);
-                    return (score, version, chartConstant, total);
+
+                    if (searchRes.HasValue)
+                    {
+                        var (diff, song) = searchRes.Value;
+                        return (score, diff, song, total, version);
+                    }
+#pragma warning disable CS8619
+                    return (score, null, null, total, version);
+#pragma warning restore CS8619
                 })
                 .OrderByDescending(p => p.total)
                 .ToList();
@@ -97,33 +107,34 @@ namespace Pepper.Commands.Maimai
                 .WithText($"Total Old rating : {NormalizeRating(oldScores.Select(s => s.total).Sum())}");
 
             var newEmbed = newScores
-                .Chunk(10)
-                .Select(entries =>
+                .Chunk(3)
+                .Select((entries, i1) =>
                 {
-                    var fields = CreateFields(entries);
-                    return new LocalEmbed
+                    var page = entries.Select((e, i2) =>
                     {
-                        Title = "New charts - top rated plays",
-                        Fields = fields.ToList(),
-                        Footer = newFooter
-                    };
+                        var (score, diff, song, total, version) = e;
+                        var embed = CreateEmbed(score, diff, song, total, i1 * 3 + i2);
+                        embed = embed.WithFooter(newFooter);
+                        return embed;
+                    });
+                    return page;
                 });
 
             var oldEmbed = oldScores
-                .Chunk(10)
-                .Select(entries =>
+                .Chunk(3)
+                .Select((entries, i1) =>
                 {
-                    var fields = CreateFields(entries);
-                    return new LocalEmbed
+                    var page = entries.Select((e, i2) =>
                     {
-                        Title = "Old charts - top rated plays",
-                        Fields = fields.ToList(),
-                        Footer = oldFooter
-                    };
+                        var (score, diff, song, total, version) = e;
+                        var embed = CreateEmbed(score, diff, song, total, i1 * 3 + i2);
+                        embed = embed.WithFooter(oldFooter);
+                        return embed;
+                    });
+                    return page;
                 });
 
-            var embeds = Enumerable.Empty<LocalEmbed>()
-                .Concat(newEmbed)
+            var embeds = newEmbed
                 .Concat(oldEmbed)
                 .Select(embed => new Page().WithEmbeds(embed).WithContent("These calculations are estimated."));
 
@@ -132,23 +143,51 @@ namespace Pepper.Commands.Maimai
             return View(new PagedView(new ListPageProvider(embeds)), TimeSpan.FromSeconds(30));
         }
 
-        private static IEnumerable<LocalEmbedField> CreateFields(
-            IEnumerable<(ScoreRecord score, int version, int chartConstant, long total)> entries
-        )
+        private LocalEmbed CreateEmbed(ScoreRecord score, Pepper.Commons.Maimai.Entities.Difficulty? diff, Song? song, long total, int index = 0)
         {
-            return entries
-                .Select(entry =>
-                {
-                    var (score, _, constant, total) = entry;
-                    var accuracy = score.Accuracy;
-                    var diffText = DifficultyStrings[(int) score.Difficulty];
-                    var field = new LocalEmbedField()
-                        .WithName(
-                            $"{score.Name}  [{diffText} {constant / 10}.{constant % 10}]")
-                        .WithValue($"**{NormalizeRating(total),3}** rating - " +
-                                   $"**{accuracy / 10000}**.**{(accuracy % 10000).ToString().PadRight(0, '0')}**%");
-                    return field;
-                });
+            var diffText = DifficultyStrings[(int) score.Difficulty];
+            var accuracy = score.Accuracy;
+            int chartConstant;
+            if (diff != null)
+            {
+                chartConstant = diff.Level * 10 + diff.LevelDecimal;
+            }
+            else
+            {
+                var d = score.Level;
+                chartConstant = d.Item1 * 10 + (d.Item2 ? 7 : 0);
+            }
+
+            var rankEndingInPlus = score.Rank[^1] == 'p';
+
+            var embed = new LocalEmbed
+            {
+                Author = new LocalEmbedAuthor()
+                    .WithName($"{index + 1}. "
+                              + score.Name
+                              + (score.Version == ChartVersion.Deluxe ? "  [DX] " : "  ")
+                              + $"[{diffText} {chartConstant / 10}.{chartConstant % 10}]"),
+                Description = $"**{accuracy / 10000}**.**{(accuracy % 10000).ToString().PadRight(0, '0')}**%"
+                              + " - ["
+                              + (rankEndingInPlus
+                                  ? $"**{score.Rank[..^1].ToUpperInvariant()}**+"
+                                  : $"**{score.Rank.ToUpperInvariant()}**")
+                              + $"] - **{NormalizeRating(total)}** rating",
+                Color = GetColor(score.Difficulty)
+            };
+            var imageUrl = GameDataService.GetImageUrl(score.Name);
+            if (imageUrl != null)
+            {
+                embed = embed.WithThumbnailUrl(imageUrl);
+            }
+
+            if (song != null)
+            {
+                embed.AddField("Genre", song.Genre!.Name, true);
+                embed.AddField("Version", song.AddVersion!.Name, true);
+                embed.AddField("Level", $"{score.Level.Item1}{(score.Level.Item2 ? "+" : "")}", true);
+            }
+            return embed;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]

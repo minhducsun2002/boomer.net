@@ -1,4 +1,5 @@
 using System.Net.Http;
+using Disqord;
 using Pepper.Commons.Maimai.Structures;
 using Pepper.Database.MaimaiDxNetCookieProviders;
 using Pepper.Services.Maimai;
@@ -90,6 +91,20 @@ namespace Pepper.Commands.Maimai
                 _ => ""
             };
             return syncText;
+        }
+
+        protected static Color GetColor(Difficulty difficulty)
+        {
+            var color = difficulty switch
+            {
+                Difficulty.Basic => new Color(0x45c124),
+                Difficulty.Advanced => new Color(0xffba01),
+                Difficulty.Expert => new Color(0xff7b7b),
+                Difficulty.Master => new Color(0x9f51dc),
+                Difficulty.ReMaster => new Color(0xdbaaff),
+                _ => new Color(0x45c124)
+            };
+            return color;
         }
     }
 }
