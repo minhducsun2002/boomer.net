@@ -38,22 +38,7 @@ namespace Pepper.Structures
 
         public override async ValueTask DisposeAsync()
         {
-            foreach (var component in EnumerateComponents())
-            {
-                switch (component)
-                {
-                    case ButtonViewComponent buttonViewComponent:
-                        {
-                            buttonViewComponent.IsDisabled = true;
-                            break;
-                        }
-                    case SelectionViewComponent selectionViewComponent:
-                        {
-                            selectionViewComponent.IsDisabled = true;
-                            break;
-                        }
-                }
-            }
+            ClearComponents();
             await Menu.ApplyChangesAsync();
             await base.DisposeAsync();
         }
