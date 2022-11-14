@@ -159,13 +159,14 @@ namespace Pepper.Commands.Maimai
             }
 
             var rankEndingInPlus = score.Rank[^1] == 'p';
+            var hasMultipleVersions = GameDataService.HasMultipleVersions(score.Name);
 
             var embed = new LocalEmbed
             {
                 Author = new LocalEmbedAuthor()
                     .WithName($"{index + 1}. "
                               + score.Name
-                              + (score.Version == ChartVersion.Deluxe ? "  [DX] " : "  ")
+                              + (score.Version == ChartVersion.Deluxe && hasMultipleVersions ? "  [DX] " : "  ")
                               + $"[{diffText} {chartConstant / 10}.{chartConstant % 10}]"),
                 Description = $"**{accuracy / 10000}**.**{(accuracy % 10000).ToString().PadRight(0, '0')}**%"
                               + " - ["

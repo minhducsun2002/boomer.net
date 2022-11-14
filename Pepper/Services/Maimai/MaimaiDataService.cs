@@ -38,6 +38,8 @@ namespace Pepper.Services.Maimai
             this.serviceProvider = serviceProvider;
         }
 
+        public bool HasMultipleVersions(string songName) => nameCache.TryGetValue(songName, out var ids) && ids.Count > 1;
+
         public string? GetImageUrl(string songName)
         {
             if (imageNameCache.TryGetValue(songName, out var fileName))
