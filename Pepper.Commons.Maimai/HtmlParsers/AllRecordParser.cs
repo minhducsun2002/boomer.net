@@ -34,7 +34,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                     var difficulty = RecentRecordParser.ParseDifficulty(difficultyImageSrc);
                     var rankImage = node.QuerySelector("input").PreviousSiblingElement().PreviousSiblingElement();
                     var rankImageSrc = rankImage.GetAttributeValue("src", "");
-                    var rank = RecentRecordParser.ParseRank(rankImageSrc);
+                    var rank = ParseRank(rankImageSrc);
 
                     var chartVersionImage = node.QuerySelector(".music_kind_icon");
                     chartVersionImage ??= node.QuerySelector(".music_kind_icon_dx");

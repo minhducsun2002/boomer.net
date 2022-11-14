@@ -83,5 +83,19 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             raw[^1] == '+'
                 ? (int.Parse(raw[..^1]), true)
                 : (int.Parse(raw), false);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string ParseRank(ReadOnlySpan<char> raw)
+        {
+            var len = raw.Length;
+            for (var i = 54; i < len; i++)
+            {
+                if (raw[i] == '.')
+                {
+                    return raw[54..i].ToString();
+                }
+            }
+            return "";
+        }
     }
 }
