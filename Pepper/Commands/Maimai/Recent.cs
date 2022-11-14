@@ -49,13 +49,18 @@ namespace Pepper.Commands.Maimai
                             Difficulty.ReMaster => new Color(0xdbaaff),
                             _ => new Color(0x45c124)
                         };
+                        var song = GameDataService.ResolveSongLoosely(record.Name, record.Difficulty, record.Version);
+                        var level = song.HasValue
+                            ? song?.Item1.Level + "." + song?.Item1.LevelDecimal
+                            : "";
                         var rankEndingInPlus = record.Rank.EndsWith("plus");
                         var comboText = GetStatusString(record.FcStatus);
                         var syncText = GetStatusString(record.SyncStatus);
 
                         var r = new LocalEmbed
                         {
-                            Author = new LocalEmbedAuthor().WithName($"Track {record.Track} - {diff}"),
+                            Author = new LocalEmbedAuthor()
+                                .WithName($"Track {record.Track} - {diff} {level}"),
                             Title = $"{record.Name}",
                             Description = $"**{record.Accuracy / 10000}**.**{record.Accuracy % 10000}**%" +
                                           $" - **{(rankEndingInPlus ? record.Rank[..^4].ToUpperInvariant() : record.Rank.ToUpperInvariant())}**"

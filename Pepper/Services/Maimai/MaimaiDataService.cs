@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
+using Pepper.Commons.Maimai.Structures;
 using Pepper.Structures;
 using Serilog;
 using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
@@ -26,7 +27,7 @@ namespace Pepper.Services.Maimai
             this.serviceProvider = serviceProvider;
         }
 
-        public (Difficulty, Song)? ResolveSong(string name, Pepper.Commons.Maimai.Structures.Difficulty difficulty, (int, bool) level)
+        public (Difficulty, Song)? ResolveSongExact(string name, Pepper.Commons.Maimai.Structures.Difficulty difficulty, (int, bool) level)
         {
             if (!nameCache.TryGetValue(name, out var ids))
             {
@@ -44,6 +45,34 @@ namespace Pepper.Services.Maimai
                     {
                         return (diff, songCache[id]);
                     }
+                }
+            }
+
+            return null;
+        }
+
+        public (Difficulty, Song)? ResolveSongLoosely(string name, Pepper.Commons.Maimai.Structures.Difficulty difficulty, ChartVersion version)
+        {
+            if (!nameCache.TryGetValue(name, out var ids))
+            {
+                return null;
+            }
+
+            int id;
+            if (ids.Count > 1)
+            {
+                id = Math.Max(ids[0], ids[1]);
+            }
+            else
+            {
+                id = ids[0];
+            }
+            var diffs = songCache[id].Difficulties;
+            foreach (var diff in diffs)
+            {
+                if ((int) difficulty == diff.Order)
+                {
+                    return (diff, songCache[id]);
                 }
             }
 

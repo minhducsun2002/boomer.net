@@ -57,7 +57,7 @@ namespace Pepper.Commands.Maimai
                 .Select(score =>
                 {
                     int chartConstant;
-                    var searchRes = GameDataService.ResolveSong(score.Name, score.Difficulty, score.Level);
+                    var searchRes = GameDataService.ResolveSongExact(score.Name, score.Difficulty, score.Level);
                     var version = GameDataService.NewestVersion;
                     if (searchRes.HasValue)
                     {
