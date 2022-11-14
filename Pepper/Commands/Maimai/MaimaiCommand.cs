@@ -57,7 +57,7 @@ namespace Pepper.Commands.Maimai
         {
             for (var i = 0; i < Coeff.Length; i++)
             {
-                if (accuracy > Coeff[i].Item1)
+                if (accuracy >= Coeff[i].Item1)
                 {
                     return Coeff[i].Item2;
                 }
