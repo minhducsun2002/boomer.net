@@ -1,4 +1,4 @@
-namespace Pepper.Commons.Maimai.Structures.Exception
+namespace Pepper.Commons.Maimai.Structures.Exceptions
 {
     public class LoginFailedException : System.Exception, IFriendlyException
     {

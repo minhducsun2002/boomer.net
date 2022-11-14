@@ -1,5 +1,5 @@
 using System.Net;
-using Pepper.Commons.Maimai.Structures.Exception;
+using Pepper.Commons.Maimai.Structures.Exceptions;
 
 namespace Pepper.Commons.Maimai
 {

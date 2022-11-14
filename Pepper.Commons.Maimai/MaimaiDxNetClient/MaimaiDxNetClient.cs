@@ -1,5 +1,5 @@
 using Pepper.Commons.Maimai.Structures;
-using Pepper.Commons.Maimai.Structures.Exception;
+using Pepper.Commons.Maimai.Structures.Exceptions;
 
 namespace Pepper.Commons.Maimai
 {
