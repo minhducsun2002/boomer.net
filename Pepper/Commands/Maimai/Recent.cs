@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -31,8 +32,24 @@ namespace Pepper.Commands.Maimai
             var client = new MaimaiDxNetClient(HttpClient, cookie!);
             var recent = await client.GetUserRecentRecord();
 
-            var embeds = recent
-                .Chunk(4)
+            var chunks = new List<List<RecentRecord>>();
+            var current = new List<RecentRecord>();
+            foreach (var record in recent)
+            {
+                current.Add(record);
+                if (record.Track == 1)
+                {
+                    chunks.Add(current);
+                    current = new List<RecentRecord>();
+                }
+            }
+
+            if (current.Count != 0)
+            {
+                chunks.Add(current);
+            }
+
+            var embeds = chunks
                 .Select(recordGroup =>
                 {
                     var embeds = recordGroup.Select(record =>
@@ -61,7 +78,7 @@ namespace Pepper.Commands.Maimai
                             Author = new LocalEmbedAuthor()
                                 .WithName($"Track {record.Track} - {diff} {levelText}"),
                             Title = $"{record.Name}",
-                            Description = $"**{record.Accuracy / 10000}**.**{record.Accuracy % 10000}**%" +
+                            Description = $"**{record.Accuracy / 10000}**.**{record.Accuracy % 10000:0000}**%" +
                                           $" - **{(rankEndingInPlus ? record.Rank[..^4].ToUpperInvariant() : record.Rank.ToUpperInvariant())}**"
                                           + (rankEndingInPlus ? "+" : "")
                                           + (comboText == "" ? comboText : $" [**{comboText}**]")
