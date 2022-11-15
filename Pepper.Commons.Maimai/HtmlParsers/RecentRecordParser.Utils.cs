@@ -12,7 +12,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             var year = int.Parse(raw[..4]);
             var month = int.Parse(raw[5..7]);
             var date = int.Parse(raw[8..10]);
-            var hour = int.Parse(raw[8..10]);
+            var hour = int.Parse(raw[11..13]);
             var minute = int.Parse(raw[14..]);
             return new DateTimeOffset(year, month, date, hour, minute, 00, TimeSpan.FromHours(9));
         }
