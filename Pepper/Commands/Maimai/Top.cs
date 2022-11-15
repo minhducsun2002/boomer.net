@@ -190,11 +190,5 @@ namespace Pepper.Commands.Maimai
             }
             return embed;
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-        private static int NormalizeRating(long total)
-        {
-            return (int) (total / 1000000 / 10 / 10);
-        }
     }
 }

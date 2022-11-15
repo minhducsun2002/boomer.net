@@ -1,4 +1,5 @@
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using Disqord;
 using Pepper.Commons.Maimai.Structures;
 using Pepper.Database.MaimaiDxNetCookieProviders;
@@ -105,6 +106,12 @@ namespace Pepper.Commands.Maimai
                 _ => new Color(0x45c124)
             };
             return color;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        protected static int NormalizeRating(long total)
+        {
+            return (int) (total / 1000000 / 10 / 10);
         }
     }
 }
