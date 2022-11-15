@@ -119,7 +119,8 @@ namespace Pepper.Commands.Maimai
                         return r;
                     });
                     return new Page().WithEmbeds(embeds.Append(new LocalEmbed()));
-                });
+                })
+                .ToArray();
 
             return View(new PagedView(new ListPageProvider(embeds)), TimeSpan.FromSeconds(30));
         }

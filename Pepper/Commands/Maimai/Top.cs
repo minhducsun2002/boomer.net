@@ -136,8 +136,8 @@ namespace Pepper.Commands.Maimai
 
             var embeds = newEmbed
                 .Concat(oldEmbed)
-                .Select(embed => new Page().WithEmbeds(embed).WithContent("These calculations are estimated."));
-
+                .Select(embed => new Page().WithEmbeds(embed).WithContent("These calculations are estimated."))
+                .ToArray();
 
             await msg.DeleteAsync();
             return View(new PagedView(new ListPageProvider(embeds)), TimeSpan.FromSeconds(30));
