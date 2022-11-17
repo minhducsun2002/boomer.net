@@ -20,8 +20,9 @@ namespace Pepper.Commons.Maimai.HtmlParsers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static int ParseAccuracy(ReadOnlySpan<char> raw)
         {
-            // form: AB.CDEF%
-            var markerIndex = raw.Length == 9 ? 3 : 2;
+            // form: A[B][C].EFGH%
+            // 7 -> 1, 8 -> 2, 9 -> 3
+            var markerIndex = raw.Length - 6;
             var p1 = raw[..markerIndex];
             var p2 = raw[(markerIndex + 1)..^1];
             return int.Parse(p1) * 10000 + int.Parse(p2);
