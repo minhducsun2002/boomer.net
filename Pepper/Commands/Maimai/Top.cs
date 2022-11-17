@@ -168,7 +168,7 @@ namespace Pepper.Commands.Maimai
                               + score.Name
                               + (score.Version == ChartVersion.Deluxe && hasMultipleVersions ? "  [DX] " : "  ")
                               + $"[{diffText} {chartConstant / 10}.{chartConstant % 10}]"),
-                Description = $"**{accuracy / 10000}**.**{(accuracy % 10000).ToString().PadRight(0, '0')}**%"
+                Description = $"**{accuracy / 10000}**.**{accuracy % 10000:0000}**%"
                               + " - ["
                               + (rankEndingInPlus
                                   ? $"**{score.Rank[..^1].ToUpperInvariant()}**+"
