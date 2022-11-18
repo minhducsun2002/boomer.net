@@ -63,18 +63,6 @@ var hostBuilder = new HostBuilder()
     .ConfigureAppConfiguration(app =>
     {
         app.AddEnvironmentVariables("PEPPER_");
-        var configUrl = Environment.GetEnvironmentVariable("PEPPER_CONFIG_URL");
-        if (!string.IsNullOrWhiteSpace(configUrl))
-        {
-            var httpClient = new HttpClient();
-            Log.Information($"Downloading JSON configuration from {configUrl}...");
-            var config = httpClient.GetStreamAsync(configUrl).Result;
-            app.AddJsonStream(config);
-        }
-        else
-        {
-            app.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "config/config.json"));
-        }
     })
     .ConfigureServices((context, services) =>
     {
@@ -115,8 +103,7 @@ var hostBuilder = new HostBuilder()
             bot.GatewayProxy = bot.RestProxy = new WebProxy(context.Configuration["DISCORD_PROXY"]);
         }
         bot.Token = context.Configuration["DISCORD_TOKEN"];
-        bot.Prefixes = context.Configuration.GetAllCommandPrefixes()
-            .SelectMany(kv => kv.Value);
+        bot.Prefixes = new [] { "b!", "o!" };
         bot.Intents |= GatewayIntent.DirectMessages;
     })
     .UseDefaultServiceProvider(option => option.ValidateOnBuild = true);

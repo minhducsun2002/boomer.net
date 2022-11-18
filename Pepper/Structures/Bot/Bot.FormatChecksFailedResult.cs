@@ -33,13 +33,7 @@ namespace Pepper.Structures
                 return true;
             }
 
-            var prefixCheckType = typeof(PrefixCheckAttribute);
-            if (types.Count == 1 && types.First().Key == prefixCheckType)
-            {
-                return false;
-            }
-
-            var firstValidCheck = checks.First(c => c.GetType() != prefixCheckType).Key;
+            var firstValidCheck = checks.First().Key;
             messageBase.Content = @$"A secret check named {
                 firstValidCheck.GetType().Name.Replace("Attribute", "", StringComparison.OrdinalIgnoreCase)} failed.";
             return true;

@@ -20,7 +20,6 @@ namespace Pepper.Structures
         private static readonly Type[] DownleveledAttributeTypes =
         {
             typeof(CategoryAttribute),
-            typeof(PrefixCategoryAttribute),
             typeof(HiddenAttribute)
         };
 

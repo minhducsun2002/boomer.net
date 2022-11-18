@@ -12,17 +12,15 @@ namespace Pepper.Structures
     {
         public static string[] GetPrefixes(this ITextCommand command, DiscordBotBase bot)
         {
-            var prefixCategory = command.CustomAttributes.OfType<PrefixCategoryAttribute>().FirstOrDefault()?.PrefixCategory;
-            var config = bot.Services.GetRequiredService<IConfiguration>();
-            var prefixes = string.IsNullOrWhiteSpace(prefixCategory)
-                ? ((DefaultPrefixProvider) bot.Prefixes).Prefixes.OfType<StringPrefix>().Select(prefix => prefix.ToString())
-                : config.GetCommandPrefixes(prefixCategory);
+            var prefixes = ((DefaultPrefixProvider) bot.Prefixes).Prefixes.OfType<StringPrefix>().Select(prefix => prefix.ToString());
             return prefixes.ToArray();
         }
 
         public static string GetPrimaryInvocation(this ITextCommand command, DiscordBotBase bot)
         {
-            var prefix = command.GetPrefixes(bot).MinBy(s => s.Length);
+            var prefix = ((DefaultPrefixProvider) bot.Prefixes).Prefixes
+                .OfType<StringPrefix>()
+                .Select(prefix => prefix.ToString());
             var name = command.Aliases.MinBy(s => s.Length);
             return prefix + name;
         }

@@ -97,11 +97,9 @@ namespace Pepper.Commands.General
 
         private List<LocalEmbed> HandleCommand(ITextCommand[] commands)
         {
-            var prefixCategory = commands[0].CustomAttributes.OfType<PrefixCategoryAttribute>().FirstOrDefault()?.PrefixCategory;
-            var config = Context.Services.GetRequiredService<IConfiguration>();
-            var prefixes = string.IsNullOrWhiteSpace(prefixCategory)
-                ? ((DefaultPrefixProvider) Context.Bot.Prefixes).Prefixes.Select(prefix => prefix.ToString()!).ToArray()
-                : config.GetCommandPrefixes(prefixCategory);
+            var prefixes = ((DefaultPrefixProvider) Context.Bot.Prefixes).Prefixes
+                .Select(prefix => prefix.ToString()!)
+                .ToArray();
 
             string basePrefix = prefixes[0], baseInvocation = $"{basePrefix}{commands[0].Aliases[0]}";
             var otherPrefixes = prefixes.Length > 1 ? prefixes[1..] : System.Array.Empty<string>();

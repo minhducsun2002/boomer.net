@@ -12,11 +12,9 @@ using Pepper.Commons.Osu;
 using Pepper.Structures;
 using Pepper.Structures.CommandAttributes.Metadata;
 using Pepper.Structures.External.Osu;
-using Pepper.Utilities.Osu;
 
 namespace Pepper.Commands.Osu
 {
-    [PrefixCategory("osu")]
     [Category("osu!")]
     public abstract class OsuCommand : Command
     {
