@@ -3,7 +3,6 @@ using System.Linq;
 using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Bot.Commands.Text;
-using Pepper.Structures.CommandAttributes.Checks;
 using Qmmands;
 
 namespace Pepper.Structures
@@ -18,12 +17,6 @@ namespace Pepper.Structures
             if (types.ContainsKey(typeof(RequireBotOwnerAttribute)))
             {
                 messageBase.Content = "Sorry, only my owner can do that.";
-                return true;
-            }
-
-            if (types.ContainsKey(typeof(RequireGuildWhitelistAttribute)))
-            {
-                messageBase.Content = "Guild-restricted command.";
                 return true;
             }
 

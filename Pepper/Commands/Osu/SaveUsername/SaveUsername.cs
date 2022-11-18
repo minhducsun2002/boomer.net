@@ -4,7 +4,6 @@ using Disqord.Bot;
 using Disqord.Bot.Commands;
 using Pepper.Commons.Osu;
 using Pepper.Database.OsuUsernameProviders;
-using Pepper.Structures.CommandAttributes.Checks;
 using Qmmands;
 using Qmmands.Text;
 
@@ -22,7 +21,6 @@ namespace Pepper.Commands.Osu
         }
 
         [SaveUsername]
-        [RequireGuildWhitelist("osu-user-set")]
         [TextCommand("usersave", "save", "userset", "set")]
         [Description("Set the username to default to in your future requests.")]
         public IDiscordCommandResult Exec([Remainder][Description("Username to save.")] string username)
