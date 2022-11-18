@@ -4,8 +4,9 @@ using System.Linq;
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
+using PagedViewBase = Pepper.Commons.Structures.Views.PagedViewBase;
 
-namespace Pepper.Structures
+namespace Pepper.Commons.Structures.Views
 {
     public class SelectionPagedView : PagedViewBase
     {

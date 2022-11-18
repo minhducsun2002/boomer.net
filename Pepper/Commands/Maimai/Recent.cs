@@ -13,7 +13,7 @@ using Pepper.Services.Maimai;
 using Qmmands;
 using Qmmands.Text;
 using Qommon;
-using PagedView = Pepper.Structures.PagedView;
+using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
 namespace Pepper.Commands.Maimai
 {

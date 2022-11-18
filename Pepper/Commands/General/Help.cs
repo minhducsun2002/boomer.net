@@ -11,6 +11,7 @@ using Humanizer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commons.Structures;
+using Pepper.Commons.Structures.Views;
 using Pepper.FuzzySearch;
 using Pepper.Structures;
 using Pepper.Structures.CommandAttributes.Metadata;
@@ -18,7 +19,7 @@ using Pepper.Utilities;
 using Qmmands;
 using Qmmands.Text;
 using Qommon;
-using PagedView = Pepper.Structures.PagedView;
+using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
 namespace Pepper.Commands.General
 {

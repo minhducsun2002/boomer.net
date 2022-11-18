@@ -8,11 +8,11 @@ using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Beatmaps;
 using Pepper.Structures.External.Osu;
 using APIBeatmapSet = Pepper.Commons.Osu.API.APIBeatmapSet;
-using PagedView = Pepper.Structures.PagedView;
+using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
 namespace Pepper.Commands.Osu
 {
-    internal class BeatmapsetPagedView : PagedView
+    internal class BeatmapsetPagedView : Commons.Structures.Views.PagedView
     {
         private readonly Dictionary<int, ButtonViewComponent> pageJumps = new();
         private const int CustomRow = 1;

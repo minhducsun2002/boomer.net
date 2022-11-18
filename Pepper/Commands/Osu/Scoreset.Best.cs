@@ -17,11 +17,11 @@ using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures;
 using Qmmands;
 using Qmmands.Text;
-using PagedView = Pepper.Structures.PagedView;
+using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
 namespace Pepper.Commands.Osu
 {
-    internal class ScoresetPagedView : PagedView
+    internal class ScoresetPagedView : Commons.Structures.Views.PagedView
     {
         public ScoresetPagedView(PageProvider pageProvider) : base(pageProvider) { }
     }

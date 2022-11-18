@@ -8,11 +8,11 @@ using Disqord.Rest;
 using Pepper.Structures.External.Osu;
 using APIBeatmapSet = Pepper.Commons.Osu.API.APIBeatmapSet;
 using Limits = Disqord.Discord.Limits;
-using PagedViewBase = Pepper.Structures.PagedViewBase;
+using PagedViewBase = Pepper.Commons.Structures.Views.PagedViewBase;
 
 namespace Pepper.Commands.Osu
 {
-    internal class BeatmapSingleView : PagedViewBase
+    internal class BeatmapSingleView : Commons.Structures.Views.PagedViewBase
     {
         private readonly APIBeatmapSet beatmapset;
         private readonly Dictionary<int, int> beatmapIdToIndex;

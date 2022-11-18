@@ -4,7 +4,7 @@ using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 
-namespace Pepper.Structures
+namespace Pepper.Commons.Structures.Views
 {
     public class PagedView : Disqord.Extensions.Interactivity.Menus.Paged.PagedView
     {

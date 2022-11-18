@@ -16,7 +16,7 @@ using Pepper.Services.Maimai;
 using Qmmands;
 using Qmmands.Text;
 using Difficulty = Pepper.Commons.Maimai.Structures.Difficulty;
-using PagedView = Pepper.Structures.PagedView;
+using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
 namespace Pepper.Commands.Maimai
 {

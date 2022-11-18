@@ -16,7 +16,7 @@ using Pepper.Structures.CommandAttributes.Checks;
 using Pepper.Structures.External.Osu.Extensions;
 using Qmmands;
 using Qmmands.Text;
-using PagedView = Pepper.Structures.PagedView;
+using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
 namespace Pepper.Commands.Osu
 {
