@@ -2,6 +2,7 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using Disqord;
 using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Structures;
 using Pepper.Database.MaimaiDxNetCookieProviders;
 using Pepper.Services.Maimai;
 using Pepper.Structures;

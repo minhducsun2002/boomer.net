@@ -8,6 +8,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
+using Pepper.Commons.Structures;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures;
 using Pepper.Structures.External.Osu;

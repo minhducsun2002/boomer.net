@@ -10,7 +10,7 @@ using Qmmands.Text;
 using Qmmands.Text.Default;
 using Qommon;
 
-namespace Pepper.Structures
+namespace Pepper.Commons.Structures
 {
     public class ArgumentParser : IArgumentParser
     {

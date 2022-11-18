@@ -6,6 +6,7 @@ using Disqord.Bot.Commands;
 using Disqord.Extensions.Interactivity.Menus;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
+using Pepper.Commons.Structures;
 using Pepper.Services.Osu;
 using Pepper.Structures;
 using Pepper.Structures.External.Osu;

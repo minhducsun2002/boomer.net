@@ -12,6 +12,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Mods;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
+using Pepper.Commons.Structures;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures;
 using Qmmands;

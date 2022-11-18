@@ -9,6 +9,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using Pepper.Commons.Osu;
+using Pepper.Commons.Structures;
 using Pepper.Structures;
 using Pepper.Structures.CommandAttributes.Metadata;
 using Pepper.Structures.External.Osu;

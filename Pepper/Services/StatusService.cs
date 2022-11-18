@@ -8,6 +8,7 @@ using Disqord.Gateway;
 using Disqord.Hosting;
 using Humanizer;
 using Microsoft.Extensions.DependencyInjection;
+using Pepper.Commons.Structures;
 using Pepper.Structures;
 
 namespace Pepper.Services

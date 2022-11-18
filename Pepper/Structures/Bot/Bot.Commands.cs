@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commands.Osu;
 using Pepper.Commons.Osu;
+using Pepper.Commons.Structures;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures.CommandAttributes.Metadata;
 using Pepper.Structures.External.Osu;

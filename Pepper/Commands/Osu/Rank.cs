@@ -8,6 +8,7 @@ using Disqord.Gateway;
 using Disqord.Rest;
 using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
+using Pepper.Commons.Structures;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Services.Osu;
 using Pepper.Structures;

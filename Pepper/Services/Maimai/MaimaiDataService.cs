@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Structures;
 using Pepper.Structures;
 using Serilog;
 using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;

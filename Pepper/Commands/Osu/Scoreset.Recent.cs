@@ -10,6 +10,7 @@ using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Commons.Osu.APIClients.Ripple;
+using Pepper.Commons.Structures;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures;
 using Pepper.Structures.CommandAttributes.Metadata;

@@ -9,7 +9,7 @@ using Pepper.Structures.CommandAttributes.Checks;
 using Pepper.Structures.CommandAttributes.Metadata;
 using Qmmands;
 using Qmmands.Text;
-using Command = Pepper.Structures.Command;
+using Command = Pepper.Commons.Structures.Command;
 
 namespace Pepper.Commands.Reserved
 {

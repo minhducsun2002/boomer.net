@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Pepper.Commons.Structures;
 using Pepper.Structures;
 using Serilog;
 

@@ -10,6 +10,7 @@ using Disqord.Extensions.Interactivity.Menus.Paged;
 using Humanizer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pepper.Commons.Structures;
 using Pepper.FuzzySearch;
 using Pepper.Structures;
 using Pepper.Structures.CommandAttributes.Metadata;
