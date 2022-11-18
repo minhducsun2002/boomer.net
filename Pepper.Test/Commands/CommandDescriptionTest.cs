@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Pepper.Commons.Structures;
 using Pepper.Structures;
 using Qmmands;
 using Qmmands.Text;

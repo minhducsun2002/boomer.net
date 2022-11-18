@@ -4,7 +4,7 @@ using System.Linq;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Structures
+namespace Pepper.Commons.Structures
 {
     public static class CommandServiceExtensions
     {

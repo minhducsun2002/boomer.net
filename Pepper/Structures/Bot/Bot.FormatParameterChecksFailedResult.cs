@@ -1,6 +1,7 @@
 using System.Linq;
 using Disqord;
 using Disqord.Bot.Commands.Text;
+using Pepper.Commons.Interfaces.FailureFormattable;
 using Qmmands;
 
 namespace Pepper.Structures

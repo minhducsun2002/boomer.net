@@ -1,6 +1,7 @@
 using Disqord;
 using Disqord.Bot.Commands.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Pepper.Commons.Interfaces.FailureFormattable;
 using Qmmands;
 using Qmmands.Default;
 

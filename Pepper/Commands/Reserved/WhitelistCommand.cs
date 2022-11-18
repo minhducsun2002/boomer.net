@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Disqord.Bot.Commands;
 using Microsoft.Extensions.DependencyInjection;
+using Pepper.Commons.Structures;
 using Pepper.Database;
 using Pepper.Services;
 using Pepper.Structures;

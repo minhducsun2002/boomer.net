@@ -2,7 +2,7 @@ using Disqord;
 using Disqord.Bot.Commands;
 using Qmmands;
 
-namespace Pepper.Structures
+namespace Pepper.Commons.Interfaces.FailureFormattable
 {
     public interface IFailureFormattableParameterCheck
     {

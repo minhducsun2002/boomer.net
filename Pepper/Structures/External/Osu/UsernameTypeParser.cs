@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Disqord.Bot.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commands.Osu;
+using Pepper.Commons.Interfaces.FailureFormattable;
+using Pepper.Commons.Structures;
 using Pepper.Database.OsuUsernameProviders;
 using Qmmands;
 
