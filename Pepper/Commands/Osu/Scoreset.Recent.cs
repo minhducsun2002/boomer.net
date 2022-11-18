@@ -13,7 +13,6 @@ using Pepper.Commons.Osu.APIClients.Ripple;
 using Pepper.Commons.Structures;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Structures;
-using Pepper.Structures.CommandAttributes.Metadata;
 using Qmmands;
 using Qmmands.Text;
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace Pepper.Structures.CommandAttributes.Metadata
+namespace Pepper.Commons.Structures.CommandAttributes.Metadata
 {
     /// <summary>
     /// Specify this on modules/commands to hide them from everyone except owners in <see cref="Pepper.Commands.General.Help"/> results.

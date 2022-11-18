@@ -6,7 +6,6 @@ using Disqord.Bot;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Pepper.Structures.CommandAttributes.Metadata;
 using Qmmands.Text;
 using Qmmands.Text.Default;
 

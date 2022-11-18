@@ -16,7 +16,6 @@ using Pepper.Commons.Structures;
 using Pepper.Database.OsuUsernameProviders;
 using Pepper.Services.Osu;
 using Pepper.Structures;
-using Pepper.Structures.CommandAttributes.Metadata;
 using Pepper.Structures.External.Osu;
 using Pepper.Utilities.Osu;
 using Qmmands;

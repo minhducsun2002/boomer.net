@@ -3,10 +3,10 @@ using System.Runtime.CompilerServices;
 using Disqord;
 using Pepper.Commons.Maimai.Structures;
 using Pepper.Commons.Structures;
+using Pepper.Commons.Structures.CommandAttributes.Metadata;
 using Pepper.Database.MaimaiDxNetCookieProviders;
 using Pepper.Services.Maimai;
 using Pepper.Structures;
-using Pepper.Structures.CommandAttributes.Metadata;
 
 namespace Pepper.Commands.Maimai
 {
