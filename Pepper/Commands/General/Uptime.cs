@@ -3,9 +3,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Disqord;
-using Disqord.Bot;
 using Disqord.Bot.Commands;
-using Pepper.Utilities;
+using Pepper.Frontends.Osu.Utils;
 using Qmmands;
 using Qmmands.Text;
 

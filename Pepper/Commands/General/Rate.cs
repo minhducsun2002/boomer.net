@@ -2,7 +2,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using Disqord.Bot;
 using Disqord.Bot.Commands;
 using Qmmands;
 using Qmmands.Text;

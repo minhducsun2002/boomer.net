@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
-using PagedViewBase = Pepper.Commons.Structures.Views.PagedViewBase;
 
 namespace Pepper.Commons.Structures.Views
 {

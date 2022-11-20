@@ -1,8 +1,5 @@
-using System.Linq;
 using Disqord.Bot;
 using Disqord.Bot.Commands.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Qmmands.Text;
 
 namespace Pepper.Commons.Structures

@@ -2,7 +2,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Disqord;
-using Disqord.Bot;
 using Disqord.Bot.Commands;
 using Qmmands;
 using Qmmands.Text;

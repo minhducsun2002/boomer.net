@@ -1,5 +1,3 @@
-using System;
-
 namespace Pepper.Commons.Structures.CommandAttributes.Metadata
 {
     /// <summary>

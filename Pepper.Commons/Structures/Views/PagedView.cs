@@ -1,7 +1,4 @@
-using System;
-using System.Threading.Tasks;
 using Disqord;
-using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 
 namespace Pepper.Commons.Structures.Views

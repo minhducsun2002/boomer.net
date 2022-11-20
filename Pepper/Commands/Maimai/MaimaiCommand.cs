@@ -6,7 +6,6 @@ using Pepper.Commons.Structures;
 using Pepper.Commons.Structures.CommandAttributes.Metadata;
 using Pepper.Database.MaimaiDxNetCookieProviders;
 using Pepper.Services.Maimai;
-using Pepper.Structures;
 
 namespace Pepper.Commands.Maimai
 {

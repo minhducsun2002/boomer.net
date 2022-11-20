@@ -1,7 +1,5 @@
-using System;
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus.Paged;
-using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
 namespace Pepper.Commons.Structures.Views
 {

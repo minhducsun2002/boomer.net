@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Disqord;
-using Disqord.Bot;
 using Disqord.Bot.Commands;
 using Disqord.Extensions.Interactivity;
 using Disqord.Rest;

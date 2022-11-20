@@ -1,4 +1,4 @@
-namespace Pepper.Utilities
+namespace Pepper.Frontends.Osu.Utils
 {
     public static class StringUtilities
     {

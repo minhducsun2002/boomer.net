@@ -1,6 +1,5 @@
 using System;
 using Pepper.Commons.Structures;
-using Pepper.Structures;
 using Qmmands;
 using Qmmands.Text;
 

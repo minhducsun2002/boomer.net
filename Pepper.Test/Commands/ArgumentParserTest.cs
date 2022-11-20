@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commons.Structures;
-using Pepper.Structures;
 using Pepper.Test.Commands.Mock;
 using Qmmands;
 using Qmmands.Text;
