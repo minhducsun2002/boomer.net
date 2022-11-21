@@ -7,7 +7,7 @@ using Disqord.Bot.Commands.Text;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Commands.Debugging
+namespace Pepper.Commons.Commands.Debugging
 {
     public class Time : DebuggingCommand
     {

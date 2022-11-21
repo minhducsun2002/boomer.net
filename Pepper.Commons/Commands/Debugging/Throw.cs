@@ -3,7 +3,7 @@ using Disqord.Bot.Commands;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Commands.Debugging
+namespace Pepper.Commons.Commands.Debugging
 {
     public class Throw : DebuggingCommand
     {

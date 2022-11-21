@@ -7,6 +7,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Disqord.Bot" Version="1.0.0-alpha" />
+        <PackageReference Include="Humanizer" Version="2.14.1" />
         <PackageReference Include="Serilog" Version="2.10.0" />
         <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
         <PackageReference Include="Serilog.Exceptions" Version="7.0.0" />
@@ -19,6 +20,10 @@
         <PackageReference Include="dotenv.net" Version="3.0.0" />
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\Pepper.FuzzySearch\Pepper.FuzzySearch.csproj" />
         <ProjectReference Include="..\Pepper.Logging.Serilog.Sinks.Discord\Pepper.Logging.Serilog.Sinks.Discord.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Commands" />
     </ItemGroup>
 </Project>

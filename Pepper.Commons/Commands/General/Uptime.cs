@@ -1,14 +1,12 @@
-using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Disqord;
 using Disqord.Bot.Commands;
-using Pepper.Frontends.Osu.Utils;
+using Humanizer;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Commands.General
+namespace Pepper.Commons.Commands.General
 {
     public class Uptime : GeneralCommand
     {
@@ -100,7 +98,7 @@ namespace Pepper.Commands.General
                     (interval.Seconds, "second")
                 }
                 .Select(field =>
-                    field.Item1 >= 1 ? $"**{field.Item1}** {field.Item2 + StringUtilities.Plural(field.Item1)}" : "")
+                    field.Item1 >= 1 ? $"**{field.Item1}** {(field.Item1 > 1 ? field.Item2.Pluralize() : field.Item2)}" : "")
                 .Where(output => output.Length > 0)
                 .ToArray();
 

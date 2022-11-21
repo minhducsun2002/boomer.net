@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commons.Structures.CommandAttributes.Metadata;
 using Qmmands;
@@ -73,6 +74,12 @@ namespace Pepper.Commons.Structures
         public override ValueTask InitializeApplicationCommandsAsync(CancellationToken cancellationToken = default)
         {
             return ValueTask.CompletedTask;
+        }
+
+        protected override IEnumerable<Assembly> GetModuleAssemblies()
+        {
+            var commonAssembly = typeof(Bot).Assembly;
+            return base.GetModuleAssemblies().Append(commonAssembly);
         }
     }
 }

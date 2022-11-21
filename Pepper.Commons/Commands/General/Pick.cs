@@ -1,12 +1,9 @@
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot.Commands;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Commands.General
+namespace Pepper.Commons.Commands.General
 {
     public class Pick : GeneralCommand
     {

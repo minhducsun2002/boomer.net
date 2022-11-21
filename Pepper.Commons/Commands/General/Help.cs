@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Bot.Commands.Text;
@@ -12,13 +8,12 @@ using Pepper.Commons.Structures;
 using Pepper.Commons.Structures.CommandAttributes.Metadata;
 using Pepper.Commons.Structures.Views;
 using Pepper.FuzzySearch;
-using Pepper.Frontends.Osu.Utils;
 using Qmmands;
 using Qmmands.Text;
 using Qommon;
 using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
-namespace Pepper.Commands.General
+namespace Pepper.Commons.Commands.General
 {
     public class Help : GeneralCommand
     {
@@ -140,8 +135,10 @@ namespace Pepper.Commands.General
                         new LocalEmbedField
                         {
                             Name = "Flags" + overload,
-                            Value = $@"The following parameter{
-                                StringUtilities.Plural(flagParams.Count)
+                            Value = $@"The following {
+                                (flagParams.Count > 1
+                                    ? "parameter".Pluralize()
+                                    : "parameter")
                             } are flags & must be prefixed with certain strings, listed below."
                                     + "\n"
                                     + string.Join(

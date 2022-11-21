@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -6,7 +5,7 @@ using Disqord.Bot.Commands;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Commands.General
+namespace Pepper.Commons.Commands.General
 {
     public class Rate : GeneralCommand
     {
