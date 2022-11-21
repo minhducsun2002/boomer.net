@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pepper\Pepper.csproj" />
+    <ProjectReference Include="..\Pepper.Frontends.Maimai\Pepper.Frontends.Maimai.csproj" />
+    <ProjectReference Include="..\Pepper.Frontends.Osu\Pepper.Frontends.Osu.csproj" />
   </ItemGroup>
 </Project>

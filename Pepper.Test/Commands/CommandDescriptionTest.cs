@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Pepper.Commons.Commands.General;
 using Pepper.Commons.Structures;
+using Pepper.Frontends.Maimai.Commands;
+using Pepper.Frontends.Osu.Commands;
 using Qmmands;
 using Qmmands.Text;
 using Qmmands.Text.Default;
@@ -32,14 +35,10 @@ namespace Pepper.Test.Commands
                 .BuildServiceProvider();
             var commandService = services.GetRequiredService<ICommandService>();
             DefaultTextSetup.Initialize(commandService);
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var name = assembly.FullName!;
-                if (name.StartsWith("Pepper") && !name.Contains("Test", StringComparison.OrdinalIgnoreCase))
-                {
-                    commandService.AddModules(assembly, Bot.DownlevelAttributes);
-                }
-            }
+
+            commandService.AddModules(typeof(GeneralCommand).Assembly);
+            commandService.AddModules(typeof(OsuCommand).Assembly);
+            commandService.AddModules(typeof(MaimaiCommand).Assembly);
 
             return type switch
             {
