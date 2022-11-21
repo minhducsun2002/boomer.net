@@ -34,7 +34,7 @@ var hostBuilder = new HostBuilder()
     .ConfigureDiscordBot<Bot>((context, bot) =>
     {
         bot.Token = context.Configuration["DISCORD_TOKEN"];
-        bot.Prefixes = new [] { "b!", "o!" };
+        bot.Prefixes = new [] { "m!" };
         bot.Intents |= GatewayIntent.DirectMessages;
         bot.ServiceAssemblies = new[]
         {
