@@ -1,4 +1,5 @@
-﻿using Disqord.Bot.Hosting;
+﻿using System.Reflection;
+using Disqord.Bot.Hosting;
 using Disqord.Gateway;
 using dotenv.net;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,10 @@ var hostBuilder = new HostBuilder()
         bot.Token = context.Configuration["DISCORD_TOKEN"];
         bot.Prefixes = new [] { "b!", "o!" };
         bot.Intents |= GatewayIntent.DirectMessages;
+        bot.ServiceAssemblies = new[]
+        {
+            Assembly.GetEntryAssembly()!, typeof(Service).Assembly
+        };
     })
     .UseDefaultServiceProvider(options => options.ValidateOnBuild = true);
     

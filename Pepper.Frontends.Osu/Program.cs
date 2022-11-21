@@ -1,4 +1,5 @@
-﻿using Disqord.Bot.Hosting;
+﻿using System.Reflection;
+using Disqord.Bot.Hosting;
 using Disqord.Gateway;
 using dotenv.net;
 using Microsoft.EntityFrameworkCore;
@@ -6,8 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pepper.Commons;
 using Pepper.Commons.Osu;
+using Pepper.Commons.Structures;
 using Pepper.Frontends.Database.OsuUsernameProviders;
-using Pepper.Frontends.Osu.Structures;
+using Bot = Pepper.Frontends.Osu.Structures.Bot;
 
 DotEnv.Load();
 var webhookLog = Environment.GetEnvironmentVariable("PEPPER_DISCORD_WEBHOOK_LOG");
@@ -37,6 +39,10 @@ var hostBuilder = new HostBuilder()
         bot.Token = context.Configuration["DISCORD_TOKEN"];
         bot.Prefixes = new[] { "o!" };
         bot.Intents |= GatewayIntent.DirectMessages;
+        bot.ServiceAssemblies = new[]
+        {
+            Assembly.GetEntryAssembly()!, typeof(Service).Assembly
+        };
     })
     .UseDefaultServiceProvider(option => option.ValidateOnBuild = true);
 
