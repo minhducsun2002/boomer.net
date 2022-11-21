@@ -14,7 +14,7 @@ using Pepper.Commons.Structures;
 using Serilog;
 using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
 
-namespace Pepper.Services.Maimai
+namespace Pepper.Frontends.Maimai.Services
 {
     public class MaimaiDataService : Service
     {

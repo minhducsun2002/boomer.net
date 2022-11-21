@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Threading.Tasks;
 using BitFaster.Caching.Lru;
 using Microsoft.EntityFrameworkCore;
-using Pepper.Database.MaimaiDxNetCookieProviders;
+using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Serilog;
 
-namespace Pepper.Database
+namespace Pepper.Frontends.Maimai.Database
 {
     public class MariaDbMaimaiDxNetCookieProvider : DbContext, IMaimaiDxNetCookieProvider
     {

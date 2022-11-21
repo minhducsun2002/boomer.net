@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Pepper.Database.MaimaiDxNetCookieProviders
+namespace Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders
 {
     public interface IMaimaiDxNetCookieProvider
     {

@@ -1,7 +1,3 @@
-using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Extensions.Interactivity.Menus.Paged;
@@ -9,14 +5,14 @@ using Disqord.Rest;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures;
-using Pepper.Database.MaimaiDxNetCookieProviders;
-using Pepper.Services.Maimai;
+using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
+using Pepper.Frontends.Maimai.Services;
 using Qmmands;
 using Qmmands.Text;
 using Difficulty = Pepper.Commons.Maimai.Structures.Difficulty;
 using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
-namespace Pepper.Commands.Maimai
+namespace Pepper.Frontends.Maimai.Commands
 {
     public class Top : MaimaiCommand
     {
