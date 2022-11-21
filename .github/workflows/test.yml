@@ -3,7 +3,7 @@ name: Run test
 on:
   push:
     paths:
-    - 'Pepper/**'
+    - 'Pepper.Frontends.*/**'
     - '.github/workflows/test.yml'
     - 'Pepper.Test/**'
   repository_dispatch:
