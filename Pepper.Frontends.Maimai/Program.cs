@@ -35,7 +35,7 @@ var hostBuilder = new HostBuilder()
     {
         bot.Token = context.Configuration["DISCORD_TOKEN"];
         bot.Prefixes = new[] { "m!", "b!" };
-        bot.Intents |= GatewayIntent.DirectMessages;
+        bot.Intents |= GatewayIntents.DirectMessages;
         bot.ServiceAssemblies = new[]
         {
             Assembly.GetEntryAssembly()!, typeof(Service).Assembly

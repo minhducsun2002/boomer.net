@@ -63,17 +63,17 @@ namespace Pepper.Commons.Structures
             base.MutateModule(moduleBuilder);
         }
 
-        public override ValueTask InitializeAsync(CancellationToken cancellationToken)
+        protected override ValueTask OnInitialize(CancellationToken cancellationToken)
         {
             var argumentParserProvider = (DefaultArgumentParserProvider) Services.GetRequiredService<IArgumentParserProvider>();
             argumentParserProvider.Add(new ArgumentParser());
             argumentParserProvider.SetDefaultParser(typeof(ArgumentParser));
-            return base.InitializeAsync(cancellationToken);
+            return base.OnInitialize(cancellationToken);
         }
 
-        public override ValueTask InitializeApplicationCommandsAsync(CancellationToken cancellationToken = default)
+        protected override ValueTask<bool> ShouldInitializeApplicationCommands(CancellationToken cancellationToken)
         {
-            return ValueTask.CompletedTask;
+            return new ValueTask<bool>(false);
         }
 
         protected override IEnumerable<Assembly> GetModuleAssemblies()

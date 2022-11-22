@@ -66,16 +66,16 @@ namespace Pepper.Frontends.Osu.Commands
 
         protected override void ApplyPageIndex(Page page) { }
 
-        protected override ValueTask OnNextPageButtonAsync(ButtonEventArgs e)
+        protected override ValueTask OnNextPageButton(ButtonEventArgs e)
         {
-            var result = base.OnNextPageButtonAsync(e);
+            var result = base.OnNextPageButton(e);
             UpdateButtonStates();
             return result;
         }
 
-        protected override ValueTask OnLastPageButtonAsync(ButtonEventArgs e)
+        protected override ValueTask OnLastPageButton(ButtonEventArgs e)
         {
-            var result = base.OnLastPageButtonAsync(e);
+            var result = base.OnLastPageButton(e);
             UpdateButtonStates();
             return result;
         }
