@@ -52,7 +52,7 @@ namespace Pepper.Commons
                 .ToDictionary(kv => kv.Key[prefix.Length..], kv => kv.Value);
             hostBuilder = hostBuilder.ConfigureAppConfiguration(app =>
             {
-                app.AddInMemoryCollection(env);    
+                app.AddInMemoryCollection(env);
                 app.AddEnvironmentVariables(prefix);
             });
             return hostBuilder;

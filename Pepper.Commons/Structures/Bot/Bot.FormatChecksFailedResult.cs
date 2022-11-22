@@ -25,8 +25,7 @@ namespace Pepper.Commons.Structures
             }
 
             var firstValidCheck = checks.First().Key;
-            messageBase.Content = @$"A secret check named {
-                firstValidCheck.GetType().Name.Replace("Attribute", "", StringComparison.OrdinalIgnoreCase)} failed.";
+            messageBase.Content = @$"A secret check named {firstValidCheck.GetType().Name.Replace("Attribute", "", StringComparison.OrdinalIgnoreCase)} failed.";
             return true;
         }
     }

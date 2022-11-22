@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
 using Disqord.Bot.Commands;
 using Microsoft.Extensions.DependencyInjection;
-using Pepper.Frontends.Osu.Commands;
 using Pepper.Commons.Interfaces.FailureFormattable;
 using Pepper.Commons.Structures;
 using Pepper.Frontends.Database.OsuUsernameProviders;
+using Pepper.Frontends.Osu.Commands;
 using Qmmands;
 
 namespace Pepper.Frontends.Osu.Structures

@@ -1,10 +1,10 @@
 using Disqord;
 using Disqord.Bot.Commands;
-using Pepper.Frontends.Osu.Commands;
 using Pepper.Commons.Interfaces.FailureFormattable;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Structures;
 using Pepper.Frontends.Database.OsuUsernameProviders;
+using Pepper.Frontends.Osu.Commands;
 using Pepper.Frontends.Osu.Structures.Extensions;
 using Qmmands;
 

@@ -135,11 +135,9 @@ namespace Pepper.Commons.Commands.General
                         new LocalEmbedField
                         {
                             Name = "Flags" + overload,
-                            Value = $@"The following {
-                                (flagParams.Count > 1
+                            Value = $@"The following {(flagParams.Count > 1
                                     ? "parameter".Pluralize()
-                                    : "parameter")
-                            } are flags & must be prefixed with certain strings, listed below."
+                                    : "parameter")} are flags & must be prefixed with certain strings, listed below."
                                     + "\n"
                                     + string.Join(
                                         '\n',

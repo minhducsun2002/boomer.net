@@ -36,10 +36,10 @@ namespace Pepper.Frontends.Osu.Structures
                     }
                 }
             }
-            
+
             base.MutateModule(moduleBuilder);
         }
-    
+
         protected override ValueTask AddTypeParsers(DefaultTypeParserProvider typeParserProvider, CancellationToken cancellationToken)
         {
             typeParserProvider.AddParserAsDefault(new RulesetTypeParser());
