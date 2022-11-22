@@ -70,11 +70,14 @@ namespace Pepper.Frontends.Osu.Commands
                 })
                 .ToArray();
 
+            var modText = modFilters.Length > 0 ? $" with mod {string.Join("", modFilters.Select(m => m.Acronym))}" : "";
             var pages = new ArrayPageProvider<APIScore>(
                 filtered,
                 (_, chunk) => new Page().WithEmbeds(
                     SerializeScoreset(chunk, scoreLink: false)
-                        .WithFooter($"Top plays (all times are UTC)")
+                        .WithFooter(
+                            $"Top plays (all times are UTC){modText}"
+                        )
                         .WithAuthor(SerializeAuthorBuilder(user))
                 ),
                 MaxScorePerPage
@@ -84,7 +87,7 @@ namespace Pepper.Frontends.Osu.Commands
             {
                 return Reply(new LocalEmbed()
                     .WithDescription(
-                        $"No top play found for user [{user.Username}]({user.PublicUrl}) on mode {ruleset.RulesetInfo.Name}"));
+                        $"No top play found for user [{user.Username}]({user.PublicUrl}) on mode {ruleset.RulesetInfo.Name}{modText}"));
             }
 
             return Menu(new DefaultTextMenu(new ScoresetPagedView(pages)));
