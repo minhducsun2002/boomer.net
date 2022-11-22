@@ -4,7 +4,9 @@ on:
   push:
     paths:
       - 'Pepper.Commons.Osu/**'
-      - '.github/workflows/osu-commons-nuget-publish.yml'  
+      - '.github/workflows/osu-commons-nuget-publish.yml'
+    branches:
+      - master
   repository_dispatch:
   workflow_dispatch:
 
