@@ -93,6 +93,7 @@ namespace Pepper.Commons.Commands.General
         {
             var prefixes = ((DefaultPrefixProvider) Context.Bot.Prefixes).Prefixes
                 .Select(prefix => prefix.ToString()!)
+                .Where(p => p != Context.Bot.CurrentUser!.Mention)
                 .ToArray();
 
             string basePrefix = prefixes[0], baseInvocation = $"{basePrefix}{commands[0].Aliases[0]}";
@@ -209,7 +210,5 @@ namespace Pepper.Commons.Commands.General
 
             return embed;
         }
-
-        private string SelfInvocation() => $"{Context.Prefix}{Context.Command!.Aliases[0]}";
     }
 }
