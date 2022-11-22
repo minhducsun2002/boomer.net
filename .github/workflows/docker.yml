@@ -18,11 +18,14 @@ env:
 
 jobs:
   build-and-push-image:
-    name: Publish Docker image to Registry
+    name: Publish (${{ matrix.dockerfile }})
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix: 
+        dockerfile: ['osu', 'maimai']
 
     steps:
       - name: Checkout repository
@@ -42,12 +45,13 @@ jobs:
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.dockerfile }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
+          file: dockerfiles/${{ matrix.dockerfile }}.dockerfile
           push: true
           platforms: linux/amd64, linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
