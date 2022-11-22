@@ -107,6 +107,10 @@ namespace Pepper.Commons.Commands.General
                     .Select(param => (param, param.CustomAttributes.OfType<FlagAttribute>().First()))
                     .ToList();
 
+                var nonFlagParams = command.Parameters
+                    .Where(param => !param.CustomAttributes.OfType<FlagAttribute>().Any())
+                    .ToList();
+
                 var fields = new List<LocalEmbedField>
                 {
                     new()
@@ -115,18 +119,18 @@ namespace Pepper.Commons.Commands.General
                         Value = $@"`{baseInvocation} {
                             string.Join(
                                 ' ',
-                                command.Parameters.Select(param => {
-                                    var flags = param.CustomAttributes.OfType<FlagAttribute>().FirstOrDefault()?.Flags;
-                                    // TODO we are assuming flag parameters are always optional
-                                    var quotes = (flags == null ? "" : "f") + (param.GetTypeInformation().IsOptional || flags != null ? "[]" : "<>");
-                                    return param.GetTypeInformation().IsEnumerable
-                                        ? quotes[..^1] + param.Name + "1" + quotes[^1] + "..." + quotes[..^1] + param.Name + "N" + quotes[^1]
-                                        : quotes[..^1] + param.Name + quotes[^1];
-                                }))
+                                nonFlagParams
+                                    .Select(param => {
+                                        // TODO we are assuming flag parameters are always optional
+                                        var quotes = param.GetTypeInformation().IsOptional ? "[]" : "<>";
+                                        return param.GetTypeInformation().IsEnumerable
+                                            ? quotes[..^1] + param.Name + "1" + quotes[^1] + "..." + quotes[..^1] + param.Name + "N" + quotes[^1]
+                                            : quotes[..^1] + param.Name + quotes[^1];
+                                    }))
                         }".TrimEnd()
                                 + "`\n\n"
                                 + string.Join('\n',
-                                    command.Parameters.Select(param => $"- `{param.Name}` {param.Description}"))
+                                    nonFlagParams.Select(param => $"- `{param.Name}` {param.Description}"))
                     }
                 };
 
@@ -136,17 +140,13 @@ namespace Pepper.Commons.Commands.General
                         new LocalEmbedField
                         {
                             Name = "Flags" + overload,
-                            Value = $@"The following {(flagParams.Count > 1
-                                    ? "parameter".Pluralize()
-                                    : "parameter")} are flags & must be prefixed with certain strings, listed below."
-                                    + "\n"
-                                    + string.Join(
+                            Value = string.Join(
                                         '\n',
                                         flagParams.Select(pair =>
                                         {
                                             var (param, flagAttribute) = pair;
-                                            return
-                                                $"`{param.Name}` **:** {string.Join(" | ", flagAttribute.Flags.Select(f => $"`{f}`"))}";
+                                            var flag = flagAttribute.Flags[0];
+                                            return $"`{flag}{param.Name}` {param.Description}";
                                         })
                                     )
                         });
