@@ -7,7 +7,7 @@ on:
       - '**/*.csproj'
       - '**/*.sln'
       - 'nuget.config'
-      - 'Dockerfile'
+      - 'dockerfiles/*.dockerfile'
       - '.github/workflows/docker.yml'
   repository_dispatch:
   workflow_dispatch:
