@@ -24,7 +24,4 @@
         <ProjectReference Include="..\Pepper.FuzzySearch\Pepper.FuzzySearch.csproj" />
         <ProjectReference Include="..\Pepper.Logging.Serilog.Sinks.Discord\Pepper.Logging.Serilog.Sinks.Discord.csproj" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Commands" />
-    </ItemGroup>
 </Project>

@@ -11,10 +11,4 @@
       <ProjectReference Include="..\Pepper.Commons.Maimai\Pepper.Commons.Maimai.csproj" />
       <ProjectReference Include="..\Pepper.Commons\Pepper.Commons.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Database" />
-      <Folder Include="Services" />
-    </ItemGroup>
-
 </Project>
