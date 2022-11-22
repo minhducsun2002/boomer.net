@@ -81,8 +81,8 @@ namespace Pepper.Commons.Maimai.HtmlParsers
 
         private static (int, bool) ParseLevel(ReadOnlySpan<char> raw) =>
             raw[^1] == '+'
-                ? (int.Parse(raw[..^1]), true)
-                : (int.Parse(raw), false);
+                ? (PlayerDataParser.FastIntParse(raw[..^1]), true)
+                : (PlayerDataParser.FastIntParse(raw), false);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ParseRank(ReadOnlySpan<char> raw)

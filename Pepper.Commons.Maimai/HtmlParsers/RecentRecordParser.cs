@@ -25,7 +25,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                 var difficulty = ParseDifficulty(topImageSrc);
                 var trackNumText = topText[0].InnerText;
                 var trackNum = trackNumText[^2..];
-                var track = int.Parse(trackNum);
+                var track = PlayerDataParser.FastIntParse(trackNum);
                 var time = topText[1].InnerText;
                 var parsedTime = ParseTime(time);
 

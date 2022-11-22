@@ -16,15 +16,15 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             var name = main.QuerySelector(".name_block");
             var avatar = main.QuerySelector(".w_112.f_l");
             var playCountText = main.QuerySelector(".m_5.m_t_10.t_r.f_12");
-            var playCount = int.Parse(GetIntFromString(playCountText.InnerText));
+            var playCount = FastIntParse(GetIntFromString(playCountText.InnerText));
             var danImageLink = main.QuerySelector(".h_35.f_l").GetAttributeValue("src", "");
             var danLevel = GetTwoDigitsData("rank_", danImageLink)!.Value;
             var seasonClassImageLink = main.QuerySelector(".p_l_10.h_35.f_l").GetAttributeValue("src", "");
             var seasonClass = GetTwoDigitsData("rank_s_", seasonClassImageLink)!.Value;
             var ratingNode = main.QuerySelector(".rating_block");
-            var rating = int.Parse(ratingNode.InnerText);
+            var rating = FastIntParse(ratingNode.InnerText);
             var starNode = main.QuerySelector(".p_l_10.f_l.f_14");
-            var star = int.Parse(GetIntFromString(starNode.InnerText));
+            var star = FastIntParse(GetIntFromString(starNode.InnerText));
 
             var statRecords = main.QuerySelectorAll(".musiccount_img_block > img")
                 .Select(img =>

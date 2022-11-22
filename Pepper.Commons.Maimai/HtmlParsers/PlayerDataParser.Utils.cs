@@ -62,7 +62,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
         private static int SplitStatRecord(string s)
         {
             var a = s.Split('/', 2);
-            return int.Parse(a[0]);
+            return FastIntParse(a[0]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -93,6 +93,20 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             }
 
             return ReadOnlySpan<char>.Empty;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        internal static int FastIntParse(ReadOnlySpan<char> s)
+        {
+            var output = 0;
+            var len = s.Length;
+            for (var i = 0; i < len; i++)
+            {
+                var c = s[i];
+                output = output * 10 + (c - '0');
+            }
+
+            return output;
         }
     }
 }

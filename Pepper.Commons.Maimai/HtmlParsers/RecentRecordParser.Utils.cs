@@ -9,11 +9,11 @@ namespace Pepper.Commons.Maimai.HtmlParsers
         private static DateTimeOffset ParseTime(ReadOnlySpan<char> raw)
         {
             // form: YYYY/MM/DD hh:mm
-            var year = int.Parse(raw[..4]);
-            var month = int.Parse(raw[5..7]);
-            var date = int.Parse(raw[8..10]);
-            var hour = int.Parse(raw[11..13]);
-            var minute = int.Parse(raw[14..]);
+            var year = PlayerDataParser.FastIntParse(raw[..4]);
+            var month = PlayerDataParser.FastIntParse(raw[5..7]);
+            var date = PlayerDataParser.FastIntParse(raw[8..10]);
+            var hour = PlayerDataParser.FastIntParse(raw[11..13]);
+            var minute = PlayerDataParser.FastIntParse(raw[14..]);
             return new DateTimeOffset(year, month, date, hour, minute, 00, TimeSpan.FromHours(9));
         }
 
@@ -25,7 +25,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             var markerIndex = raw.Length - 6;
             var p1 = raw[..markerIndex];
             var p2 = raw[(markerIndex + 1)..^1];
-            return int.Parse(p1) * 10000 + int.Parse(p2);
+            return PlayerDataParser.FastIntParse(p1) * 10000 + PlayerDataParser.FastIntParse(p2);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
