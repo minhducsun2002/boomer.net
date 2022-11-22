@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders
 {
     public interface IMaimaiDxNetCookieProvider

@@ -1,4 +1,3 @@
-using System;
 using Disqord.Bot.Commands;
 using Qmmands;
 using Qmmands.Text;

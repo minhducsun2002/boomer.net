@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BitFaster.Caching.Lru;
-using Newtonsoft.Json.Linq;
 using Pepper.Commons.Osu.API;
 using Pepper.Commons.Osu.APIClients.Default;
 using RestSharp;

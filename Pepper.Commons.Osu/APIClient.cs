@@ -1,17 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BitFaster.Caching.Lru;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Catch;
-using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Taiko;
 using Pepper.Commons.Osu.API;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;

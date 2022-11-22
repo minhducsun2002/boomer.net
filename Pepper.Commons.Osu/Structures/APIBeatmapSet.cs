@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Online.API.Requests.Responses;
 

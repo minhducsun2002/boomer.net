@@ -1,9 +1,7 @@
 using System.Diagnostics;
-using Disqord.Bot.Hosting;
 using dotenv.net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Pepper.Commons.Structures;
 using Pepper.Logging.Serilog.Sinks.Discord;
 using Serilog;
 using Serilog.Events;

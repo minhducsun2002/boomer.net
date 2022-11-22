@@ -1,7 +1,4 @@
-using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Disqord.Bot.Commands;
 using Disqord.Bot.Commands.Text;
 using Qmmands;
