@@ -29,21 +29,29 @@ namespace Pepper.Test.Commands
         public override IEnumerable<object[]> GetData(MethodInfo testMethod)
         {
             var _ = Bot.VersionHash;
-            var services = new ServiceCollection()
-                .AddLogging()
-                .AddTextCommandService()
-                .BuildServiceProvider();
-            var commandService = services.GetRequiredService<ICommandService>();
-            DefaultTextSetup.Initialize(commandService);
-
-            commandService.AddModules(typeof(GeneralCommand).Assembly);
-            commandService.AddModules(typeof(OsuCommand).Assembly);
-            commandService.AddModules(typeof(MaimaiCommand).Assembly);
+            var assemblies = new[]
+            {
+                typeof(OsuCommand).Assembly,
+                typeof(MaimaiCommand).Assembly,
+            };
+            var bots = assemblies.Select(a =>
+            {
+                var services = new ServiceCollection()
+                    .AddLogging()
+                    .AddTextCommandService()
+                    .BuildServiceProvider();
+                var commandService = services.GetRequiredService<ICommandService>();
+                DefaultTextSetup.Initialize(commandService);
+                commandService.AddModules(typeof(GeneralCommand).Assembly);
+                commandService.AddModules(a);
+                return (services, commandService, commands: commandService.EnumerateTextCommands());
+            });
 
             return type switch
             {
-                Data.Command => commandService.EnumerateTextCommands().Select(command => new object[] { command }),
-                Data.Parameter => commandService.EnumerateTextCommands()
+                Data.Command => bots.SelectMany(p => p.commands).Select(command => new object[] { command }),
+                Data.Parameter => bots
+                    .SelectMany(p => p.commands)
                     .SelectMany(command => command.Parameters)
                     .Select(parameter => new object[] { parameter }),
                 _ => throw new ArgumentException($"Invalid data type for {nameof(type)}")

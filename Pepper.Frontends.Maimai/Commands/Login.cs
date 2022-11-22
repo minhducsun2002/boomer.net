@@ -18,7 +18,7 @@ namespace Pepper.Frontends.Maimai.Commands
         private static readonly LocalEmoji Failed = new("❌");
         private static readonly LocalEmoji Success = new("✅");
 
-        [TextCommand("mailogin")]
+        [TextCommand("mailogin", "login")]
         [Description("Provide your cookie here.")]
         [RequirePrivate]
         public async Task<IDiscordCommandResult?> Exec([Description("Self-explanatory.")] string? cookie = null)

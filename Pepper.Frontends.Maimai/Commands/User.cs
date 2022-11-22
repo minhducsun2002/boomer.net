@@ -14,7 +14,7 @@ namespace Pepper.Frontends.Maimai.Commands
         public User(HttpClient httpClient, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
             : base(httpClient, data, cookieProvider) { }
 
-        [TextCommand("maiuser")]
+        [TextCommand("maiuser", "user", "u")]
         [Description("Show info of an user.")]
         public async Task<IDiscordCommandResult> Exec(
             [Description("User in question")] IMember? player = null

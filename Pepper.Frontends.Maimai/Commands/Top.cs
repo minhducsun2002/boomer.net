@@ -28,7 +28,7 @@ namespace Pepper.Frontends.Maimai.Commands
             "BASIC", "ADVANCED", "EXPERT", "MASTER", "Re:MASTER"
         };
 
-        [TextCommand("maitop")]
+        [TextCommand("maitop", "top")]
         [Description("Show top rated plays of an user.")]
         public async Task<IDiscordCommandResult> Exec(
             [Description("User in question")] IMember? player = null
