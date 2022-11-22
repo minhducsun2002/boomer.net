@@ -9,36 +9,25 @@ namespace Pepper.Commons.Maimai.HtmlParsers
         internal static (int, int) ParseSlashedVsMaxStats(ReadOnlySpan<char> raw)
         {
             // format : [A,]BCD / [A,]BCD
-            int f1 = 0, f2 = 0, len = raw.Length;
-            var blown = false;
+            var len = raw.Length;
+            var index = -1;
             for (var i = 0; i < len; i++)
             {
-                if (raw[i] == ',' || raw[i] == ' ')
-                {
-                    continue;
-                }
-
                 if (raw[i] == '/')
                 {
-                    blown = true;
-                    continue;
-                }
-
-                if (blown)
-                {
-                    f2 = f2 == 0
-                        ? raw[i] - '0'
-                        : 10 * f2 + (raw[i] - '0');
-                }
-                else
-                {
-                    f1 = f1 == 0
-                        ? raw[i] - '0'
-                        : 10 * f1 + (raw[i] - '0');
+                    index = i;
                 }
             }
 
-            return (f1, f2);
+            if (index == -1)
+            {
+                return (0, 0);
+            }
+
+            return (
+                PlayerDataParser.FastIntParseIgnoreCommaAndSpace(raw[..index]),
+                PlayerDataParser.FastIntParseIgnoreCommaAndSpace(raw[(index + 1)..])
+            );
         }
 
         private static FcStatus ParseFcStatus(ReadOnlySpan<char> raw)

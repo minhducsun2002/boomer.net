@@ -58,11 +58,20 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             };
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int SplitStatRecord(string s)
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        private static int SplitStatRecord(ReadOnlySpan<char> s)
         {
-            var a = s.Split('/', 2);
-            return FastIntParse(a[0]);
+            var len = s.Length;
+            for (var i = 0; i < len; i++)
+            {
+                if (s[i] == '/')
+                {
+                    return FastIntParseIgnoreCommaAndSpace(s[..i]);
+                }
+            }
+
+            return 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -103,6 +112,24 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             for (var i = 0; i < len; i++)
             {
                 var c = s[i];
+                output = output * 10 + (c - '0');
+            }
+
+            return output;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        internal static int FastIntParseIgnoreCommaAndSpace(ReadOnlySpan<char> s)
+        {
+            var output = 0;
+            var len = s.Length;
+            for (var i = 0; i < len; i++)
+            {
+                var c = s[i];
+                if (c is ',' or ' ')
+                {
+                    continue;
+                }
                 output = output * 10 + (c - '0');
             }
 
