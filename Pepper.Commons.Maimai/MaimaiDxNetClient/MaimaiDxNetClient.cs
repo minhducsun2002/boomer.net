@@ -29,7 +29,16 @@ namespace Pepper.Commons.Maimai
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.TryAddWithoutValidation("Cookie", $"userId={uid}");
             var file = await httpClient.SendAsync(request);
-            return await file.Content.ReadAsStringAsync();
+            var content = await file.Content.ReadAsStringAsync();
+            var errorCodeIndex = content.IndexOf("ERROR CODE：", StringComparison.Ordinal);
+            if (errorCodeIndex != -1)
+            {
+                var startIndex = errorCodeIndex + "ERROR CODE：".Length;
+                var endIndex = content.IndexOf("<", startIndex, StringComparison.Ordinal);
+                int.TryParse(content[startIndex..endIndex], out var code);
+                throw new LoginFailedException(code);
+            }
+            return content;
         }
     }
 }

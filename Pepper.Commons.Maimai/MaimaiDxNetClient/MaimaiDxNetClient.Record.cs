@@ -7,11 +7,8 @@ namespace Pepper.Commons.Maimai
     {
         public async Task<IEnumerable<RecentRecord>> GetUserRecentRecord()
         {
-            var uid = await GetAuthUserId();
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://maimaidx-eng.com/maimai-mobile/record/");
-            request.Headers.TryAddWithoutValidation("Cookie", $"userId={uid}");
-            var file = await httpClient.SendAsync(request);
-            return RecentRecordParser.Parse(await file.Content.ReadAsStringAsync());
+            var html = await GetHtml("https://maimaidx-eng.com/maimai-mobile/record/");
+            return RecentRecordParser.Parse(html);
         }
 
         public async Task<IEnumerable<ScoreRecord>> GetUserDifficultyRecord(Difficulty difficulty)
