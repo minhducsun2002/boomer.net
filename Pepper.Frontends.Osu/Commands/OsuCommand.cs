@@ -1,6 +1,7 @@
 using System.Globalization;
 using AJ.Code;
 using Disqord;
+using Disqord.Rest;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
@@ -15,9 +16,20 @@ namespace Pepper.Frontends.Osu.Commands
     [Category("osu!")]
     public abstract class OsuCommand : Command
     {
-        public OsuCommand(APIClientStore apiClientStore) => APIClientStore = apiClientStore;
+        protected OsuCommand(APIClientStore apiClientStore) => APIClientStore = apiClientStore;
         protected readonly APIClientStore APIClientStore;
         protected static Ruleset[] Rulesets => RulesetTypeParser.SupportedRulesets;
+
+        private static readonly LocalEmoji Hourglass = new("⏳");
+        public override async ValueTask OnBeforeExecuted()
+        {
+            await Context.Message.AddReactionAsync(Hourglass);
+        }
+
+        public override async ValueTask OnAfterExecuted()
+        {
+            await Context.Message.RemoveOwnReactionAsync(Hourglass);
+        }
 
         protected static string ResolveEarthEmoji(string countryCode)
         {
