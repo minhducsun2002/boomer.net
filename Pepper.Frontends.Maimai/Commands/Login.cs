@@ -1,4 +1,3 @@
-using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Rest;
 using Pepper.Commons.Maimai;
@@ -13,10 +12,6 @@ namespace Pepper.Frontends.Maimai.Commands
     {
         public Login(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
             : base(http, data, cookieProvider) { }
-
-        private static readonly LocalEmoji Hourglass = new("⏳");
-        private static readonly LocalEmoji Failed = new("❌");
-        private static readonly LocalEmoji Success = new("✅");
 
         [TextCommand("mailogin", "login")]
         [Description("Provide your cookie here.")]

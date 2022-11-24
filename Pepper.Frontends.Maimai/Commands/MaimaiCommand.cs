@@ -22,6 +22,13 @@ namespace Pepper.Frontends.Maimai.Commands
             GameDataService = dataService;
         }
 
+        // Universe PLUS
+        protected int LatestVersion => GameDataService.NewestVersion == 0 ? 18 : GameDataService.NewestVersion;
+        protected static readonly Difficulty[] Difficulties =
+        {
+            Difficulty.Basic, Difficulty.Advanced, Difficulty.Expert, Difficulty.Master, Difficulty.ReMaster
+        };
+
         /// <param name="accuracy">Accuracy, in range [0, 1005000]</param>
         /// <param name="chartConstant">Chart constant, in range [10, 150]</param>
         /// <returns></returns>
@@ -112,5 +119,9 @@ namespace Pepper.Frontends.Maimai.Commands
         {
             return (int) (total / 1000000 / 10 / 10);
         }
+
+        protected static readonly LocalEmoji Hourglass = new("⏳");
+        protected static readonly LocalEmoji Failed = new("❌");
+        protected static readonly LocalEmoji Success = new("✅");
     }
 }

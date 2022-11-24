@@ -9,19 +9,13 @@ using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
 using Qmmands;
 using Qmmands.Text;
-using Difficulty = Pepper.Commons.Maimai.Structures.Difficulty;
 using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
 namespace Pepper.Frontends.Maimai.Commands
 {
-    public class Top : MaimaiCommand
+    public class Top : TopScoreCommand
     {
         public Top(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider) : base(http, data, cookieProvider) { }
-
-        private static readonly Difficulty[] Difficulties =
-        {
-            Difficulty.Basic, Difficulty.Advanced, Difficulty.Expert, Difficulty.Master, Difficulty.ReMaster
-        };
 
         private static readonly string[] DifficultyStrings =
         {
@@ -39,13 +33,7 @@ namespace Pepper.Frontends.Maimai.Commands
 
             var msg = await Reply($"A few seconds please, loading {Difficulties.Length} pages...");
 
-            // Universe PLUS
-            var latestVersion = GameDataService.NewestVersion == 0 ? 18 : GameDataService.NewestVersion;
-            var records = Enumerable.Empty<ScoreRecord>();
-            foreach (var diff in Difficulties)
-            {
-                records = records.Concat(await client.GetUserDifficultyRecord(diff));
-            }
+            var records = await ListAllScores(client);
 
             var scores = records
                 .AsParallel()
@@ -88,11 +76,11 @@ namespace Pepper.Frontends.Maimai.Commands
             }
 
             var newScores = scores
-                .Where(s => s.version == latestVersion)
+                .Where(s => s.version == LatestVersion)
                 .Take(15)
                 .ToList();
             var oldScores = scores
-                .Where(s => s.version != latestVersion)
+                .Where(s => s.version != LatestVersion)
                 .Take(35)
                 .ToList();
             var newFooter = new LocalEmbedFooter()
