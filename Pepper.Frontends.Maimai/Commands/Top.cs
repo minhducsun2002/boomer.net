@@ -31,8 +31,6 @@ namespace Pepper.Frontends.Maimai.Commands
             var cookie = await CookieProvider.GetCookie(player?.Id ?? Context.AuthorId);
             var client = new MaimaiDxNetClient(HttpClient, cookie!);
 
-            var msg = await Reply($"A few seconds please, loading {Difficulties.Length} pages...");
-
             var records = await ListAllScores(client);
 
             var scores = records
@@ -71,7 +69,6 @@ namespace Pepper.Frontends.Maimai.Commands
 
             if (scores.Count == 0)
             {
-                await msg.DeleteAsync();
                 return Reply("No score was found!");
             }
 
@@ -121,7 +118,6 @@ namespace Pepper.Frontends.Maimai.Commands
                 .Select(embed => new Page().WithEmbeds(embed).WithContent("These calculations are estimated."))
                 .ToArray();
 
-            await msg.DeleteAsync();
             return View(new PagedView(new ListPageProvider(embeds)), TimeSpan.FromSeconds(30));
         }
 

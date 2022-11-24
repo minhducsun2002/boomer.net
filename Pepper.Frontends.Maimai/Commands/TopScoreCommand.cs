@@ -1,3 +1,4 @@
+using Disqord.Rest;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Structures;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
@@ -7,8 +8,18 @@ namespace Pepper.Frontends.Maimai.Commands
 {
     public class TopScoreCommand : MaimaiCommand
     {
-        public TopScoreCommand(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
+        protected TopScoreCommand(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
             : base(http, data, cookieProvider) { }
+
+        public override async ValueTask OnBeforeExecuted()
+        {
+            await Context.Message.AddReactionAsync(Hourglass);
+        }
+
+        public override async ValueTask OnAfterExecuted()
+        {
+            await Context.Message.RemoveOwnReactionAsync(Hourglass);
+        }
 
         protected async Task<IEnumerable<ScoreRecord>> ListAllScores(MaimaiDxNetClient client)
         {
