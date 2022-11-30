@@ -78,7 +78,9 @@ namespace Pepper.Frontends.Maimai.Services
             int id;
             if (ids.Count > 1)
             {
-                id = Math.Max(ids[0], ids[1]);
+                id = version == ChartVersion.Deluxe
+                    ? Math.Max(ids[0], ids[1])
+                    : Math.Min(ids[0], ids[1]);
             }
             else
             {
