@@ -17,7 +17,7 @@ namespace Pepper.Frontends.Maimai.Commands
         public Recent(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
             : base(http, data, cookieProvider) { }
 
-        [TextCommand("mairecent", "recent")]
+        [TextCommand("mairecent", "recent", "rs")]
         [Description("Show recent plays of an user.")]
         public async Task<IDiscordCommandResult> Exec(
             [Description("User in question")] IMember? player = null
