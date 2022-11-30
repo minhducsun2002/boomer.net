@@ -81,9 +81,9 @@ namespace Pepper.Frontends.Maimai.Commands
                 .Take(35)
                 .ToList();
             var newFooter = new LocalEmbedFooter()
-                .WithText($"Total New rating : {NormalizeRating(newScores.Select(s => s.total).Sum())}");
+                .WithText($"Total New rating : {newScores.Select(s => NormalizeRating(s.total)).Sum()}");
             var oldFooter = new LocalEmbedFooter()
-                .WithText($"Total Old rating : {NormalizeRating(oldScores.Select(s => s.total).Sum())}");
+                .WithText($"Total Old rating : {oldScores.Select(s => NormalizeRating(s.total)).Sum()}");
 
             var newEmbed = newScores
                 .Chunk(3)
