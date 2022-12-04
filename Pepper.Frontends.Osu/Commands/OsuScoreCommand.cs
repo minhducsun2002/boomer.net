@@ -122,24 +122,6 @@ namespace Pepper.Frontends.Osu.Commands
                 embed.Footer = new LocalEmbedFooter().WithText(footer);
             }
 
-            if (sc.User.Id == 16212851 || Context.Author.Id == 490107873834303488)
-            {
-                var baseMsg = "đm xoài, ngu";
-                if ((workingBeatmap.BeatmapSetInfo?.OnlineID ?? b.OnlineBeatmapSetID) == 497942)
-                {
-                    baseMsg += ", farm harebare fanfare lắm vl";
-                }
-
-                var isNc = false;
-                if (mods.Any(m => m.Acronym.ToUpperInvariant() == "DT" || (isNc = m.Acronym.ToUpperInvariant() == "NC")) &&
-                    mods.Any(m => m.Acronym.ToUpperInvariant() == "HD"))
-                {
-                    baseMsg += " lại còn farm HD" + (isNc ? " rồi còn bày đặt NC" : "DT");
-                }
-
-                return Reply(baseMsg, embed);
-            }
-
             return Reply(embed);
         }
     }
