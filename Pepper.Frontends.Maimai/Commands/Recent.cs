@@ -113,7 +113,11 @@ namespace Pepper.Frontends.Maimai.Commands
                         }
                         return r;
                     });
-                    return new Page().WithEmbeds(embeds.Append(new LocalEmbed()));
+                    if (chunks.Count != 1)
+                    {
+                        embeds = embeds.Append(new LocalEmbed());
+                    }
+                    return new Page().WithEmbeds(embeds);
                 })
                 .ToArray();
 
