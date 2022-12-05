@@ -17,11 +17,6 @@ namespace Pepper.Frontends.Maimai.Commands
     {
         public Top(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider) : base(http, data, cookieProvider) { }
 
-        private static readonly string[] DifficultyStrings =
-        {
-            "BASIC", "ADVANCED", "EXPERT", "MASTER", "Re:MASTER"
-        };
-
         [TextCommand("maitop", "top")]
         [Description("Show top rated plays of an user.")]
         public async Task<IDiscordCommandResult> Exec(

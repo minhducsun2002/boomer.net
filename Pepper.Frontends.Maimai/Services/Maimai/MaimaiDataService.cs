@@ -44,6 +44,18 @@ namespace Pepper.Frontends.Maimai.Services
             return null;
         }
 
+
+        public (Difficulty, Song)? ResolveSongExact(int id, Pepper.Commons.Maimai.Structures.Difficulty difficulty)
+        {
+            if (!songCache.TryGetValue(id, out var song))
+            {
+                return null;
+            }
+
+            var res = ResolveDiff(id, difficulty);
+            return (res!, song);
+        }
+
         public (Difficulty, Song)? ResolveSongExact(string name, Pepper.Commons.Maimai.Structures.Difficulty difficulty, (int, bool) level)
         {
             if (!nameCache.TryGetValue(name, out var ids))
@@ -53,14 +65,30 @@ namespace Pepper.Frontends.Maimai.Services
 
             foreach (var id in ids)
             {
-                var diffs = songCache[id].Difficulties;
-                foreach (var diff in diffs)
+                var res = ResolveDiff(id, difficulty, level);
+                if (res != null)
                 {
-                    if (diff.Level == level.Item1 &&
-                        (diff.LevelDecimal >= 7 == level.Item2) &&
-                        ((int) difficulty == diff.Order))
+                    return (res, songCache[id]);
+                }
+            }
+
+            return null;
+        }
+
+        private Difficulty? ResolveDiff(int id, Pepper.Commons.Maimai.Structures.Difficulty difficulty, (int, bool)? level = null)
+        {
+            var diffs = songCache[id].Difficulties;
+            foreach (var diff in diffs)
+            {
+                if ((int) difficulty == diff.Order)
+                {
+                    if (level == null)
                     {
-                        return (diff, songCache[id]);
+                        return diff;
+                    }
+                    if (diff.Level == level.Value.Item1 && (diff.LevelDecimal >= 7 == level.Value.Item2))
+                    {
+                        return diff;
                     }
                 }
             }
@@ -86,16 +114,8 @@ namespace Pepper.Frontends.Maimai.Services
             {
                 id = ids[0];
             }
-            var diffs = songCache[id].Difficulties;
-            foreach (var diff in diffs)
-            {
-                if ((int) difficulty == diff.Order)
-                {
-                    return (diff, songCache[id]);
-                }
-            }
 
-            return null;
+            return ResolveSongExact(id, difficulty);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -111,7 +131,7 @@ namespace Pepper.Frontends.Maimai.Services
                     NewestVersion = difficulty.Id;
                 }
                 var songEntries = await dataDb.Songs
-                    .Include(s => s.Difficulties.Where(d => d.Enabled))
+                    .Include(s => s.Difficulties.Where(d => d.Enabled).OrderByDescending(d => d.Order))
                     .Include(s => s.Artist)
                     .Include(s => s.Genre)
                     .Include(s => s.AddVersion)

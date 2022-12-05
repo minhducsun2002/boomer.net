@@ -29,10 +29,15 @@ namespace Pepper.Frontends.Maimai.Commands
             Difficulty.Basic, Difficulty.Advanced, Difficulty.Expert, Difficulty.Master, Difficulty.ReMaster
         };
 
+        public static readonly string[] DifficultyStrings =
+        {
+            "BASIC", "ADVANCED", "EXPERT", "MASTER", "Re:MASTER"
+        };
+
         /// <param name="accuracy">Accuracy, in range [0, 1005000]</param>
         /// <param name="chartConstant">Chart constant, in range [10, 150]</param>
         /// <returns></returns>
-        protected static long GetFinalScore(long accuracy, long chartConstant)
+        public static long GetFinalScore(long accuracy, long chartConstant)
         {
             if (accuracy > 1005000)
             {
@@ -74,7 +79,7 @@ namespace Pepper.Frontends.Maimai.Commands
             return 0;
         }
 
-        protected static string GetStatusString(FcStatus fcStatus)
+        public static string GetStatusString(FcStatus fcStatus)
         {
             var comboText = fcStatus switch
             {
@@ -87,7 +92,7 @@ namespace Pepper.Frontends.Maimai.Commands
             return comboText;
         }
 
-        protected static string GetStatusString(SyncStatus syncStatus)
+        public static string GetStatusString(SyncStatus syncStatus)
         {
             var syncText = syncStatus switch
             {
@@ -100,7 +105,7 @@ namespace Pepper.Frontends.Maimai.Commands
             return syncText;
         }
 
-        protected static Color GetColor(Difficulty difficulty)
+        public static Color GetColor(Difficulty difficulty)
         {
             var color = difficulty switch
             {
@@ -115,7 +120,7 @@ namespace Pepper.Frontends.Maimai.Commands
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-        protected static int NormalizeRating(long total)
+        public static int NormalizeRating(long total)
         {
             return (int) (total / 1000000 / 10 / 10);
         }

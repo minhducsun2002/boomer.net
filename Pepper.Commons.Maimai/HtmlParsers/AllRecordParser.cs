@@ -13,7 +13,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             doc.LoadHtml(html);
 
             var main = doc.DocumentNode;
-            var statRecords = main.QuerySelectorAll(".w_450.m_15.p_r.f_0")
+            var statRecords = main.QuerySelectorAll(".w_450.m_15.f_0")
                 .Select(node =>
                 {
                     var accuracyNode = node.QuerySelector(".music_score_block.w_120.t_r.f_l.f_12");
