@@ -18,6 +18,10 @@ namespace Pepper.Commons.Maimai
 
             var req = new HttpRequestMessage(HttpMethod.Get, maimaiSsidRedemptionUrl);
             var res = await AuthHttpClient.SendAsync(req);
+            if (res.StatusCode == HttpStatusCode.ServiceUnavailable)
+            {
+                throw new MaintenanceException();
+            }
             if (!res.Headers.TryGetValues("Set-Cookie", out var setCookies))
             {
                 return null;
