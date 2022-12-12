@@ -5,7 +5,7 @@ namespace Pepper.Commons.Maimai
 {
     public partial class MaimaiDxNetClient
     {
-        public async Task<IEnumerable<RecentRecord>> GetUserRecentRecord()
+        public async Task<IEnumerable<RecentRecord?>> GetUserRecentRecord()
         {
             var html = await GetHtml("https://maimaidx-eng.com/maimai-mobile/record/");
             return RecentRecordParser.Parse(html);

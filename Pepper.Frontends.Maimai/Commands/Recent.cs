@@ -26,17 +26,32 @@ namespace Pepper.Frontends.Maimai.Commands
             var cookie = await CookieProvider.GetCookie(player?.Id ?? Context.AuthorId);
             var client = new MaimaiDxNetClient(HttpClient, cookie!);
             var recent = await client.GetUserRecentRecord();
+            var hasFailedParsing = false;
+            var recentFiltered = recent.Where(r =>
+            {
+                if (r == null)
+                {
+                    hasFailedParsing = true;
+                }
+
+                return r != null;
+            }).ToArray() as RecentRecord[];
 
             var chunks = new List<List<RecentRecord>>();
             var current = new List<RecentRecord>();
-            foreach (var record in recent)
+            var last = recentFiltered[0];
+            foreach (var record in recentFiltered)
             {
-                current.Add(record);
-                if (record.Track == 1)
+                if (record.Track >= last.Track)
                 {
-                    chunks.Add(current);
-                    current = new List<RecentRecord>();
+                    if (current.Count != 0)
+                    {
+                        chunks.Add(current);
+                        current = new List<RecentRecord>();
+                    }
                 }
+                current.Add(record);
+                last = record;
             }
 
             if (current.Count != 0)
@@ -117,7 +132,12 @@ namespace Pepper.Frontends.Maimai.Commands
                     {
                         embeds = embeds.Append(new LocalEmbed());
                     }
-                    return new Page().WithEmbeds(embeds);
+                    var page = new Page().WithEmbeds(embeds);
+                    if (hasFailedParsing)
+                    {
+                        page = page.WithContent("Failed to parse some scores : grouping & ordering might be inaccurate.");
+                    }
+                    return page;
                 })
                 .ToArray();
 
