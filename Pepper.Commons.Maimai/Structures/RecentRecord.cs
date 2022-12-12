@@ -17,6 +17,7 @@ namespace Pepper.Commons.Maimai.Structures
         public ChallengeType ChallengeType { get; set; }
         public int ChallengeRemainingHealth { get; set; }
         public int ChallengeMaxHealth { get; set; }
+        public bool? IsWinningMatching { get; set; }
 #pragma warning restore CS8618
     }
 }

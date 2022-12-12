@@ -116,5 +116,11 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             };
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        private static bool ParseWinningMatching(ReadOnlySpan<char> raw)
+        {
+            // https://maimaidx-eng.com/maimai-mobile/img/playlog/win.png;
+            return raw[51] == 'w';
+        }
     }
 }

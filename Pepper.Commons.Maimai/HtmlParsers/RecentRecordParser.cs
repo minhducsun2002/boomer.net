@@ -29,6 +29,14 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                 var time = topText[1].InnerText;
                 var parsedTime = ParseTime(time);
 
+                bool? isWinningMatching = null;
+                var matchingResultNode = top.QuerySelector(".playlog_vs_result.v_b");
+                var src = matchingResultNode?.GetAttributeValue("src", "");
+                if (src != null)
+                {
+                    isWinningMatching = ParseWinningMatching(src);
+                }
+
                 var content = top.NextSiblingElement();
                 var accuracyText = content.QuerySelector(".playlog_achievement_txt.t_r").InnerText;
                 var name = HttpUtility.HtmlDecode(content.QuerySelector(".basic_block.m_5.p_5.p_l_10.f_13.break").InnerText);
@@ -81,7 +89,8 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                     ImageUrl = jacketImageUrl,
                     ChallengeType = challengeType,
                     ChallengeMaxHealth = maxHealth,
-                    ChallengeRemainingHealth = health
+                    ChallengeRemainingHealth = health,
+                    IsWinningMatching = isWinningMatching
                 };
             });
             return data;
