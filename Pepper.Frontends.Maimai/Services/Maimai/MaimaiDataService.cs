@@ -53,7 +53,7 @@ namespace Pepper.Frontends.Maimai.Services
             }
 
             var res = ResolveDiff(id, difficulty);
-            return (res!, song);
+            return res != null ? (res, song) : null;
         }
 
         public (Difficulty, Song)? ResolveSongExact(string name, Pepper.Commons.Maimai.Structures.Difficulty difficulty, (int, bool) level)
