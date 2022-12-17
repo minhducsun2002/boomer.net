@@ -26,6 +26,7 @@ namespace Pepper.Frontends.Maimai.Commands
             var client = new MaimaiDxNetClient(HttpClient, cookie!);
             var user = await client.GetUserPlayData();
             var stats = user.UserStatistics;
+            var isShinDan = user.DanLevel > 11;
 
             return Reply(new LocalEmbed
             {
@@ -33,7 +34,7 @@ namespace Pepper.Frontends.Maimai.Commands
                 ThumbnailUrl = user.Avatar,
                 Author = new LocalEmbedAuthor
                 {
-                    Name = $"Dan {user.DanLevel.Ordinalize()} - class {user.SeasonClass}"
+                    Name = $"{(isShinDan ? "Shin " : "")}{(user.DanLevel % 11).Ordinalize()} Dan - class {user.SeasonClass}"
                 },
                 Description = $"**{user.Rating}** rating, cleared **{stats.Clear}** charts through **{user.PlayCount}** plays.",
                 Fields = new List<LocalEmbedField>
