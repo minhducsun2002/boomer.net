@@ -20,8 +20,19 @@ namespace Pepper.Frontends.Maimai.Structures
         {
             base.FormatLocalMessage(message);
             var pageIndex = CurrentPageIndex;
-            var components = interactionIds[pageIndex]
-                .Select((c) => LocalComponent.Button(c.Item1, $"Track {c.Item2}"));
+            var sortedButtonIds = new Dictionary<string, List<int>>();
+            foreach (var (buttonId, trackNumber) in interactionIds[pageIndex])
+            {
+                if (!sortedButtonIds.TryGetValue(buttonId, out var ids))
+                {
+                    ids = new List<int>();
+                }
+
+                ids.Add(trackNumber);
+                sortedButtonIds[buttonId] = ids;
+            }
+            var components = sortedButtonIds
+                .Select(c => LocalComponent.Button(c.Key, $"Track {string.Join(" / ", c.Value)}"));
             if (message.Components.HasValue)
             {
                 // ReSharper disable once CoVariantArrayConversion
