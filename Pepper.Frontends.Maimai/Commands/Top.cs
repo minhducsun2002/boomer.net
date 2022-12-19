@@ -5,6 +5,8 @@ using Disqord.Rest;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Maimai.Structures.Enums;
+using Pepper.Commons.Maimai.Structures.Score;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
 using Qmmands;
@@ -116,7 +118,7 @@ namespace Pepper.Frontends.Maimai.Commands
             return View(new PagedView(new ListPageProvider(embeds)), TimeSpan.FromSeconds(30));
         }
 
-        private LocalEmbed CreateEmbed(ScoreRecord score, Pepper.Commons.Maimai.Entities.Difficulty? diff, Song? song, long total, int index = 0)
+        private LocalEmbed CreateEmbed(TopRecord score, Pepper.Commons.Maimai.Entities.Difficulty? diff, Song? song, long total, int index = 0)
         {
             var diffText = DifficultyStrings[(int) score.Difficulty];
             var accuracy = score.Accuracy;

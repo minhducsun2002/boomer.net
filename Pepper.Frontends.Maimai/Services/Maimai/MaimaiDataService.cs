@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Maimai.Structures.Enums;
 using Pepper.Commons.Structures;
 using Serilog;
 using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
@@ -45,7 +46,7 @@ namespace Pepper.Frontends.Maimai.Services
         }
 
 
-        public (Difficulty, Song)? ResolveSongExact(int id, Pepper.Commons.Maimai.Structures.Difficulty difficulty)
+        public (Difficulty, Song)? ResolveSongExact(int id, Commons.Maimai.Structures.Enums.Difficulty difficulty)
         {
             if (!songCache.TryGetValue(id, out var song))
             {
@@ -56,7 +57,7 @@ namespace Pepper.Frontends.Maimai.Services
             return res != null ? (res, song) : null;
         }
 
-        public (Difficulty, Song)? ResolveSongExact(string name, Pepper.Commons.Maimai.Structures.Difficulty difficulty, (int, bool) level)
+        public (Difficulty, Song)? ResolveSongExact(string name, Commons.Maimai.Structures.Enums.Difficulty difficulty, (int, bool) level)
         {
             if (!nameCache.TryGetValue(name, out var ids))
             {
@@ -75,7 +76,7 @@ namespace Pepper.Frontends.Maimai.Services
             return null;
         }
 
-        private Difficulty? ResolveDiff(int id, Pepper.Commons.Maimai.Structures.Difficulty difficulty, (int, bool)? level = null)
+        private Difficulty? ResolveDiff(int id, Commons.Maimai.Structures.Enums.Difficulty difficulty, (int, bool)? level = null)
         {
             var diffs = songCache[id].Difficulties;
             foreach (var diff in diffs)
@@ -96,7 +97,7 @@ namespace Pepper.Frontends.Maimai.Services
             return null;
         }
 
-        public (Difficulty, Song)? ResolveSongLoosely(string name, Pepper.Commons.Maimai.Structures.Difficulty difficulty, ChartVersion version)
+        public (Difficulty, Song)? ResolveSongLoosely(string name, Commons.Maimai.Structures.Enums.Difficulty difficulty, ChartVersion version)
         {
             if (!nameCache.TryGetValue(name, out var ids))
             {

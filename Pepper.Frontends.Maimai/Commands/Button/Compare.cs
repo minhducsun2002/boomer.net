@@ -4,10 +4,11 @@ using Disqord.Rest;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Maimai.Structures.Enums;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
 using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
-using DifficultyEnum = Pepper.Commons.Maimai.Structures.Difficulty;
+using DifficultyEnum = Pepper.Commons.Maimai.Structures.Enums.Difficulty;
 
 namespace Pepper.Frontends.Maimai.Commands.Button
 {

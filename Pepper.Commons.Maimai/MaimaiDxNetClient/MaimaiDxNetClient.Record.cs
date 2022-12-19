@@ -1,5 +1,7 @@
 using Pepper.Commons.Maimai.HtmlParsers;
 using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Maimai.Structures.Enums;
+using Pepper.Commons.Maimai.Structures.Score;
 
 namespace Pepper.Commons.Maimai
 {
@@ -11,7 +13,7 @@ namespace Pepper.Commons.Maimai
             return RecentRecordParser.Parse(html);
         }
 
-        public async Task<IEnumerable<ScoreRecord>> GetUserDifficultyRecord(Difficulty difficulty)
+        public async Task<IEnumerable<TopRecord>> GetUserDifficultyRecord(Difficulty difficulty)
         {
             var url =
                 $"https://maimaidx-eng.com/maimai-mobile/record/musicGenre/search/?genre=99&diff={(int) difficulty}";
@@ -19,7 +21,7 @@ namespace Pepper.Commons.Maimai
             return AllRecordParser.Parse(html);
         }
 
-        public async Task<IEnumerable<ScoreRecord>> GetUserDifficultyRecord((int, bool) level)
+        public async Task<IEnumerable<TopRecord>> GetUserDifficultyRecord((int, bool) level)
         {
             var (lv, plus) = level;
             if (lv is < 1 or > 15)

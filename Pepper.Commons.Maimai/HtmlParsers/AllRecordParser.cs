@@ -2,12 +2,13 @@ using System.Web;
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
 using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Maimai.Structures.Score;
 
 namespace Pepper.Commons.Maimai.HtmlParsers
 {
     public static partial class AllRecordParser
     {
-        public static IEnumerable<ScoreRecord> Parse(string html)
+        public static IEnumerable<TopRecord> Parse(string html)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
@@ -52,7 +53,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                     var fsImageSrc = fsImage.GetAttributeValue("src", "");
                     var fsStatus = ParseSyncStatus(fsImageSrc);
 
-                    return new ScoreRecord
+                    return new TopRecord
                     {
                         Name = decodedName,
                         Accuracy = accuracy,
@@ -68,7 +69,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                 })
                 .Where(rec => rec != null);
 
-            return statRecords as IEnumerable<ScoreRecord>;
+            return statRecords as IEnumerable<TopRecord>;
         }
     }
 }

@@ -1,6 +1,8 @@
-namespace Pepper.Commons.Maimai.Structures
+using Pepper.Commons.Maimai.Structures.Enums;
+
+namespace Pepper.Commons.Maimai.Structures.Score
 {
-    public class ScoreRecord
+    public abstract class ScoreRecord
     {
 #pragma warning disable CS8618
         public ChartVersion Version { get; set; }
@@ -10,9 +12,6 @@ namespace Pepper.Commons.Maimai.Structures
         public FcStatus FcStatus { get; set; }
         public SyncStatus SyncStatus { get; set; }
         public Difficulty Difficulty { get; set; }
-        public (int, bool) Level { get; set; }
-        public int Notes { get; set; }
-        public int MaxNotes { get; set; }
 #pragma warning restore CS8618
     }
 }

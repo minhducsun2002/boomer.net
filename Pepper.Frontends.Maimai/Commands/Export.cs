@@ -4,6 +4,7 @@ using Disqord.Bot.Commands;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Maimai.Structures.Score;
 using Pepper.Commons.Structures.CommandAttributes.Metadata;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
@@ -66,12 +67,12 @@ namespace Pepper.Frontends.Maimai.Commands
 
             if (!scores.ContainsKey(true))
             {
-                scores[true] = Array.Empty<(ScoreRecord score, int chartConstant, Song? song, long total, int version)>();
+                scores[true] = Array.Empty<(TopRecord score, int chartConstant, Song? song, long total, int version)>();
             }
 
             if (!scores.ContainsKey(false))
             {
-                scores[false] = Array.Empty<(ScoreRecord score, int chartConstant, Song? song, long total, int version)>();
+                scores[false] = Array.Empty<(TopRecord score, int chartConstant, Song? song, long total, int version)>();
             }
 
             var msg = new LocalMessage();
@@ -90,7 +91,7 @@ namespace Pepper.Frontends.Maimai.Commands
             return null;
         }
 
-        private static string SerializeToCsv(IEnumerable<(ScoreRecord score, int chartConstant, Song? song, long total, int version)> list)
+        private static string SerializeToCsv(IEnumerable<(TopRecord score, int chartConstant, Song? song, long total, int version)> list)
         {
             var l = list.Select(v =>
             {

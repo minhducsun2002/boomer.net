@@ -1,6 +1,7 @@
 using Disqord.Rest;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Maimai.Structures.Score;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
 
@@ -21,9 +22,9 @@ namespace Pepper.Frontends.Maimai.Commands
             await Context.Message.RemoveOwnReactionAsync(Hourglass);
         }
 
-        protected async Task<IEnumerable<ScoreRecord>> ListAllScores(MaimaiDxNetClient client)
+        protected async Task<IEnumerable<TopRecord>> ListAllScores(MaimaiDxNetClient client)
         {
-            var records = Enumerable.Empty<ScoreRecord>();
+            var records = Enumerable.Empty<TopRecord>();
             foreach (var diff in Difficulties)
             {
                 records = records.Concat(await client.GetUserDifficultyRecord(diff));

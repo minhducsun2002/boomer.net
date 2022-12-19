@@ -1,18 +1,13 @@
-namespace Pepper.Commons.Maimai.Structures
+using Pepper.Commons.Maimai.Structures.Enums;
+
+namespace Pepper.Commons.Maimai.Structures.Score
 {
-    public class RecentRecord
+    public class RecentRecord : ScoreRecord
     {
 #pragma warning disable CS8618
-        public ChartVersion Version { get; set; }
-        public string Name { get; set; }
-        public string Rank { get; set; }
         public int MultiplayerRank { get; set; }
-        public int Accuracy { get; set; }
         public int Track { get; set; }
         public DateTimeOffset Timestamp { get; set; }
-        public FcStatus FcStatus { get; set; }
-        public SyncStatus SyncStatus { get; set; }
-        public Difficulty Difficulty { get; set; }
         public string? ImageUrl { get; set; }
         public ChallengeType ChallengeType { get; set; }
         public int ChallengeRemainingHealth { get; set; }

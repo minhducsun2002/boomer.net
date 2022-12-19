@@ -1,3 +1,5 @@
+using Pepper.Commons.Maimai.Structures.Enums;
+
 namespace Pepper.Commons.Maimai.Structures
 {
     public class User
