@@ -13,7 +13,7 @@ namespace Pepper.Frontends.Maimai.Structures
 {
     public partial class RecentScorePagedView
     {
-        public static RecentScorePagedView Create(IEnumerable<(RecentRecord?, (Difficulty, Song)?)> records)
+        public static RecentScorePagedView Create(IEnumerable<(RecentRecord?, (Difficulty, Song, bool)?)> records)
         {
             var recordsArray = records.ToArray();
             var hasFailedParsing = false;
@@ -26,7 +26,7 @@ namespace Pepper.Frontends.Maimai.Structures
 
                     return r.Item1 != null;
                 })
-                .ToArray() as (RecentRecord, (Difficulty, Song)?)[];
+                .ToArray() as (RecentRecord, (Difficulty, Song, bool)?)[];
 
             var grouped = GroupRecords(recentFiltered);
             var serializedPages = SerializeRecords(grouped, hasFailedParsing);
@@ -38,11 +38,11 @@ namespace Pepper.Frontends.Maimai.Structures
             );
         }
 
-        private static List<List<(RecentRecord, (Difficulty, Song)?)>> GroupRecords(
-            IList<(RecentRecord, (Difficulty, Song)?)> records)
+        private static List<List<(RecentRecord, (Difficulty, Song, bool)?)>> GroupRecords(
+            IList<(RecentRecord, (Difficulty, Song, bool)?)> records)
         {
-            var chunks = new List<List<(RecentRecord, (Difficulty, Song)?)>>();
-            var current = new List<(RecentRecord, (Difficulty, Song)?)>();
+            var chunks = new List<List<(RecentRecord, (Difficulty, Song, bool)?)>>();
+            var current = new List<(RecentRecord, (Difficulty, Song, bool)?)>();
             var last = records[0];
             foreach (var entry in records)
             {
@@ -70,7 +70,7 @@ namespace Pepper.Frontends.Maimai.Structures
         }
 
         private static List<List<(string, int)>> SerializeInteractions(
-            IEnumerable<IEnumerable<(RecentRecord, (Difficulty, Song)?)>> chunks)
+            IEnumerable<IEnumerable<(RecentRecord, (Difficulty, Song, bool)?)>> chunks)
         {
             var res = chunks
                 .Select(chunk =>
@@ -95,7 +95,7 @@ namespace Pepper.Frontends.Maimai.Structures
             return res.ToList();
         }
 
-        private static IEnumerable<Page> SerializeRecords(List<List<(RecentRecord, (Difficulty, Song)?)>> chunks,
+        private static IEnumerable<Page> SerializeRecords(List<List<(RecentRecord, (Difficulty, Song, bool hasMultipleVersions)?)>> chunks,
             bool hasFailedParsing)
         {
             return chunks.Select(recordGroup =>
@@ -106,12 +106,12 @@ namespace Pepper.Frontends.Maimai.Structures
                     var diff = MaimaiCommand.DifficultyStrings[(int) record.Difficulty];
 
                     var levelText = song.HasValue
-                        ? song.Value.Item1.Level + "." + song.Value.Item1.LevelDecimal
+                        ? " " + song.Value.Item1.Level + "." + song.Value.Item1.LevelDecimal
                         : "";
                     int rating = default;
                     if (song.HasValue)
                     {
-                        var (d, _) = song.Value;
+                        var (d, _, _) = song.Value;
                         var level = d.Level * 10 + d.LevelDecimal;
                         rating = MaimaiCommand.NormalizeRating(MaimaiCommand.GetFinalScore(record.Accuracy, level));
                     }
@@ -123,8 +123,10 @@ namespace Pepper.Frontends.Maimai.Structures
                     var r = new LocalEmbed
                     {
                         Author = new LocalEmbedAuthor()
-                            .WithName($"Track {record.Track} - {diff} {levelText}"),
-                        Title = $"{record.Name}",
+                            .WithName($"{record.Track}. "
+                                      + record.Name
+                                      + (record.Version == ChartVersion.Deluxe && song?.hasMultipleVersions == true ? "  [DX] " : "  ")
+                                      + $"[{diff}{levelText}]"),
                         Description = $"**{record.Accuracy / 10000}**.**{record.Accuracy % 10000:0000}**%" +
                                       $" - **{(rankEndingInPlus ? record.Rank[..^4].ToUpperInvariant() : record.Rank.ToUpperInvariant())}**"
                                       + (rankEndingInPlus ? "+" : "")

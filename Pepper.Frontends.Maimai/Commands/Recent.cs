@@ -32,11 +32,16 @@ namespace Pepper.Frontends.Maimai.Commands
             {
                 if (record == null)
                 {
-                    return ((RecentRecord?) null, ((Difficulty, Song)?) null);
+                    return ((RecentRecord?) null, ((Difficulty, Song, bool)?) null);
                 }
 
                 var res = GameDataService.ResolveSongLoosely(record.Name, record.Difficulty, record.Version);
-                return (record, res);
+                if (res != null)
+                {
+                    var hasMultipleVersion = GameDataService.HasMultipleVersions(record.Name);
+                    return (record, (res.Value.Item1, res.Value.Item2, hasMultipleVersion));
+                }
+                return (record, null);
             });
 
             return View(RecentScorePagedView.Create(rs), TimeSpan.FromSeconds(30));
