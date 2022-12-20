@@ -77,6 +77,12 @@ namespace Pepper.Frontends.Maimai.Commands.Button
                 new LocalInteractionMessageResponse()
                     .WithContent($"Score of {Context.Author.Mention}")
                     .WithEmbeds(embed)
+                    .WithComponents(LocalComponent.Row(
+                        LocalComponent.Button(
+                            CreateCommand(id, name, version, difficulty, baseLevel, plus == 1),
+                            "Check your score"
+                        ).WithStyle(LocalButtonComponentStyle.Secondary)
+                    ))
             );
         }
 
