@@ -29,18 +29,20 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             return PlayerDataParser.FastIntParse(p1) * 10000 + PlayerDataParser.FastIntParse(p2);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static string ParseRank(ReadOnlySpan<char> raw)
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        private static (string, bool) ParseRank(ReadOnlySpan<char> raw)
         {
+            // https://maimaidx-eng.com/maimai-mobile/img/playlog/ssplus.png?ver=1.25
             var len = raw.Length;
             for (var i = 51; i < len; i++)
             {
                 if (raw[i] == '.')
                 {
-                    return raw[51..i].ToString();
+                    var isPlus = raw[i - 2] == 'u';
+                    return (raw[51..(isPlus ? i - 4 : i)].ToString(), isPlus);
                 }
             }
-            return "";
+            return ("", false);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -80,27 +80,27 @@ namespace Pepper.Frontends.Maimai.Commands
             return 0;
         }
 
-        public static string GetStatusString(FcStatus fcStatus)
+        public static string GetFormattedStatusString(FcStatus fcStatus)
         {
             var comboText = fcStatus switch
             {
-                FcStatus.FC => "FC",
-                FcStatus.FCPlus => "FC+",
-                FcStatus.AllPerfect => "AP",
-                FcStatus.AllPerfectPlus => "AP+",
+                FcStatus.FC => "**FC**",
+                FcStatus.FCPlus => "**FC**+",
+                FcStatus.AllPerfect => "**AP**",
+                FcStatus.AllPerfectPlus => "**AP**+",
                 _ => ""
             };
             return comboText;
         }
 
-        public static string GetStatusString(SyncStatus syncStatus)
+        public static string GetFormattedStatusString(SyncStatus syncStatus)
         {
             var syncText = syncStatus switch
             {
-                SyncStatus.FullSyncDx => "FS DX",
-                SyncStatus.FullSyncDxPlus => "FS DX+",
-                SyncStatus.FullSync => "FS",
-                SyncStatus.FullSyncPlus => "FS+",
+                SyncStatus.FullSyncDx => "**FS DX**",
+                SyncStatus.FullSyncDxPlus => "**FS DX**+",
+                SyncStatus.FullSync => "**FS**",
+                SyncStatus.FullSyncPlus => "**FS**+",
                 _ => ""
             };
             return syncText;

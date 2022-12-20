@@ -103,70 +103,11 @@ namespace Pepper.Frontends.Maimai.Structures
                 var embeds = recordGroup.Select(entry =>
                 {
                     var (record, song) = entry;
-                    var diff = MaimaiCommand.DifficultyStrings[(int) record.Difficulty];
-
-                    var levelText = song.HasValue
-                        ? " " + song.Value.Item1.Level + "." + song.Value.Item1.LevelDecimal
-                        : "";
-                    int rating = default;
-                    if (song.HasValue)
-                    {
-                        var (d, _, _) = song.Value;
-                        var level = d.Level * 10 + d.LevelDecimal;
-                        rating = MaimaiCommand.NormalizeRating(MaimaiCommand.GetFinalScore(record.Accuracy, level));
-                    }
-
-                    var rankEndingInPlus = record.Rank.EndsWith("plus");
-                    var comboText = MaimaiCommand.GetStatusString(record.FcStatus);
-                    var syncText = MaimaiCommand.GetStatusString(record.SyncStatus);
-
-                    var r = new LocalEmbed
-                    {
-                        Author = new LocalEmbedAuthor()
-                            .WithName($"{record.Track}. "
-                                      + record.Name
-                                      + (record.Version == ChartVersion.Deluxe && song?.hasMultipleVersions == true ? "  [DX] " : "  ")
-                                      + $"[{diff}{levelText}]"),
-                        Description = $"**{record.Accuracy / 10000}**.**{record.Accuracy % 10000:0000}**%" +
-                                      $" - **{(rankEndingInPlus ? record.Rank[..^4].ToUpperInvariant() : record.Rank.ToUpperInvariant())}**"
-                                      + (rankEndingInPlus ? "+" : "")
-                                      + (comboText == "" ? comboText : $" [**{comboText}**]")
-                                      + (syncText == "" ? syncText : $" [**{syncText}**]"),
-                        ThumbnailUrl = record.ImageUrl ?? Optional<string>.Empty,
-                        Timestamp = record.Timestamp,
-                        Color = MaimaiCommand.GetColor(record.Difficulty)
-                    };
-
-                    if (record.ChallengeType != ChallengeType.None)
-                    {
-                        var hp = record.ChallengeRemainingHealth;
-                        var maxHp = record.ChallengeMaxHealth;
-#pragma warning disable CS8509
-                        var text = record.ChallengeType switch
-#pragma warning restore CS8509
-                        {
-                            ChallengeType.PerfectChallenge => $"Perfect Challenge : {hp}/{maxHp}",
-                            ChallengeType.Course => $"Course : {hp}/{maxHp}"
-                        };
-                        r.Footer = new LocalEmbedFooter
-                        {
-                            Text = text
-                        };
-                    }
-
-                    if (rating != default)
-                    {
-                        if (r.Footer.HasValue)
-                        {
-                            r.Footer.Value.Text = $"{rating} rating • " + r.Footer.Value.Text;
-                        }
-                        else
-                        {
-                            r = r.WithFooter($"{rating} rating");
-                        }
-                    }
-
-                    return r;
+                    return ScoreFormatter.FormatScore(
+                        record,
+                        song?.Item1, null, record.Track, record.ImageUrl,
+                        hasMultipleVersions: song?.hasMultipleVersions
+                    );
                 });
                 if (chunks.Count != 1)
                 {

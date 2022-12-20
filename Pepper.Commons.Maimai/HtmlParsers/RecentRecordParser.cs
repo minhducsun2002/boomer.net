@@ -49,7 +49,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                     var chartTypeSrc = content.QuerySelector(".playlog_music_kind_icon").GetAttributeValue("src", "");
                     var version = ParseVersion(chartTypeSrc);
                     var accuracy = ParseAccuracy(accuracyText);
-                    var rank = ParseRank(rankImageSrc);
+                    var (rank, rankPlus) = ParseRank(rankImageSrc);
                     var fcImage = content.QuerySelector(".playlog_score_block").NextSiblingElement();
                     var fcImageSrc = fcImage.GetAttributeValue("src", "");
                     var fcStatus = ParseFcStatus(fcImageSrc);
@@ -87,6 +87,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                         Accuracy = accuracy,
                         Name = name,
                         Rank = rank,
+                        RankPlus = rankPlus,
                         Version = version,
                         FcStatus = fcStatus,
                         MultiplayerRank = multiplayerRank,

@@ -9,6 +9,7 @@ using Pepper.Commons.Maimai.Structures.Enums;
 using Pepper.Commons.Maimai.Structures.Score;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
+using Pepper.Frontends.Maimai.Structures;
 using Qmmands;
 using Qmmands.Text;
 using PagedView = Pepper.Commons.Structures.Views.PagedView;
@@ -90,9 +91,9 @@ namespace Pepper.Frontends.Maimai.Commands
                     {
                         var (score, diff, song, total, version) = e;
                         var embed = CreateEmbed(score, diff, song, total, i1 * 3 + i2);
-                        embed = embed.WithFooter(newFooter);
                         return embed;
-                    });
+                    })
+                        .Append(new LocalEmbed().WithFooter(newFooter));
                     return page;
                 });
 
@@ -104,9 +105,9 @@ namespace Pepper.Frontends.Maimai.Commands
                     {
                         var (score, diff, song, total, version) = e;
                         var embed = CreateEmbed(score, diff, song, total, i1 * 3 + i2);
-                        embed = embed.WithFooter(oldFooter);
                         return embed;
-                    });
+                    })
+                        .Append(new LocalEmbed().WithFooter(oldFooter)); ;
                     return page;
                 });
 
@@ -120,50 +121,9 @@ namespace Pepper.Frontends.Maimai.Commands
 
         private LocalEmbed CreateEmbed(TopRecord score, Pepper.Commons.Maimai.Entities.Difficulty? diff, Song? song, long total, int index = 0)
         {
-            var diffText = DifficultyStrings[(int) score.Difficulty];
-            var accuracy = score.Accuracy;
-            int chartConstant;
-            if (diff != null)
-            {
-                chartConstant = diff.Level * 10 + diff.LevelDecimal;
-            }
-            else
-            {
-                var d = score.Level;
-                chartConstant = d.Item1 * 10 + (d.Item2 ? 7 : 0);
-            }
-
-            var rankEndingInPlus = score.Rank[^1] == 'p';
             var hasMultipleVersions = GameDataService.HasMultipleVersions(score.Name);
-
-            var embed = new LocalEmbed
-            {
-                Author = new LocalEmbedAuthor()
-                    .WithName($"{index + 1}. "
-                              + score.Name
-                              + (score.Version == ChartVersion.Deluxe && hasMultipleVersions ? "  [DX] " : "  ")
-                              + $"[{diffText} {chartConstant / 10}.{chartConstant % 10}]"),
-                Description = $"**{accuracy / 10000}**.**{accuracy % 10000:0000}**%"
-                              + " - ["
-                              + (rankEndingInPlus
-                                  ? $"**{score.Rank[..^1].ToUpperInvariant()}**+"
-                                  : $"**{score.Rank.ToUpperInvariant()}**")
-                              + $"] - **{NormalizeRating(total)}** rating",
-                Color = GetColor(score.Difficulty)
-            };
             var imageUrl = GameDataService.GetImageUrl(score.Name);
-            if (imageUrl != null)
-            {
-                embed = embed.WithThumbnailUrl(imageUrl);
-            }
-
-            if (song != null)
-            {
-                embed.AddField("Genre", song.Genre!.Name, true);
-                embed.AddField("Version", song.AddVersion!.Name, true);
-                embed.AddField("Level", $"{score.Level.Item1}{(score.Level.Item2 ? "+" : "")}", true);
-            }
-            return embed;
+            return ScoreFormatter.FormatScore(score, diff, song, index + 1, imageUrl, score.Level, hasMultipleVersions);
         }
     }
 }

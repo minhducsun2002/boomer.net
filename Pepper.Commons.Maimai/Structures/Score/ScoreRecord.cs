@@ -8,6 +8,7 @@ namespace Pepper.Commons.Maimai.Structures.Score
         public ChartVersion Version { get; set; }
         public string Name { get; set; }
         public string Rank { get; set; }
+        public bool RankPlus { get; set; }
         public int Accuracy { get; set; }
         public FcStatus FcStatus { get; set; }
         public SyncStatus SyncStatus { get; set; }

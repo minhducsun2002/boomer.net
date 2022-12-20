@@ -75,17 +75,19 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                 : (PlayerDataParser.FastIntParse(raw), false);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string ParseRank(ReadOnlySpan<char> raw)
+        private static (string, bool) ParseRank(ReadOnlySpan<char> raw)
         {
+            // https://maimaidx-eng.com/maimai-mobile/img/music_icon_ssp.png?ver=1.25
             var len = raw.Length;
             for (var i = 54; i < len; i++)
             {
                 if (raw[i] == '.')
                 {
-                    return raw[54..i].ToString();
+                    var isPlus = raw[i - 1] == 'p';
+                    return (raw[54..(isPlus ? i - 1 : i)].ToString(), isPlus);
                 }
             }
-            return "";
+            return ("", false);
         }
     }
 }
