@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Disqord.Bot.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commons.Commands.General;
 using Pepper.Commons.Structures;
@@ -39,9 +40,10 @@ namespace Pepper.Test.Commands
                 var services = new ServiceCollection()
                     .AddLogging()
                     .AddTextCommandService()
+                    .AddCommandService()
                     .BuildServiceProvider();
                 var commandService = services.GetRequiredService<ICommandService>();
-                DefaultTextSetup.Initialize(commandService);
+                DefaultBotCommandsSetup.Initialize(commandService);
                 commandService.AddModules(typeof(GeneralCommand).Assembly);
                 commandService.AddModules(a);
                 return (services, commandService, commands: commandService.EnumerateTextCommands());
