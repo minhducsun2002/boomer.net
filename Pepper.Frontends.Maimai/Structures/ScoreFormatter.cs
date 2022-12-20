@@ -10,7 +10,7 @@ namespace Pepper.Frontends.Maimai.Structures
 {
     public class ScoreFormatter
     {
-        private static readonly string[] DifficultyStrings =
+        public static readonly string[] DifficultyStrings =
         {
             "BASIC", "ADVANCED", "EXPERT", "MASTER", "Re:MASTER"
         };
@@ -18,7 +18,7 @@ namespace Pepper.Frontends.Maimai.Structures
         public static LocalEmbed FormatScore(
             ScoreRecord record,
             Difficulty? diff, Song? song,
-            int number,
+            int? number = null,
             string? imageUrl = null,
             (int, bool)? levelHints = null, bool? hasMultipleVersions = null)
         {
@@ -62,11 +62,12 @@ namespace Pepper.Frontends.Maimai.Structures
             var nameText = record.Name + (record.Version == ChartVersion.Deluxe && hasMultipleVersions == true ? "  [DX] " : "  ");
             var ratingText = rating != default ? $" - **{rating}**{(isAccurateLevel ? "" : " (?)")} rating" : "";
             var rankText = $"**{record.Rank.ToUpperInvariant()}**{(record.RankPlus ? "+" : "")}";
+            var numberText = number != null ? $"{number}. " : "";
             char openingBracket = isTop ? '(' : '[', closingBracket = isTop ? ')' : ']';
 
             var r = new LocalEmbed
             {
-                Author = new LocalEmbedAuthor().WithName($"{number}. {nameText}[{diffText}{levelText}]"),
+                Author = new LocalEmbedAuthor().WithName($"{numberText}{nameText}[{diffText}{levelText}]"),
                 Description = $"**{record.Accuracy / 10000}**.**{record.Accuracy % 10000:0000}**%"
                               + (isTop ? $" - [{rankText}]" : $" - {rankText}")
                               + (comboText == "" ? comboText : $" {openingBracket}{comboText}{closingBracket}")

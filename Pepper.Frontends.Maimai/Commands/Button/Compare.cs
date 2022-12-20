@@ -7,6 +7,7 @@ using Pepper.Commons.Maimai.Structures;
 using Pepper.Commons.Maimai.Structures.Enums;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
+using Pepper.Frontends.Maimai.Structures;
 using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
 using DifficultyEnum = Pepper.Commons.Maimai.Structures.Enums.Difficulty;
 
@@ -53,7 +54,7 @@ namespace Pepper.Frontends.Maimai.Commands.Button
             var decimalLevel = p.HasValue
                 ? p.Value.Item1.LevelDecimal
                 : (plus == 1 ? 7 : 0);
-            var title = $"**{name}**  [__{MaimaiCommand.DifficultyStrings[d]}__ **{baseLevel}**.**{decimalLevel}**]";
+            var title = $"**{name}**  [__{ScoreFormatter.DifficultyStrings[d]}__ **{baseLevel}**.**{decimalLevel}**]";
 
             if (record == null)
             {
@@ -64,11 +65,18 @@ namespace Pepper.Frontends.Maimai.Commands.Button
                 return;
             }
 
-            var score = MaimaiCommand.GetFinalScore(record.Accuracy, baseLevel * 10 + decimalLevel);
+            var image = GameDataService.GetImageUrl(record.Name);
+            var multipleVersions = GameDataService.HasMultipleVersions(record.Name);
+            var embed = ScoreFormatter.FormatScore(
+                record, p?.Item1, p?.Item2,
+                levelHints: (baseLevel, plus == 1),
+                imageUrl: image,
+                hasMultipleVersions: multipleVersions
+            );
             await Context.Interaction.Followup().SendAsync(
                 new LocalInteractionMessageResponse()
-                    .WithContent($"Score of {Context.Author.Mention}\n" +
-                                 $"{title} : **{record.Accuracy / 10000}**.**{record.Accuracy % 10000:0000}**% - {MaimaiCommand.NormalizeRating(score)}")
+                    .WithContent($"Score of {Context.Author.Mention}")
+                    .WithEmbeds(embed)
             );
         }
 

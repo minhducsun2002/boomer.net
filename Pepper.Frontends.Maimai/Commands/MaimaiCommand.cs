@@ -30,11 +30,6 @@ namespace Pepper.Frontends.Maimai.Commands
             Difficulty.Basic, Difficulty.Advanced, Difficulty.Expert, Difficulty.Master, Difficulty.ReMaster
         };
 
-        public static readonly string[] DifficultyStrings =
-        {
-            "BASIC", "ADVANCED", "EXPERT", "MASTER", "Re:MASTER"
-        };
-
         /// <param name="accuracy">Accuracy, in range [0, 1005000]</param>
         /// <param name="chartConstant">Chart constant, in range [10, 150]</param>
         /// <returns></returns>
