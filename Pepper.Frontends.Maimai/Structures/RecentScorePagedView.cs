@@ -32,7 +32,13 @@ namespace Pepper.Frontends.Maimai.Structures
                 sortedButtonIds[buttonId] = ids;
             }
             var components = sortedButtonIds
-                .Select(c => LocalComponent.Button(c.Key, $"Track {string.Join(" / ", c.Value)}"));
+                .Take(5 - 1)
+                .Select(c =>
+                    LocalComponent.Button(c.Key, string.Join(" / ", c.Value))
+                        .WithStyle(LocalButtonComponentStyle.Secondary)
+                )
+                .Prepend(LocalComponent.Button(Guid.Empty.ToString(), "Check your score :").WithIsDisabled(true));
+
             if (message.Components.HasValue)
             {
                 // ReSharper disable once CoVariantArrayConversion
