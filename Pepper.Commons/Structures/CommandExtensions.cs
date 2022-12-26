@@ -16,7 +16,8 @@ namespace Pepper.Commons.Structures
         {
             var prefix = ((DefaultPrefixProvider) bot.Prefixes).Prefixes
                 .OfType<StringPrefix>()
-                .Select(prefix => prefix.ToString());
+                .Select(prefix => prefix.ToString())
+                .MinBy(prefix => prefix.Length);
             var name = command.Aliases.MinBy(s => s.Length);
             return prefix + name;
         }
