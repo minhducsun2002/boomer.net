@@ -119,40 +119,46 @@ namespace Pepper.Frontends.Maimai.Services
             return ResolveSongExact(id, difficulty);
         }
 
+        public async Task Load(MaimaiDataDbContext dataDb, HttpClient httpClient, CancellationToken stoppingToken)
+        {
+            Log.Information("Loading song data...");
+            var difficulty = await dataDb.AddVersions.OrderByDescending(a => a.Id)
+                .FirstOrDefaultAsync(cancellationToken: stoppingToken);
+            if (difficulty != null)
+            {
+                NewestVersion = difficulty.Id;
+            }
+            var songEntries = await dataDb.Songs
+                .Include(s => s.Difficulties.Where(d => d.Enabled).OrderByDescending(d => d.Order))
+                .Include(s => s.Artist)
+                .Include(s => s.Genre)
+                .Include(s => s.AddVersion)
+                .ToListAsync(cancellationToken: stoppingToken);
+
+            songCache = songEntries.ToDictionary(e => e.Id, e => e);
+
+            nameCache = songEntries
+                .GroupBy(e => e.Name)
+                .ToDictionary(e => e.Key, e => e.Select(e => e.Id).ToList());
+            Log.Information("Loaded {0} songs", songCache.Count);
+
+            Log.Information("Loading image data");
+            var s = await httpClient.GetStringAsync("https://maimai.sega.jp/data/maimai_songs.json", stoppingToken);
+            var parsed = JsonConvert.DeserializeObject<SongImageData[]>(s);
+            var mapped = parsed!
+                .DistinctBy(s => s.Name)
+                .ToDictionary(s => s.Name, s => s.ImageFileName);
+            imageNameCache = mapped;
+            Log.Information("Loaded image data");
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             using (var scope = serviceProvider.CreateScope())
             {
                 var dataDb = scope.ServiceProvider.GetRequiredService<MaimaiDataDbContext>();
-                Log.Information("Loading song data...");
-                var difficulty = await dataDb.AddVersions.OrderByDescending(a => a.Id)
-                    .FirstOrDefaultAsync(cancellationToken: stoppingToken);
-                if (difficulty != null)
-                {
-                    NewestVersion = difficulty.Id;
-                }
-                var songEntries = await dataDb.Songs
-                    .Include(s => s.Difficulties.Where(d => d.Enabled).OrderByDescending(d => d.Order))
-                    .Include(s => s.Artist)
-                    .Include(s => s.Genre)
-                    .Include(s => s.AddVersion)
-                    .ToListAsync(cancellationToken: stoppingToken);
-
-                songCache = songEntries.ToDictionary(e => e.Id, e => e);
-
-                nameCache = songEntries
-                    .GroupBy(e => e.Name)
-                    .ToDictionary(e => e.Key, e => e.Select(e => e.Id).ToList());
-                Log.Information("Loaded {0} songs", songCache.Count);
-
-                Log.Information("Loading image data");
                 var httpClient = scope.ServiceProvider.GetRequiredService<HttpClient>();
-                var s = await httpClient.GetStringAsync("https://maimai.sega.jp/data/maimai_songs.json", stoppingToken);
-                var parsed = JsonConvert.DeserializeObject<SongImageData[]>(s);
-                var mapped = parsed!
-                    .DistinctBy(s => s.Name)
-                    .ToDictionary(s => s.Name, s => s.ImageFileName);
-                imageNameCache = mapped;
+                await Load(dataDb, httpClient, stoppingToken);
             }
 
             await base.ExecuteAsync(stoppingToken);
