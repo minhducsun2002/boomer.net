@@ -20,6 +20,9 @@ namespace Pepper.Frontends.Maimai.Commands.Button
 
         private const string Name = "maicompare_1";
 
+        private static readonly DifficultyEnum[] DefaultDifficulties =
+            { DifficultyEnum.Basic, DifficultyEnum.Advanced, DifficultyEnum.Expert, DifficultyEnum.Master };
+
         [ButtonCommand($"{Name}:*:*:*:*:*:*")]
         // id, name, dx/std, bas/adv/exp/mas/remas, 13, + or not
         public async Task Exec(int id, string name, int ver, int d, int baseLevel, int plus)
@@ -73,16 +76,23 @@ namespace Pepper.Frontends.Maimai.Commands.Button
                 imageUrl: image,
                 hasMultipleVersions: multipleVersions
             );
+
+            embed = embed.WithFooter("Click buttons below to check your score!");
+
+            var buttons = (p?.Item2.Difficulties.Select(d => (DifficultyEnum) d.Order) ?? DefaultDifficulties)
+                .Select(
+                    (diff, index) => LocalComponent.Button(
+                        CreateCommand(id, name, version, diff, baseLevel, plus == 1),
+                        ScoreFormatter.DifficultyStrings[index]
+                    ).WithStyle(LocalButtonComponentStyle.Secondary)
+                )
+                .Take(5);
             await Context.Interaction.Followup().SendAsync(
                 new LocalInteractionMessageResponse()
                     .WithContent($"Score of {Context.Author.Mention}")
                     .WithEmbeds(embed)
-                    .WithComponents(LocalComponent.Row(
-                        LocalComponent.Button(
-                            CreateCommand(id, name, version, difficulty, baseLevel, plus == 1),
-                            "Check your score"
-                        ).WithStyle(LocalButtonComponentStyle.Secondary)
-                    ))
+                    // ReSharper disable once CoVariantArrayConversion
+                    .WithComponents(LocalComponent.Row(buttons.ToArray()))
             );
         }
 
