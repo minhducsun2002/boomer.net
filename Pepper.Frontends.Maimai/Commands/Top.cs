@@ -95,7 +95,8 @@ namespace Pepper.Frontends.Maimai.Commands
                     })
                         .Append(new LocalEmbed().WithFooter(newFooter));
                     return page;
-                });
+                })
+                .ToArray();
 
             var oldEmbed = oldScores
                 .Chunk(3)
@@ -116,7 +117,7 @@ namespace Pepper.Frontends.Maimai.Commands
                 .Select(embed => new Page().WithEmbeds(embed).WithContent("These calculations are estimated."))
                 .ToArray();
 
-            return View(new PagedView(new ListPageProvider(embeds)), TimeSpan.FromSeconds(30));
+            return View(new TopScorePagedView(new ListPageProvider(embeds), newEmbed.Length), TimeSpan.FromSeconds(30));
         }
 
         private LocalEmbed CreateEmbed(TopRecord score, Pepper.Commons.Maimai.Entities.Difficulty? diff, Song? song, long total, int index = 0)
