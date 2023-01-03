@@ -72,7 +72,7 @@ namespace Pepper.Frontends.Maimai.Commands.Button
             var multipleVersions = GameDataService.HasMultipleVersions(record.Name);
             var embed = ScoreFormatter.FormatScore(
                 record, p?.Item1, p?.Item2,
-                levelHints: (baseLevel, plus == 1),
+                levelHints: (p?.Item1.Level ?? baseLevel, plus == 1),
                 imageUrl: image,
                 hasMultipleVersions: multipleVersions
             );
@@ -81,10 +81,16 @@ namespace Pepper.Frontends.Maimai.Commands.Button
 
             var buttons = (p?.Item2.Difficulties.Select(d => (DifficultyEnum) d.Order) ?? DefaultDifficulties)
                 .Select(
-                    (diff, index) => LocalComponent.Button(
-                        CreateCommand(id, name, version, diff, baseLevel, plus == 1),
-                        ScoreFormatter.DifficultyStrings[index]
-                    ).WithStyle(LocalButtonComponentStyle.Secondary)
+                    (diff, index) =>
+                    {
+                        var diffRecord = p?.Item2.Difficulties.ElementAtOrDefault(index);
+                        var songDiff = diffRecord?.Level;
+                        var songDecimal = diffRecord?.LevelDecimal;
+                        return LocalComponent.Button(
+                            CreateCommand(id, name, version, diff, songDiff, songDecimal == null ? null : songDecimal >= 7),
+                            ScoreFormatter.DifficultyStrings[index]
+                        ).WithStyle(LocalButtonComponentStyle.Secondary);
+                    }
                 )
                 .Take(5);
             await Context.Interaction.Followup().SendAsync(
