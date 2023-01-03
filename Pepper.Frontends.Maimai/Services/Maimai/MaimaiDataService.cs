@@ -129,7 +129,7 @@ namespace Pepper.Frontends.Maimai.Services
                 NewestVersion = difficulty.Id;
             }
             var songEntries = await dataDb.Songs
-                .Include(s => s.Difficulties.Where(d => d.Enabled).OrderByDescending(d => d.Order))
+                .Include(s => s.Difficulties.Where(d => d.Enabled).OrderBy(d => d.Order))
                 .Include(s => s.Artist)
                 .Include(s => s.Genre)
                 .Include(s => s.AddVersion)

@@ -79,16 +79,17 @@ namespace Pepper.Frontends.Maimai.Commands.Button
 
             embed = embed.WithFooter("Click buttons below to check your score!");
 
-            var buttons = (p?.Item2.Difficulties.Select(d => (DifficultyEnum) d.Order) ?? DefaultDifficulties)
+            var orderedDifficulties = p?.Item2.Difficulties.OrderBy(d => d.Order).ToArray();
+            var buttons = (orderedDifficulties?.Select(d => (DifficultyEnum) d.Order) ?? DefaultDifficulties)
                 .Select(
                     (diff, index) =>
                     {
-                        var diffRecord = p?.Item2.Difficulties.ElementAtOrDefault(index);
+                        var diffRecord = orderedDifficulties?.ElementAtOrDefault(index);
                         var songDiff = diffRecord?.Level;
                         var songDecimal = diffRecord?.LevelDecimal;
                         return LocalComponent.Button(
                             CreateCommand(id, name, version, diff, songDiff, songDecimal == null ? null : songDecimal >= 7),
-                            ScoreFormatter.DifficultyStrings[index]
+                            ScoreFormatter.DifficultyStrings[(int) diff]
                         ).WithStyle(LocalButtonComponentStyle.Secondary);
                     }
                 )
