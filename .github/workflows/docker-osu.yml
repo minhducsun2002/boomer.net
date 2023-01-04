@@ -1,14 +1,14 @@
-name: Push Docker image to GitHub Container Registry
+name: Push Docker image for osu! frontend to GitHub Container Registry
 
 on:
   push:
     paths:
-      - '**/*.cs'
-      - '**/*.csproj'
-      - '**/*.sln'
+      - '**Osu**/*.cs'
+      - '**Osu**/*.csproj'
+      - 'boomer.sln'
       - 'nuget.config'
-      - 'dockerfiles/*.dockerfile'
-      - '.github/workflows/docker.yml'
+      - 'dockerfiles/osu.dockerfile'
+      - '.github/workflows/docker-osu.yml'
   repository_dispatch:
   workflow_dispatch:
 
@@ -25,7 +25,7 @@ jobs:
       packages: write
     strategy:
       matrix: 
-        dockerfile: ['osu', 'maimai']
+        dockerfile: ['osu']
 
     steps:
       - name: Checkout repository
