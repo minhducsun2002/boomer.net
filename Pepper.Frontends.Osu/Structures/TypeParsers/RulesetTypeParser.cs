@@ -19,13 +19,25 @@ namespace Pepper.Frontends.Osu.Structures.TypeParsers
             new ManiaRuleset()
         };
 
+        private static readonly (string, Ruleset)[] RulesetNames =
+        {
+            ("osu", SupportedRulesets[0]),
+            ("std", SupportedRulesets[0]),
+            ("taiko", SupportedRulesets[1]),
+            ("fruits", SupportedRulesets[2]),
+            ("catch", SupportedRulesets[2]),
+            ("ctb", SupportedRulesets[2]),
+            ("mania", SupportedRulesets[3])
+        };
+
         public override ValueTask<ITypeParserResult<Ruleset>> ParseAsync(ICommandContext context, IParameter parameter, ReadOnlyMemory<char> input)
         {
             Ruleset defaultRuleset = new OsuRuleset();
             try
             {
-                defaultRuleset = SupportedRulesets
-                    .First(ruleset => string.Equals(ruleset.ShortName, new string(input.Span), StringComparison.OrdinalIgnoreCase));
+                defaultRuleset = RulesetNames
+                    .First(pair => pair.Item1.Equals(input.ToString(), StringComparison.OrdinalIgnoreCase))
+                    .Item2;
 
             }
             catch { /* ignored, defaults to osu! */ }
