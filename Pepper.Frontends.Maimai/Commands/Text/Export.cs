@@ -11,7 +11,7 @@ using Pepper.Frontends.Maimai.Services;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Frontends.Maimai.Commands
+namespace Pepper.Frontends.Maimai.Commands.Text
 {
     [Hidden]
     [RequireBotOwner]

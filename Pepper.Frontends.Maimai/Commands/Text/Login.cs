@@ -6,9 +6,9 @@ using Pepper.Frontends.Maimai.Services;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Frontends.Maimai.Commands
+namespace Pepper.Frontends.Maimai.Commands.Text
 {
-    public class Login : MaimaiCommand
+    public class Login : MaimaiTextCommand
     {
         public Login(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
             : base(http, data, cookieProvider) { }

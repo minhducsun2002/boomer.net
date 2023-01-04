@@ -5,9 +5,9 @@ using Pepper.Commons.Maimai.Structures.Score;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
 
-namespace Pepper.Frontends.Maimai.Commands
+namespace Pepper.Frontends.Maimai.Commands.Text
 {
-    public class TopScoreCommand : MaimaiCommand
+    public class TopScoreCommand : MaimaiTextCommand
     {
         protected TopScoreCommand(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
             : base(http, data, cookieProvider) { }

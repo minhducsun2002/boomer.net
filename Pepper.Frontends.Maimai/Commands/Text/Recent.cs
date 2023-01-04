@@ -12,9 +12,9 @@ using Qmmands;
 using Qmmands.Text;
 using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
 
-namespace Pepper.Frontends.Maimai.Commands
+namespace Pepper.Frontends.Maimai.Commands.Text
 {
-    public class Recent : MaimaiCommand
+    public class Recent : MaimaiTextCommand
     {
         public Recent(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
             : base(http, data, cookieProvider) { }

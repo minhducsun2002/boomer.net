@@ -6,7 +6,7 @@ using Disqord.Bot.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commons.Commands.General;
 using Pepper.Commons.Structures;
-using Pepper.Frontends.Maimai.Commands;
+using Pepper.Frontends.Maimai.Commands.Text;
 using Pepper.Frontends.Osu.Commands;
 using Qmmands;
 using Qmmands.Text;
@@ -33,7 +33,7 @@ namespace Pepper.Test.Commands
             var assemblies = new[]
             {
                 typeof(OsuCommand).Assembly,
-                typeof(MaimaiCommand).Assembly,
+                typeof(MaimaiTextCommand).Assembly,
             };
             var bots = assemblies.Select(a =>
             {

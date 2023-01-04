@@ -14,7 +14,7 @@ using Qmmands;
 using Qmmands.Text;
 using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
-namespace Pepper.Frontends.Maimai.Commands
+namespace Pepper.Frontends.Maimai.Commands.Text
 {
     public class Top : TopScoreCommand
     {

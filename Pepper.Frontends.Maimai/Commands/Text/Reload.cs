@@ -7,11 +7,11 @@ using Pepper.Frontends.Maimai.Services;
 using Qmmands;
 using Qmmands.Text;
 
-namespace Pepper.Frontends.Maimai.Commands
+namespace Pepper.Frontends.Maimai.Commands.Text
 {
     [Hidden]
     [RequireBotOwner]
-    public class Reload : MaimaiCommand
+    public class Reload : MaimaiTextCommand
     {
         private readonly MaimaiDataDbContext dbContext;
         public Reload(
