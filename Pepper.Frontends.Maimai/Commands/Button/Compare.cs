@@ -23,6 +23,8 @@ namespace Pepper.Frontends.Maimai.Commands.Button
         private static readonly DifficultyEnum[] DefaultDifficulties =
             { DifficultyEnum.Basic, DifficultyEnum.Advanced, DifficultyEnum.Expert, DifficultyEnum.Master };
 
+        private const string GuideText = "Click buttons below to check your score!";
+
         [ButtonCommand($"{Name}:*:*:*:*:*:*")]
         // id, name, dx/std, bas/adv/exp/mas/remas, 13, + or not
         public async Task Exec(int id, string name, int ver, int d, int baseLevel, int plus)
@@ -59,28 +61,6 @@ namespace Pepper.Frontends.Maimai.Commands.Button
                 : (plus == 1 ? 7 : 0);
             var title = $"**{name}**  [__{ScoreFormatter.DifficultyStrings[d]}__ **{baseLevel}**.**{decimalLevel}**]";
 
-            if (record == null)
-            {
-                await Context.Interaction.Followup().SendAsync(
-                    new LocalInteractionMessageResponse()
-                        .WithContent($"No score for {Context.Author.Mention} on {title}")
-                );
-                return;
-            }
-
-            var chartRecord = await client.GetUserScoreOnChart(record.MusicDetailLink!);
-            var detailedRecord = chartRecord.First(r => r.Difficulty == record.Difficulty);
-            var image = GameDataService.GetImageUrl(record.Name);
-            var multipleVersions = GameDataService.HasMultipleVersions(record.Name);
-            var embed = ScoreFormatter.FormatScore(
-                detailedRecord, p?.Item1, p?.Item2,
-                levelHints: (p?.Item1.Level ?? baseLevel, plus == 1),
-                imageUrl: image,
-                hasMultipleVersions: multipleVersions
-            );
-
-            embed = embed.WithFooter("Click buttons below to check your score!");
-
             var orderedDifficulties = p?.Item2.Difficulties.OrderBy(d => d.Order).ToArray();
             var buttons = (orderedDifficulties?.Select(d => (DifficultyEnum) d.Order) ?? DefaultDifficulties)
                 .Select(
@@ -96,6 +76,31 @@ namespace Pepper.Frontends.Maimai.Commands.Button
                     }
                 )
                 .Take(5);
+
+            if (record == null)
+            {
+                await Context.Interaction.Followup().SendAsync(
+                    new LocalInteractionMessageResponse()
+                        .WithContent($"No score for {Context.Author.Mention} on {title}.\n{GuideText}")
+                        // ReSharper disable once CoVariantArrayConversion
+                        .WithComponents(LocalComponent.Row(buttons.ToArray()))
+                );
+                return;
+            }
+
+            var chartRecord = await client.GetUserScoreOnChart(record.MusicDetailLink!);
+            var detailedRecord = chartRecord.First(r => r.Difficulty == record.Difficulty);
+            var image = GameDataService.GetImageUrl(record.Name);
+            var multipleVersions = GameDataService.HasMultipleVersions(record.Name);
+            var embed = ScoreFormatter.FormatScore(
+                detailedRecord, p?.Item1, p?.Item2,
+                levelHints: (p?.Item1.Level ?? baseLevel, plus == 1),
+                imageUrl: image,
+                hasMultipleVersions: multipleVersions
+            );
+
+            embed = embed.WithFooter(GuideText);
+
             await Context.Interaction.Followup().SendAsync(
                 new LocalInteractionMessageResponse()
                     .WithContent($"Score of {Context.Author.Mention}")
