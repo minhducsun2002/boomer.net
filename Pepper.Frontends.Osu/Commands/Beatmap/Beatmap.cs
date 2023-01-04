@@ -4,7 +4,8 @@ using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
 using Pepper.Commons.Structures;
 using Pepper.Frontends.Osu.Services;
-using Pepper.Frontends.Osu.Structures;
+
+using Pepper.Frontends.Osu.Structures.TypeParsers;
 using Qmmands;
 using Qmmands.Text;
 

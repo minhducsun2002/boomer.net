@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Pepper.Commons.Osu;
 using Pepper.Frontends.Database.OsuUsernameProviders;
 using Pepper.Frontends.Osu.Commands;
+using Pepper.Frontends.Osu.Structures.TypeParsers;
 using Qmmands;
 using Qmmands.Default;
 using Qmmands.Text;

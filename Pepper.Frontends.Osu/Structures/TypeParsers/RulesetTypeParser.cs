@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Taiko;
 using Qmmands;
 using Qmmands.Default;
 
-namespace Pepper.Frontends.Osu.Structures
+namespace Pepper.Frontends.Osu.Structures.TypeParsers
 {
     // TODO: Write tests for this
     public class RulesetTypeParser : TypeParser<Ruleset>

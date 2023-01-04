@@ -6,6 +6,7 @@ using Pepper.Commons.Structures;
 using Pepper.Frontends.Database.OsuUsernameProviders;
 using Pepper.Frontends.Osu.Services;
 using Pepper.Frontends.Osu.Structures;
+using Pepper.Frontends.Osu.Structures.TypeParsers;
 using Qmmands;
 using Qmmands.Text;
 

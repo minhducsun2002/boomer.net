@@ -3,6 +3,7 @@ using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Beatmaps;
 using Pepper.Frontends.Osu.Structures;
+using Pepper.Frontends.Osu.Structures.TypeParsers;
 using APIBeatmapSet = Pepper.Commons.Osu.API.APIBeatmapSet;
 
 namespace Pepper.Frontends.Osu.Commands

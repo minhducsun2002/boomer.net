@@ -3,7 +3,7 @@ using Pepper.Frontends.Osu.Services;
 using Pepper.Frontends.Osu.Utils;
 using Qmmands;
 
-namespace Pepper.Frontends.Osu.Structures
+namespace Pepper.Frontends.Osu.Structures.TypeParsers
 {
     public interface IBeatmapOrSetResolvable { }
     internal interface IBeatmapSetResolvable : IBeatmapOrSetResolvable { public int BeatmapsetId { get; } }

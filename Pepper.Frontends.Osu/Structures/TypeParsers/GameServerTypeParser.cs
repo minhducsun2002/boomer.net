@@ -2,7 +2,7 @@ using Disqord.Bot.Commands;
 using Pepper.Commons.Osu;
 using Qmmands;
 
-namespace Pepper.Frontends.Osu.Structures
+namespace Pepper.Frontends.Osu.Structures.TypeParsers
 {
     public class GameServerTypeParser : DiscordTypeParser<GameServer>
     {

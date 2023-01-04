@@ -9,7 +9,7 @@ using osu.Game.Scoring;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Structures;
 using Pepper.Commons.Structures.CommandAttributes.Metadata;
-using Pepper.Frontends.Osu.Structures;
+using Pepper.Frontends.Osu.Structures.TypeParsers;
 
 namespace Pepper.Frontends.Osu.Commands
 {

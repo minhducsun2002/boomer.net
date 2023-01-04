@@ -7,7 +7,7 @@ using Pepper.Frontends.Database.OsuUsernameProviders;
 using Pepper.Frontends.Osu.Commands;
 using Qmmands;
 
-namespace Pepper.Frontends.Osu.Structures
+namespace Pepper.Frontends.Osu.Structures.TypeParsers
 {
     public class UsernameTypeParser : DiscordTypeParser<Username>, IFailureFormattableTypeParser
     {
