@@ -1,3 +1,5 @@
+using Disqord;
+using Disqord.Rest;
 using Pepper.Commons.Osu;
 using Pepper.Frontends.Osu.Services;
 using Pepper.Frontends.Osu.Utils;
@@ -9,15 +11,34 @@ namespace Pepper.Frontends.Osu.Commands
         protected BeatmapContextCommand(APIClientStore apiClientStore, BeatmapContextProviderService b) : base(apiClientStore) => beatmapContext = b;
 
         private readonly BeatmapContextProviderService beatmapContext;
-        protected int? GetBeatmapIdFromContext()
+        protected async ValueTask<int?> GetBeatmapIdFromContext()
         {
-            var maybeMsg = Context.Message.ReferencedMessage;
-            if (maybeMsg.HasValue && maybeMsg.Value != null)
+            var refMessage = Context.Message.Reference;
+            if (refMessage != null)
             {
-                var msg = maybeMsg.Value!;
+                var maybeMsg = Context.Message.ReferencedMessage;
+                IUserMessage? message;
+                if (!maybeMsg.HasValue)
+                {
+                    try
+                    {
+                        var msg = await Context.Bot.FetchMessageAsync(refMessage.ChannelId, refMessage.MessageId!.Value);
+                        message = msg as IUserMessage;
+                    }
+                    catch
+                    {
+                        message = null;
+                    }
+                }
+                else
+                {
+                    message = maybeMsg.Value;
+                }
+
+
                 // there should only be a single embed
-                var embed = msg.Embeds[0];
-                if (embed.Url is not null)
+                var embed = message?.Embeds[0];
+                if (embed?.Url != null)
                 {
                     if (URLParser.CheckMapUrl(embed.Url, out _, out var id, out _) && id != null)
                     {

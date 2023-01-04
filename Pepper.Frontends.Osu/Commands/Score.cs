@@ -111,7 +111,7 @@ namespace Pepper.Frontends.Osu.Commands
             [Remainder][Description("Username to check. Default to your username, if set.")] Username username
         )
         {
-            var beatmap = GetBeatmapIdFromContext();
+            var beatmap = await GetBeatmapIdFromContext();
             if (beatmap == null)
             {
                 return Reply(
