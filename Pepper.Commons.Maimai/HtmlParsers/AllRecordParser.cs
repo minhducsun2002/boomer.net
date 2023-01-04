@@ -53,6 +53,9 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                     var fsImageSrc = fsImage.GetAttributeValue("src", "");
                     var fsStatus = ParseSyncStatus(fsImageSrc);
 
+                    var detailLinkNode = node.QuerySelector("form > input");
+                    var detailLink = detailLinkNode?.GetAttributeValue("value", "");
+
                     return new TopRecord
                     {
                         Name = decodedName,
@@ -65,7 +68,8 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                         Notes = note,
                         MaxNotes = maxNote,
                         FcStatus = fcStatus,
-                        SyncStatus = fsStatus
+                        SyncStatus = fsStatus,
+                        MusicDetailLink = detailLink
                     };
                 })
                 .Where(rec => rec != null);

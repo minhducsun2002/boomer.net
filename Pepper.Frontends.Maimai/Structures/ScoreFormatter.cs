@@ -1,4 +1,5 @@
 using Disqord;
+using Humanizer;
 using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures.Enums;
 using Pepper.Commons.Maimai.Structures.Score;
@@ -101,6 +102,12 @@ namespace Pepper.Frontends.Maimai.Structures
                 }
             }
 
+            if (record is ChartRecord chartRecord)
+            {
+                var playCount = chartRecord.PlayCount;
+                r.Description += $"\n\n{playCount} {(playCount < 2 ? "play" : "play".Pluralize())}, last played "
+                    + $"<t:{chartRecord.LastPlayed.ToUnixTimeSeconds()}:f>";
+            }
 
             if (rating != default && !isTop)
             {

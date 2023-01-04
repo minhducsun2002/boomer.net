@@ -31,7 +31,8 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             );
         }
 
-        private static FcStatus ParseFcStatus(ReadOnlySpan<char> raw)
+        [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
+        internal static FcStatus ParseFcStatus(ReadOnlySpan<char> raw)
         {
             // https://maimaidx-eng.com/maimai-mobile/img/music_icon_fcp.png?ver=1.25
             return raw[54] switch
@@ -50,7 +51,8 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             };
         }
 
-        private static SyncStatus ParseSyncStatus(ReadOnlySpan<char> raw)
+        [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
+        internal static SyncStatus ParseSyncStatus(ReadOnlySpan<char> raw)
         {
             // https://maimaidx-eng.com/maimai-mobile/img/music_icon_fsp.png?ver=1.25
             return raw[54] switch
@@ -69,13 +71,14 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             };
         }
 
-        private static (int, bool) ParseLevel(ReadOnlySpan<char> raw) =>
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        internal static (int, bool) ParseLevel(ReadOnlySpan<char> raw) =>
             raw[^1] == '+'
                 ? (PlayerDataParser.FastIntParse(raw[..^1]), true)
                 : (PlayerDataParser.FastIntParse(raw), false);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static (string, bool) ParseRank(ReadOnlySpan<char> raw)
+        internal static (string, bool) ParseRank(ReadOnlySpan<char> raw)
         {
             // https://maimaidx-eng.com/maimai-mobile/img/music_icon_ssp.png?ver=1.25
             var len = raw.Length;

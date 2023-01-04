@@ -6,8 +6,8 @@ namespace Pepper.Commons.Maimai.HtmlParsers
 {
     public partial class RecentRecordParser
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static DateTimeOffset ParseTime(ReadOnlySpan<char> raw)
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        internal static DateTimeOffset ParseTime(ReadOnlySpan<char> raw)
         {
             // form: YYYY/MM/DD hh:mm
             var year = PlayerDataParser.FastIntParse(raw[..4]);

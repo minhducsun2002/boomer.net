@@ -1,3 +1,4 @@
+using System.Web;
 using Pepper.Commons.Maimai.HtmlParsers;
 using Pepper.Commons.Maimai.Structures;
 using Pepper.Commons.Maimai.Structures.Enums;
@@ -33,6 +34,13 @@ namespace Pepper.Commons.Maimai
             var url = $"https://maimaidx-eng.com/maimai-mobile/record/musicLevel/search/?level={option}";
             var html = await GetHtml(url);
             return AllRecordParser.Parse(html);
+        }
+
+        public async Task<IEnumerable<ChartRecord>> GetUserScoreOnChart(string linkValue)
+        {
+            var url = "https://maimaidx-eng.com/maimai-mobile/record/musicDetail/?idx=" + HttpUtility.UrlEncode(linkValue);
+            var html = await GetHtml(url);
+            return ChartRecordParser.Parse(html);
         }
 
         private readonly (int, int, int)[] levelOptions =

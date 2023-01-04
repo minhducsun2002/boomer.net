@@ -68,10 +68,12 @@ namespace Pepper.Frontends.Maimai.Commands.Button
                 return;
             }
 
+            var chartRecord = await client.GetUserScoreOnChart(record.MusicDetailLink!);
+            var detailedRecord = chartRecord.First(r => r.Difficulty == record.Difficulty);
             var image = GameDataService.GetImageUrl(record.Name);
             var multipleVersions = GameDataService.HasMultipleVersions(record.Name);
             var embed = ScoreFormatter.FormatScore(
-                record, p?.Item1, p?.Item2,
+                detailedRecord, p?.Item1, p?.Item2,
                 levelHints: (p?.Item1.Level ?? baseLevel, plus == 1),
                 imageUrl: image,
                 hasMultipleVersions: multipleVersions
