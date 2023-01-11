@@ -8,6 +8,7 @@ using Pepper.Commons.Maimai.Structures.Score;
 using Pepper.Commons.Structures.CommandAttributes.Metadata;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
+using Pepper.Frontends.Maimai.Utils;
 using Qmmands;
 using Qmmands.Text;
 
@@ -51,7 +52,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                         chartConstant = diff.Item1 * 10 + (diff.Item2 ? 7 : 0);
                     }
 
-                    var total = GetFinalScore(score.Accuracy, chartConstant);
+                    var total = Calculate.GetFinalScore(score.Accuracy, chartConstant);
                     Song? song = null;
                     if (searchRes.HasValue)
                     {

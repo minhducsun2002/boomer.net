@@ -10,6 +10,7 @@ using Pepper.Commons.Maimai.Structures.Score;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
 using Pepper.Frontends.Maimai.Structures;
+using Pepper.Frontends.Maimai.Utils;
 using Qmmands;
 using Qmmands.Text;
 using PagedView = Pepper.Commons.Structures.Views.PagedView;
@@ -51,7 +52,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                         chartConstant = diff.Item1 * 10 + (diff.Item2 ? 7 : 0);
                     }
 
-                    var total = GetFinalScore(score.Accuracy, chartConstant);
+                    var total = Calculate.GetFinalScore(score.Accuracy, chartConstant);
 
                     if (searchRes.HasValue)
                     {
@@ -79,9 +80,9 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 .Take(35)
                 .ToList();
             var newFooter = new LocalEmbedFooter()
-                .WithText($"Total New rating : {newScores.Select(s => NormalizeRating(s.total)).Sum()}");
+                .WithText($"Total New rating : {newScores.Select(s => Calculate.NormalizedRating(s.total)).Sum()}");
             var oldFooter = new LocalEmbedFooter()
-                .WithText($"Total Old rating : {oldScores.Select(s => NormalizeRating(s.total)).Sum()}");
+                .WithText($"Total Old rating : {oldScores.Select(s => Calculate.NormalizedRating(s.total)).Sum()}");
 
             var newEmbed = newScores
                 .Chunk(3)

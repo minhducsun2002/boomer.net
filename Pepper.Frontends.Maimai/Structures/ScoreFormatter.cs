@@ -4,6 +4,7 @@ using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures.Enums;
 using Pepper.Commons.Maimai.Structures.Score;
 using Pepper.Frontends.Maimai.Commands.Text;
+using Pepper.Frontends.Maimai.Utils;
 using Qommon;
 using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
 
@@ -55,11 +56,11 @@ namespace Pepper.Frontends.Maimai.Structures
             int rating = default;
             if (chartConstant != default)
             {
-                rating = MaimaiTextCommand.NormalizeRating(MaimaiTextCommand.GetFinalScore(record.Accuracy, chartConstant));
+                rating = Calculate.NormalizedRating(Calculate.GetFinalScore(record.Accuracy, chartConstant));
             }
 
-            var comboText = MaimaiTextCommand.GetFormattedStatusString(record.FcStatus);
-            var syncText = MaimaiTextCommand.GetFormattedStatusString(record.SyncStatus);
+            var comboText = Format.Status(record.FcStatus);
+            var syncText = Format.Status(record.SyncStatus);
             var nameText = record.Name + (record.Version == ChartVersion.Deluxe && hasMultipleVersions == true ? "  [DX] " : "  ");
             var ratingText = rating != default ? $" - **{rating}**{(isAccurateLevel ? "" : " (?)")} rating" : "";
             var rankText = $"**{record.Rank.ToUpperInvariant()}**{(record.RankPlus ? "+" : "")}";
@@ -75,7 +76,7 @@ namespace Pepper.Frontends.Maimai.Structures
                               + (syncText == "" ? syncText : $" {openingBracket}{syncText}{closingBracket}")
                               + (isTop ? ratingText : ""),
                 ThumbnailUrl = imageUrl ?? Optional<string>.Empty,
-                Color = MaimaiTextCommand.GetColor(record.Difficulty)
+                Color = Format.Color(record.Difficulty)
             };
 
             var footerText = new List<string>();
