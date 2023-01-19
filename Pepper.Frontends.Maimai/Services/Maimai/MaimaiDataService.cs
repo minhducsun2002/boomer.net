@@ -66,7 +66,7 @@ namespace Pepper.Frontends.Maimai.Services
 
             foreach (var id in ids)
             {
-                var res = ResolveDiff(id, difficulty, level);
+                var res = ResolveDiff(id, difficulty);
                 if (res != null)
                 {
                     return (res, songCache[id]);
