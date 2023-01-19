@@ -38,7 +38,7 @@ namespace Pepper.Frontends.Maimai.Structures
                 if (levelHints.HasValue)
                 {
                     var (baseLevel, plus) = levelHints.Value;
-                    levelText = $"{baseLevel}${(plus ? "+" : "")}";
+                    levelText = $"{baseLevel}{(plus ? "+" : "")}";
                     chartConstant = baseLevel * 10 + (plus ? 7 : 0);
                 }
                 else
