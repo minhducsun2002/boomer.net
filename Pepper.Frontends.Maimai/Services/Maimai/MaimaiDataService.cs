@@ -57,11 +57,19 @@ namespace Pepper.Frontends.Maimai.Services
             return res != null ? (res, song) : null;
         }
 
-        public (Difficulty, Song)? ResolveSongExact(string name, Commons.Maimai.Structures.Enums.Difficulty difficulty, (int, bool) level)
+        public (Difficulty, Song)? ResolveSongExact(
+            string name, Commons.Maimai.Structures.Enums.Difficulty difficulty, (int, bool) level, ChartVersion? chartVersion = null
+        )
         {
             if (!nameCache.TryGetValue(name, out var ids))
             {
                 return null;
+            }
+
+            if (chartVersion != null)
+            {
+                var id = chartVersion == ChartVersion.Deluxe ? ids.Max() : ids.Min();
+                ids = new List<int> { id };
             }
 
             foreach (var id in ids)
