@@ -35,12 +35,12 @@ namespace Pepper.Frontends.Maimai.Utils
         {
             var color = difficulty switch
             {
-                Difficulty.Basic => new Color(0x45c124),
-                Difficulty.Advanced => new Color(0xffba01),
-                Difficulty.Expert => new Color(0xff7b7b),
-                Difficulty.Master => new Color(0x9f51dc),
-                Difficulty.ReMaster => new Color(0xdbaaff),
-                _ => new Color(0x45c124)
+                Difficulty.Basic => new Color(0x6fe163),
+                Difficulty.Advanced => new Color(0xf8df3a),
+                Difficulty.Expert => new Color(0xff828e),
+                Difficulty.Master => new Color(0xc27ff4),
+                Difficulty.ReMaster => new Color(0xe5ddea),
+                _ => new Color(0x6fe163)
             };
             return color;
         }
