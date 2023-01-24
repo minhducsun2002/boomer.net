@@ -10,5 +10,10 @@
     <ItemGroup>
       <ProjectReference Include="..\Pepper.Commons.Maimai\Pepper.Commons.Maimai.csproj" />
       <ProjectReference Include="..\Pepper.Commons\Pepper.Commons.csproj" />
+      <ProjectReference Include="..\Pepper.PngPayloadEmbed\Pepper.PngPayloadEmbed.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Structures\Generated\.gitkeep" />
     </ItemGroup>
 </Project>

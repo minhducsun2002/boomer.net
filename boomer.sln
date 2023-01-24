@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepper.Frontends.Maimai.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepper.Frontends.MaimaiStatistics", "Pepper.Frontends.MaimaiStatistics\Pepper.Frontends.MaimaiStatistics.csproj", "{DAA26C2C-DC33-49F9-B492-A4D80D8EDC18}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pepper.PngPayloadEmbed", "Pepper.PngPayloadEmbed\Pepper.PngPayloadEmbed.csproj", "{D77023C5-F6CE-4028-92B5-F71BD467C687}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -142,5 +144,17 @@ Global
 		{DAA26C2C-DC33-49F9-B492-A4D80D8EDC18}.Release|x64.Build.0 = Release|Any CPU
 		{DAA26C2C-DC33-49F9-B492-A4D80D8EDC18}.Release|x86.ActiveCfg = Release|Any CPU
 		{DAA26C2C-DC33-49F9-B492-A4D80D8EDC18}.Release|x86.Build.0 = Release|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Debug|x64.Build.0 = Debug|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Debug|x86.Build.0 = Debug|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Release|x64.ActiveCfg = Release|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Release|x64.Build.0 = Release|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Release|x86.ActiveCfg = Release|Any CPU
+		{D77023C5-F6CE-4028-92B5-F71BD467C687}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

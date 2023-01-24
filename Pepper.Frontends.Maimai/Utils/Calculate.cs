@@ -16,7 +16,7 @@ namespace Pepper.Frontends.Maimai.Utils
             return accuracy * chartConstant * GetRankCoeff(accuracy);
         }
 
-        private static readonly (int, int)[] Coeff = {
+        public static readonly (int, int)[] Coeff = {
             (1005000, 224),
             (1004999, 222),
             (1000000, 216),
