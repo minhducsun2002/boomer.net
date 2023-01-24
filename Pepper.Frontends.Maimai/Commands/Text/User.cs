@@ -2,7 +2,7 @@ using Disqord;
 using Disqord.Bot.Commands;
 using Humanizer;
 using Pepper.Commons.Maimai;
-using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Maimai.Structures.Data;
 using Pepper.Frontends.Maimai.Commands.Button;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;

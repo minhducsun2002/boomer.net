@@ -1,9 +1,9 @@
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Pepper.Commons.Maimai.Entities;
-using Pepper.Commons.Maimai.Structures;
-using Pepper.Commons.Maimai.Structures.Enums;
-using Pepper.Commons.Maimai.Structures.Score;
+using Pepper.Commons.Maimai.Structures.Data;
+using Pepper.Commons.Maimai.Structures.Data.Enums;
+using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Commands;
 using Pepper.Frontends.Maimai.Commands.Button;
 using Qommon;

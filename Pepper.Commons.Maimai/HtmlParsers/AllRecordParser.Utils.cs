@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
-using Pepper.Commons.Maimai.Structures;
-using Pepper.Commons.Maimai.Structures.Enums;
+using Pepper.Commons.Maimai.Structures.Data;
+using Pepper.Commons.Maimai.Structures.Data.Enums;
 
 namespace Pepper.Commons.Maimai.HtmlParsers
 {

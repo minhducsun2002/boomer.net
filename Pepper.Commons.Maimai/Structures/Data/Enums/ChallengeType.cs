@@ -1,4 +1,4 @@
-namespace Pepper.Commons.Maimai.Structures.Enums
+namespace Pepper.Commons.Maimai.Structures.Data.Enums
 {
     public enum ChallengeType
     {

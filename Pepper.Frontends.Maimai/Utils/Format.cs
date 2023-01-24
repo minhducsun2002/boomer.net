@@ -1,5 +1,5 @@
 using Disqord;
-using Pepper.Commons.Maimai.Structures.Enums;
+using Pepper.Commons.Maimai.Structures.Data.Enums;
 
 namespace Pepper.Frontends.Maimai.Utils
 {

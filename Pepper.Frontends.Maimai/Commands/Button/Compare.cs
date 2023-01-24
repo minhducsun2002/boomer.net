@@ -3,13 +3,13 @@ using Disqord.Bot.Commands.Components;
 using Disqord.Rest;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
-using Pepper.Commons.Maimai.Structures;
-using Pepper.Commons.Maimai.Structures.Enums;
+using Pepper.Commons.Maimai.Structures.Data;
+using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
 using Pepper.Frontends.Maimai.Structures;
 using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
-using DifficultyEnum = Pepper.Commons.Maimai.Structures.Enums.Difficulty;
+using DifficultyEnum = Pepper.Commons.Maimai.Structures.Data.Enums.Difficulty;
 
 namespace Pepper.Frontends.Maimai.Commands.Button
 {

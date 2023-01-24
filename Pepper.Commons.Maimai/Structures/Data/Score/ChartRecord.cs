@@ -1,4 +1,4 @@
-namespace Pepper.Commons.Maimai.Structures.Score
+namespace Pepper.Commons.Maimai.Structures.Data.Score
 {
     public class ChartRecord : TopRecord
     {

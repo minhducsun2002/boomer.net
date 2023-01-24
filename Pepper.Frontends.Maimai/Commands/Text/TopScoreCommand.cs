@@ -1,7 +1,7 @@
 using Disqord.Rest;
 using Pepper.Commons.Maimai;
-using Pepper.Commons.Maimai.Structures;
-using Pepper.Commons.Maimai.Structures.Score;
+using Pepper.Commons.Maimai.Structures.Data;
+using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
 

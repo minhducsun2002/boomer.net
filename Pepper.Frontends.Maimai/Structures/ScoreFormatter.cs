@@ -1,8 +1,8 @@
 using Disqord;
 using Humanizer;
 using Pepper.Commons.Maimai.Entities;
-using Pepper.Commons.Maimai.Structures.Enums;
-using Pepper.Commons.Maimai.Structures.Score;
+using Pepper.Commons.Maimai.Structures.Data.Enums;
+using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Commands.Text;
 using Pepper.Frontends.Maimai.Utils;
 using Qommon;

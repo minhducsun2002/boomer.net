@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 using Disqord;
-using Pepper.Commons.Maimai.Structures.Enums;
+using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Commons.Structures;
 using Pepper.Commons.Structures.CommandAttributes.Metadata;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;

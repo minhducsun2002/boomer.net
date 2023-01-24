@@ -1,4 +1,4 @@
-namespace Pepper.Commons.Maimai.Structures
+namespace Pepper.Commons.Maimai.Structures.Data
 {
     public class UserStatistics
     {

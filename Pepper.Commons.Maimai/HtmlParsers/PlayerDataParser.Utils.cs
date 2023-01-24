@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-using Pepper.Commons.Maimai.Structures;
+using Pepper.Commons.Maimai.Structures.Data;
 
 namespace Pepper.Commons.Maimai.HtmlParsers
 {

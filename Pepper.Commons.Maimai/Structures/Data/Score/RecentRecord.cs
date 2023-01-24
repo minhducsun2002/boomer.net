@@ -1,6 +1,6 @@
-using Pepper.Commons.Maimai.Structures.Enums;
+using Pepper.Commons.Maimai.Structures.Data.Enums;
 
-namespace Pepper.Commons.Maimai.Structures.Score
+namespace Pepper.Commons.Maimai.Structures.Data.Score
 {
     public class RecentRecord : ScoreRecord
     {

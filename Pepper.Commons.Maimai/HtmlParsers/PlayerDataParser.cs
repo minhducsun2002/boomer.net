@@ -1,7 +1,7 @@
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
-using Pepper.Commons.Maimai.Structures;
-using Pepper.Commons.Maimai.Structures.Enums;
+using Pepper.Commons.Maimai.Structures.Data;
+using Pepper.Commons.Maimai.Structures.Data.Enums;
 
 namespace Pepper.Commons.Maimai.HtmlParsers
 {
