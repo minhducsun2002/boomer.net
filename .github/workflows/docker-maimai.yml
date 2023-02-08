@@ -3,6 +3,8 @@ name: Push Docker image for maimai frontend to GitHub Container Registry
 on:
   push:
     paths:
+      - 'Pepper.Commons/**/*.cs'
+      - 'Pepper.Commons/**/*.csproj'
       - '**Maimai**/*.cs'
       - '**Maimai**/*.csproj'
       - 'boomer.sln'

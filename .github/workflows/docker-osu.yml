@@ -3,6 +3,8 @@ name: Push Docker image for osu! frontend to GitHub Container Registry
 on:
   push:
     paths:
+      - 'Pepper.Commons/**/*.cs'
+      - 'Pepper.Commons/**/*.csproj'
       - '**Osu**/*.cs'
       - '**Osu**/*.csproj'
       - 'boomer.sln'
