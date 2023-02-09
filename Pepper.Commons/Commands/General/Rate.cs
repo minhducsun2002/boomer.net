@@ -16,7 +16,7 @@ namespace Pepper.Commons.Commands.General
         private const int RngBucketSize = 86400 / 2;
         private const int ImprovementBucketSize = 86400 * 3 / 2;
 
-        // -0.25 to 1.00
+        // -0.75 to 0.5
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         private static double GetRngAdjustment(long unixTimestamp)
         {
@@ -25,11 +25,11 @@ namespace Pepper.Commons.Commands.General
             var p1 = Math.Sin(part15);
             var p2 = Math.Cos(part2);
             var p3 = p1 * p1 * p2 * 5 / 8;
-            var p4 = p3 + 0.375;
+            var p4 = p3 - 0.125;
             return p4;
         }
 
-        // 0 to 0.2
+        // 0 to 0.1
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         private static double GetImprovementRate(long unixTimestamp)
         {
@@ -37,7 +37,7 @@ namespace Pepper.Commons.Commands.General
             double part3 = (double) bucket / 3, part2 = (double) bucket / 2;
             double cos3 = Math.Cos(part3), cos2 = Math.Cos(part2);
             var p1 = cos3 * cos2;
-            return Math.Abs(p1) / 5;
+            return Math.Abs(p1) / 10;
         }
 
         [TextCommand("rate")]
