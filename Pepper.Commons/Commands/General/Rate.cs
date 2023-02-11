@@ -50,6 +50,7 @@ namespace Pepper.Commons.Commands.General
                 ? "you"
                 : $"\"**{Regex.Replace(whatToRate, @"([|\\*])", @"\$1", RegexOptions.Compiled)}**\"";
 
+            whatToRate = whatToRate.Trim();
             var hash = Hasher.ComputeHash(Encoding.UTF8.GetBytes(whatToRate));
             var timestamp = Context.Message.CreatedAt().ToUnixTimeSeconds();
 
