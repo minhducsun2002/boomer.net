@@ -40,32 +40,52 @@ namespace Pepper.Commons.Commands.General
             return Math.Abs(p1) / 10;
         }
 
-        [TextCommand("rate")]
-        [Description("Rate something on a scale from 0 to 10.")]
-        public IDiscordCommandResult Exec(
-            [Remainder][Description("What do you want me to rate?")] string whatToRate = ""
-        )
+        private static int GetScaledRating(string query, long timestampInSeconds, ulong authorId)
         {
-            var obj = string.IsNullOrWhiteSpace(whatToRate)
-                ? "you"
-                : $"\"**{Regex.Replace(whatToRate, @"([|\\*])", @"\$1", RegexOptions.Compiled)}**\"";
-
-            whatToRate = whatToRate.Trim();
-            var hash = Hasher.ComputeHash(Encoding.UTF8.GetBytes(whatToRate));
-            var timestamp = Context.Message.CreatedAt().ToUnixTimeSeconds();
+            query = query.Trim();
+            var hash = Hasher.ComputeHash(Encoding.UTF8.GetBytes(query));
+            var authorSeed = (long) (authorId / 2);
 
             var baseRating = hash.Aggregate(1, (current, @byte) => current + @byte) % 11;
-            var improvement = GetImprovementRate(timestamp) + GetImprovementRate((long) (Context.AuthorId.RawValue / 2));
+            var improvement = GetImprovementRate(timestampInSeconds) + GetImprovementRate(authorSeed);
             if (Math.Abs(improvement) > 1)
             {
                 improvement /= 2;
             }
-            var burst = (GetRngAdjustment(timestamp) + GetRngAdjustment((long) (Context.AuthorId.RawValue / 2))) / 2;
+
+            var burst = (GetRngAdjustment(timestampInSeconds) + GetRngAdjustment(authorSeed)) / 2;
             var scaled = (int) Math.Round((baseRating + improvement * baseRating + burst) * 100);
+
             if (scaled % 100 >= 75)
             {
                 scaled = Math.Min(scaled + 100, 1100);
             }
+
+            return scaled;
+        }
+
+        [TextCommand("rate")]
+        [Description("Rate something on a scale from 0 to 10.")]
+        public async Task<IDiscordCommandResult> Exec(
+            [Remainder][Description("What do you want me to rate?")] string whatToRate = ""
+        )
+        {
+            var displayedMessage = string.IsNullOrWhiteSpace(whatToRate)
+                ? "you"
+                : $"\"**{Regex.Replace(whatToRate, @"([|\\*])", @"\$1", RegexOptions.Compiled)}**\"";
+            if (string.IsNullOrWhiteSpace(whatToRate))
+            {
+                var referencedMessage = await GetReferencedMessage();
+                if (referencedMessage != null && !string.IsNullOrWhiteSpace(referencedMessage.Content))
+                {
+                    whatToRate = referencedMessage.Content;
+                    displayedMessage = "that";
+                }
+            }
+
+            whatToRate = whatToRate.Trim();
+
+            var scaled = GetScaledRating(whatToRate, Context.Message.CreatedAt().ToUnixTimeSeconds(), Context.AuthorId.RawValue);
             var result = scaled / 100;
             var msg = result switch
             {
@@ -81,7 +101,7 @@ namespace Pepper.Commons.Commands.General
                 _ => "a mild"
             };
 
-            return Reply($"I'd give {obj} {msg} **{result}/10**.");
+            return Reply($"I'd give {displayedMessage} {msg} **{result}/10**.");
         }
     }
 }
