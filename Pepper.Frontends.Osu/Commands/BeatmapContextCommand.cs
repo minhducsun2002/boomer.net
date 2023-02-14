@@ -13,37 +13,13 @@ namespace Pepper.Frontends.Osu.Commands
         private readonly BeatmapContextProviderService beatmapContext;
         protected async ValueTask<int?> GetBeatmapIdFromContext()
         {
-            var refMessage = Context.Message.Reference;
-            if (refMessage != null)
+            var message = await GetReferencedMessage();
+            var embed = message?.Embeds[0];
+            if (embed?.Url != null)
             {
-                var maybeMsg = Context.Message.ReferencedMessage;
-                IUserMessage? message;
-                if (!maybeMsg.HasValue)
+                if (URLParser.CheckMapUrl(embed.Url, out _, out var id, out _) && id != null)
                 {
-                    try
-                    {
-                        var msg = await Context.Bot.FetchMessageAsync(refMessage.ChannelId, refMessage.MessageId!.Value);
-                        message = msg as IUserMessage;
-                    }
-                    catch
-                    {
-                        message = null;
-                    }
-                }
-                else
-                {
-                    message = maybeMsg.Value;
-                }
-
-
-                // there should only be a single embed
-                var embed = message?.Embeds[0];
-                if (embed?.Url != null)
-                {
-                    if (URLParser.CheckMapUrl(embed.Url, out _, out var id, out _) && id != null)
-                    {
-                        return id.Value;
-                    }
+                    return id.Value;
                 }
             }
 
