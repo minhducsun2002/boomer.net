@@ -97,7 +97,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             var l = list.Select(v =>
             {
                 var (sc, constant, song, total, _) = v;
-                return $"{song?.Genre?.Name ?? ""}|{sc.Name}|{constant}|{sc.Accuracy}|{total}";
+                return $"{song?.Genre?.Name ?? ""}|{sc.Name}|{sc.Difficulty.ToString()}|{constant}|{sc.Accuracy}|{total}";
             });
             return string.Join("\n", l);
         }
