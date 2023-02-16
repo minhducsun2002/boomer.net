@@ -79,10 +79,12 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 .Where(s => s.version != LatestVersion)
                 .Take(35)
                 .ToList();
+            var newSum = newScores.Select(s => Calculate.NormalizedRating(s.total)).Sum();
+            var oldSum = oldScores.Select(s => Calculate.NormalizedRating(s.total)).Sum();
             var newFooter = new LocalEmbedFooter()
-                .WithText($"Total New rating : {newScores.Select(s => Calculate.NormalizedRating(s.total)).Sum()}");
+                .WithText($"Total New rating : {newSum}, avg {newSum / 15}");
             var oldFooter = new LocalEmbedFooter()
-                .WithText($"Total Old rating : {oldScores.Select(s => Calculate.NormalizedRating(s.total)).Sum()}");
+                .WithText($"Total Old rating : {oldSum}, avg {oldSum / 35}");
 
             var newEmbed = newScores
                 .Chunk(3)
