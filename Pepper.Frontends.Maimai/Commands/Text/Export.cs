@@ -38,7 +38,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 .Select(score =>
                 {
                     int chartConstant;
-                    var searchRes = GameDataService.ResolveSongExact(score.Name, score.Difficulty, score.Level);
+                    var searchRes = GameDataService.ResolveSongExact(score.Name, score.Difficulty, score.Level, score.Version);
                     var version = GameDataService.NewestVersion;
                     if (searchRes.HasValue)
                     {
