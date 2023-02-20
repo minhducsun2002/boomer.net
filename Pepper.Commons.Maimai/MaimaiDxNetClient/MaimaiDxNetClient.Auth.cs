@@ -11,10 +11,6 @@ namespace Pepper.Commons.Maimai
         private async Task<string?> GetAuthUserId()
         {
             var maimaiSsidRedemptionUrl = await VerifyCookie();
-            if (maimaiSsidRedemptionUrl == null)
-            {
-                return null;
-            }
 
             var req = new HttpRequestMessage(HttpMethod.Get, maimaiSsidRedemptionUrl);
             var res = await AuthHttpClient.SendAsync(req);
@@ -33,7 +29,7 @@ namespace Pepper.Commons.Maimai
             return cookieValue;
         }
 
-        public async Task<string?> VerifyCookie()
+        public async Task<string> VerifyCookie()
         {
             if (clal == null)
             {
@@ -43,10 +39,12 @@ namespace Pepper.Commons.Maimai
             var amAllReq = new HttpRequestMessage(HttpMethod.Get, AuthUrl);
             amAllReq.Headers.Add("Cookie", $"clal={clal}");
             var amAllRes = await AuthHttpClient.SendAsync(amAllReq);
-            return amAllRes.StatusCode != HttpStatusCode.Redirect
-                ? null
-                // we're fucked
-                : amAllRes.Headers.Location!.ToString();
+            if (amAllRes.StatusCode != HttpStatusCode.Redirect)
+            {
+                throw new InvalidCookieException($"Status code was {amAllRes.StatusCode}");
+            }
+
+            return amAllRes.Headers.Location!.ToString();
         }
     }
 }
