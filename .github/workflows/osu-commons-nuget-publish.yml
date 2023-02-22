@@ -20,11 +20,16 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 6.0.101
+      - name: Package
+        run: dotnet pack Pepper.Commons.Osu -o dist/ --version-suffix "$(date +%Y%m%d-%H%M)";
       - name: Publish
         env:
           API_KEY: ${{ secrets.NUGET_API_KEY }}
           NUGET_SOURCE: ${{ secrets.NUGET_FEED }}
         run: |
-          dotnet pack Pepper.Commons.Osu -o dist/ --version-suffix "$(date +%Y%m%d-%H%M)";
           dotnet nuget push dist/*.nupkg --api-key "$API_KEY" --source "$NUGET_SOURCE";
-          
+      - name: Publish to GitHub
+        env:
+          API_KEY: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dotnet nuget push dist/*.nupkg --api-key "$API_KEY" --source "https://nuget.pkg.github.com/$GITHUB_ACTOR/index.json";
