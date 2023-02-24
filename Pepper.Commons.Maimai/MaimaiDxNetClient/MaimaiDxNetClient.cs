@@ -19,7 +19,7 @@ namespace Pepper.Commons.Maimai
             this.httpClient = httpClient;
         }
 
-        private async Task<string> GetHtml(string url)
+        public async Task<string> GetHtml(string url)
         {
             var uid = await GetAuthUserId();
             if (uid == null)
