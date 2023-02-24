@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Disqord;
 using Disqord.Bot.Commands;
+using Pepper.Commons.Extensions;
 using Qmmands;
 using Qmmands.Text;
 
@@ -75,7 +76,7 @@ namespace Pepper.Commons.Commands.General
                 : $"\"**{Regex.Replace(whatToRate, @"([|\\*])", @"\$1", RegexOptions.Compiled)}**\"";
             if (string.IsNullOrWhiteSpace(whatToRate))
             {
-                var referencedMessage = await GetReferencedMessage();
+                var referencedMessage = await Context.GetReferencedMessage();
                 if (referencedMessage != null && !string.IsNullOrWhiteSpace(referencedMessage.Content))
                 {
                     whatToRate = referencedMessage.Content;

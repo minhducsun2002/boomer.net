@@ -6,6 +6,7 @@ using Pepper.Commons.Structures;
 using Pepper.Frontends.Database.OsuUsernameProviders;
 using Pepper.Frontends.Osu.Services;
 using Pepper.Frontends.Osu.Structures;
+using Pepper.Frontends.Osu.Structures.ParameterAttributes;
 using Pepper.Frontends.Osu.Structures.TypeParsers;
 using Qmmands;
 using Qmmands.Text;
@@ -16,11 +17,11 @@ namespace Pepper.Frontends.Osu.Commands
     {
         public Score(APIClientStore s, BeatmapContextProviderService b, ModParserService p) : base(s, b, p) { }
 
-        [TextCommand("sc", "score", "scores", "c", "check")]
+        [TextCommand("sc", "score", "scores")]
         [Description("View/list scores on a certain map")]
         [OverloadPriority(2)]
         public async Task<IDiscordCommandResult> BeatmapBased(
-            [Description("A score URL, a beatmap URL, or a beatmap ID.")] IBeatmapResolvable beatmapResolvable,
+            [Description("A score URL, a beatmap URL, or a beatmap ID.")][DoNotFill] IBeatmapResolvable beatmapResolvable,
             [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Remainder][Description("Username to check. Default to your username, if set.")] Username username
         )
@@ -108,7 +109,7 @@ namespace Pepper.Frontends.Osu.Commands
         [Description("View/list scores on the latest map posted in the current channel")]
         [OverloadPriority(1)]
         public async Task<IDiscordCommandResult> UserOnly(
-            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            // [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Remainder][Description("Username to check. Default to your username, if set.")] Username username
         )
         {
@@ -119,7 +120,7 @@ namespace Pepper.Frontends.Osu.Commands
                     "No beatmap was ever sent in this channel. Please use `o!map` with the relevant map link/ID first.");
             }
 
-            return await BeatmapBased(new BeatmapResolvable(beatmap.Value), server, username);
+            return await BeatmapBased(new BeatmapResolvable(beatmap.Value), GameServer.Osu, username);
         }
 
         // [TextCommand("sc", "score", "scores", "c", "check")]

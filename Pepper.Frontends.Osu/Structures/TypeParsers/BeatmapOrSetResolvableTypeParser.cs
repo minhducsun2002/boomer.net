@@ -1,5 +1,8 @@
 using Disqord.Bot.Commands;
+using Disqord.Bot.Commands.Text;
+using Pepper.Commons.Extensions;
 using Pepper.Frontends.Osu.Services;
+using Pepper.Frontends.Osu.Structures.ParameterAttributes;
 using Pepper.Frontends.Osu.Utils;
 using Qmmands;
 
@@ -40,21 +43,20 @@ namespace Pepper.Frontends.Osu.Structures.TypeParsers
 
     public class BeatmapResolvableTypeParser : DiscordTypeParser<IBeatmapResolvable>
     {
-        private readonly BeatmapContextProviderService contextProviderService;
-        public BeatmapResolvableTypeParser(BeatmapContextProviderService contextProvider)
-        {
-            contextProviderService = contextProvider;
-        }
-
-        public override ValueTask<ITypeParserResult<IBeatmapResolvable>> ParseAsync(IDiscordCommandContext context, IParameter parameter, ReadOnlyMemory<char> input)
+        public override async ValueTask<ITypeParserResult<IBeatmapResolvable>> ParseAsync(IDiscordCommandContext context, IParameter parameter, ReadOnlyMemory<char> input)
         {
             var isEmpty = input.Length == 0;
             if (isEmpty)
             {
-                var beatmapId = contextProviderService.GetBeatmap(context.ChannelId.ToString());
-                if (beatmapId != null)
+                var doNotFill = parameter.CustomAttributes.OfType<DoNotFillAttribute>().Any();
+                if (!doNotFill)
                 {
-                    return Success(new BeatmapResolvable(beatmapId.Value));
+                    var ctx = (IDiscordTextCommandContext) context;
+                    var beatmapId = await ctx.GetBeatmapIdFromContext();
+                    if (beatmapId != null)
+                    {
+                        return Success(new BeatmapResolvable(beatmapId.Value));
+                    }
                 }
             }
 
@@ -76,18 +78,13 @@ namespace Pepper.Frontends.Osu.Structures.TypeParsers
 
     public class BeatmapOrSetResolvableTypeParser : DiscordTypeParser<IBeatmapOrSetResolvable>
     {
-        private readonly BeatmapContextProviderService contextProviderService;
-        public BeatmapOrSetResolvableTypeParser(BeatmapContextProviderService contextProvider)
-        {
-            contextProviderService = contextProvider;
-        }
-
-        public override ValueTask<ITypeParserResult<IBeatmapOrSetResolvable>> ParseAsync(IDiscordCommandContext context, IParameter parameter, ReadOnlyMemory<char> input)
+        public override async ValueTask<ITypeParserResult<IBeatmapOrSetResolvable>> ParseAsync(IDiscordCommandContext context, IParameter parameter, ReadOnlyMemory<char> input)
         {
             var isEmpty = input.Length == 0;
             if (isEmpty)
             {
-                var beatmapId = contextProviderService.GetBeatmap(context.ChannelId.ToString());
+                var ctx = (IDiscordTextCommandContext) context;
+                var beatmapId = await ctx.GetBeatmapIdFromContext();
                 if (beatmapId != null)
                 {
                     return Success(new BeatmapResolvable(beatmapId.Value));
