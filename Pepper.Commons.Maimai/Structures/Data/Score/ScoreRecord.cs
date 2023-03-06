@@ -9,6 +9,9 @@ namespace Pepper.Commons.Maimai.Structures.Data.Score
         public string Name { get; set; }
         public string Rank { get; set; }
         public bool RankPlus { get; set; }
+        /// <summary>
+        /// Accuracy of this score : from 0 to 1000000
+        /// </summary>
         public int Accuracy { get; set; }
         public FcStatus FcStatus { get; set; }
         public SyncStatus SyncStatus { get; set; }

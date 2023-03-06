@@ -109,9 +109,17 @@ namespace Pepper.Frontends.Maimai.Structures
                         hasMultipleVersions: song?.hasMultipleVersions
                     );
                 });
-                if (chunks.Count != 1)
+                var records = recordGroup.Select(r => r.Item1).ToList();
+                var isCourseCredit = records.All(record => record.ChallengeType == ChallengeType.Course);
+                if (chunks.Count != 1 || isCourseCredit)
                 {
-                    embeds = embeds.Append(new LocalEmbed());
+                    var footer = new LocalEmbed();
+                    if (isCourseCredit)
+                    {
+                        var sum = records.Select(r => r.Accuracy).Sum();
+                        footer = footer.WithFooter($"Total : {sum / 10000}.{sum % 10000}%");
+                    }
+                    embeds = embeds.Append(footer);
                 }
 
                 var page = new Page().WithEmbeds(embeds);
