@@ -57,13 +57,15 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                     if (searchRes.HasValue)
                     {
                         var (diff, song) = searchRes.Value;
-                        return (score, diff, song, total, version);
+                        return (score, diff, song, constant: chartConstant, accuracy: score.Accuracy, total, version);
                     }
 #pragma warning disable CS8619
-                    return (score, null, null, total, version);
+                    return (score, null, null, constant: chartConstant, accuracy: score.Accuracy, total, version);
 #pragma warning restore CS8619
                 })
                 .OrderByDescending(p => p.total)
+                .ThenByDescending(p => p.constant)
+                .ThenByDescending(p => p.accuracy)
                 .ToList();
 
             if (scores.Count == 0)
@@ -92,7 +94,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 {
                     var page = entries.Select((e, i2) =>
                     {
-                        var (score, diff, song, total, version) = e;
+                        var (score, diff, song, _, _, total, _) = e;
                         var embed = CreateEmbed(score, diff, song, total, i1 * 3 + i2);
                         return embed;
                     })
@@ -107,11 +109,11 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 {
                     var page = entries.Select((e, i2) =>
                     {
-                        var (score, diff, song, total, version) = e;
+                        var (score, diff, song, _, _, total, _) = e;
                         var embed = CreateEmbed(score, diff, song, total, i1 * 3 + i2);
                         return embed;
                     })
-                        .Append(new LocalEmbed().WithFooter(oldFooter)); ;
+                        .Append(new LocalEmbed().WithFooter(oldFooter));
                     return page;
                 });
 
