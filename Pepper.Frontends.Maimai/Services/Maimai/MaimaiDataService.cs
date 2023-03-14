@@ -68,13 +68,20 @@ namespace Pepper.Frontends.Maimai.Services
 
             if (chartVersion != null)
             {
-                var id = chartVersion == ChartVersion.Deluxe ? ids.Max() : ids.Min();
-                ids = new List<int> { id };
+                // there are actually songs with identical names
+                if (ids.Count == 2)
+                {
+                    if (Math.Abs(ids[0] - ids[1]) == 10000)
+                    {
+                        var id = chartVersion == ChartVersion.Deluxe ? ids.Max() : ids.Min();
+                        ids = new List<int> { id };
+                    }
+                }
             }
 
             foreach (var id in ids)
             {
-                var res = ResolveDiff(id, difficulty);
+                var res = ResolveDiff(id, difficulty, level);
                 if (res != null)
                 {
                     return (res, SongCache[id]);
