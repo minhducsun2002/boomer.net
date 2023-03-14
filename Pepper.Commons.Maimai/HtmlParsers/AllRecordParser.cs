@@ -38,9 +38,21 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                     var (rank, rankPlus) = ParseRank(rankImageSrc);
 
                     var chartVersionImage = node.QuerySelector(".music_kind_icon");
-                    chartVersionImage ??= node.QuerySelector(".music_kind_icon_dx");
-                    chartVersionImage ??= node.QuerySelector(".music_kind_icon_standard");
-                    var chartVersionImageSrc = chartVersionImage.GetAttributeValue("src", "");
+                    if (chartVersionImage == null)
+                    {
+                        var child = node.GetChildElements().ToArray();
+                        for (var i = 0; i < child.Length; i++)
+                        {
+                            var e = child[i];
+                            if (e.Name == "img" && e.GetAttributeValue("onclick", "123") == "123")
+                            {
+                                chartVersionImage = e;
+                                break;
+                            }
+                        }
+                    }
+
+                    var chartVersionImageSrc = chartVersionImage!.GetAttributeValue("src", "");
                     var chartVersion = RecentRecordParser.ParseVersion(chartVersionImageSrc);
                     var noteNode = node.QuerySelector(".music_score_block.w_180.t_r.f_l.f_12");
                     var noteText = noteNode.InnerText.Trim();
