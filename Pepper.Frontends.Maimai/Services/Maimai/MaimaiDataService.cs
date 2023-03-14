@@ -24,7 +24,7 @@ namespace Pepper.Frontends.Maimai.Services
         private static readonly ILogger Log = Serilog.Log.Logger.ForContext<MaimaiDataService>();
         private readonly IServiceProvider serviceProvider;
         private Dictionary<string, string> imageNameCache = new();
-        private Dictionary<int, Song> songCache = new();
+        public Dictionary<int, Song> SongCache = new();
         private Dictionary<string, List<int>> nameCache = new();
         public int NewestVersion { get; private set; }
 
@@ -48,7 +48,7 @@ namespace Pepper.Frontends.Maimai.Services
 
         public (Difficulty, Song)? ResolveSongExact(int id, Commons.Maimai.Structures.Data.Enums.Difficulty difficulty)
         {
-            if (!songCache.TryGetValue(id, out var song))
+            if (!SongCache.TryGetValue(id, out var song))
             {
                 return null;
             }
@@ -77,7 +77,7 @@ namespace Pepper.Frontends.Maimai.Services
                 var res = ResolveDiff(id, difficulty);
                 if (res != null)
                 {
-                    return (res, songCache[id]);
+                    return (res, SongCache[id]);
                 }
             }
 
@@ -86,7 +86,7 @@ namespace Pepper.Frontends.Maimai.Services
 
         private Difficulty? ResolveDiff(int id, Commons.Maimai.Structures.Data.Enums.Difficulty difficulty, (int, bool)? level = null)
         {
-            var diffs = songCache[id].Difficulties;
+            var diffs = SongCache[id].Difficulties;
             foreach (var diff in diffs)
             {
                 if ((int) difficulty == diff.Order)
@@ -143,12 +143,12 @@ namespace Pepper.Frontends.Maimai.Services
                 .Include(s => s.AddVersion)
                 .ToListAsync(cancellationToken: stoppingToken);
 
-            songCache = songEntries.ToDictionary(e => e.Id, e => e);
+            SongCache = songEntries.ToDictionary(e => e.Id, e => e);
 
             nameCache = songEntries
                 .GroupBy(e => e.Name)
                 .ToDictionary(e => e.Key, e => e.Select(e => e.Id).ToList());
-            Log.Information("Loaded {0} songs", songCache.Count);
+            Log.Information("Loaded {0} songs", SongCache.Count);
 
             Log.Information("Loading image data");
             var s = await httpClient.GetStringAsync("https://maimai.sega.jp/data/maimai_songs.json", stoppingToken);
