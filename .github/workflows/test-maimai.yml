@@ -9,6 +9,7 @@ on:
       - '**Maimai**/*.csproj'
       - 'boomer.sln'
       - 'nuget.config'
+      - '.github/workflows/test-maimai.yml'
   repository_dispatch:
   workflow_dispatch:
 
@@ -27,7 +28,8 @@ jobs:
           SQL_PATH: ${{ secrets.MAIMAI_DATA_SQL }} 
         run: |
           sudo systemctl start mysql.service;
-          curl $SQL_PATH | mysql -u root -proot maimai;
+          mysql -u root -proot -e "create database maimai";
+          curl -L $SQL_PATH | mysql -u root -proot maimai;
       - name: Test
         env:
           MARIADB_CONNECTION_STRING_MAIMAI: Server=localhost;Port=3306;User=root;Password=root;Database=maimai
