@@ -26,9 +26,12 @@ namespace Pepper.Commons.Services
             while (!stoppingToken.IsCancellationRequested)
             {
                 var status = services[index].GetCurrentStatus();
-                await Client.SetPresenceAsync(new LocalActivity(status, ActivityType.Playing), stoppingToken);
+                if (!string.IsNullOrWhiteSpace(status))
+                {
+                    await Client.SetPresenceAsync(new LocalActivity(status, ActivityType.Playing), stoppingToken);
+                    await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
+                }
                 index = (index + 1) % services.Count;
-                await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
             }
         }
     }
