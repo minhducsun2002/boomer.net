@@ -43,7 +43,7 @@ namespace Pepper.Frontends.Maimai.Commands.Button
             var cookie = await CookieProvider.GetCookie(Context.AuthorId);
             var client = new MaimaiDxNetClient(HttpClient, cookie!);
             var rec = await client.GetUserDifficultyRecord((baseLevel, plus == 1));
-            var record = rec.FirstOrDefault(r => r.Name == name && r.Version == version);
+            var record = rec.FirstOrDefault(r => r.Name == name && r.Version == version && r.Difficulty == difficulty);
 
             (Difficulty, Song)? p;
             if (baseLevel != 0)
