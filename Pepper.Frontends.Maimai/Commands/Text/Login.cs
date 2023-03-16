@@ -1,3 +1,4 @@
+using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Rest;
 using Pepper.Commons.Maimai;
@@ -18,9 +19,39 @@ namespace Pepper.Frontends.Maimai.Commands.Text
         [RequirePrivate]
         public async Task<IDiscordCommandResult?> Exec([Description("Self-explanatory.")] string? cookie = null)
         {
-            if (cookie == null)
+            if (string.IsNullOrWhiteSpace(cookie))
             {
-                return Reply("Please provide a cookie.");
+                return Reply(
+                    new LocalMessage()
+                        .WithContent("```js" +
+                                     "\njavascript:prompt(" +
+                                     "'Please copy this and enter into chat :','m!login '+document.cookie.split(';').map(a=>a.trim()).filter(a=>a.startsWith('clal='))[0]);" +
+                                     "```")
+                        .WithEmbeds(
+                            new LocalEmbed()
+                                .WithFields(
+                                    new LocalEmbedField()
+                                        .WithName("Step 1")
+                                        .WithValue("Create a bookmarklet in your browser.\nUse the above text string as URL."),
+                                    new LocalEmbedField()
+                                        .WithName("Step 2")
+                                        .WithValue("[Log into maimaiDX NET](https://maimaidx-eng.com/maimai-mobile/)."),
+                                    new LocalEmbedField()
+                                        .WithName("Step 3")
+                                        .WithValue("Go to [this site](https://lng-tgk-aime-gw.am-all.net/common_auth/)."),
+                                    new LocalEmbedField()
+                                        .WithName("Step 4")
+                                        .WithValue("Launch the bookmarklet you just created.\n" +
+                                                   "Copy the resulting command and paste it here."),
+                                    new LocalEmbedField()
+                                        .WithName("For whoever thinks they know what they're doing")
+                                        .WithValue("Step 1 and 4 can be skipped if you know what you're doing.\n" +
+                                                   "Just paste the script into the address bar after step 3.\n" +
+                                                   "Beware that Chrome strips the `javascript:` prefix - manually type it back.")
+                                )
+                                .WithFooter("It is advised that you perform step 2 onward using an incognito window.")
+                        )
+                );
             }
             await Context.Message.AddReactionAsync(Hourglass);
             if (!await TryCookie(cookie))
