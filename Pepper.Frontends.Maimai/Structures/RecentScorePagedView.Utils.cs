@@ -117,7 +117,7 @@ namespace Pepper.Frontends.Maimai.Structures
                     if (isCourseCredit)
                     {
                         var sum = records.Select(r => r.Accuracy).Sum();
-                        footer = footer.WithFooter($"Total : {sum / 10000}.{sum % 10000}%");
+                        footer = footer.WithFooter($"Total : {sum / 10000}.{sum % 10000:0000}%");
                     }
                     embeds = embeds.Append(footer);
                 }
