@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using dotenv.net;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pepper.Logging.Serilog.Sinks.Discord;
 using Serilog;
@@ -43,6 +44,14 @@ namespace Pepper.Commons
                 }
             });
             return hostBuilder;
+        }
+
+        public static IHostBuilder UseDefaultServices(this IHostBuilder hostBuilder)
+        {
+            return hostBuilder.ConfigureServices(collection =>
+            {
+                collection.AddHttpClient();
+            });
         }
 
         public static IHostBuilder UseEnvironmentVariables(this IHostBuilder hostBuilder)

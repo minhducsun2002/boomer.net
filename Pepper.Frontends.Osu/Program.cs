@@ -17,6 +17,7 @@ var webhookLog = Environment.GetEnvironmentVariable("PEPPER_DISCORD_WEBHOOK_LOG"
 var hostBuilder = new HostBuilder()
     .UseLogging(webhookLog)
     .UseEnvironmentVariables()
+    .UseDefaultServices()
     .ConfigureServices((context, services) =>
     {
         services.AddDbContextPool<IOsuUsernameProvider, MariaDbOsuUsernameProvider>(builder =>
@@ -26,7 +27,6 @@ var hostBuilder = new HostBuilder()
         }, 16);
 
         services.AddSingleton<ModParserService>();
-        services.AddSingleton<HttpClient>();
         services.AddAPIClientStore(credentials =>
         {
             credentials.OAuth2ClientId = int.Parse(context.Configuration["OSU_OAUTH2_CLIENT_ID"]);
