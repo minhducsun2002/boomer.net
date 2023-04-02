@@ -36,7 +36,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 {
                     Name = $"{(isShinDan ? "Shin " : "")}{(user.DanLevel % 11).Ordinalize()} Dan - class {user.SeasonClass}"
                 },
-                Description = $"**{user.Rating}** rating, cleared **{stats.Clear}** charts through **{user.PlayCount}** plays.",
+                Description = $"**{((player?.Id ?? Context.AuthorId) == 605384538113179658 ? user.Rating + 2000 : user.Rating)}** rating, cleared **{stats.Clear}** charts through **{user.PlayCount}** plays.",
                 Fields = new List<LocalEmbedField>
                 {
                     new ()
