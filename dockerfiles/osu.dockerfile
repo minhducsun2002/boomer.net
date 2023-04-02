@@ -4,6 +4,7 @@ WORKDIR /app
 COPY . . 
 COPY nuget.config .
 RUN echo $BUILD_HASH
+RUN dotnet restore
 RUN dotnet publish Pepper.Frontends.Osu -c release -o dist/ 
 
 FROM mcr.microsoft.com/dotnet/runtime:6.0.4-alpine3.14
