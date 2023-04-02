@@ -18,8 +18,8 @@ namespace Pepper.Frontends.Maimai.Commands.Text
     [RequireBotOwner]
     public class Export : TopScoreCommand
     {
-        public Export(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
-            : base(http, data, cookieProvider) { }
+        public Export(MaimaiDxNetClientFactory factory, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
+            : base(factory, data, cookieProvider) { }
 
         [TextCommand("topcsv", "csv")]
         [Description("No description.")]
@@ -28,7 +28,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
         )
         {
             var cookie = await CookieProvider.GetCookie(player?.Id ?? Context.AuthorId);
-            var client = new MaimaiDxNetClient(HttpClient, cookie!);
+            var client = ClientFactory.Create(cookie!);
 
             var records = await ListAllScores(client);
 

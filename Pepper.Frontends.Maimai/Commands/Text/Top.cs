@@ -19,7 +19,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
 {
     public class Top : TopScoreCommand
     {
-        public Top(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider) : base(http, data, cookieProvider) { }
+        public Top(MaimaiDxNetClientFactory factory, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider) : base(factory, data, cookieProvider) { }
 
         [TextCommand("maitop", "top")]
         [Description("Show top rated plays of an user.")]
@@ -28,7 +28,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
         )
         {
             var cookie = await CookieProvider.GetCookie(player?.Id ?? Context.AuthorId);
-            var client = new MaimaiDxNetClient(HttpClient, cookie!);
+            var client = ClientFactory.Create(cookie);
 
             var records = await ListAllScores(client);
 

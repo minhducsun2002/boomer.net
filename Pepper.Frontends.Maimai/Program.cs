@@ -10,6 +10,7 @@ using Pepper.Commons.Maimai;
 using Pepper.Commons.Structures;
 using Pepper.Frontends.Maimai.Database;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
+using Pepper.Frontends.Maimai.Services;
 
 DotEnv.Load();
 var webhookLog = Environment.GetEnvironmentVariable("PEPPER_DISCORD_WEBHOOK_LOG");
@@ -17,6 +18,7 @@ var webhookLog = Environment.GetEnvironmentVariable("PEPPER_DISCORD_WEBHOOK_LOG"
 var hostBuilder = new HostBuilder()
     .UseLogging(webhookLog)
     .UseEnvironmentVariables()
+    .UseDefaultServices()
     .ConfigureServices((context, services) =>
     {
         services.AddDbContextPool<IMaimaiDxNetCookieProvider, MariaDbMaimaiDxNetCookieProvider>(builder =>
@@ -29,7 +31,8 @@ var hostBuilder = new HostBuilder()
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING_MAIMAI")!;
             builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         }, 16);
-        services.AddSingleton<HttpClient>();
+        services.AddSingleton<MaimaiDxNetClientFactory>();
+        services.AddSingleton<ICookieConsistencyLocker, CookieLockingService>();
     })
     .ConfigureDiscordBot<Bot>((context, bot) =>
     {

@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using Disqord;
+using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Commons.Structures;
 using Pepper.Commons.Structures.CommandAttributes.Metadata;
@@ -13,12 +14,15 @@ namespace Pepper.Frontends.Maimai.Commands.Text
     public abstract class MaimaiTextCommand : Command
     {
         // TODO: Split game data DB requirement into another subclass. User needs no game data.
-        protected readonly HttpClient HttpClient;
+        protected readonly MaimaiDxNetClientFactory ClientFactory;
         protected readonly IMaimaiDxNetCookieProvider CookieProvider;
         protected readonly MaimaiDataService GameDataService;
-        public MaimaiTextCommand(HttpClient httpClient, MaimaiDataService dataService, IMaimaiDxNetCookieProvider cookieProvider)
+        public MaimaiTextCommand(
+            MaimaiDxNetClientFactory factory,
+            MaimaiDataService dataService,
+            IMaimaiDxNetCookieProvider cookieProvider)
         {
-            HttpClient = httpClient;
+            ClientFactory = factory;
             CookieProvider = cookieProvider;
             GameDataService = dataService;
         }

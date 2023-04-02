@@ -14,12 +14,16 @@ namespace Pepper.Frontends.Maimai.Commands.Text
     public class Reload : MaimaiTextCommand
     {
         private readonly MaimaiDataDbContext dbContext;
+        private readonly IHttpClientFactory httpClientFactory;
         public Reload(
-            HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookie,
+            IHttpClientFactory httpClientFactory,
+            MaimaiDxNetClientFactory factory,
+            MaimaiDataService data, IMaimaiDxNetCookieProvider cookie,
             MaimaiDataDbContext dbContext
-        ) : base(http, data, cookie)
+        ) : base(factory, data, cookie)
         {
             this.dbContext = dbContext;
+            this.httpClientFactory = httpClientFactory;
         }
 
         [TextCommand("reload")]
@@ -29,7 +33,8 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             await Context.Message.AddReactionAsync(Hourglass);
             try
             {
-                await GameDataService.Load(dbContext, HttpClient, CancellationToken.None);
+                var client = httpClientFactory.CreateClient();
+                await GameDataService.Load(dbContext, client, CancellationToken.None);
                 await Context.Message.RemoveOwnReactionAsync(Hourglass);
                 return Reaction(Success);
             }

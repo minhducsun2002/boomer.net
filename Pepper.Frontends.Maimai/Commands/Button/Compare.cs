@@ -15,8 +15,8 @@ namespace Pepper.Frontends.Maimai.Commands.Button
 {
     public class Compare : MaimaiButtonCommand
     {
-        public Compare(HttpClient httpClient, MaimaiDataService data, IMaimaiDxNetCookieProvider cookie)
-            : base(httpClient, data, cookie) { }
+        public Compare(MaimaiDxNetClientFactory factory, MaimaiDataService data, IMaimaiDxNetCookieProvider cookie)
+            : base(factory, data, cookie) { }
 
         private const string Name = "maicompare_1";
 
@@ -41,7 +41,7 @@ namespace Pepper.Frontends.Maimai.Commands.Button
             await Context.Interaction.Response().DeferAsync();
 
             var cookie = await CookieProvider.GetCookie(Context.AuthorId);
-            var client = new MaimaiDxNetClient(HttpClient, cookie!);
+            var client = ClientFactory.Create(cookie!);
             var rec = await client.GetUserDifficultyRecord((baseLevel, plus == 1));
             var record = rec.FirstOrDefault(r => r.Name == name && r.Version == version && r.Difficulty == difficulty);
 

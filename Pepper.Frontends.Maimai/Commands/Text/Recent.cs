@@ -1,9 +1,7 @@
 using Disqord;
 using Disqord.Bot.Commands;
-using Disqord.Extensions.Interactivity.Menus.Paged;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
-using Pepper.Commons.Maimai.Structures.Data;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
@@ -16,8 +14,8 @@ namespace Pepper.Frontends.Maimai.Commands.Text
 {
     public class Recent : MaimaiTextCommand
     {
-        public Recent(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
-            : base(http, data, cookieProvider) { }
+        public Recent(MaimaiDxNetClientFactory factory, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
+            : base(factory, data, cookieProvider) { }
 
         [TextCommand("mairecent", "recent", "rs")]
         [Description("Show recent plays of an user.")]
@@ -26,7 +24,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
         )
         {
             var cookie = await CookieProvider.GetCookie(player?.Id ?? Context.AuthorId);
-            var client = new MaimaiDxNetClient(HttpClient, cookie!);
+            var client = ClientFactory.Create(cookie!);
             var recent = await client.GetUserRecentRecord();
             var rs = recent.Select(record =>
             {

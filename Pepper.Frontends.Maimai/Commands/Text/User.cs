@@ -13,8 +13,8 @@ namespace Pepper.Frontends.Maimai.Commands.Text
 {
     public class User : MaimaiTextCommand
     {
-        public User(HttpClient httpClient, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
-            : base(httpClient, data, cookieProvider) { }
+        public User(MaimaiDxNetClientFactory factory, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
+            : base(factory, data, cookieProvider) { }
 
         [TextCommand("maiuser", "user", "u")]
         [Description("Show info of an user.")]
@@ -23,7 +23,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
         )
         {
             var cookie = await CookieProvider.GetCookie(player?.Id ?? Context.AuthorId);
-            var client = new MaimaiDxNetClient(HttpClient, cookie!);
+            var client = ClientFactory.Create(cookie!);
             var user = await client.GetUserPlayData();
             var stats = user.UserStatistics;
             var isShinDan = user.DanLevel > 11;

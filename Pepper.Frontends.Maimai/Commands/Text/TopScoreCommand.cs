@@ -9,8 +9,8 @@ namespace Pepper.Frontends.Maimai.Commands.Text
 {
     public class TopScoreCommand : MaimaiTextCommand
     {
-        protected TopScoreCommand(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
-            : base(http, data, cookieProvider) { }
+        protected TopScoreCommand(MaimaiDxNetClientFactory factory, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
+            : base(factory, data, cookieProvider) { }
 
         public override async ValueTask OnBeforeExecuted()
         {

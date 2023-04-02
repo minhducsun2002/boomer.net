@@ -11,8 +11,8 @@ namespace Pepper.Frontends.Maimai.Commands.Text
 {
     public class Login : MaimaiTextCommand
     {
-        public Login(HttpClient http, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
-            : base(http, data, cookieProvider) { }
+        public Login(MaimaiDxNetClientFactory factory, MaimaiDataService data, IMaimaiDxNetCookieProvider cookieProvider)
+            : base(factory, data, cookieProvider) { }
 
         [TextCommand("mailogin", "login")]
         [Description("Provide your cookie here.")]
@@ -85,7 +85,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
 
         private async Task<bool> TryCookie(string cookie)
         {
-            var client = new MaimaiDxNetClient(HttpClient, cookie);
+            var client = ClientFactory.Create(cookie);
             return await client.VerifyCookie() != null;
         }
     }
