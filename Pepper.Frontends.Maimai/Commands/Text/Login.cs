@@ -47,7 +47,10 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                                         .WithName("For whoever thinks they know what they're doing")
                                         .WithValue("Step 1 and 4 can be skipped if you know what you're doing.\n" +
                                                    "Just paste the script into the address bar after step 3.\n" +
-                                                   "Beware that Chrome strips the `javascript:` prefix - manually type it back.")
+                                                   "Beware that Chrome strips the `javascript:` prefix - manually type it back."),
+                                    new LocalEmbedField()
+                                        .WithName("Important notice")
+                                        .WithValue("Twitter integration seems to be broken these days. Log in **using other methods** (step 2) and try again.")
                                 )
                                 .WithFooter("It is advised that you perform step 2 onward using an incognito window.")
                         )
