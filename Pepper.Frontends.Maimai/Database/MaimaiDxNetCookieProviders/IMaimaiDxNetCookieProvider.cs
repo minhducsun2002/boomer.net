@@ -4,5 +4,6 @@ namespace Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders
     {
         public ValueTask<string?> GetCookie(ulong discordId);
         public Task StoreCookie(ulong discordId, string cookie);
+        public void FlushCache(ulong? discordId = null);
     }
 }

@@ -20,8 +20,20 @@ namespace Pepper.Frontends.Maimai.Database
         private static readonly ILogger Log = Serilog.Log.Logger.ForContext<MariaDbMaimaiDxNetCookieProvider>();
 
         public MariaDbMaimaiDxNetCookieProvider(DbContextOptions<MariaDbMaimaiDxNetCookieProvider> options) : base(options) { }
-        private readonly FastConcurrentLru<ulong, string> cache = new(200);
+        private FastConcurrentLru<ulong, string> cache = new(200);
         private DbSet<Record> DbSet { get; set; } = null!;
+
+        public void FlushCache(ulong? discordId = null)
+        {
+            if (discordId == null)
+            {
+                cache = new FastConcurrentLru<ulong, string>(200);
+            }
+            else
+            {
+                cache.TryRemove(discordId.Value);
+            }
+        }
 
         public async ValueTask<string?> GetCookie(ulong discordId)
         {
