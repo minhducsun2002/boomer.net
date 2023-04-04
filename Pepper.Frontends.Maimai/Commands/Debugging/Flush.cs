@@ -17,6 +17,7 @@ namespace Pepper.Frontends.Maimai.Commands.Debugging
         public Flush(MaimaiDxNetClientFactory f, MaimaiDataService d, IMaimaiDxNetCookieProvider c) : base(f, d, c) { }
 
         [TextCommand("flush")]
+        [Description("Remove cached cookies (for an user if specified)")]
         public IDiscordCommandResult Exec([Description("User ID to remove cache")] ulong? discordId = null)
         {
             CookieProvider.FlushCache(discordId);
