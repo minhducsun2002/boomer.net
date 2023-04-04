@@ -25,7 +25,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                     new LocalMessage()
                         .WithContent("```js" +
                                      "\njavascript:prompt(" +
-                                     "'Please copy this and enter into chat :','m!login '+document.cookie.split(';').map(a=>a.trim()).filter(a=>a.startsWith('clal='))[0]);" +
+                                     "'Please copy this and enter into chat :','m!login '+document.cookie.split(';').map(a=>a.trim()).filter(a=>a.startsWith('clal='))[0].substr(5));" +
                                      "```")
                         .WithEmbeds(
                             new LocalEmbed()
