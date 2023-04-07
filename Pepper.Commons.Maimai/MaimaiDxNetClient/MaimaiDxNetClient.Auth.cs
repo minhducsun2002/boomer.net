@@ -47,7 +47,7 @@ namespace Pepper.Commons.Maimai
             var amAllRes = await AuthHttpClient.SendAsync(amAllReq);
             if (amAllRes.StatusCode != HttpStatusCode.Redirect)
             {
-                throw new InvalidCookieException($"Status code was {amAllRes.StatusCode}");
+                throw new InvalidCookieException($"Status code was {(int) amAllRes.StatusCode}");
             }
 
             return amAllRes.Headers.Location!.ToString();
