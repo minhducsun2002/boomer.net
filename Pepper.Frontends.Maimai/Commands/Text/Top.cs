@@ -37,35 +37,20 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 .WithDegreeOfParallelism(8)
                 .Select(score =>
                 {
-                    int chartConstant;
                     var searchRes = GameDataService.ResolveSongExact(score.Name, score.Difficulty, score.Level, score.Version);
-                    var version = GameDataService.NewestVersion;
-                    if (searchRes.HasValue)
-                    {
-                        var (diff, song) = searchRes.Value;
-                        version = song.AddVersionId;
-                        chartConstant = diff.Level * 10 + diff.LevelDecimal;
-                    }
-                    else
-                    {
-                        var diff = score.Level;
-                        chartConstant = diff.Item1 * 10 + (diff.Item2 ? 7 : 0);
-                    }
-
-                    var total = Calculate.GetFinalScore(score.Accuracy, chartConstant);
-
-                    if (searchRes.HasValue)
-                    {
-                        var (diff, song) = searchRes.Value;
-                        return (score, diff, song, constant: chartConstant, accuracy: score.Accuracy, total, version);
-                    }
-#pragma warning disable CS8619
-                    return (score, null, null, constant: chartConstant, accuracy: score.Accuracy, total, version);
-#pragma warning restore CS8619
+                    var a = new ScoreWithMeta<TopRecord>(
+                        score,
+                        searchRes?.Item2,
+                        searchRes?.Item1,
+                        GameDataService.NewestVersion,
+                        GameDataService.HasMultipleVersions(score.Name),
+                        GameDataService.GetImageUrl(score.Name));
+                    return a;
                 })
-                .OrderByDescending(p => p.total)
-                .ThenByDescending(p => p.constant)
-                .ThenByDescending(p => p.accuracy)
+                .Where(p => p.Rating != null)
+                .OrderByDescending(p => p.Rating)
+                .ThenByDescending(p => p.ChartConstant)
+                .ThenByDescending(p => p.Score.Accuracy)
                 .ToList();
 
             if (scores.Count == 0)
@@ -74,62 +59,15 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             }
 
             var newScores = scores
-                .Where(s => s.version == LatestVersion)
+                .Where(s => s.Version == LatestVersion)
                 .Take(15)
                 .ToList();
             var oldScores = scores
-                .Where(s => s.version != LatestVersion)
+                .Where(s => s.Version != LatestVersion)
                 .Take(35)
                 .ToList();
-            var newSum = newScores.Select(s => Calculate.NormalizedRating(s.total)).Sum();
-            var oldSum = oldScores.Select(s => Calculate.NormalizedRating(s.total)).Sum();
-            var newFooter = new LocalEmbedFooter()
-                .WithText($"Total New rating : {newSum}, avg {newSum / 15}");
-            var oldFooter = new LocalEmbedFooter()
-                .WithText($"Total Old rating : {oldSum}, avg {oldSum / 35}");
 
-            var newEmbed = newScores
-                .Chunk(3)
-                .Select((entries, i1) =>
-                {
-                    var page = entries.Select((e, i2) =>
-                    {
-                        var (score, diff, song, _, _, total, _) = e;
-                        var embed = CreateEmbed(score, diff, song, total, i1 * 3 + i2);
-                        return embed;
-                    })
-                        .Append(new LocalEmbed().WithFooter(newFooter));
-                    return page;
-                })
-                .ToArray();
-
-            var oldEmbed = oldScores
-                .Chunk(3)
-                .Select((entries, i1) =>
-                {
-                    var page = entries.Select((e, i2) =>
-                    {
-                        var (score, diff, song, _, _, total, _) = e;
-                        var embed = CreateEmbed(score, diff, song, total, i1 * 3 + i2);
-                        return embed;
-                    })
-                        .Append(new LocalEmbed().WithFooter(oldFooter));
-                    return page;
-                });
-
-            var embeds = newEmbed
-                .Concat(oldEmbed)
-                .Select(embed => new Page().WithEmbeds(embed).WithContent("These calculations are estimated."))
-                .ToArray();
-
-            return View(new TopScorePagedView(new ListPageProvider(embeds), newEmbed.Length), TimeSpan.FromSeconds(30));
-        }
-
-        private LocalEmbed CreateEmbed(TopRecord score, Pepper.Commons.Maimai.Entities.Difficulty? diff, Song? song, long total, int index = 0)
-        {
-            var hasMultipleVersions = GameDataService.HasMultipleVersions(score.Name);
-            var imageUrl = GameDataService.GetImageUrl(score.Name);
-            return ScoreFormatter.FormatScore(score, diff, song, index + 1, imageUrl, score.Level, hasMultipleVersions);
+            return View(new TopScorePagedView(new TopScorePageProvider(newScores, oldScores)), TimeSpan.FromSeconds(30));
         }
     }
 }

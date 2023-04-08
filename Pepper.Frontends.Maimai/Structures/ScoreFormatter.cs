@@ -10,6 +10,15 @@ using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
 
 namespace Pepper.Frontends.Maimai.Structures
 {
+    public class ScoreFormatter<TScoreType> where TScoreType : ScoreRecord
+    {
+        public static LocalEmbed FormatScore(ScoreWithMeta<TScoreType> record, int? number = null)
+        {
+            (int, bool)? hint = record.Score is TopRecord top ? top.Level : null;
+            return ScoreFormatter.FormatScore(record.Score, record.Difficulty, record.Song, number, record.ImageUrl, hint, record.SongHasMultipleVersion);
+        }
+    }
+
     public class ScoreFormatter
     {
         public static readonly string[] DifficultyStrings =
