@@ -7,7 +7,7 @@ using Humanizer;
 using Pepper.Commons.Structures;
 using Pepper.Commons.Structures.CommandAttributes.Metadata;
 using Pepper.Commons.Structures.Views;
-using Pepper.FuzzySearch;
+using FuseNET;
 using Qmmands;
 using Qmmands.Text;
 using Qommon;
