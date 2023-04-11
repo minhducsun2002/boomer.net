@@ -22,8 +22,6 @@
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
         <PackageReference Include="dotenv.net" Version="3.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\Pepper.Logging.Serilog.Sinks.Discord\Pepper.Logging.Serilog.Sinks.Discord.csproj" />
+        <PackageReference Include="Serilog.Sinks.Discord" Version="1.0.0-20230411-0345" />
     </ItemGroup>
 </Project>

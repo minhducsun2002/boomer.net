@@ -3,9 +3,9 @@ using dotenv.net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Pepper.Logging.Serilog.Sinks.Discord;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.Discord;
 using Serilog.Templates;
 
 namespace Pepper.Commons
