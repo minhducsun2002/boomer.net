@@ -5,8 +5,8 @@ on:
     paths:
       - 'Pepper.Commons/**/*.cs'
       - 'Pepper.Commons/**/*.csproj'
-      - 'Pepper.Frontends.MaimaiStatistics/*.cs'
-      - 'Pepper.Frontends.MaimaiStatistics/*.csproj'
+      - 'Pepper.Frontends.MaimaiStatistics/**/*.cs'
+      - 'Pepper.Frontends.MaimaiStatistics/**/*.csproj'
       - 'boomer.sln'
       - 'nuget.config'
       - 'dockerfiles/maimai-dump.dockerfile'
