@@ -5,6 +5,7 @@ using Humanizer;
 using Microsoft.Extensions.DependencyInjection;
 using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Frontends.MaimaiStatistics.Database.ProgressRecordProvider;
+using Pepper.Frontends.MaimaiStatistics.Structures;
 using Qmmands.Text;
 using PagedView = Pepper.Commons.Structures.Views.PagedView;
 
@@ -20,7 +21,10 @@ namespace Pepper.Frontends.MaimaiStatistics.Commands
         public async Task<IDiscordCommandResult> Exec()
         {
             var now = DateTimeOffset.Now;
-            var current = (await RecordProvider.ListMaxInRange()).ToDictionary(r => r.FriendId, r => r);
+            var current = (await RecordProvider.ListMaxInRange())
+                .ToDictionary(r => r.FriendId, r => r)
+                .OrderByDescending(a => a.Value.Rating)
+                .ToArray();
             var r = (await Task.WhenAll(
                     times.Select(async day =>
                     {
@@ -32,22 +36,27 @@ namespace Pepper.Frontends.MaimaiStatistics.Commands
                 ))
                 .SelectMany(a => a)
                 .GroupBy(a => a.FriendId)
-                .ToList();
-            r = r.OrderByDescending(r => r.MaxBy(p => p.Rating)!.Rating).ToList();
-            var lines = r.Select(g =>
+                .ToDictionary(a => a.Key, a => a.ToArray());
+            
+            var lines = current.Select(v =>
             {
-                var n = g.OrderByDescending(g => g.Timestamp).ToList();
-                var currentRating = current[n[0].FriendId].Rating;
-                var ratings = g.Select(a => a.Rating)
-                    .OrderByDescending(a => a)
+                var (friend, latest) = v;
+                if (!r.TryGetValue(friend, out var g))
+                {
+                    g = Array.Empty<ProgressRecord>();
+                }
+                var currentRating = latest.Rating;
+                var ratings = g
+                    .OrderByDescending(a => a.Timestamp)
+                    .Select(a => a.Rating)
                     .Select((a, i) => $"{times[i]}d : **{(currentRating - a == 0 ? "" : "+")}{currentRating - a}**");
-                var dan = n[0].Dan;
-                var isShinDan = dan > 11;
+                var joined = string.Join(" / ", ratings);
+                var dan = latest.Dan;
                 return new LocalEmbedField()
                     .WithName(
-                        $"[{n[0].Rating}]  {n[0].Name}   - {(isShinDan ? "Shin " : "")}{(dan % 11).Ordinalize()} Dan - {(SeasonClass) n[0].Class}"
+                        $"[{latest.Rating}]  {latest.Name}   - {(dan > 11 ? "Shin " : "")}{(dan % 11).Ordinalize()} Dan - {(SeasonClass) latest.Class}"
                     )
-                    .WithValue(string.Join(" / ", ratings));
+                    .WithValue(string.IsNullOrWhiteSpace(joined) ? "(not enough data)" : joined);
             });
             var embeds = lines.Chunk(10)
                 .Select(chunk => new Page().WithEmbeds(new LocalEmbed().WithFields(chunk)));
