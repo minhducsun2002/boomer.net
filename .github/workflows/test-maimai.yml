@@ -5,8 +5,10 @@ on:
     paths:
       - 'Pepper.Commons/**/*.cs'
       - 'Pepper.Commons/**/*.csproj'
-      - '**Maimai**/*.cs'
-      - '**Maimai**/*.csproj'
+      - 'Pepper.Commons.Maimai/**/*.cs'
+      - 'Pepper.Commons.Maimai/**/*.csproj'
+      - 'Pepper.Frontends.Maimai/**/*.cs'
+      - 'Pepper.Frontends.Maimai/**/*.csproj'
       - 'boomer.sln'
       - 'nuget.config'
       - '.github/workflows/test-maimai.yml'
