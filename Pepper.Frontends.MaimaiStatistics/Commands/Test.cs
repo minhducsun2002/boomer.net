@@ -40,7 +40,7 @@ namespace Pepper.Frontends.MaimaiStatistics.Commands
                 var currentRating = current[n[0].FriendId].Rating;
                 var ratings = g.Select(a => a.Rating)
                     .OrderByDescending(a => a)
-                    .Select((a, i) => $"{times[i]}d : **{currentRating - a}**");
+                    .Select((a, i) => $"{times[i]}d : **{(currentRating - a == 0 ? "" : "+")}{currentRating - a}**");
                 var dan = n[0].Dan;
                 var isShinDan = dan > 11;
                 return new LocalEmbedField()
