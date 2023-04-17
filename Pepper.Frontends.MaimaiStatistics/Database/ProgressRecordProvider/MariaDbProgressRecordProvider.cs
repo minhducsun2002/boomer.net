@@ -29,5 +29,19 @@ namespace Pepper.Frontends.MaimaiStatistics.Database.ProgressRecordProvider
             var res = DbSet.FromSqlRaw(query);
             return await res.ToListAsync();
         }
+
+        public async Task<IEnumerable<ProgressRecord>> ListMaxAllTime()
+        {
+            var res = DbSet.FromSqlRaw(
+                $@"
+                select id, grouped_max.friend_id, class, name, rating, dan, latest_time as timestamp from (
+                     select friend_id, max(timestamp) as latest_time from progress_log where TRUE group by friend_id
+                 ) grouped_max
+                     join progress_log on grouped_max.friend_id = progress_log.friend_id and progress_log.timestamp = latest_time
+                group by grouped_max.friend_id;
+                "
+            );
+            return await res.ToListAsync();
+        }
     }
 }

@@ -5,6 +5,7 @@ namespace Pepper.Frontends.MaimaiStatistics.Database.ProgressRecordProvider
     public interface IProgressRecordProvider
     {
         public Task<IEnumerable<ProgressRecord>> ListMaxInRange(DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null);
+        public Task<IEnumerable<ProgressRecord>> ListMaxAllTime();
 
     }
 }

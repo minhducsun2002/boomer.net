@@ -21,7 +21,7 @@ namespace Pepper.Frontends.MaimaiStatistics.Commands
         public async Task<IDiscordCommandResult> Exec()
         {
             var now = DateTimeOffset.Now;
-            var current = (await RecordProvider.ListMaxInRange())
+            var current = (await RecordProvider.ListMaxAllTime())
                 .ToDictionary(r => r.FriendId, r => r)
                 .OrderByDescending(a => a.Value.Rating)
                 .ToArray();
@@ -37,7 +37,7 @@ namespace Pepper.Frontends.MaimaiStatistics.Commands
                 .SelectMany(a => a)
                 .GroupBy(a => a.FriendId)
                 .ToDictionary(a => a.Key, a => a.ToArray());
-            
+
             var lines = current.Select(v =>
             {
                 var (friend, latest) = v;
