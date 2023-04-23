@@ -36,6 +36,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             var cookie = await CookieProvider.GetCookie(player?.Id ?? Context.AuthorId);
             var client = ClientFactory.Create(cookie!);
 
+            var user = await client.GetUserPlayData();
             var records = await ListAllScores(client);
 
             var sc = records
@@ -78,7 +79,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             var oldCsv = SerializeToCsv(scores[false]);
             var newBytes = Encoding.UTF8.GetBytes(newCsv);
             var oldBytes = Encoding.UTF8.GetBytes(oldCsv);
-            var serializedDump = PngPayloadWrapper.Wrap(Encrypt(CreatePackedScores(sc)));
+            var serializedDump = PngPayloadWrapper.Wrap(Encrypt(CreatePackedScores(sc, user)));
             using var newStream = new MemoryStream(newBytes);
             using var oldStream = new MemoryStream(oldBytes);
             using var imgStream = new MemoryStream(serializedDump);
@@ -116,7 +117,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             return final;
         }
 
-        private byte[] CreatePackedScores(IEnumerable<ScoreWithMeta<TopRecord>> records)
+        private byte[] CreatePackedScores(IEnumerable<ScoreWithMeta<TopRecord>> records, Commons.Maimai.Structures.Data.User? user = null)
         {
             var r = records
                 .AsParallel()
@@ -143,12 +144,24 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 })
                 .ToArray();
 
+            TopExportUser? u = null;
+            if (user is not null)
+            {
+                u = new TopExportUser
+                {
+                    Name = user.Name,
+                    Rating = user.Rating,
+                    DanLevel = user.DanLevel,
+                    PlayCount = user.PlayCount
+                };
+            }
             var export = new TopExport
             {
                 Coefficients = Calculate.Coeff.Select(a => new[] { a.Item1, a.Item2 }).ToArray(),
                 MaimaiVersion = GameDataService.NewestVersion,
                 Timestamp = DateTimeOffset.Now,
-                TopExportScores = r
+                TopExportScores = r,
+                User = u
             };
 
             var res = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(export));

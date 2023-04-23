@@ -10,6 +10,10 @@ namespace Pepper.Frontends.Maimai.Structures.Export
         [JsonPropertyName("version")]
         public int FormatVersion { get; } = 1;
 
+        [JsonProperty("user")]
+        [JsonPropertyName("user")]
+        public TopExportUser? User { get; set; }
+
         [JsonProperty("maimai_version")]
         [JsonPropertyName("maimai_version")]
         public int MaimaiVersion { get; set; }
