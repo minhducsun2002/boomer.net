@@ -8,7 +8,7 @@ namespace Pepper.Frontends.Maimai.Structures.Export
     {
         [JsonProperty("version")]
         [JsonPropertyName("version")]
-        public readonly int FormatVersion = 1;
+        public int FormatVersion { get; } = 1;
 
         [JsonProperty("maimai_version")]
         [JsonPropertyName("maimai_version")]
@@ -20,10 +20,10 @@ namespace Pepper.Frontends.Maimai.Structures.Export
 
         [JsonProperty("coeff")]
         [JsonPropertyName("coeff")]
-        public (int, int)[] Coefficients = Calculate.Coeff;
+        public int[][] Coefficients { get; set; } = Array.Empty<int[]>();
 
         [JsonProperty("scores")]
         [JsonPropertyName("scores")]
-        public TopExportScore[] TopExportScores = Array.Empty<TopExportScore>();
+        public TopExportScore[] TopExportScores { get; set; } = Array.Empty<TopExportScore>();
     }
 }

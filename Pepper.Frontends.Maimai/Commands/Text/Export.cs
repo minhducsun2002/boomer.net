@@ -1,13 +1,11 @@
 using System.IO.Compression;
+using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Rest;
-using Newtonsoft.Json;
 using Pepper.Commons.Maimai;
-using Pepper.Commons.Maimai.Entities;
-using Pepper.Commons.Maimai.Structures.Data;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Commons.Structures.CommandAttributes.Metadata;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
@@ -18,6 +16,7 @@ using Pepper.Frontends.Maimai.Utils;
 using Pepper.PngPayloadEmbed;
 using Qmmands;
 using Qmmands.Text;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Pepper.Frontends.Maimai.Commands.Text
 {
@@ -79,9 +78,11 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             var oldCsv = SerializeToCsv(scores[false]);
             var newBytes = Encoding.UTF8.GetBytes(newCsv);
             var oldBytes = Encoding.UTF8.GetBytes(oldCsv);
+            var serializedDump = PngPayloadWrapper.Wrap(Encrypt(CreatePackedScores(sc)));
             using var newStream = new MemoryStream(newBytes);
             using var oldStream = new MemoryStream(oldBytes);
-            using var imgStream = new MemoryStream(PngPayloadWrapper.Wrap(CreatePackedScores(sc)));
+            using var imgStream = new MemoryStream(serializedDump);
+
             msg = msg
                 .AddAttachment(new LocalAttachment().WithStream(newStream).WithFileName("new.csv"))
                 .AddAttachment(new LocalAttachment().WithStream(oldStream).WithFileName("old.csv"))
@@ -101,6 +102,20 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             return null;
         }
 
+        private byte[] Encrypt(byte[] payload)
+        {
+            var password = Environment.GetEnvironmentVariable("DUMP_PASSWORD") ?? "";
+            var key = SHA256.HashData(Encoding.UTF8.GetBytes(password))[..16];
+            var aes = Aes.Create();
+            aes.KeySize = 128;
+            aes.BlockSize = 128;
+            aes.GenerateIV();
+            aes.Key = key;
+            var res = aes.EncryptCbc(payload, aes.IV, PaddingMode.PKCS7);
+            var final = aes.IV.Concat(res).ToArray();
+            return final;
+        }
+
         private byte[] CreatePackedScores(IEnumerable<ScoreWithMeta<TopRecord>> records)
         {
             var r = records
@@ -115,20 +130,35 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                         Accuracy = r.Accuracy,
                         ChartVersion = r.Version,
                         Difficulty = r.Difficulty,
-                        DXScore = (r.Notes, r.MaxNotes),
+                        DxScore = r.Notes,
+                        MaxDxScore = r.MaxNotes,
                         FcStatus = r.FcStatus,
                         SyncStatus = r.SyncStatus,
-                        Level = (r.Level.Item1, levelDecimal, s.Difficulty != null),
-                        MaimaiVersion = GameDataService.NewestVersion,
+                        Level = r.Level.Item1,
+                        LevelDecimal = levelDecimal,
+                        TrueDecimal = s.Difficulty != null,
+                        MaimaiVersion = s.Song?.AddVersionId ?? GameDataService.NewestVersion,
                         Song = s.Score.Name
                     };
-                });
+                })
+                .ToArray();
 
-            var res = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(r));
+            var export = new TopExport
+            {
+                Coefficients = Calculate.Coeff.Select(a => new[] { a.Item1, a.Item2 }).ToArray(),
+                MaimaiVersion = GameDataService.NewestVersion,
+                Timestamp = DateTimeOffset.Now,
+                TopExportScores = r
+            };
+
+            var res = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(export));
             using var memoryStream = new MemoryStream(res);
             using var outputStream = new MemoryStream();
-            using var gzipStream = new GZipStream(outputStream, CompressionLevel.Optimal);
-            memoryStream.CopyTo(gzipStream);
+            // Apparently GzipStream only flushes everything upon disposal, so at the .ToArray() call it must have been disposed
+            using (var gzipStream = new GZipStream(outputStream, CompressionMode.Compress, true))
+            {
+                memoryStream.CopyTo(gzipStream);
+            }
             return outputStream.ToArray();
         }
 

@@ -20,11 +20,23 @@ namespace Pepper.Frontends.Maimai.Structures.Export
 
         [JsonProperty("level")]
         [JsonPropertyName("level")]
-        public (int, int, bool) Level { get; set; } // level, decimal, true decimal or not
+        public int Level { get; set; }
+
+        [JsonProperty("level_decimal")]
+        [JsonPropertyName("level_decimal")]
+        public int LevelDecimal { get; set; }
+
+        [JsonProperty("true_decimal")]
+        [JsonPropertyName("true_decimal")]
+        public bool TrueDecimal { get; set; }
 
         [JsonProperty("score")]
         [JsonPropertyName("score")]
-        public (int, int) DXScore { get; set; }
+        public int DxScore { get; set; }
+
+        [JsonProperty("max_score")]
+        [JsonPropertyName("max_score")]
+        public int MaxDxScore { get; set; }
 
         [JsonProperty("accuracy")]
         [JsonPropertyName("accuracy")]
