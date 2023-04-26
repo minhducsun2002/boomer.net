@@ -13,6 +13,30 @@ namespace Pepper.Frontends.Maimai.Utils
             return record.Name + (record.Version == ChartVersion.Deluxe && sc.SongHasMultipleVersion ? "  [DX] " : "  ");
         }
 
+        public static string ChartConstant<T>(ScoreWithMeta<T> sc, (int, bool)? levelHints = null) where T : ScoreRecord
+        {
+            var diff = sc.Difficulty;
+            string levelText;
+            if (diff != null)
+            {
+                levelText = $"{diff.Level}.{diff.LevelDecimal}";
+            }
+            else
+            {
+                if (levelHints.HasValue)
+                {
+                    var (baseLevel, plus) = levelHints.Value;
+                    levelText = $"{baseLevel}{(plus ? "+" : "")}";
+                }
+                else
+                {
+                    levelText = "";
+                }
+            }
+
+            return levelText;
+        }
+
         public static string Statistics(ScoreRecord record)
         {
             var isTop = record is TopRecord;

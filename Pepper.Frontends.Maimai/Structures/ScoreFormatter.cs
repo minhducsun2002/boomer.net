@@ -36,11 +36,9 @@ namespace Pepper.Frontends.Maimai.Structures
             var song = e.Song;
             var diffText = DifficultyStrings[(int) record.Difficulty];
             bool isAccurateLevel = diff != null, isTop = record is TopRecord;
-            string levelText;
             int chartConstant;
             if (diff != null)
             {
-                levelText = $"{diff.Level}.{diff.LevelDecimal}";
                 chartConstant = diff.Level * 10 + diff.LevelDecimal;
             }
             else
@@ -48,19 +46,12 @@ namespace Pepper.Frontends.Maimai.Structures
                 if (levelHints.HasValue)
                 {
                     var (baseLevel, plus) = levelHints.Value;
-                    levelText = $"{baseLevel}{(plus ? "+" : "")}";
                     chartConstant = baseLevel * 10 + (plus ? 7 : 0);
                 }
                 else
                 {
-                    levelText = "";
                     chartConstant = default;
                 }
-            }
-
-            if (levelText != "")
-            {
-                levelText = " " + levelText;
             }
 
             int rating = default;
@@ -72,6 +63,11 @@ namespace Pepper.Frontends.Maimai.Structures
             var nameText = Format.SongName(e);
             var ratingText = rating != default ? $" - **{rating}**{(isAccurateLevel ? "" : " (?)")} rating" : "";
             var numberText = number != null ? $"{number}. " : "";
+            var levelText = Format.ChartConstant(e, levelHints);
+            if (!string.IsNullOrEmpty(levelText))
+            {
+                levelText = " " + levelText;
+            }
 
             var r = new LocalEmbed
             {
