@@ -1,34 +1,25 @@
 using Disqord;
 using Disqord.Extensions.Interactivity.Menus.Paged;
-using Pepper.Commons.Maimai.Entities;
-using Pepper.Commons.Maimai.Structures.Data;
 using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Commons.Maimai.Structures.Data.Score;
-using Pepper.Frontends.Maimai.Commands;
 using Pepper.Frontends.Maimai.Commands.Button;
-using Qommon;
-using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
 
 namespace Pepper.Frontends.Maimai.Structures
 {
     public partial class RecentScorePagedView
     {
-        public static RecentScorePagedView Create(IEnumerable<(RecentRecord?, (Difficulty, Song, bool)?)> records)
+        public static RecentScorePagedView Create(IEnumerable<ScoreWithMeta<RecentRecord>?> records)
         {
             var recordsArray = records.ToArray();
             var hasFailedParsing = false;
             var recentFiltered = recordsArray.Where(r =>
                 {
-                    if (r.Item1 == null)
-                    {
-                        hasFailedParsing = true;
-                    }
-
-                    return r.Item1 != null;
+                    hasFailedParsing = r is null || hasFailedParsing;
+                    return r != null;
                 })
-                .ToArray() as (RecentRecord, (Difficulty, Song, bool)?)[];
+                .ToArray();
 
-            var grouped = GroupRecords(recentFiltered);
+            var grouped = GroupRecords(recentFiltered!);
             var serializedPages = SerializeRecords(grouped, hasFailedParsing);
             var serializedInteractionIds = SerializeInteractions(grouped);
 
@@ -38,16 +29,16 @@ namespace Pepper.Frontends.Maimai.Structures
             );
         }
 
-        private static List<List<(RecentRecord, (Difficulty, Song, bool)?)>> GroupRecords(
-            IList<(RecentRecord, (Difficulty, Song, bool)?)> records)
+        private static List<List<ScoreWithMeta<RecentRecord>>> GroupRecords(
+            IList<ScoreWithMeta<RecentRecord>> records)
         {
-            var chunks = new List<List<(RecentRecord, (Difficulty, Song, bool)?)>>();
-            var current = new List<(RecentRecord, (Difficulty, Song, bool)?)>();
+            var chunks = new List<List<ScoreWithMeta<RecentRecord>>>();
+            var current = new List<ScoreWithMeta<RecentRecord>>();
             var last = records[0];
             foreach (var entry in records)
             {
-                var (record, _) = entry;
-                var (lastRecord, _) = last;
+                var record = entry.Score;
+                var lastRecord = last.Score;
                 if (record.Track >= lastRecord.Track)
                 {
                     if (current.Count != 0)
@@ -70,20 +61,19 @@ namespace Pepper.Frontends.Maimai.Structures
         }
 
         private static List<List<(string, int)>> SerializeInteractions(
-            IEnumerable<IEnumerable<(RecentRecord, (Difficulty, Song, bool)?)>> chunks)
+            IEnumerable<IEnumerable<ScoreWithMeta<RecentRecord>>> chunks)
         {
             var res = chunks
                 .Select(chunk =>
                 {
                     var res = chunk.Select(r =>
                     {
-                        var (record, meta) = r;
-                        var song = meta?.Item2;
-                        var diff = meta?.Item1;
+                        var record = r.Score;
+                        var diff = r.Difficulty;
                         var interactionId = Compare.CreateCommand(
-                            song?.Id, record.Name, record.Version, record.Difficulty,
+                            r.Song?.Id, record.Name, record.Version, record.Difficulty,
                             diff?.Level,
-                            diff?.LevelDecimal != null ? diff.LevelDecimal >= 7 : null
+                            r.IsConstantAccurate ? diff!.LevelDecimal >= 7 : null
                         );
 
                         return (interactionId, record.Track);
@@ -95,21 +85,15 @@ namespace Pepper.Frontends.Maimai.Structures
             return res.ToList();
         }
 
-        private static IEnumerable<Page> SerializeRecords(List<List<(RecentRecord, (Difficulty, Song, bool hasMultipleVersions)?)>> chunks,
+        private static IEnumerable<Page> SerializeRecords(IReadOnlyCollection<List<ScoreWithMeta<RecentRecord>>> chunks,
             bool hasFailedParsing)
         {
             return chunks.Select(recordGroup =>
             {
-                var embeds = recordGroup.Select(entry =>
-                {
-                    var (record, song) = entry;
-                    return ScoreFormatter.FormatScore(
-                        record,
-                        song?.Item1, null, record.Track, record.ImageUrl,
-                        hasMultipleVersions: song?.hasMultipleVersions
-                    );
-                });
-                var records = recordGroup.Select(r => r.Item1).ToList();
+                var embeds = recordGroup.Select(
+                    entry => ScoreFormatter<RecentRecord>.FormatScore(entry, entry.Score.Track, false)
+                );
+                var records = recordGroup.Select(r => r.Score).ToList();
                 var isCourseCredit = records.All(record => record.ChallengeType == ChallengeType.Course);
                 if (chunks.Count != 1 || isCourseCredit)
                 {

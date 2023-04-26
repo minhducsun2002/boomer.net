@@ -1,14 +1,12 @@
 using Disqord;
 using Disqord.Bot.Commands;
 using Pepper.Commons.Maimai;
-using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
 using Pepper.Frontends.Maimai.Structures;
 using Qmmands;
 using Qmmands.Text;
-using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
 
 namespace Pepper.Frontends.Maimai.Commands.Text
 {
@@ -30,16 +28,19 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             {
                 if (record == null)
                 {
-                    return ((RecentRecord?) null, ((Difficulty, Song, bool)?) null);
+                    return null;
                 }
 
                 var res = GameDataService.ResolveSongLoosely(record.Name, record.Difficulty, record.Version);
-                if (res != null)
-                {
-                    var hasMultipleVersion = GameDataService.HasMultipleVersions(record.Name);
-                    return (record, (res.Value.Item1, res.Value.Item2, hasMultipleVersion));
-                }
-                return (record, null);
+                var diff = res?.Item1;
+                var song = res?.Item2;
+
+                return new ScoreWithMeta<RecentRecord>(
+                    record, song, diff,
+                    song?.AddVersionId ?? GameDataService.NewestVersion,
+                    GameDataService.HasMultipleVersions(record.Name),
+                    GameDataService.GetImageUrl(record.Name)
+                );
             });
 
             return View(RecentScorePagedView.Create(rs), TimeSpan.FromSeconds(30));

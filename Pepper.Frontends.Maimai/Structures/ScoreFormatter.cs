@@ -3,7 +3,6 @@ using Humanizer;
 using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Commons.Maimai.Structures.Data.Score;
-using Pepper.Frontends.Maimai.Commands.Text;
 using Pepper.Frontends.Maimai.Utils;
 using Qommon;
 using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
@@ -12,10 +11,10 @@ namespace Pepper.Frontends.Maimai.Structures
 {
     public class ScoreFormatter<TScoreType> where TScoreType : ScoreRecord
     {
-        public static LocalEmbed FormatScore(ScoreWithMeta<TScoreType> record, int? number = null)
+        public static LocalEmbed FormatScore(ScoreWithMeta<TScoreType> record, int? number = null, bool showSongCategories = true)
         {
             (int, bool)? hint = record.Score is TopRecord top ? top.Level : null;
-            return ScoreFormatter.FormatScore(record.Score, record.Difficulty, record.Song, number, record.ImageUrl, hint, record.SongHasMultipleVersion);
+            return ScoreFormatter.FormatScore(record.Score, record.Difficulty, record.Song, number, record.ImageUrl, hint, record.SongHasMultipleVersion, showSongCategories);
         }
     }
 
@@ -31,7 +30,9 @@ namespace Pepper.Frontends.Maimai.Structures
             Difficulty? diff, Song? song,
             int? number = null,
             string? imageUrl = null,
-            (int, bool)? levelHints = null, bool? hasMultipleVersions = null)
+            (int, bool)? levelHints = null,
+            bool? hasMultipleVersions = null,
+            bool showSongCategories = true)
         {
             var diffText = DifficultyStrings[(int) record.Difficulty];
             bool isAccurateLevel = diff != null, isTop = record is TopRecord;
@@ -129,7 +130,7 @@ namespace Pepper.Frontends.Maimai.Structures
                 r = r.WithFooter(string.Join("  •  ", footerText));
             }
 
-            if (song != null)
+            if (song != null && showSongCategories)
             {
                 r.AddField("Genre", song.Genre!.Name, true).AddField("Version", song.AddVersion!.Name, true);
                 if (chartConstant != default)
