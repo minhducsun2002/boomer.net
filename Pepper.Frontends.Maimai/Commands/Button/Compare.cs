@@ -1,13 +1,15 @@
 using Disqord;
 using Disqord.Bot.Commands.Components;
 using Disqord.Rest;
+using Humanizer;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
-using Pepper.Commons.Maimai.Structures.Data;
 using Pepper.Commons.Maimai.Structures.Data.Enums;
+using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
 using Pepper.Frontends.Maimai.Structures;
+using Pepper.Frontends.Maimai.Utils;
 using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
 using DifficultyEnum = Pepper.Commons.Maimai.Structures.Data.Enums.Difficulty;
 
@@ -58,55 +60,73 @@ namespace Pepper.Frontends.Maimai.Commands.Button
             }
             var decimalLevel = p.HasValue
                 ? p.Value.Item1.LevelDecimal
-                : (plus == 1 ? 7 : 0);
+                : plus == 1 ? 7 : 0;
             var title = $"**{name}**  [__{ScoreFormatter.DifficultyStrings[d]}__ **{baseLevel}**.**{decimalLevel}**]";
-
-            var orderedDifficulties = p?.Item2.Difficulties.OrderBy(d => d.Order).ToArray();
-            var buttons = (orderedDifficulties?.Select(d => (DifficultyEnum) d.Order) ?? DefaultDifficulties)
-                .Select(
-                    (diff, index) =>
-                    {
-                        var diffRecord = orderedDifficulties?.ElementAtOrDefault(index);
-                        var songDiff = diffRecord?.Level;
-                        var songDecimal = diffRecord?.LevelDecimal;
-                        return LocalComponent.Button(
-                            CreateCommand(id, name, version, diff, songDiff, songDecimal == null ? null : songDecimal >= 7),
-                            ScoreFormatter.DifficultyStrings[(int) diff]
-                        ).WithStyle(LocalButtonComponentStyle.Secondary);
-                    }
-                )
-                .Take(5);
 
             if (record == null)
             {
                 await Context.Interaction.Followup().SendAsync(
                     new LocalInteractionMessageResponse()
                         .WithContent($"No score for {Context.Author.Mention} on {title}.\n{GuideText}")
-                        // ReSharper disable once CoVariantArrayConversion
-                        .WithComponents(LocalComponent.Row(buttons.ToArray()))
+                // ReSharper disable once CoVariantArrayConversion
+                // .WithComponents(LocalComponent.Row(buttons.ToArray()))
                 );
                 return;
             }
 
             var chartRecord = await client.GetUserScoreOnChart(record.MusicDetailLink!);
-            var detailedRecord = chartRecord.First(r => r.Difficulty == record.Difficulty);
+            var detailedRecord = chartRecord
+                .OrderBy(r => r.Difficulty)
+                .Select(r =>
+                {
+                    var s = GameDataService.ResolveSongExact(r.Name, r.Difficulty, r.Level, r.Version);
+                    var multiple = GameDataService.HasMultipleVersions(r.Name);
+                    return new ScoreWithMeta<ChartRecord>(
+                        r,
+                        s?.Item2,
+                        s?.Item1,
+                        s?.Item2.AddVersionId ?? GameDataService.NewestVersion,
+                        multiple,
+                        GameDataService.GetImageUrl(r.Name)
+                    );
+                })
+                .ToArray();
             var image = GameDataService.GetImageUrl(record.Name);
-            var multipleVersions = GameDataService.HasMultipleVersions(record.Name);
-            var embed = ScoreFormatter.FormatScore(
-                detailedRecord, p?.Item1, p?.Item2,
-                levelHints: (p?.Item1.Level ?? baseLevel, plus == 1),
-                imageUrl: image,
-                hasMultipleVersions: multipleVersions
-            );
+            var embed = new LocalEmbed().WithTitle(Format.SongName(detailedRecord[0]));
+            if (image is not null)
+            {
+                embed = embed.WithThumbnailUrl(image);
+            }
+            foreach (var r in detailedRecord)
+            {
+                var playCount = r.Score.PlayCount;
+                var last = r.Score.LastPlayed;
+                embed.AddField(
+                    ScoreFormatter.DifficultyStrings[(int) r.Score.Difficulty],
+                    Format.Statistics(r.Score) + $" - {Format.Rating(r)} rating"
+                    + $"\n\n{playCount} {(playCount < 2 ? "play" : "play".Pluralize())}, last played <t:{last.ToUnixTimeSeconds()}:f>"
+                );
+            }
 
             embed = embed.WithFooter(GuideText);
 
+            var meta = detailedRecord[0];
             await Context.Interaction.Followup().SendAsync(
                 new LocalInteractionMessageResponse()
                     .WithContent($"Score of {Context.Author.Mention}")
                     .WithEmbeds(embed)
                     // ReSharper disable once CoVariantArrayConversion
-                    .WithComponents(LocalComponent.Row(buttons.ToArray()))
+                    .WithComponents(
+                        LocalComponent.Row(
+                            LocalComponent.Button(
+                                CreateCommand(
+                                    meta.Song?.Id, name, version, difficulty,
+                                    meta.Difficulty?.Level, meta.Difficulty?.LevelDecimal == null ? null : meta.Difficulty.LevelDecimal >= 7
+                                ),
+                                "Check your score™"
+                            ).WithStyle(LocalButtonComponentStyle.Success)
+                        )
+                    )
             );
         }
 

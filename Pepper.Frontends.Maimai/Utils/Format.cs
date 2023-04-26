@@ -1,10 +1,41 @@
 using Disqord;
 using Pepper.Commons.Maimai.Structures.Data.Enums;
+using Pepper.Commons.Maimai.Structures.Data.Score;
+using Pepper.Frontends.Maimai.Structures;
 
 namespace Pepper.Frontends.Maimai.Utils
 {
     public static class Format
     {
+        public static string SongName<T>(ScoreWithMeta<T> sc) where T : ScoreRecord
+        {
+            var record = sc.Score;
+            return record.Name + (record.Version == ChartVersion.Deluxe && sc.SongHasMultipleVersion ? "  [DX] " : "  ");
+        }
+
+        public static string Statistics(ScoreRecord record)
+        {
+            var isTop = record is TopRecord;
+            var comboText = Status(record.FcStatus);
+            var syncText = Status(record.SyncStatus);
+            var rankText = $"**{record.Rank.ToUpperInvariant()}**{(record.RankPlus ? "+" : "")}";
+            char openingBracket = isTop ? '(' : '[', closingBracket = isTop ? ')' : ']';
+            return $"**{record.Accuracy / 10000}**.**{record.Accuracy % 10000:0000}**%"
+                   + (isTop ? $" - [{rankText}]" : $" - {rankText}")
+                   + (comboText == "" ? comboText : $" {openingBracket}{comboText}{closingBracket}")
+                   + (syncText == "" ? syncText : $" {openingBracket}{syncText}{closingBracket}");
+        }
+
+        public static string Rating<T>(ScoreWithMeta<T> sc) where T : ScoreRecord
+        {
+            var rating = sc.Rating;
+            if (rating is not null)
+            {
+                rating = Calculate.NormalizedRating(rating.Value);
+            }
+            return rating != null ? $"**{rating}**{(sc.IsRatingAccurate ? "" : " (?)")}" : "";
+        }
+
         public static string Status(FcStatus fcStatus)
         {
             var comboText = fcStatus switch

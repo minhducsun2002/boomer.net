@@ -1,11 +1,9 @@
 using Disqord;
 using Humanizer;
-using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Utils;
 using Qommon;
-using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
 
 namespace Pepper.Frontends.Maimai.Structures
 {
@@ -14,7 +12,7 @@ namespace Pepper.Frontends.Maimai.Structures
         public static LocalEmbed FormatScore(ScoreWithMeta<TScoreType> record, int? number = null, bool showSongCategories = true)
         {
             (int, bool)? hint = record.Score is TopRecord top ? top.Level : null;
-            return ScoreFormatter.FormatScore(record.Score, record.Difficulty, record.Song, number, record.ImageUrl, hint, record.SongHasMultipleVersion, showSongCategories);
+            return ScoreFormatter.FormatScore(record, number, record.ImageUrl, hint, showSongCategories);
         }
     }
 
@@ -25,15 +23,17 @@ namespace Pepper.Frontends.Maimai.Structures
             "BASIC", "ADVANCED", "EXPERT", "MASTER", "Re:MASTER"
         };
 
-        public static LocalEmbed FormatScore(
-            ScoreRecord record,
-            Difficulty? diff, Song? song,
+        public static LocalEmbed FormatScore<TScoreType>(
+            ScoreWithMeta<TScoreType> e,
             int? number = null,
             string? imageUrl = null,
             (int, bool)? levelHints = null,
-            bool? hasMultipleVersions = null,
-            bool showSongCategories = true)
+            bool showSongCategories = true) where TScoreType : ScoreRecord
+
         {
+            var record = e.Score;
+            var diff = e.Difficulty;
+            var song = e.Song;
             var diffText = DifficultyStrings[(int) record.Difficulty];
             bool isAccurateLevel = diff != null, isTop = record is TopRecord;
             string levelText;
@@ -69,22 +69,14 @@ namespace Pepper.Frontends.Maimai.Structures
                 rating = Calculate.NormalizedRating(Calculate.GetFinalScore(record.Accuracy, chartConstant));
             }
 
-            var comboText = Format.Status(record.FcStatus);
-            var syncText = Format.Status(record.SyncStatus);
-            var nameText = record.Name + (record.Version == ChartVersion.Deluxe && hasMultipleVersions == true ? "  [DX] " : "  ");
+            var nameText = Format.SongName(e);
             var ratingText = rating != default ? $" - **{rating}**{(isAccurateLevel ? "" : " (?)")} rating" : "";
-            var rankText = $"**{record.Rank.ToUpperInvariant()}**{(record.RankPlus ? "+" : "")}";
             var numberText = number != null ? $"{number}. " : "";
-            char openingBracket = isTop ? '(' : '[', closingBracket = isTop ? ')' : ']';
 
             var r = new LocalEmbed
             {
                 Author = new LocalEmbedAuthor().WithName($"{numberText}{nameText}[{diffText}{levelText}]"),
-                Description = $"**{record.Accuracy / 10000}**.**{record.Accuracy % 10000:0000}**%"
-                              + (isTop ? $" - [{rankText}]" : $" - {rankText}")
-                              + (comboText == "" ? comboText : $" {openingBracket}{comboText}{closingBracket}")
-                              + (syncText == "" ? syncText : $" {openingBracket}{syncText}{closingBracket}")
-                              + (isTop ? ratingText : ""),
+                Description = Format.Statistics(record) + (isTop ? ratingText : ""),
                 ThumbnailUrl = imageUrl ?? Optional<string>.Empty,
                 Color = Format.Color(record.Difficulty)
             };
@@ -117,7 +109,7 @@ namespace Pepper.Frontends.Maimai.Structures
             {
                 var playCount = chartRecord.PlayCount;
                 r.Description += $"\n\n{playCount} {(playCount < 2 ? "play" : "play".Pluralize())}, last played "
-                    + $"<t:{chartRecord.LastPlayed.ToUnixTimeSeconds()}:f>";
+                                 + $"<t:{chartRecord.LastPlayed.ToUnixTimeSeconds()}:f>";
             }
 
             if (rating != default && !isTop)
