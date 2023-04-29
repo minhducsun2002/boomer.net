@@ -22,6 +22,14 @@ namespace Pepper.Commons.Maimai
             return AllRecordParser.Parse(html);
         }
 
+        public async Task<IEnumerable<SongScoreEntry>> GetUserDifficultyMetadata(Difficulty difficulty)
+        {
+            var url =
+                $"https://maimaidx-eng.com/maimai-mobile/record/musicGenre/search/?genre=99&diff={(int) difficulty}";
+            var html = await GetHtml(url);
+            return AllRecordParser.ParseMeta(html);
+        }
+
         public async Task<IEnumerable<TopRecord>> GetUserDifficultyRecord((int, bool) level)
         {
             var (lv, plus) = level;

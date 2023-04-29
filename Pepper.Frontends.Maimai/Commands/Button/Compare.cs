@@ -41,7 +41,7 @@ namespace Pepper.Frontends.Maimai.Commands.Button
 
             var cookie = await CookieProvider.GetCookie(Context.AuthorId);
             var client = ClientFactory.Create(cookie!);
-            var rec = await client.GetUserDifficultyRecord(difficulty);
+            var rec = await client.GetUserDifficultyMetadata(difficulty);
             var record = rec.FirstOrDefault(r => r.Name == name && r.Version == version);
             if (record == null)
             {

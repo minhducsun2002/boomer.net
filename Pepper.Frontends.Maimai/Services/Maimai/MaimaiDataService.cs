@@ -106,7 +106,7 @@ namespace Pepper.Frontends.Maimai.Services
                     {
                         if (diff.LevelDecimal >= 7 == level.Value.Item2 || diff.Level <= 6)
                         {
-                            return diff;   
+                            return diff;
                         }
                     }
                 }
