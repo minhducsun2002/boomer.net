@@ -51,7 +51,15 @@ namespace Pepper.Frontends.Osu.Commands
                 MessageTemplate = msg => msg.Content = "You didn't choose the server in time. Try again.";
             }
             ClearComponents();
-            await Menu.ApplyChangesAsync();
+            // TODO: Remove all this try-catch
+            try
+            {
+                await Menu.ApplyChangesAsync();
+            }
+            catch (Exception e)
+            {
+                // ignored for now
+            }
             await base.DisposeAsync();
         }
 

@@ -36,7 +36,15 @@ namespace Pepper.Commons.Structures.Views
         public override async ValueTask DisposeAsync()
         {
             ClearComponents();
-            await Menu.ApplyChangesAsync();
+            // TODO: Remove all this try-catch
+            try
+            {
+                await Menu.ApplyChangesAsync();
+            }
+            catch (Exception e)
+            {
+                // ignored for now
+            }
             await base.DisposeAsync();
         }
     }
