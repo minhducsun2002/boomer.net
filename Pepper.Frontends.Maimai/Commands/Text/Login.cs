@@ -57,11 +57,12 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 );
             }
             await Context.Message.AddReactionAsync(Hourglass);
-            if (!await TryCookie(cookie))
+            long? friendCode;
+            if ((friendCode = await TryCookie(cookie)) == null)
             {
                 if (cookie.StartsWith("clal="))
                 {
-                    if (!await TryCookie(cookie[5..]))
+                    if ((friendCode = await TryCookie(cookie[5..])) == null)
                     {
                         return await ReactFailed();
                     }
@@ -73,7 +74,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 }
             }
 
-            await CookieProvider.StoreCookie(Context.AuthorId, cookie);
+            await CookieProvider.StoreCookie(Context.AuthorId, cookie, friendCode.Value);
             await Context.Message.AddReactionAsync(Success);
             await Context.Message.RemoveOwnReactionAsync(Hourglass);
             return null;
@@ -86,10 +87,17 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             return null;
         }
 
-        private async Task<bool> TryCookie(string cookie)
+        private async Task<long?> TryCookie(string cookie)
         {
             var client = ClientFactory.Create(cookie);
-            return await client.VerifyCookie() != null;
+            try
+            {
+                return await client.GetUserFriendCode();
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

@@ -10,5 +10,11 @@ namespace Pepper.Commons.Maimai
             var html = await GetHtml("https://maimaidx-eng.com/maimai-mobile/playerData/");
             return PlayerDataParser.Parse(html);
         }
+        
+        public async Task<long> GetUserFriendCode()
+        {
+            var html = await GetHtml("https://maimaidx-eng.com/maimai-mobile/friend/userFriendCode/");
+            return SelfFriendCodeParser.Parse(html);
+        }
     }
 }

@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BitFaster.Caching.Lru;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Serilog;
 
@@ -15,19 +16,20 @@ namespace Pepper.Frontends.Maimai.Database
             [Key]
             [Column("discord_id")] public ulong DiscordId { get; set; }
             [Column("cookie")] public string Cookie { get; set; } = "";
+            [Column("friend_id")] public long FriendId { get; set; }
         }
 
         private static readonly ILogger Log = Serilog.Log.Logger.ForContext<MariaDbMaimaiDxNetCookieProvider>();
 
         public MariaDbMaimaiDxNetCookieProvider(DbContextOptions<MariaDbMaimaiDxNetCookieProvider> options) : base(options) { }
-        private FastConcurrentLru<ulong, string> cache = new(200);
+        private FastConcurrentLru<ulong, Record> cache = new(200);
         private DbSet<Record> DbSet { get; set; } = null!;
 
         public void FlushCache(ulong? discordId = null)
         {
             if (discordId == null)
             {
-                cache = new FastConcurrentLru<ulong, string>(200);
+                cache = new FastConcurrentLru<ulong, Record>(200);
             }
             else
             {
@@ -35,7 +37,19 @@ namespace Pepper.Frontends.Maimai.Database
             }
         }
 
+        public async ValueTask<long?> GetFriendId(ulong discordId)
+        {
+            var r = await GetEntry(discordId);
+            return r?.FriendId;
+        }
+
         public async ValueTask<string?> GetCookie(ulong discordId)
+        {
+            var r = await GetEntry(discordId);
+            return r?.Cookie;
+        }
+
+        private async ValueTask<Record?> GetEntry(ulong discordId)
         {
             if (cache.TryGet(discordId, out var ret))
             {
@@ -46,31 +60,34 @@ namespace Pepper.Frontends.Maimai.Database
             var res = await DbSet.FirstOrDefaultAsync(r => r.DiscordId == discordId);
             if (res != null)
             {
-                cache.AddOrUpdate(discordId, res.Cookie);
-                return res.Cookie;
+                cache.AddOrUpdate(discordId, res);
+                return res;
             }
             return null;
         }
 
-        public async Task StoreCookie(ulong discordId, string cookie)
+        public async Task StoreCookie(ulong discordId, string cookie, long friendId)
         {
             var existing = await DbSet.FirstOrDefaultAsync(r => r.DiscordId == discordId);
+            EntityEntry<Record> entry;
             if (existing != null)
             {
                 existing.Cookie = cookie;
-                Update(existing);
+                existing.FriendId = friendId;
+                entry = Update(existing);
             }
             else
             {
-                Add(new Record
+                entry = Add(new Record
                 {
                     Cookie = cookie,
-                    DiscordId = discordId
+                    DiscordId = discordId,
+                    FriendId = friendId
                 });
             }
 
             await SaveChangesAsync();
-            cache.AddOrUpdate(discordId, cookie);
+            cache.AddOrUpdate(discordId, entry.Entity);
         }
     }
 }
