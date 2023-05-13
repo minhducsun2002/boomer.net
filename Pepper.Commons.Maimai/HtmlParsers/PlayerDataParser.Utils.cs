@@ -7,29 +7,29 @@ namespace Pepper.Commons.Maimai.HtmlParsers
     {
         private static UserStatistics GetUserStatistics(Dictionary<string, string> stats)
         {
-            var app = SplitStatRecord(stats["app"]);
-            var ap = SplitStatRecord(stats["ap"]);
-            var fcp = SplitStatRecord(stats["fcp"]);
-            var fc = SplitStatRecord(stats["fc"]);
-            var fsd = SplitStatRecord(stats["fsd"]);
-            var fsdp = SplitStatRecord(stats["fsdp"]);
-            var fsp = SplitStatRecord(stats["fsp"]);
-            var fs = SplitStatRecord(stats["fs"]);
+            var app = SplitStatRecord((ReadOnlySpan<char>) stats["app"]);
+            var ap = SplitStatRecord((ReadOnlySpan<char>) stats["ap"]);
+            var fcp = SplitStatRecord((ReadOnlySpan<char>) stats["fcp"]);
+            var fc = SplitStatRecord((ReadOnlySpan<char>) stats["fc"]);
+            var fsd = SplitStatRecord((ReadOnlySpan<char>) stats["fsd"]);
+            var fsdp = SplitStatRecord((ReadOnlySpan<char>) stats["fsdp"]);
+            var fsp = SplitStatRecord((ReadOnlySpan<char>) stats["fsp"]);
+            var fs = SplitStatRecord((ReadOnlySpan<char>) stats["fs"]);
 
-            var sssp = SplitStatRecord(stats["sssp"]);
-            var sss = SplitStatRecord(stats["sss"]);
-            var ssp = SplitStatRecord(stats["ssp"]);
-            var ss = SplitStatRecord(stats["ss"]);
-            var sp = SplitStatRecord(stats["sp"]);
-            var s = SplitStatRecord(stats["s"]);
+            var sssp = SplitStatRecord((ReadOnlySpan<char>) stats["sssp"]);
+            var sss = SplitStatRecord((ReadOnlySpan<char>) stats["sss"]);
+            var ssp = SplitStatRecord((ReadOnlySpan<char>) stats["ssp"]);
+            var ss = SplitStatRecord((ReadOnlySpan<char>) stats["ss"]);
+            var sp = SplitStatRecord((ReadOnlySpan<char>) stats["sp"]);
+            var s = SplitStatRecord((ReadOnlySpan<char>) stats["s"]);
 
-            var clear = SplitStatRecord(stats["clear"]);
+            var clear = SplitStatRecord((ReadOnlySpan<char>) stats["clear"]);
 
-            var dx5 = SplitStatRecord(stats["dxstar_5"]);
-            var dx4 = SplitStatRecord(stats["dxstar_4"]);
-            var dx3 = SplitStatRecord(stats["dxstar_3"]);
-            var dx2 = SplitStatRecord(stats["dxstar_2"]);
-            var dx1 = SplitStatRecord(stats["dxstar_1"]);
+            var dx5 = SplitStatRecord((ReadOnlySpan<char>) stats["dxstar_5"]);
+            var dx4 = SplitStatRecord((ReadOnlySpan<char>) stats["dxstar_4"]);
+            var dx3 = SplitStatRecord((ReadOnlySpan<char>) stats["dxstar_3"]);
+            var dx2 = SplitStatRecord((ReadOnlySpan<char>) stats["dxstar_2"]);
+            var dx1 = SplitStatRecord((ReadOnlySpan<char>) stats["dxstar_1"]);
             return new UserStatistics
             {
                 AllPerfect = ap,
@@ -58,7 +58,6 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             };
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         private static int SplitStatRecord(ReadOnlySpan<char> s)
         {
@@ -67,12 +66,13 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             {
                 if (s[i] == '/')
                 {
-                    return FastIntParseIgnoreCommaAndSpace(s[..i]);
+                    return NumericParsingUtils.FastIntParseIgnoreCommaAndSpace(s[..i]);
                 }
             }
 
             return 0;
         }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static (int, int)? GetTwoDigitsData(string prefix, string data)
@@ -102,38 +102,6 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             }
 
             return ReadOnlySpan<char>.Empty;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-        internal static int FastIntParse(ReadOnlySpan<char> s)
-        {
-            var output = 0;
-            var len = s.Length;
-            for (var i = 0; i < len; i++)
-            {
-                var c = s[i];
-                output = output * 10 + (c - '0');
-            }
-
-            return output;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-        internal static int FastIntParseIgnoreCommaAndSpace(ReadOnlySpan<char> s)
-        {
-            var output = 0;
-            var len = s.Length;
-            for (var i = 0; i < len; i++)
-            {
-                var c = s[i];
-                if (c is ',' or ' ')
-                {
-                    continue;
-                }
-                output = output * 10 + (c - '0');
-            }
-
-            return output;
         }
     }
 }

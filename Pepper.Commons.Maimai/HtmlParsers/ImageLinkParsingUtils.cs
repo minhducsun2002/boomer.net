@@ -1,38 +1,12 @@
 using System.Runtime.CompilerServices;
-using Pepper.Commons.Maimai.Structures.Data;
 using Pepper.Commons.Maimai.Structures.Data.Enums;
 
 namespace Pepper.Commons.Maimai.HtmlParsers
 {
-    public partial class AllRecordParser
+    public static class ImageLinkParsingUtils
     {
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
-        internal static (int, int) ParseSlashedVsMaxStats(ReadOnlySpan<char> raw)
-        {
-            // format : [A,]BCD / [A,]BCD
-            var len = raw.Length;
-            var index = -1;
-            for (var i = 0; i < len; i++)
-            {
-                if (raw[i] == '/')
-                {
-                    index = i;
-                }
-            }
-
-            if (index == -1)
-            {
-                return (0, 0);
-            }
-
-            return (
-                PlayerDataParser.FastIntParseIgnoreCommaAndSpace(raw[..index]),
-                PlayerDataParser.FastIntParseIgnoreCommaAndSpace(raw[(index + 1)..])
-            );
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
-        internal static FcStatus ParseFcStatus(ReadOnlySpan<char> raw)
+        public static FcStatus ParseFcStatus(ReadOnlySpan<char> raw)
         {
             // https://maimaidx-eng.com/maimai-mobile/img/music_icon_fcp.png?ver=1.25
             return raw[54] switch
@@ -52,7 +26,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
-        internal static SyncStatus ParseSyncStatus(ReadOnlySpan<char> raw)
+        public static SyncStatus ParseSyncStatus(ReadOnlySpan<char> raw)
         {
             // https://maimaidx-eng.com/maimai-mobile/img/music_icon_fsp.png?ver=1.25
             return raw[54] switch
@@ -72,13 +46,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-        internal static (int, bool) ParseLevel(ReadOnlySpan<char> raw) =>
-            raw[^1] == '+'
-                ? (PlayerDataParser.FastIntParse(raw[..^1]), true)
-                : (PlayerDataParser.FastIntParse(raw), false);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static (string, bool) ParseRank(ReadOnlySpan<char> raw)
+        public static (string, bool) ParseRank(ReadOnlySpan<char> raw)
         {
             // https://maimaidx-eng.com/maimai-mobile/img/music_icon_ssp.png?ver=1.25
             var len = raw.Length;
@@ -91,6 +59,28 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                 }
             }
             return ("", false);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public static ChartVersion ParseVersion(ReadOnlySpan<char> raw) =>
+            // https://maimaidx-eng.com/maimai-mobile/img/music_(dx,standard).png
+            raw[49] == 'd'
+                ? ChartVersion.Deluxe
+                : ChartVersion.Standard;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public static Difficulty ParseDifficulty(ReadOnlySpan<char> raw)
+        {
+            // https://maimaidx-eng.com/maimai-mobile/img/diff_expert.png
+            return raw[48] switch
+            {
+                'b' => Difficulty.Basic,
+                'a' => Difficulty.Advanced,
+                'e' => Difficulty.Expert,
+                'm' => Difficulty.Master,
+                'r' => Difficulty.ReMaster,
+                _ => Difficulty.None
+            };
         }
     }
 }

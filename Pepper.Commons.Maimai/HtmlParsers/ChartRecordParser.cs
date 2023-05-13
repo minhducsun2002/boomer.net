@@ -1,6 +1,7 @@
 using System.Web;
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
+using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 
 namespace Pepper.Commons.Maimai.HtmlParsers
@@ -20,20 +21,20 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                 {
                     var accuracyNode = node.QuerySelector(".music_score_block.w_120.d_ib.t_r.f_12");
                     var accuracyText = accuracyNode.InnerText;
-                    var accuracy = RecentRecordParser.ParseAccuracy(accuracyText);
+                    var accuracy = NumericParsingUtils.ParseAccuracy((ReadOnlySpan<char>) accuracyText);
                     var levelNode = node.QuerySelector(".music_lv_back");
                     var levelText = levelNode.InnerText;
-                    var level = AllRecordParser.ParseLevel(levelText);
+                    var level = NumericParsingUtils.ParseLevel((ReadOnlySpan<char>) levelText);
                     var difficultyImage = node.QuerySelector(".h_20.f_l");
                     var difficultyImageSrc = difficultyImage.GetAttributeValue("src", "");
-                    var difficulty = RecentRecordParser.ParseDifficulty(difficultyImageSrc);
+                    var difficulty = ImageLinkParsingUtils.ParseDifficulty((ReadOnlySpan<char>) difficultyImageSrc);
                     var rankImage = node.QuerySelector(".p_t_5.v_t");
                     var rankImageSrc = rankImage.GetAttributeValue("src", "");
-                    var (rank, rankPlus) = AllRecordParser.ParseRank(rankImageSrc);
+                    var (rank, rankPlus) = ImageLinkParsingUtils.ParseRank((ReadOnlySpan<char>) rankImageSrc);
 
                     var chartVersionImage = node.QuerySelector(".music_kind_icon");
                     var chartVersionImageSrc = chartVersionImage.GetAttributeValue("src", "");
-                    var chartVersion = RecentRecordParser.ParseVersion(chartVersionImageSrc);
+                    var chartVersion = ImageLinkParsingUtils.ParseVersion((ReadOnlySpan<char>) chartVersionImageSrc);
 
                     var playStatsTableNode = node.QuerySelector("table"); // table -> tr, no tbody here
                     // apparently it's #text -> tr -> #text -> tr -> #text
@@ -42,18 +43,18 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                     var lastPlayedText = lastPlayedNode.InnerText;
                     var playCountText = playCountNode.InnerText;
                     var lastPlayed = RecentRecordParser.ParseTime(lastPlayedText);
-                    var playCount = PlayerDataParser.FastIntParseIgnoreCommaAndSpace(playCountText);
+                    var playCount = NumericParsingUtils.FastIntParseIgnoreCommaAndSpace((ReadOnlySpan<char>) playCountText);
 
                     var noteNode = node.QuerySelector(".music_score_block.w_310.m_r_0.d_ib.t_r.f_12");
                     var noteText = noteNode.InnerText.Trim();
-                    var (note, maxNote) = AllRecordParser.ParseSlashedVsMaxStats(noteText);
+                    var (note, maxNote) = NumericParsingUtils.ParseSlashedVsMaxStats((ReadOnlySpan<char>) noteText);
 
                     var fcImage = rankImage.NextSiblingElement();
                     var fcImageSrc = fcImage.GetAttributeValue("src", "");
-                    var fcStatus = AllRecordParser.ParseFcStatus(fcImageSrc);
+                    var fcStatus = ImageLinkParsingUtils.ParseFcStatus((ReadOnlySpan<char>) fcImageSrc);
                     var fsImage = fcImage.NextSiblingElement();
                     var fsImageSrc = fsImage.GetAttributeValue("src", "");
-                    var fsStatus = AllRecordParser.ParseSyncStatus(fsImageSrc);
+                    var fsStatus = ImageLinkParsingUtils.ParseSyncStatus((ReadOnlySpan<char>) fsImageSrc);
 
                     return new ChartRecord
                     {

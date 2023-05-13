@@ -26,10 +26,10 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                         .ToArray();
                     var topImage = top.QuerySelector(".playlog_diff.v_b");
                     var topImageSrc = topImage.GetAttributeValue("src", "");
-                    var difficulty = ParseDifficulty(topImageSrc);
+                    var difficulty = ImageLinkParsingUtils.ParseDifficulty((ReadOnlySpan<char>) topImageSrc);
                     var trackNumText = topText[0].InnerText;
                     var trackNum = trackNumText[^2..];
-                    var track = PlayerDataParser.FastIntParse(trackNum);
+                    var track = NumericParsingUtils.FastIntParse((ReadOnlySpan<char>) trackNum);
                     var time = topText[1].InnerText;
                     var parsedTime = ParseTime(time);
 
@@ -47,8 +47,8 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                         .InnerText);
                     var rankImageSrc = content.QuerySelector(".playlog_scorerank").GetAttributeValue("src", "");
                     var chartTypeSrc = content.QuerySelector(".playlog_music_kind_icon").GetAttributeValue("src", "");
-                    var version = ParseVersion(chartTypeSrc);
-                    var accuracy = ParseAccuracy(accuracyText);
+                    var version = ImageLinkParsingUtils.ParseVersion((ReadOnlySpan<char>) chartTypeSrc);
+                    var accuracy = NumericParsingUtils.ParseAccuracy((ReadOnlySpan<char>) accuracyText);
                     var (rank, rankPlus) = ParseRank(rankImageSrc);
                     var fcImage = content.QuerySelector(".playlog_score_block").NextSiblingElement();
                     var fcImageSrc = fcImage.GetAttributeValue("src", "");
@@ -77,7 +77,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                         challengeType = ParseChallengeType(challengeImageSrc);
                         var challengeHealthNode = challengeNode.QuerySelector(".playlog_life_block");
                         var challengeHealthText = challengeHealthNode.InnerText;
-                        (health, maxHealth) = AllRecordParser.ParseSlashedVsMaxStats(challengeHealthText);
+                        (health, maxHealth) = NumericParsingUtils.ParseSlashedVsMaxStats((ReadOnlySpan<char>) challengeHealthText);
                     }
 
                     return new RecentRecord
