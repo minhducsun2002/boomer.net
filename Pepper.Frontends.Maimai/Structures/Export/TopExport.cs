@@ -29,5 +29,9 @@ namespace Pepper.Frontends.Maimai.Structures.Export
         [JsonProperty("scores")]
         [JsonPropertyName("scores")]
         public TopExportScore[] TopExportScores { get; set; } = Array.Empty<TopExportScore>();
+
+        [JsonProperty("genres")]
+        [JsonPropertyName("genres")]
+        public TopExportGenre[] TopExportGenres { get; set; } = Array.Empty<TopExportGenre>();
     }
 }

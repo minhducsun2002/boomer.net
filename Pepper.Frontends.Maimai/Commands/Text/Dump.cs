@@ -85,7 +85,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
 
         private byte[] CreatePackedScores(IEnumerable<ScoreWithMeta<TopRecord>> records, Commons.Maimai.Structures.Data.User? user = null)
         {
-            var r = records
+            var scores = records
                 .AsParallel()
                 .WithDegreeOfParallelism(8)
                 .Select(s =>
@@ -105,7 +105,9 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                         LevelDecimal = levelDecimal,
                         TrueDecimal = s.Difficulty != null,
                         MaimaiVersion = s.Song?.AddVersionId ?? GameDataService.NewestVersion,
-                        Song = s.Score.Name
+                        Song = s.Score.Name,
+                        GenreId = s.Song?.GenreId ?? -1,
+                        Genre = s.Score.Genre
                     };
                 })
                 .ToArray();
@@ -121,13 +123,21 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                     PlayCount = user.PlayCount
                 };
             }
+
+            var genres = GameDataService.GenreCache.Select(kv => new TopExportGenre
+            {
+                Id = kv.Key,
+                Name = kv.Value
+            });
+
             var export = new TopExport
             {
                 Coefficients = Calculate.Coeff.Select(a => new[] { a.Item1, a.Item2 }).ToArray(),
                 MaimaiVersion = GameDataService.NewestVersion,
                 Timestamp = DateTimeOffset.Now,
-                TopExportScores = r,
-                User = u
+                TopExportScores = scores,
+                User = u,
+                TopExportGenres = genres.ToArray()
             };
 
             var res = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(export));

@@ -53,5 +53,13 @@ namespace Pepper.Frontends.Maimai.Structures.Export
         [JsonProperty("difficulty")]
         [JsonPropertyName("difficulty")]
         public Difficulty Difficulty { get; set; }
+
+        [JsonProperty("genre_id")]
+        [JsonPropertyName("genre_id")]
+        public int GenreId { get; set; }
+
+        [JsonProperty("genre")]
+        [JsonPropertyName("genre")]
+        public string? Genre { get; set; }
     }
 }

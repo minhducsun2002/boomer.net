@@ -26,6 +26,8 @@ namespace Pepper.Frontends.Maimai.Services
         private Dictionary<string, string> imageNameCache = new();
         public Dictionary<int, Song> SongCache = new();
         private Dictionary<string, List<int>> nameCache = new();
+        public Dictionary<int, string> GenreCache = new();
+
         public int NewestVersion { get; private set; }
 
         public MaimaiDataService(IServiceProvider serviceProvider)
@@ -168,6 +170,11 @@ namespace Pepper.Frontends.Maimai.Services
                 .ToDictionary(s => s.Name, s => s.ImageFileName);
             imageNameCache = mapped;
             Log.Information("Loaded image data");
+
+            Log.Information("Loading genre data");
+            var categoryEntries = await dataDb.Genres.ToListAsync(cancellationToken: stoppingToken);
+            GenreCache = categoryEntries.ToDictionary(g => g.Id, g => g.Name);
+            Log.Information("Loaded {0} genres", GenreCache.Count);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

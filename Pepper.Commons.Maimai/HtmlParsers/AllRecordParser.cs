@@ -1,12 +1,11 @@
 using System.Web;
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
-using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 
 namespace Pepper.Commons.Maimai.HtmlParsers
 {
-    public static partial class AllRecordParser
+    public static class AllRecordParser
     {
         private static SongScoreEntry ParseMetadata(HtmlNode node)
         {
@@ -64,9 +63,11 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             doc.LoadHtml(html);
 
             var main = doc.DocumentNode;
-            var statRecords = main.QuerySelectorAll(".w_450.m_15.f_0")
-                .Select(node =>
+            var elementList = EnumerateElements(main.QuerySelector(".screw_block").ParentNode);
+            var statRecords = elementList
+                .Select(pair =>
                 {
+                    var (genre, node) = pair;
                     var accuracyNode = node.QuerySelector(".music_score_block.w_120.t_r.f_l.f_12");
                     if (accuracyNode == null)
                     {
@@ -104,12 +105,35 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                         MaxNotes = maxNote,
                         FcStatus = fcStatus,
                         SyncStatus = fsStatus,
-                        MusicDetailLink = meta.MusicDetailLink
+                        MusicDetailLink = meta.MusicDetailLink,
+                        Genre = genre
                     };
                 })
                 .Where(rec => rec != null);
 
             return statRecords as IEnumerable<TopRecord>;
+        }
+
+        private static IEnumerable<(string?, HtmlNode)> EnumerateElements(HtmlNode parent)
+        {
+            var child = parent.ChildNodes
+                .Where(element => element is not HtmlTextNode)
+                .ToArray();
+
+            string? genre = null;
+            foreach (var c in child)
+            {
+                if (c.HasClass("screw_block"))
+                {
+                    genre = c.InnerText;
+                    continue;
+                }
+
+                if (c.HasClass("w_450"))
+                {
+                    yield return (genre, c);
+                }
+            }
         }
     }
 }

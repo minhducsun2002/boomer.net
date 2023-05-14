@@ -8,5 +8,6 @@ namespace Pepper.Commons.Maimai.Structures.Data.Score
         // append this to https://maimaidx-eng.com/maimai-mobile/record/musicDetail/?idx=
         // to get working link
         public string? MusicDetailLink { get; set; }
+        public string? Genre { get; set; }
     }
 }
