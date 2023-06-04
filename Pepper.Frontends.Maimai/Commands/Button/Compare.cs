@@ -113,7 +113,7 @@ namespace Pepper.Frontends.Maimai.Commands.Button
 
         public static string CreateCommand(int? id, string name, ChartVersion version, DifficultyEnum d, int? baseLevel, bool? plus)
         {
-            return $"{Name}:{(id != 0 ? id : 0)}:{name}:{(int) version}:{(int) d}:{(baseLevel != 0 ? baseLevel : 0)}:{(plus is not true ? 0 : 1)}";
+            return $"{Name}:{(id > 0 ? id : 0)}:{name}:{(int) version}:{(int) d}:{(baseLevel > 0 ? baseLevel : 0)}:{(plus is not true ? 0 : 1)}";
         }
     }
 }
