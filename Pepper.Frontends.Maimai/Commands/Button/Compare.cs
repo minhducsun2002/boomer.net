@@ -1,16 +1,15 @@
+using System.Web;
 using Disqord;
 using Disqord.Bot.Commands.Components;
 using Disqord.Rest;
 using Humanizer;
 using Pepper.Commons.Maimai;
-using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
 using Pepper.Frontends.Maimai.Structures;
 using Pepper.Frontends.Maimai.Utils;
-using Difficulty = Pepper.Commons.Maimai.Entities.Difficulty;
 using DifficultyEnum = Pepper.Commons.Maimai.Structures.Data.Enums.Difficulty;
 
 namespace Pepper.Frontends.Maimai.Commands.Button
@@ -36,6 +35,7 @@ namespace Pepper.Frontends.Maimai.Commands.Button
             }
             var difficulty = (DifficultyEnum) d;
             var version = (ChartVersion) ver;
+            name = DecodeName(name);
 
             await Context.Interaction.Response().DeferAsync();
 
@@ -113,7 +113,11 @@ namespace Pepper.Frontends.Maimai.Commands.Button
 
         public static string CreateCommand(int? id, string name, ChartVersion version, DifficultyEnum d, int? baseLevel, bool? plus)
         {
-            return $"{Name}:{(id > 0 ? id : 0)}:{name}:{(int) version}:{(int) d}:{(baseLevel > 0 ? baseLevel : 0)}:{(plus is not true ? 0 : 1)}";
+            var encoded = EncodeName(name);
+            return $"{Name}:{(id > 0 ? id : 0)}:{encoded}:{(int) version}:{(int) d}:{(baseLevel > 0 ? baseLevel : 0)}:{(plus is not true ? 0 : 1)}";
         }
+
+        private static string EncodeName(string s) => HttpUtility.UrlEncode(s);
+        private static string DecodeName(string s) => HttpUtility.UrlDecode(s);
     }
 }
