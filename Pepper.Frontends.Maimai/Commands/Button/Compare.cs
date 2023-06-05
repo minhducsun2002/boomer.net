@@ -117,7 +117,7 @@ namespace Pepper.Frontends.Maimai.Commands.Button
             return $"{Name}:{(id > 0 ? id : 0)}:{encoded}:{(int) version}:{(int) d}:{(baseLevel > 0 ? baseLevel : 0)}:{(plus is not true ? 0 : 1)}";
         }
 
-        private static string EncodeName(string s) => HttpUtility.UrlEncode(s);
-        private static string DecodeName(string s) => HttpUtility.UrlDecode(s);
+        private static string EncodeName(string s) => s.Replace(':', '\x01');
+        private static string DecodeName(string s) => s.Replace('\x01', ':');
     }
 }
