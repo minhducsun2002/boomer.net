@@ -21,7 +21,7 @@ namespace Pepper.Frontends.Maimai.Services
 #pragma warning restore CS8618
         }
 
-        private static readonly ILogger Log = Serilog.Log.Logger.ForContext<MaimaiDataService>();
+        private readonly ILogger? log;
         private readonly IServiceProvider serviceProvider;
         private Dictionary<string, string> imageNameCache = new();
         public Dictionary<int, Song> SongCache = new();
@@ -30,9 +30,10 @@ namespace Pepper.Frontends.Maimai.Services
 
         public int NewestVersion { get; private set; }
 
-        public MaimaiDataService(IServiceProvider serviceProvider)
+        public MaimaiDataService(IServiceProvider serviceProvider, ILogger? logger = null)
         {
             this.serviceProvider = serviceProvider;
+            log = logger?.ForContext<MaimaiDataService>();
         }
 
         public bool HasMultipleVersions(string songName) => nameCache.TryGetValue(songName, out var ids) && ids.Count > 1;
@@ -141,7 +142,7 @@ namespace Pepper.Frontends.Maimai.Services
 
         public async Task Load(MaimaiDataDbContext dataDb, HttpClient httpClient, CancellationToken stoppingToken)
         {
-            Log.Information("Loading song data...");
+            log?.Information("Loading song data...");
             var difficulty = await dataDb.AddVersions.OrderByDescending(a => a.Id)
                 .FirstOrDefaultAsync(cancellationToken: stoppingToken);
             if (difficulty != null)
@@ -160,21 +161,21 @@ namespace Pepper.Frontends.Maimai.Services
             nameCache = songEntries
                 .GroupBy(e => e.Name)
                 .ToDictionary(e => e.Key, e => e.Select(e => e.Id).ToList());
-            Log.Information("Loaded {0} songs", SongCache.Count);
+            log?.Information("Loaded {0} songs", SongCache.Count);
 
-            Log.Information("Loading image data");
+            log?.Information("Loading image data");
             var s = await httpClient.GetStringAsync("https://maimai.sega.jp/data/maimai_songs.json", stoppingToken);
             var parsed = JsonConvert.DeserializeObject<SongImageData[]>(s);
             var mapped = parsed!
                 .DistinctBy(s => s.Name)
                 .ToDictionary(s => s.Name, s => s.ImageFileName);
             imageNameCache = mapped;
-            Log.Information("Loaded image data");
+            log?.Information("Loaded image data");
 
-            Log.Information("Loading genre data");
+            log?.Information("Loading genre data");
             var categoryEntries = await dataDb.Genres.ToListAsync(cancellationToken: stoppingToken);
             GenreCache = categoryEntries.ToDictionary(g => g.Id, g => g.Name);
-            Log.Information("Loaded {0} genres", GenreCache.Count);
+            log?.Information("Loaded {0} genres", GenreCache.Count);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

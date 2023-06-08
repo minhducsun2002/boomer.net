@@ -19,9 +19,12 @@ namespace Pepper.Frontends.Maimai.Database
             [Column("friend_id")] public long FriendId { get; set; }
         }
 
-        private static readonly ILogger Log = Serilog.Log.Logger.ForContext<MariaDbMaimaiDxNetCookieProvider>();
+        private readonly ILogger? log;
 
-        public MariaDbMaimaiDxNetCookieProvider(DbContextOptions<MariaDbMaimaiDxNetCookieProvider> options) : base(options) { }
+        public MariaDbMaimaiDxNetCookieProvider(DbContextOptions<MariaDbMaimaiDxNetCookieProvider> o, ILogger? logger = null) : base(o)
+        {
+            log = logger?.ForContext<MariaDbMaimaiDxNetCookieProvider>();
+        }
         private FastConcurrentLru<ulong, Record> cache = new(200);
         private DbSet<Record> DbSet { get; set; } = null!;
 
@@ -56,7 +59,7 @@ namespace Pepper.Frontends.Maimai.Database
                 return ret;
             }
 
-            Log.Information("Didn't found a record for user {0}. Querying.", discordId);
+            log?.Information("Didn't found a record for user {0}. Querying.", discordId);
             var res = await DbSet.FirstOrDefaultAsync(r => r.DiscordId == discordId);
             if (res != null)
             {

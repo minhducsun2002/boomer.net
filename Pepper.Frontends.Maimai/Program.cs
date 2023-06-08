@@ -11,6 +11,7 @@ using Pepper.Commons.Structures;
 using Pepper.Frontends.Maimai.Database;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
+using Serilog;
 
 DotEnv.Load();
 var webhookLog = Environment.GetEnvironmentVariable("PEPPER_DISCORD_WEBHOOK_LOG");
@@ -21,11 +22,14 @@ var hostBuilder = new HostBuilder()
     .UseDefaultServices()
     .ConfigureServices((context, services) =>
     {
-        services.AddDbContextPool<IMaimaiDxNetCookieProvider, MariaDbMaimaiDxNetCookieProvider>(builder =>
+        services.AddScoped<IMaimaiDxNetCookieProvider, MariaDbMaimaiDxNetCookieProvider>(services =>
         {
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;
+            var builder = new DbContextOptionsBuilder<MariaDbMaimaiDxNetCookieProvider>();
             builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        }, 16);
+
+            return new MariaDbMaimaiDxNetCookieProvider(builder.Options, services.GetRequiredService<ILogger>());
+        });
         services.AddDbContextPool<MaimaiDataDbContext>(builder =>
         {
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING_MAIMAI")!;
