@@ -18,7 +18,7 @@ namespace Pepper.Commons.Maimai
             var maimaiSsidRedemptionUrl = await VerifyCookie();
 
             var req = new HttpRequestMessage(HttpMethod.Get, maimaiSsidRedemptionUrl);
-            var res = await AuthHttpClient.SendAsync(req);
+            var res = await authHttpClient.SendAsync(req);
             if (res.StatusCode == HttpStatusCode.ServiceUnavailable)
             {
                 throw new MaintenanceException();
@@ -44,7 +44,7 @@ namespace Pepper.Commons.Maimai
 
             var amAllReq = new HttpRequestMessage(HttpMethod.Get, AuthUrl);
             amAllReq.Headers.Add("Cookie", $"clal={clal}");
-            var amAllRes = await AuthHttpClient.SendAsync(amAllReq);
+            var amAllRes = await authHttpClient.SendAsync(amAllReq);
             if (amAllRes.StatusCode != HttpStatusCode.Redirect)
             {
                 throw new InvalidCookieException($"Status code was {(int) amAllRes.StatusCode}");

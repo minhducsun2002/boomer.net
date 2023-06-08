@@ -5,20 +5,19 @@ namespace Pepper.Commons.Maimai
     public partial class MaimaiDxNetClient
     {
         private readonly string clal;
-        private static readonly HttpClient AuthHttpClient = new(new SocketsHttpHandler
-        {
-            AllowAutoRedirect = false
-        });
+        private readonly HttpClient authHttpClient;
         private readonly HttpClient httpClient;
         private readonly ICookieConsistencyLocker? locker;
 
         /// <param name="httpClient">Self-explanatory</param>
+        /// <param name="loginClient">HTTP client without redirection following, used for login.</param>
         /// <param name="clalCookie">clal cookie without the <c>clal=</c> prefix</param>
         /// <param name="locker">Cookie locker to ensure a single cookie is used at only one place at all times.</param>
-        internal MaimaiDxNetClient(HttpClient httpClient, string clalCookie, ICookieConsistencyLocker? locker = null)
+        internal MaimaiDxNetClient(HttpClient httpClient, HttpClient loginClient, string clalCookie, ICookieConsistencyLocker? locker = null)
         {
             clal = clalCookie;
             this.httpClient = httpClient;
+            authHttpClient = loginClient;
             this.locker = locker;
         }
 

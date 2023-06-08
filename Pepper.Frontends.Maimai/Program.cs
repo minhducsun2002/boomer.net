@@ -35,7 +35,7 @@ var hostBuilder = new HostBuilder()
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING_MAIMAI")!;
             builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         }, 16);
-        services.AddSingleton<MaimaiDxNetClientFactory>();
+        services.AddMaimaiDxNetClient();
         services.AddSingleton<ICookieConsistencyLocker, CookieLockingService>();
     })
     .ConfigureDiscordBot<Bot>((context, bot) =>

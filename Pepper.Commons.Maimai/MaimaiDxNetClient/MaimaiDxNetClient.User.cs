@@ -33,7 +33,7 @@ namespace Pepper.Commons.Maimai
                 })
             };
 
-            var response = await AuthHttpClient.SendAsync(r);
+            var response = await authHttpClient.SendAsync(r);
             return response.StatusCode == HttpStatusCode.Redirect;
         }
     }
