@@ -12,7 +12,7 @@ namespace Pepper.Commons.Commands.General
 {
     public class Rate : GeneralCommand
     {
-        private static readonly SHA256 Hasher = SHA256.Create();
+        private readonly SHA256 hasher = SHA256.Create();
 
         private const int RngBucketSize = 86400 / 2;
         private const int ImprovementBucketSize = 86400 * 3 / 2;
@@ -41,10 +41,10 @@ namespace Pepper.Commons.Commands.General
             return Math.Abs(p1) / 10;
         }
 
-        private static int GetScaledRating(string query, long timestampInSeconds, ulong authorId)
+        private int GetScaledRating(string query, long timestampInSeconds, ulong authorId)
         {
             query = query.Trim();
-            var hash = Hasher.ComputeHash(Encoding.UTF8.GetBytes(query));
+            var hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(query));
             var authorSeed = (long) (authorId / 2);
 
             var baseRating = hash.Aggregate(1, (current, @byte) => current + @byte) % 11;
