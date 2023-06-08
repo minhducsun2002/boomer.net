@@ -8,8 +8,12 @@ namespace Pepper.Frontends.Database.OsuUsernameProviders
     {
         private readonly FastConcurrentLru<string, Username> cache = new(200);
 
-        private static readonly ILogger Log = Serilog.Log.Logger.ForContext<MariaDbOsuUsernameProvider>();
-        public MariaDbOsuUsernameProvider(DbContextOptions<MariaDbOsuUsernameProvider> opt) : base(opt) { }
+        private readonly ILogger? log;
+
+        public MariaDbOsuUsernameProvider(DbContextOptions<MariaDbOsuUsernameProvider> opt, ILogger? logger = null) : base(opt)
+        {
+            log = logger?.ForContext<MariaDbOsuUsernameProvider>();
+        }
 
         public DbSet<Username> DbSet { get; set; } = null!;
 
@@ -37,7 +41,7 @@ namespace Pepper.Frontends.Database.OsuUsernameProviders
                 return @return;
             }
 
-            Log.Information("Didn't found a record for user {0}. Querying.", discordId);
+            log?.Information("Didn't found a record for user {0}. Querying.", discordId);
             var record = await DbSet.FirstOrDefaultAsync(rec => rec.DiscordUserId == discordId);
             if (record != default)
             {

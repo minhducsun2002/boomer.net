@@ -9,6 +9,7 @@ using Pepper.Commons;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Structures;
 using Pepper.Frontends.Database.OsuUsernameProviders;
+using Serilog;
 using Bot = Pepper.Frontends.Osu.Structures.Bot;
 
 DotEnv.Load();
@@ -20,11 +21,15 @@ var hostBuilder = new HostBuilder()
     .UseDefaultServices()
     .ConfigureServices((context, services) =>
     {
-        services.AddDbContextPool<IOsuUsernameProvider, MariaDbOsuUsernameProvider>(builder =>
+        services.AddScoped<IOsuUsernameProvider, MariaDbOsuUsernameProvider>(services =>
         {
+            var logger = services.GetRequiredService<ILogger>();
+            var builder = new DbContextOptionsBuilder<MariaDbOsuUsernameProvider>();
             var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;
             builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        }, 16);
+
+            return new MariaDbOsuUsernameProvider(builder.Options, logger);
+        });
 
         services.AddSingleton<ModParserService>();
         services.AddAPIClientStore(credentials =>
