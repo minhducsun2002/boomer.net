@@ -1,53 +1,56 @@
 ﻿using System.Reflection;
 using Disqord.Bot.Hosting;
 using Disqord.Gateway;
-using dotenv.net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pepper.Commons;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Structures;
+using Pepper.Commons.Structures.Configuration.Loader;
 using Pepper.Frontends.Maimai.Database;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
+using Pepper.Frontends.Maimai.Structures.Configuration;
 using Serilog;
 
-DotEnv.Load();
-var webhookLog = Environment.GetEnvironmentVariable("PEPPER_DISCORD_WEBHOOK_LOG");
+var path = args.ElementAtOrDefault(0) ?? Environment.GetEnvironmentVariable("CONFIG_PATH");
+ArgumentNullException.ThrowIfNull(path);
 
-var hostBuilder = new HostBuilder()
-    .UseLogging(webhookLog)
-    .UseEnvironmentVariables()
-    .UseDefaultServices()
-    .ConfigureServices((context, services) =>
-    {
-        services.AddScoped<IMaimaiDxNetCookieProvider, MariaDbMaimaiDxNetCookieProvider>(services =>
+var host = HostManager.Create<GlobalConfiguration>((host, config) =>
+{
+    host.UseEnvironmentVariables()
+        .ConfigureServices((_, services) =>
         {
-            var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING")!;
-            var builder = new DbContextOptionsBuilder<MariaDbMaimaiDxNetCookieProvider>();
-            builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+            services.AddScoped<IMaimaiDxNetCookieProvider, MariaDbMaimaiDxNetCookieProvider>(services =>
+            {
+                var connectionString = config.Database!.Main!;
+                var builder = new DbContextOptionsBuilder<MariaDbMaimaiDxNetCookieProvider>();
+                builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 
-            return new MariaDbMaimaiDxNetCookieProvider(builder.Options, services.GetRequiredService<ILogger>());
-        });
-        services.AddDbContextPool<MaimaiDataDbContext>(builder =>
+                return new MariaDbMaimaiDxNetCookieProvider(builder.Options, services.GetRequiredService<ILogger>());
+            });
+            services.AddDbContextPool<MaimaiDataDbContext>(builder =>
+            {
+                var connectionString = config.Database!.Maimai!;
+                builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+            }, 16);
+            services.AddMaimaiDxNetClient();
+            services.AddSingleton<ICookieConsistencyLocker, CookieLockingService>();
+        })
+        .ConfigureDiscordBot<Bot>((context, bot) =>
         {
-            var connectionString = Environment.GetEnvironmentVariable("MARIADB_CONNECTION_STRING_MAIMAI")!;
-            builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        }, 16);
-        services.AddMaimaiDxNetClient();
-        services.AddSingleton<ICookieConsistencyLocker, CookieLockingService>();
-    })
-    .ConfigureDiscordBot<Bot>((context, bot) =>
-    {
-        bot.Token = context.Configuration["DISCORD_TOKEN"];
-        bot.Prefixes = new[] { "m!", "b!" };
-        bot.Intents |= GatewayIntents.DirectMessages;
-        bot.ServiceAssemblies = new[]
-        {
-            Assembly.GetEntryAssembly()!, typeof(Service).Assembly
-        };
-    })
-    .UseDefaultServiceProvider(options => options.ValidateOnBuild = true);
+            bot.Token = context.Configuration["DISCORD_TOKEN"];
+            bot.Prefixes = new[] { "m!", "b!" };
+            bot.Intents |= GatewayIntents.DirectMessages;
+            bot.ServiceAssemblies = new[]
+            {
+                Assembly.GetEntryAssembly()!, typeof(Service).Assembly
+            };
+        })
+        .UseDefaultServiceProvider(options => options.ValidateOnBuild = true);
+}, new JsonConfigurationLoader<GlobalConfiguration>(), path);
 
-await hostBuilder.RunConsoleAsync();
+await host.Run();
+
+
