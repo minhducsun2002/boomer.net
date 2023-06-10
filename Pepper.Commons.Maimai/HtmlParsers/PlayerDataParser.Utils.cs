@@ -75,7 +75,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static (int, int)? GetTwoDigitsData(string prefix, string data)
+        internal static (int, int)? GetTwoDigitsData(string prefix, string data)
         {
             var index = data.IndexOf(prefix, StringComparison.OrdinalIgnoreCase);
             if (index == -1)
@@ -90,7 +90,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ReadOnlySpan<char> GetIntFromString(ReadOnlySpan<char> s)
+        internal static ReadOnlySpan<char> GetIntFromString(ReadOnlySpan<char> s)
         {
             var len = s.Length;
             for (var i = 0; i < len; i++)

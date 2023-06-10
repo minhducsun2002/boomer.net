@@ -36,12 +36,17 @@ var host = HostManager.Create<GlobalConfiguration>((host, config) =>
                 builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             }, 16);
             services.AddMaimaiDxNetClient();
+            services.AddSingleton(s =>
+            {
+                var factory = s.GetRequiredService<IHttpClientFactory>();
+                return new MapiService(factory, config.Maimai!.FriendApiServer!);
+            });
             services.AddSingleton<ICookieConsistencyLocker, CookieLockingService>();
         })
         .ConfigureDiscordBot<Bot>((context, bot) =>
         {
             bot.Token = context.Configuration["DISCORD_TOKEN"];
-            bot.Prefixes = new[] { "m!", "b!" };
+            bot.Prefixes = new[] { "m!" };
             bot.Intents |= GatewayIntents.DirectMessages;
             bot.ServiceAssemblies = new[]
             {

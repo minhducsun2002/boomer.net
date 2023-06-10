@@ -1,4 +1,5 @@
 using Disqord;
+using Humanizer;
 using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Structures;
@@ -7,6 +8,12 @@ namespace Pepper.Frontends.Maimai.Utils
 {
     public static class Format
     {
+        public static string DanLevel(int danLevel)
+        {
+            var isShinDan = danLevel > 11;
+            return $"{(isShinDan ? "Shin " : "")}{(danLevel % 11).Ordinalize()} Dan";
+        }
+
         public static string SongName<T>(ScoreWithMeta<T> sc) where T : ScoreRecord
         {
             var record = sc.Score;

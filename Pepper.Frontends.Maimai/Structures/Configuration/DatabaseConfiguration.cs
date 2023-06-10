@@ -1,4 +1,4 @@
- using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Pepper.Frontends.Maimai.Structures.Configuration
@@ -8,7 +8,7 @@ namespace Pepper.Frontends.Maimai.Structures.Configuration
         [JsonProperty("main")]
         [JsonPropertyName("main")]
         public string? Main { get; set; }
-        
+
         [JsonProperty("maimai")]
         [JsonPropertyName("maimai")]
         public string? Maimai { get; set; }

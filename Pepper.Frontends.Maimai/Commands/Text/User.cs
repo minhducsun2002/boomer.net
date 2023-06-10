@@ -6,6 +6,7 @@ using Pepper.Commons.Maimai.Structures.Data;
 using Pepper.Frontends.Maimai.Commands.Button;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
+using Pepper.Frontends.Maimai.Utils;
 using Qmmands;
 using Qmmands.Text;
 
@@ -26,7 +27,6 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             var client = ClientFactory.Create(cookie!);
             var user = await client.GetUserPlayData();
             var stats = user.UserStatistics;
-            var isShinDan = user.DanLevel > 11;
 
             return Reply(new LocalEmbed
             {
@@ -34,7 +34,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 ThumbnailUrl = user.Avatar,
                 Author = new LocalEmbedAuthor
                 {
-                    Name = $"{(isShinDan ? "Shin " : "")}{(user.DanLevel % 11).Ordinalize()} Dan - class {user.SeasonClass}"
+                    Name = $"{Format.DanLevel(user.DanLevel)} - class {user.SeasonClass}"
                 },
                 Description = $"**{((player?.Id ?? Context.AuthorId) == 605384538113179658 ? user.Rating + 2000 : user.Rating)}** rating, cleared **{stats.Clear}** charts through **{user.PlayCount}** plays.",
                 Fields = new List<LocalEmbedField>
