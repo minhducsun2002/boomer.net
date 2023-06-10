@@ -3,10 +3,10 @@ using Pepper.Commons.Interfaces;
 
 namespace Pepper.Commons.Structures.Configuration.Loader
 {
-    public class JsonConfigurationLoader<T> : IConfigurationLoader<T> where T : GlobalConfiguration
+    public class JsonConfigurationLoader<T> : IConfigurationLoader where T : GlobalConfiguration
     {
         private static readonly HttpClient HttpClient = new();
-        public async Task<T> Load(string path)
+        public async Task<GlobalConfiguration> Load(string path)
         {
             string f;
             try

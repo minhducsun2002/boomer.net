@@ -1,7 +1,9 @@
+using Pepper.Commons.Structures.Configuration;
+
 namespace Pepper.Commons.Interfaces
 {
-    public interface IConfigurationLoader<TConfiguration>
+    public interface IConfigurationLoader
     {
-        public Task<TConfiguration> Load(string path);
+        public Task<GlobalConfiguration> Load(string path);
     }
 }

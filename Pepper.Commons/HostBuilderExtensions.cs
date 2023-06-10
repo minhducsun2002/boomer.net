@@ -2,7 +2,10 @@ using System.Diagnostics;
 using dotenv.net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Pepper.Commons.Services;
+using Pepper.Commons.Structures.Configuration;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Discord;
@@ -51,6 +54,7 @@ namespace Pepper.Commons
             return hostBuilder.ConfigureServices(collection =>
             {
                 collection.AddHttpClient();
+                collection.AddSingleton<HostService>();
             });
         }
 

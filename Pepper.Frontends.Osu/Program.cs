@@ -15,7 +15,7 @@ using Serilog;
 using Bot = Pepper.Frontends.Osu.Structures.Bot;
 
 Debug.Assert(args.Length > 0);
-var host = new HostWrapper<GlobalConfiguration>((host, config) =>
+var host = HostManager.Create<GlobalConfiguration>((host, config) =>
 {
     host.UseEnvironmentVariables()
         .ConfigureServices((_, services) =>
