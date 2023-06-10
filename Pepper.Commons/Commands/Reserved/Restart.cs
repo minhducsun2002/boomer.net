@@ -15,7 +15,7 @@ namespace Pepper.Commons.Commands.Reserved
 
         [TextCommand("restart")]
         [Description("Restart the bot")]
-        public IDiscordCommandResult? Exec()
+        public async Task<IDiscordCommandResult?> Exec()
         {
             if (g == null)
             {
@@ -23,7 +23,7 @@ namespace Pepper.Commons.Commands.Reserved
             }
 
 #pragma warning disable CS4014
-            Reply("right, let's see");
+            await Reply("right, let's see");
             Task.Run(() => g.HostWrapper?.Reload()).ConfigureAwait(false);
 #pragma warning restore CS4014
             return null;
