@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection;
+﻿using System.Reflection;
 using Disqord.Bot.Hosting;
 using Disqord.Gateway;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +13,9 @@ using Pepper.Frontends.Osu.Structures.Configuration;
 using Serilog;
 using Bot = Pepper.Frontends.Osu.Structures.Bot;
 
-Debug.Assert(args.Length > 0);
+var path = args.ElementAtOrDefault(0) ?? Environment.GetEnvironmentVariable("CONFIG_PATH");
+ArgumentNullException.ThrowIfNull(path);
+
 var host = HostManager.Create<GlobalConfiguration>((host, config) =>
 {
     host.UseEnvironmentVariables()
@@ -49,6 +50,6 @@ var host = HostManager.Create<GlobalConfiguration>((host, config) =>
             };
         })
         .UseDefaultServiceProvider(option => option.ValidateOnBuild = true);
-}, new JsonConfigurationLoader<GlobalConfiguration>(), args[0]);
+}, new JsonConfigurationLoader<GlobalConfiguration>(), path);
 
 await host.Run();
