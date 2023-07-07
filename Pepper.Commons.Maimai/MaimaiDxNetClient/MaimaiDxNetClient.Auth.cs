@@ -8,31 +8,33 @@ namespace Pepper.Commons.Maimai
         private const string AuthUrl = "https://lng-tgk-aime-gw.am-all.net/common_auth/login" +
                                        "?site_id=maimaidxex" +
                                        "&redirect_url=https://maimaidx-eng.com/maimai-mobile/&back_url=https://maimai.sega.com/";
-        private string? userId = null;
-        private async Task<string?> GetAuthUserId()
+        private bool authenticated;
+        private async Task Authenticate()
         {
-            if (userId is not null)
+            if (authenticated)
             {
-                return userId;
+                return;
             }
             var maimaiSsidRedemptionUrl = await VerifyCookie();
 
             var req = new HttpRequestMessage(HttpMethod.Get, maimaiSsidRedemptionUrl);
-            var res = await authHttpClient.SendAsync(req);
+            var res = await ExecuteRequest(req, true, false);
             if (res.StatusCode == HttpStatusCode.ServiceUnavailable)
             {
                 throw new MaintenanceException();
             }
+            
             if (!res.Headers.TryGetValues("Set-Cookie", out var setCookies))
             {
-                return null;
+                return;
             }
 
-            var uidCookie = setCookies.FirstOrDefault(cookie => cookie.StartsWith("userId"));
+            if (!setCookies.Any(cookie => cookie.StartsWith("userId")))
+            {
+                throw new LoginFailedException();
+            }
 
-            var cookieValue = uidCookie?.Split(';')[0].Split("userId=")[1];
-            userId = cookieValue;
-            return cookieValue;
+            authenticated = true;
         }
 
         public async Task<string> VerifyCookie()

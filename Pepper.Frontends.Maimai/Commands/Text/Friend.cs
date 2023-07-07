@@ -55,7 +55,18 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                     .WithDescription($"**{friend.Rating}** - {(SeasonClass) friend.Class}")
                     .WithFooter($"ID : {friendCode}");
 
-                return Reply(embed);
+                var msg = new LocalMessage()
+                    .WithEmbeds(embed)
+                    .WithComponents(
+                        LocalComponent.Row(
+                            LocalComponent.Button(
+                                Button.Friend.CreateCommand(ulong.Parse(friendCode)),
+                                "Add friend"
+                            )
+                        )
+                    );
+                
+                return Reply(msg);
             }
 
             return Reply($"Error trying friend code {friendCode} : {err ?? "(unknown error)"}");

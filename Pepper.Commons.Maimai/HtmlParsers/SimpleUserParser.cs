@@ -7,11 +7,18 @@ namespace Pepper.Commons.Maimai.HtmlParsers
 {
     public static class SimpleUserParser
     {
-        public static SimpleUser Parse(string s)
+        public static SimpleUser Parse(string s, out string? friendToken)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(s);
+            friendToken = ParseFriendRequestToken(doc.DocumentNode);
             return Parse(doc.DocumentNode);
+        }
+
+        private static string? ParseFriendRequestToken(HtmlNode main)
+        {
+            var r = main.QuerySelector("input[name='token']");
+            return r?.GetAttributeValue("value", "");
         }
 
         public static SimpleUser Parse(HtmlNode main)
