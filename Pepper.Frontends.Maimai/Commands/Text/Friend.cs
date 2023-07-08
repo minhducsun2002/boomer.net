@@ -65,7 +65,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                             )
                         )
                     );
-                
+
                 return Reply(msg);
             }
 

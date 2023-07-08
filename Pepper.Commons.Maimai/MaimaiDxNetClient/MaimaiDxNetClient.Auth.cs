@@ -23,7 +23,7 @@ namespace Pepper.Commons.Maimai
             {
                 throw new MaintenanceException();
             }
-            
+
             if (!res.Headers.TryGetValues("Set-Cookie", out var setCookies))
             {
                 return;

@@ -25,14 +25,14 @@ namespace Pepper.Commons.Maimai
             {
                 return false;
             }
-            
+
             SimpleUserParser.Parse(html, out var friendToken);
             if (friendToken == null)
             {
                 return false;
             }
 
-            var req = new HttpRequestMessage(HttpMethod.Post, 
+            var req = new HttpRequestMessage(HttpMethod.Post,
                 "https://maimaidx-eng.com/maimai-mobile/friend/search/invite/");
             req.Content = new FormUrlEncodedContent(new[]
             {
