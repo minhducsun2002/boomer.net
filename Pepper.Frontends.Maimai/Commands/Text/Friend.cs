@@ -19,6 +19,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             mapiService = s;
         }
 
+        [Description("Search for friends!")]
         [TextCommand("friend")]
         [OverloadPriority(0)]
         public async Task<IDiscordCommandResult> Exec([Description("Friend code to check.")] string friendCode = "")
@@ -72,6 +73,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             return Reply($"Error trying friend code {friendCode} : {err ?? "(unknown error)"}");
         }
 
+        [Description("Search for friends!")]
         [TextCommand("friend")]
         [OverloadPriority(1)]
         public async Task<IDiscordCommandResult> Exec([Description("Friend code to check.")] IMember? user = null)
