@@ -1,3 +1,4 @@
+using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Utils;
@@ -7,37 +8,40 @@ namespace Pepper.Frontends.Maimai.Structures
     public class ScoreWithMeta<TScoreType> where TScoreType : ScoreRecord
     {
         // FESTiVAL
-        public ScoreWithMeta(TScoreType score, Song? song, Difficulty? difficulty, int version = 19, bool hasMultipleVersions = true, string? imageUrl = null)
+        public ScoreWithMeta(TScoreType score, ISong? song, ChartLevel? level, int version = 19, bool hasMultipleVersions = true, string? imageUrl = null)
         {
             Score = score;
             Song = song;
-            Difficulty = difficulty;
+            if (level is not null)
+            {
+                Level = level;
+            }
             SongHasMultipleVersion = hasMultipleVersions;
             ImageUrl = imageUrl;
 
-            Version = song?.AddVersionId ?? version;
+            AddVersion = song?.AddVersionId ?? version;
         }
 
         public TScoreType Score { get; }
-        public Song? Song { get; }
-        public Difficulty? Difficulty { get; }
-        public int Version { get; }
+        public ISong? Song { get; }
+        public ChartLevel? Level { get; }
+        public int AddVersion { get; }
         public bool SongHasMultipleVersion { get; }
         public string? ImageUrl { get; }
 
         public bool IsRatingAccurate => IsConstantAccurate;
-        public bool IsConstantAccurate => Difficulty != null;
+        public bool IsConstantAccurate => Level != null;
 
         public int? ChartConstant
         {
             get
             {
-                var d = Difficulty;
+                var d = Level;
                 int p1, p2;
-                if (d is not null)
+                if (d.HasValue)
                 {
-                    p1 = d.Level;
-                    p2 = d.LevelDecimal;
+                    p1 = d.Value.Whole;
+                    p2 = d.Value.Decimal;
                 }
                 else
                 {

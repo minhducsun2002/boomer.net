@@ -12,6 +12,7 @@ namespace Pepper.Commons.Maimai
         public virtual DbSet<Genre> Genres { get; set; } = null!;
         public virtual DbSet<Song> Songs { get; set; } = null!;
         public virtual DbSet<Difficulty> Difficulties { get; set; } = null!;
+        public virtual DbSet<DataOverlay> DataOverlays { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

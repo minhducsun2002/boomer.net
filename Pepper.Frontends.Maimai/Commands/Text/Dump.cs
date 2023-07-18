@@ -7,6 +7,7 @@ using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Rest;
 using Pepper.Commons.Maimai;
+using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
 using Pepper.Frontends.Maimai.Services;
@@ -91,7 +92,8 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 .Select(s =>
                 {
                     var r = s.Score;
-                    var levelDecimal = s.Difficulty?.LevelDecimal ?? (r.Level.Item2 ? 7 : 0);
+                    var levelDecimal = s.Level?.Decimal ?? (r.Level.Item2 ? 7 : 0);
+                    var song = s.Song as Song;
                     return new TopExportScore
                     {
                         Accuracy = r.Accuracy,
@@ -103,10 +105,10 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                         SyncStatus = r.SyncStatus,
                         Level = r.Level.Item1,
                         LevelDecimal = levelDecimal,
-                        TrueDecimal = s.Difficulty != null,
-                        MaimaiVersion = s.Song?.AddVersionId ?? GameDataService.NewestVersion,
+                        TrueDecimal = s.IsConstantAccurate,
+                        MaimaiVersion = s.AddVersion,
                         Song = s.Score.Name,
-                        GenreId = s.Song?.GenreId ?? -1,
+                        GenreId = song?.GenreId ?? -1,
                         Genre = s.Score.Genre
                     };
                 })

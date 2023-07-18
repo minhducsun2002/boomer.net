@@ -1,5 +1,6 @@
 using Disqord;
 using Humanizer;
+using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures.Data.Enums;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Frontends.Maimai.Utils;
@@ -32,14 +33,14 @@ namespace Pepper.Frontends.Maimai.Structures
 
         {
             var record = e.Score;
-            var diff = e.Difficulty;
-            var song = e.Song;
+            var diff = e.Level;
+            var song = e.Song as Song;
             var diffText = DifficultyStrings[(int) record.Difficulty];
-            bool isAccurateLevel = diff != null, isTop = record is TopRecord;
+            bool isAccurateLevel = e.IsConstantAccurate, isTop = record is TopRecord;
             int chartConstant;
             if (diff != null)
             {
-                chartConstant = diff.Level * 10 + diff.LevelDecimal;
+                chartConstant = diff.Value.Whole * 10 + diff.Value.Decimal;
             }
             else
             {

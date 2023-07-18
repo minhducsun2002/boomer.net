@@ -2,6 +2,7 @@ using System.Text;
 using Disqord;
 using Disqord.Bot.Commands;
 using Pepper.Commons.Maimai;
+using Pepper.Commons.Maimai.Entities;
 using Pepper.Commons.Maimai.Structures.Data.Score;
 using Pepper.Commons.Structures.CommandAttributes.Metadata;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
@@ -48,7 +49,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 })
                 .ToArray();
             var scores = sc
-                .GroupBy(s => s.Version == LatestVersion)
+                .GroupBy(s => s.AddVersion == LatestVersion)
                 .ToDictionary(
                     g => g.Key,
                     g => g.OrderByDescending(s => s.Rating).ToArray()
@@ -85,7 +86,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
         {
             var l = list.Select(v =>
             {
-                var s = v.Song;
+                var s = v.Song as Song;
                 var sc = v.Score;
                 return $"{s?.Genre?.Name ?? ""}|{sc.Name}|{v.Score.Difficulty}|{v.ChartConstant!.Value}|{sc.Accuracy}|{v.Rating!.Value}";
             });

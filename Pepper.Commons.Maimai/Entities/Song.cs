@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Pepper.Commons.Maimai.Structures.Data.Enums;
 
 namespace Pepper.Commons.Maimai.Entities
 {
     [Table("songs")]
-    public class Song
+    public class Song : ISong
     {
         [Key]
         [Column("id")]
@@ -39,5 +40,7 @@ namespace Pepper.Commons.Maimai.Entities
 
         // [InverseProperty(nameof(Difficulty.Song))]
         public IReadOnlyList<Difficulty> Difficulties { get; set; } = new List<Difficulty>();
+
+        public ChartVersion Version => Id > 10000 ? ChartVersion.Deluxe : ChartVersion.Standard;
     }
 }

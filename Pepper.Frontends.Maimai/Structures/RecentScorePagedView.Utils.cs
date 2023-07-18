@@ -69,11 +69,11 @@ namespace Pepper.Frontends.Maimai.Structures
                     var res = chunk.Select(r =>
                     {
                         var record = r.Score;
-                        var diff = r.Difficulty;
+                        var diff = r.Level;
                         var interactionId = Compare.CreateCommand(
                             r.Song?.Id, record.Name, record.Version, record.Difficulty,
-                            diff?.Level,
-                            r.IsConstantAccurate ? diff!.LevelDecimal >= 7 : null
+                            diff?.Whole,
+                            r.IsConstantAccurate ? diff!.Value.Decimal >= 7 : null
                         );
 
                         return (interactionId, record.Track);

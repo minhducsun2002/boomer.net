@@ -22,11 +22,12 @@ namespace Pepper.Frontends.Maimai.Utils
 
         public static string ChartConstant<T>(ScoreWithMeta<T> sc, (int, bool)? levelHints = null) where T : ScoreRecord
         {
-            var diff = sc.Difficulty;
+            var diff = sc.Level;
             string levelText;
             if (diff != null)
             {
-                levelText = $"{diff.Level}.{diff.LevelDecimal}";
+                var d = diff.Value;
+                levelText = $"{d.Whole}.{d.Decimal}";
             }
             else
             {

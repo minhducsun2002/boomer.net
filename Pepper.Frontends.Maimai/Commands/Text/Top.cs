@@ -59,11 +59,11 @@ namespace Pepper.Frontends.Maimai.Commands.Text
             }
 
             var newScores = scores
-                .Where(s => s.Version == LatestVersion)
+                .Where(s => s.AddVersion == LatestVersion)
                 .Take(15)
                 .ToList();
             var oldScores = scores
-                .Where(s => s.Version != LatestVersion)
+                .Where(s => s.AddVersion != LatestVersion)
                 .Take(35)
                 .ToList();
 

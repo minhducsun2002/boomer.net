@@ -44,7 +44,7 @@ namespace Pepper.Frontends.Maimai.Structures
                             {
                                 var command = Compare.CreateCommand(
                                     sc.Song?.Id, sc.Score.Name, sc.Score.Version,
-                                    sc.Score.Difficulty, sc.Difficulty?.Level, sc.Difficulty?.LevelDecimal == 7
+                                    sc.Score.Difficulty, sc.Level?.Whole, sc.Level?.Decimal == 7
                                 );
                                 var index = pageIndex * ScorePerPage + index1 + 1;
                                 return (command, index);
