@@ -88,6 +88,7 @@ namespace Pepper.Frontends.Maimai.Services
             {
                 if ((int) difficulty == diff.Order)
                 {
+                    level = null;
                     if (level == null)
                     {
                         return diff.ExtractLevel();
