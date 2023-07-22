@@ -31,7 +31,8 @@ namespace Pepper.Frontends.Maimai.Structures
                     .ToList();
                 var chunked = scores.Chunk(ScorePerPage);
                 var sum = Calculate.NormalizedRating(list.Sum(d => d.Rating)!.Value);
-                var footer = new LocalEmbedFooter().WithText($"Total {(isNew ? "New" : "Old")} rating : {sum}, avg {sum / list.Count}");
+                var avg = list.Count == 0 ? 0 : sum / list.Count;
+                var footer = new LocalEmbedFooter().WithText($"Total {(isNew ? "New" : "Old")} rating : {sum}, avg {avg}");
                 var parsed = chunked.Select((chunk, pageIndex) =>
                     {
                         var embeds = chunk.Select(
