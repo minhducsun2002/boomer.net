@@ -92,6 +92,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                 .Select(s =>
                 {
                     var r = s.Score;
+                    var level = s.Level?.Whole ?? r.Level.Item1;
                     var levelDecimal = s.Level?.Decimal ?? (r.Level.Item2 ? 7 : 0);
                     var song = s.Song as Song;
                     return new TopExportScore
@@ -103,7 +104,7 @@ namespace Pepper.Frontends.Maimai.Commands.Text
                         MaxDxScore = r.MaxNotes,
                         FcStatus = r.FcStatus,
                         SyncStatus = r.SyncStatus,
-                        Level = r.Level.Item1,
+                        Level = level,
                         LevelDecimal = levelDecimal,
                         TrueDecimal = s.IsConstantAccurate,
                         MaimaiVersion = s.AddVersion,
