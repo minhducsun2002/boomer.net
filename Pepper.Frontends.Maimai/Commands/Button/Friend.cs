@@ -1,6 +1,7 @@
 using Disqord;
 using Disqord.Bot.Commands.Components;
 using Disqord.Rest;
+using Microsoft.Extensions.Logging;
 using Pepper.Commons.Maimai;
 using Pepper.Commons.Maimai.Structures.Exceptions;
 using Pepper.Frontends.Maimai.Database.MaimaiDxNetCookieProviders;
@@ -66,6 +67,7 @@ namespace Pepper.Frontends.Maimai.Commands.Button
                         new LocalInteractionMessageResponse()
                             .WithContent($"Sorry {Context.Author.Mention}, something went wrong.")
                     );
+                    Logger?.LogError(e, "Error friending {0} from discord:{1}", friendId, Context.AuthorId);
                 }
             }
         }
