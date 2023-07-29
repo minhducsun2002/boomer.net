@@ -57,14 +57,14 @@ namespace Pepper.Frontends.Maimai.Commands.Button
                 {
                     await Context.Interaction.Followup().SendAsync(
                         new LocalInteractionMessageResponse()
-                            .WithContent("Failed to login.")
+                            .WithContent($"Sorry {Context.Author.Mention}, couldn't login :(")
                     );
                 }
                 else
                 {
                     await Context.Interaction.Followup().SendAsync(
                         new LocalInteractionMessageResponse()
-                            .WithContent("Something went wrong.")
+                            .WithContent($"Sorry {Context.Author.Mention}, something went wrong.")
                     );
                 }
             }
