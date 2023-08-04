@@ -49,7 +49,7 @@ namespace Pepper.Frontends.MaimaiStatistics.Commands
                 var ratings = g
                     .OrderByDescending(a => a.Timestamp)
                     .Select(a => a.Rating)
-                    .Select((a, i) => $"{times[i]}d : **{(currentRating - a == 0 ? "" : "+")}{currentRating - a}**");
+                    .Select((a, i) => $"{times[i]}d : **{(currentRating - a <= 0 ? "" : "+")}{currentRating - a}**");
                 var joined = string.Join(" / ", ratings);
                 var dan = latest.Dan;
                 return new LocalEmbedField()

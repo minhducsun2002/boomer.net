@@ -20,10 +20,10 @@ namespace Pepper.Frontends.MaimaiStatistics.Database.ProgressRecordProvider
                 whereQuery += $" and timestamp <= '{toDate.Value:u}'";
             }
             var query = $@"
-                select id, grouped_max.friend_id, class, name, rating, dan, min(timestamp) as timestamp from (
-                      select friend_id, max(rating) as m from progress_log {whereQuery} group by friend_id
+                select id, grouped_max.friend_id, class, name, dan, m, progress_log.rating as rating, m as timestamp from (
+                      select friend_id, max(timestamp) as m from progress_log {whereQuery} group by friend_id
                 ) grouped_max
-                      join progress_log on grouped_max.friend_id = progress_log.friend_id and progress_log.rating = m
+                      join progress_log on grouped_max.friend_id = progress_log.friend_id and progress_log.timestamp = m
                 group by grouped_max.friend_id;
             ";
             var res = DbSet.FromSqlRaw(query);
