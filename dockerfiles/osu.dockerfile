@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0.101-alpine3.14 as build
+FROM mcr.microsoft.com/dotnet/sdk:6.0.413-alpine3.17 as build
 WORKDIR /app
 
 COPY . . 
