@@ -19,17 +19,17 @@ namespace Pepper.Commons
         {
             hostBuilder = hostBuilder.UseSerilog((_, configuration) =>
             {
+                var loggingTemplate = new ExpressionTemplate(
+                    "[{@t:dd-MM-yy HH:mm:ss} {@l:u3}] [Thread {ThreadId,2}]{#if SourceContext is not null} [{Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}]{#end} {@m:lj}\n{@x}{#if Contains(@x, 'Exception')}\n{#end}"
+                );
                 configuration
                     .MinimumLevel.Information()
                     .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
                     .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Infrastructure", LogEventLevel.Warning)
                     .Enrich.WithThreadId()
                     .Enrich.FromLogContext()
-                    .WriteTo.Console(
-                        new ExpressionTemplate(
-                            "[{@t:dd-MM-yy HH:mm:ss} {@l:u3}] [Thread {ThreadId,2}]{#if SourceContext is not null} [{Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}]{#end} {@m:lj}\n{@x}{#if Contains(@x, 'Exception')}\n{#end}"
-                        )
-                    );
+                    .WriteTo.Console(loggingTemplate)
+                    .WriteTo.Debug(loggingTemplate, restrictedToMinimumLevel: LogEventLevel.Error);
 
                 if (discordWebhookEndpoint != null)
                 {
