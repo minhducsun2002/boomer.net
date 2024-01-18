@@ -68,7 +68,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                 .Select(pair =>
                 {
                     var (genre, node) = pair;
-                    var accuracyNode = node.QuerySelector(".music_score_block.w_120.t_r.f_l.f_12");
+                    var accuracyNode = node.QuerySelector(".music_score_block.w_112.t_r.f_l.f_12");
                     if (accuracyNode == null)
                     {
                         return null;
@@ -81,7 +81,7 @@ namespace Pepper.Commons.Maimai.HtmlParsers
                     var rankImageSrc = rankImage.GetAttributeValue("src", "");
                     var (rank, rankPlus) = ImageLinkParsingUtils.ParseRank((ReadOnlySpan<char>) rankImageSrc);
 
-                    var noteNode = node.QuerySelector(".music_score_block.w_180.t_r.f_l.f_12");
+                    var noteNode = node.QuerySelector(".music_score_block.w_190.t_r.f_l.f_12");
                     var noteText = noteNode.InnerText.Trim();
                     var (note, maxNote) = NumericParsingUtils.ParseSlashedVsMaxStats((ReadOnlySpan<char>) noteText);
 
