@@ -15,8 +15,8 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             var main = doc.DocumentNode;
 
             var simple = SimpleUserParser.Parse(main);
-            var playCountText = main.QuerySelector(".m_5.m_t_10.t_r.f_12");
-            var playCount = NumericParsingUtils.FastIntParseIgnoreCommaAndSpace(GetIntFromString(playCountText.InnerText));
+            var playCountText = main.QuerySelector(".m_5.m_b_5.t_r.f_12");
+            var playCount = NumericParsingUtils.FastIntParseIgnoreCommaAndSpace(GetIntFromString(playCountText.ChildNodes[2].InnerText));
 
             var statRecords = main.QuerySelectorAll(".musiccount_img_block > img")
                 .Select(img =>

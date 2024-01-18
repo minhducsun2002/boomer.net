@@ -11,8 +11,8 @@ namespace Pepper.Commons.Maimai.HtmlParsers
             var ap = SplitStatRecord((ReadOnlySpan<char>) stats["ap"]);
             var fcp = SplitStatRecord((ReadOnlySpan<char>) stats["fcp"]);
             var fc = SplitStatRecord((ReadOnlySpan<char>) stats["fc"]);
-            var fsd = SplitStatRecord((ReadOnlySpan<char>) stats["fsd"]);
-            var fsdp = SplitStatRecord((ReadOnlySpan<char>) stats["fsdp"]);
+            var fsd = SplitStatRecord((ReadOnlySpan<char>) stats["fdx"]);
+            var fsdp = SplitStatRecord((ReadOnlySpan<char>) stats["fdxp"]);
             var fsp = SplitStatRecord((ReadOnlySpan<char>) stats["fsp"]);
             var fs = SplitStatRecord((ReadOnlySpan<char>) stats["fs"]);
 
