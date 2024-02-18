@@ -46,10 +46,14 @@ namespace Pepper.Frontends.Osu.Commands
 
             if (!sc.Perfect)
             {
-                var statistics = new HitStatisticsSynthesizer(sc.Statistics.Values.Sum())
-                    .Synthesize(ruleset, sc.Accuracy);
-                var fcScore = new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = sc.Accuracy, Statistics = statistics }
+                var fcScore = new ScoreInfo { Mods = mods, MaxCombo = difficulty.MaxCombo, Accuracy = sc.Accuracy }
                     .WithRulesetID(sc.RulesetID);
+                // TODO: Remove this
+                if (sc.RulesetID != 3)
+                {
+                    var statistics = new HitStatisticsSynthesizer(sc.Statistics.Values.Sum()).Synthesize(ruleset, sc.Accuracy);
+                    fcScore.Statistics = statistics;
+                }
                 fullComboPP = workingBeatmap.CalculatePerformance(fcScore, ruleset);
             }
 
