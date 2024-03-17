@@ -7,6 +7,7 @@ using Pepper.Commons.Osu.API;
 using Pepper.Frontends.Osu.Services;
 using Pepper.Frontends.Osu.Structures;
 using Pepper.Frontends.Osu.Structures.Extensions;
+using ScoreRank = Pepper.Commons.Osu.API.ScoreRank;
 
 namespace Pepper.Frontends.Osu.Commands
 {
@@ -82,7 +83,7 @@ namespace Pepper.Frontends.Osu.Commands
             var embed = new LocalEmbed
             {
                 Author = SerializeAuthorBuilder(sc.User!),
-                Title = $"[**{sc.Rank}**] {b.Metadata.Artist} - {b.Metadata.Title} [{b.DifficultyName}]"
+                Title = $"[**{(sc.Passed ? sc.Rank : ScoreRank.F)}**] {b.Metadata.Artist} - {b.Metadata.Title} [{b.DifficultyName}]"
                         + (mods.Length != 0 ? "+" + string.Join("", mods.Select(mod => mod.Acronym)) : ""),
                 Url = workingBeatmap.GetOnlineUrl(),
                 ThumbnailUrl =
