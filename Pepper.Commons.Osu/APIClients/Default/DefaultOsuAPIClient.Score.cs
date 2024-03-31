@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
@@ -30,8 +31,15 @@ namespace Pepper.Commons.Osu.APIClients.Default
             var request = new RestRequest(path);
             request.AddHeader("x-api-version", "20227270");
             var response = await restClient.GetAsync(request);
-            var deserializedResponse = JsonConvert.DeserializeObject<APIScore[]>(response.Content!);
-            return deserializedResponse!;
+            try
+            {
+                var deserializedResponse = JsonConvert.DeserializeObject<APIScore[]>(response.Content!);
+                return deserializedResponse!;
+            }
+            catch (JsonSerializationException)
+            {
+                return Array.Empty<APIScore>();
+            }
         }
 
         public override async Task<APIScore[]> GetUserBeatmapScores(int userId, int beatmapId, RulesetInfo rulesetInfo)
@@ -40,8 +48,15 @@ namespace Pepper.Commons.Osu.APIClients.Default
             var request = new RestRequest(path);
             request.AddHeader("x-api-version", "20227270");
             var response = await restClient.GetAsync(request);
-            var deserializedResponse = JsonConvert.DeserializeObject<APIScoreList>(response.Content!);
-            return deserializedResponse!.Scores.ToArray();
+            try
+            {
+                var deserializedResponse = JsonConvert.DeserializeObject<APIScoreList>(response.Content!);
+                return deserializedResponse!.Scores.ToArray();
+            }
+            catch (JsonSerializationException)
+            {
+                return Array.Empty<APIScore>();
+            }
         }
 
         internal static APIScore DeserializeToAPILegacyScoreInfo(JToken scoreObject)
