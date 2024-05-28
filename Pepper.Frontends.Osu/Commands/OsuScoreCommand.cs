@@ -1,5 +1,7 @@
+using System.Runtime.CompilerServices;
 using Disqord;
 using Disqord.Bot.Commands;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using Pepper.Commons.Extensions;
 using Pepper.Commons.Osu;
@@ -98,7 +100,7 @@ namespace Pepper.Frontends.Osu.Commands
                             $"**{sc.MaxCombo}**x/**{difficulty.MaxCombo}**x • [{SerializeHitStats(sc.Statistics, ruleset.RulesetInfo)}] • **{sc.Accuracy * 100:F3}**%"
                             + $"\n**{pp:F2}**pp {(calculated ? " (?)" : "")}"
                             + (sc.Perfect ? "" : $" / **{fullComboPP:F3}**pp (?)")
-                            + $" • **`{sc.TotalScore:n0}`**"
+                            + (ShowScore(mods, sc.RulesetID) ? $" • **`{sc.TotalScore:n0}`**" : "")
                             + (sc.OnlineBestScoreID == null
                                 ? ""
                                 : $" • [[**Score**]](https://osu.ppy.sh/scores/{ruleset.ShortName}/{sc.OnlineBestScoreID})")
@@ -128,6 +130,23 @@ namespace Pepper.Frontends.Osu.Commands
             }
 
             return Reply(embed);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
+        private static bool ShowScore(Mod[] mods, int rulesetId)
+        {
+            // mania
+            if (rulesetId == 3)
+            {
+                return true;
+            }
+
+            if (mods.Any(r => r is ModScoreV2))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
