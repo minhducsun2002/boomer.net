@@ -94,7 +94,7 @@ namespace Pepper.Frontends.Osu.Commands
                         + $" {(score.Perfect ? "(FC)" : "")}"
                         + (mods.Length != 0 ? $"+**{string.Join("", mods.Select(mod => mod.Acronym))}**" : "")
                         + "\n" + SerializeHitStats(score.Statistics, Rulesets[score.RulesetID].RulesetInfo)
-                        + $" @ **{SerializeTimestamp(score.Date, false)}**"
+                        + $" @ **{SerializeTimestamp(score.Date)}**"
                         + $"\n[**Score link**](https://osu.ppy.sh/scores/{ruleset.ShortName}/{score.OnlineID})";
                 })),
                 Timestamp = DateTimeOffset.Now,

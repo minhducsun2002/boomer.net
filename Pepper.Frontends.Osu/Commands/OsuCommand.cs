@@ -60,10 +60,9 @@ namespace Pepper.Frontends.Osu.Commands
             return string.Join('/', displayStats);
         }
 
-        public static string SerializeTimestamp(DateTimeOffset? timestamp, bool utcHint = true)
-            => (timestamp ?? DateTimeOffset.UnixEpoch)
-                .ToUniversalTime()
-                .ToString($"HH:mm:ss, dd/MM/yyyy{(utcHint ? " 'UTC'" : "")}", CultureInfo.InvariantCulture);
+        public static string SerializeTimestamp(DateTimeOffset? timestamp)
+            => $"<t:{(timestamp ?? DateTimeOffset.UnixEpoch).ToUnixTimeSeconds()}:R>";
+        
 
         public static LocalEmbedAuthor SerializeAuthorBuilder(APIUser user)
         {
