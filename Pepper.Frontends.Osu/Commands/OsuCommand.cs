@@ -2,8 +2,10 @@ using System.Globalization;
 using AJ.Code;
 using Disqord;
 using Disqord.Rest;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using Pepper.Commons.Osu;
@@ -79,6 +81,28 @@ namespace Pepper.Frontends.Osu.Commands
                 Url = userUrl
             };
             return embedAuthor;
+        }
+
+        protected static string SerializeMods(IReadOnlyList<APIMod> mods)
+        {
+            if (mods.Count == 1 && mods.ElementAtOrDefault(0)?.Acronym == "CL")
+            {
+                return "";
+            }
+
+            var m = mods.Where(m => m.Acronym != "CL");
+            return mods.Count != 0 ? "+" + string.Join("", m.Select(mod => mod.Acronym)) : "";
+        }
+        
+        protected static string SerializeMods(IReadOnlyList<Mod> mods)
+        {
+            if (mods.Count == 1 && mods.ElementAtOrDefault(0) is ModClassic)
+            {
+                return "";
+            }
+
+            var m = mods.Where(m => m is not ModClassic);
+            return mods.Count != 0 ? "+" + string.Join("", m.Select(mod => mod.Acronym)) : "";
         }
     }
 }

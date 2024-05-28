@@ -18,7 +18,7 @@ namespace Pepper.Frontends.Osu.Commands
             return new LocalEmbedField
             {
                 Name = $@"{mapset.Artist} - {mapset.Title} [{map.DifficultyName}]"
-                       + (score.Mods.Any() ? "+" + string.Join("", score.Mods.Select(m => m.Acronym)) : ""),
+                       + SerializeMods(score.Mods),
                 Value = @$"[**{score.Rank}**] "
                         + (score.PP.HasValue
                             ? $"**{score.PP}**pp (**{score.Accuracy * 100:F3}**% | **{score.MaxCombo}**x)"

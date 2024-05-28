@@ -86,7 +86,7 @@ namespace Pepper.Frontends.Osu.Commands
             {
                 Author = SerializeAuthorBuilder(sc.User!),
                 Title = $"[**{(sc.Passed ? sc.Rank : ScoreRank.F)}**] {b.Metadata.Artist} - {b.Metadata.Title} [{b.DifficultyName}]"
-                        + (mods.Length != 0 ? "+" + string.Join("", mods.Select(mod => mod.Acronym)) : ""),
+                        + SerializeMods(mods),
                 Url = workingBeatmap.GetOnlineUrl(),
                 ThumbnailUrl =
                     $"https://b.ppy.sh/thumb/{workingBeatmap.BeatmapSetInfo?.OnlineID ?? b.OnlineBeatmapSetID}l.jpg",
