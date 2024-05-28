@@ -5,9 +5,12 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Difficulty;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using Pepper.Commons.Extensions;
+using Pepper.Frontends.Osu.Structures.TypeParsers;
 
 namespace Pepper.Frontends.Osu.Structures
 {
@@ -96,10 +99,35 @@ namespace Pepper.Frontends.Osu.Structures
                         break;
                 }
 
-                builder.Append(
-                    formatted
-                    ? $"`CS`**{difficulty.CircleSize:0.##}** `AR`**{difficulty.ApproachRate:0.##}** `OD`**{difficulty.OverallDifficulty:0.##}** `HP`**{difficulty.DrainRate:0.##}**"
-                    : $"CS{difficulty.CircleSize:0.##} AR{difficulty.ApproachRate:0.##} OD{difficulty.OverallDifficulty:0.##} HP{difficulty.DrainRate:0.##}");
+                var final = new List<(string stat, float value)>();
+                var ruleset = RulesetTypeParser.SupportedRulesets[beatmapInfo.Ruleset.OnlineID];
+
+                switch (ruleset)
+                {
+                    case TaikoRuleset:
+                        {
+                            final.Add(("OD", difficulty.OverallDifficulty));
+                            final.Add(("HP", difficulty.DrainRate));
+                            break;
+                        }
+
+                    default:
+                        {
+                            final.Add(("CS", difficulty.CircleSize));
+                            final.Add(("AR", difficulty.ApproachRate));
+                            final.Add(("OD", difficulty.OverallDifficulty));
+                            final.Add(("HP", difficulty.DrainRate));
+                            break;
+                        }
+                }
+
+                var difficultyStringBuilder = new StringBuilder();
+                difficultyStringBuilder.AppendJoin(
+                    " ",
+                    final.Select(pair => formatted ? $"`{pair.stat}`**{pair.value:0.##}**" : $"{pair.stat}{pair.value:0.##}")
+                );
+
+                builder.Append(difficultyStringBuilder.ToString());
             }
 
             if ((serializationOptions & StatFilter.BPM) == StatFilter.BPM)
