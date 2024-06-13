@@ -20,10 +20,12 @@ namespace Pepper.Frontends.MaimaiStatistics.Database.ProgressRecordProvider
                 whereQuery += $" and timestamp <= '{toDate.Value:u}'";
             }
             var query = $@"
-                select id, grouped_max.friend_id, class, name, dan, m, progress_log.rating as rating, m as timestamp from (
+                select progress_log.id, grouped_max.friend_id, class, name, dan, m, progress_log.rating as rating, m as timestamp from (
                       select friend_id, max(timestamp) as m from progress_log {whereQuery} group by friend_id
                 ) grouped_max
-                      join progress_log on grouped_max.friend_id = progress_log.friend_id and progress_log.timestamp = m
+                    join progress_log on grouped_max.friend_id = progress_log.friend_id and progress_log.timestamp = m
+                    join target_friend_id tfi on grouped_max.friend_id = tfi.friend_id
+                where tfi.enabled = 1
                 group by grouped_max.friend_id;
             ";
             var res = DbSet.FromSqlRaw(query);
@@ -34,10 +36,12 @@ namespace Pepper.Frontends.MaimaiStatistics.Database.ProgressRecordProvider
         {
             var res = DbSet.FromSqlRaw(
                 $@"
-                select id, grouped_max.friend_id, class, name, rating, dan, latest_time as timestamp from (
+                select progress_log.id, grouped_max.friend_id, class, name, rating, dan, latest_time as timestamp from (
                      select friend_id, max(timestamp) as latest_time from progress_log where TRUE group by friend_id
                  ) grouped_max
                      join progress_log on grouped_max.friend_id = progress_log.friend_id and progress_log.timestamp = latest_time
+                     join target_friend_id tfi on grouped_max.friend_id = tfi.friend_id
+                where tfi.enabled = 1
                 group by grouped_max.friend_id;
                 "
             );
