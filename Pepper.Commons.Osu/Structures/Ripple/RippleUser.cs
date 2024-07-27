@@ -20,6 +20,7 @@ namespace Pepper.Commons.Osu.API.Ripple
         [JsonProperty("country")] private string CountryCode { get; set; } = "";
         public RegionInfo Country => new(CountryCode);
         public Dictionary<GameMode, RippleUserStatistics> Statistics = new();
+        [JsonProperty("favourite_mode")] public GameMode FavouriteMode { get; set; }
 
         [JsonProperty("std")]
         private RippleUserStatistics StandardStatistics

@@ -17,7 +17,10 @@ namespace Pepper.Commons.Osu.APIClients.Default
         public override Task<APIUser> GetUser(int userId, RulesetInfo rulesetInfo)
             => InternalGetUser(null, userId, rulesetInfo);
 
-        private async Task<APIUser> InternalGetUser(string? username, int? userId, RulesetInfo rulesetInfo)
+        public override Task<APIUser> GetUserDefaultRuleset(string username)
+            => InternalGetUser(username, null);
+
+        private async Task<APIUser> InternalGetUser(string? username, int? userId, RulesetInfo? rulesetInfo = null)
         {
             if (username == null && !userId.HasValue)
             {
@@ -38,7 +41,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
                     ))!;
                 });
 
-            if (legacyClient != null)
+            if (legacyClient != null && rulesetInfo != null)
             {
                 fallbackPolicy = BasePolicy()
                     .FallbackAsync(async cancellationToken => userId.HasValue

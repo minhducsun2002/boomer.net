@@ -12,9 +12,10 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
 {
     public partial class RippleOsuAPIClient
     {
-        private static APIUser DeserializeUserObject(string raw, RulesetInfo rulesetInfo)
+        private static APIUser DeserializeUserObject(string raw, RulesetInfo? rulesetInfo = null)
         {
             var user = JsonConvert.DeserializeObject<RippleUser>(raw)!;
+            rulesetInfo ??= SharedConstants.BuiltInRulesets[(int) user.FavouriteMode].RulesetInfo;
             var stats = user.Statistics[(GameMode) rulesetInfo.OnlineID];
             return new RippleAPIUser
             {
@@ -48,7 +49,8 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
                     ReplaysWatched = stats.ReplaysWatched,
                     TotalScore = stats.TotalScore,
                     TotalHits = stats.TotalHits
-                }
+                },
+                PlayMode = SharedConstants.BuiltInRulesets[(int) user.FavouriteMode].ShortName
             };
         }
 
@@ -65,6 +67,12 @@ namespace Pepper.Commons.Osu.APIClients.Ripple
         {
             var raw = await HttpClient.GetStringAsync($"https://ripple.moe/api/v1/users/full?id={id}");
             return DeserializeUserObject(raw, rulesetInfo);
+        }
+
+        public override async Task<APIUser> GetUserDefaultRuleset(string username)
+        {
+            var raw = await HttpClient.GetStringAsync($"https://ripple.moe/api/v1/users/full?name={username}");
+            return DeserializeUserObject(raw);
         }
     }
 }
