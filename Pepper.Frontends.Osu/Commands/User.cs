@@ -58,7 +58,8 @@ namespace Pepper.Frontends.Osu.Commands
                         IsInline = true
                     },
                 },
-                Footer = new LocalEmbedFooter { Text = $"Joined {SerializeTimestamp(user.JoinDate)}." },
+                Footer = new LocalEmbedFooter { Text = "Joined" },
+                Timestamp = user.JoinDate,
                 Color = new Color(color.R, color.G, color.B)
             };
 
