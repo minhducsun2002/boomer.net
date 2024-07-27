@@ -49,6 +49,12 @@ namespace Pepper.Frontends.Osu.Structures.TypeParsers
                 return Success(null!);
             }
 
+            var failure = await GetFailureMessageNoUsername(context);
+            return Failure(failure.FailureReason!);
+        }
+
+        public static async Task<IResult> GetFailureMessageNoUsername(IDiscordCommandContext context)
+        {
             var saveHintText = "";
             var saveCommand = context.Bot.Commands.EnumerateTextCommands()
                 .FirstOrDefault(command => command.CustomAttributes.OfType<SaveUsernameAttribute>().Any());
@@ -58,7 +64,7 @@ namespace Pepper.Frontends.Osu.Structures.TypeParsers
                     $" Use \"{saveCommand.GetPrimaryInvocation(context.Bot)}\" to set it up.";
             }
 
-            return Failure(
+            return Results.Failure(
                 "An username wasn't specified and couldn't find a saved username for you."
                 + saveHintText
             );

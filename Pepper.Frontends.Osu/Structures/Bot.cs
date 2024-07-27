@@ -3,6 +3,7 @@ using Disqord.Bot;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using osu.Game.Rulesets;
 using Pepper.Commons.Osu;
 using Pepper.Frontends.Database.OsuUsernameProviders;
 using Pepper.Frontends.Osu.Commands;
@@ -34,6 +35,12 @@ namespace Pepper.Frontends.Osu.Structures
                     {
                         var param = command.Parameters.FirstOrDefault(param => param.ReflectedType == typeof(Username));
                         param?.Checks.Add(new EnsureUsernamePresentCheckAttribute());
+                    }
+
+                    if (command.Parameters.Any(param => param.ReflectedType == typeof(Ruleset)))
+                    {
+                        var param = command.Parameters.FirstOrDefault(param => param.ReflectedType == typeof(Ruleset));
+                        param?.Checks.Add(new FillUnknownRulesetAttribute());
                     }
                 }
             }

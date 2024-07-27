@@ -32,17 +32,28 @@ namespace Pepper.Frontends.Osu.Structures.TypeParsers
 
         public override ValueTask<ITypeParserResult<Ruleset>> ParseAsync(ICommandContext context, IParameter parameter, ReadOnlyMemory<char> input)
         {
-            Ruleset defaultRuleset = new OsuRuleset();
+            Ruleset defaultRuleset = new UnknownRuleset();
             try
             {
-                defaultRuleset = RulesetNames
-                    .First(pair => pair.Item1.Equals(input.ToString(), StringComparison.OrdinalIgnoreCase))
-                    .Item2;
+                var res = ResolveRuleset(input);
+                if (res != null)
+                {
+                    defaultRuleset = res;
+                }
 
             }
-            catch { /* ignored, defaults to osu! */ }
+            catch { /* Leave it for further processing down the line */ }
 
             return Success(defaultRuleset);
+        }
+
+        public static Ruleset? ResolveRuleset(ReadOnlyMemory<char> slug)
+        {
+            var result = RulesetNames
+                .FirstOrDefault(pair => pair.Item1.Equals(slug.ToString(), StringComparison.OrdinalIgnoreCase))
+                .Item2;
+
+            return result;
         }
     }
 }
