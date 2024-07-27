@@ -24,7 +24,7 @@ namespace Pepper.Frontends.Osu.Structures
         ) : base(options, logger, services, client)
         { }
 
-        protected override void MutateModule(IModuleBuilder moduleBuilder)
+        protected override void MutateTopLevelModule(IModuleBuilder moduleBuilder)
         {
             // for commands accepting username & game servers, add checks
             foreach (var command in CommandUtilities.EnumerateAllCommands(moduleBuilder).OfType<ITextCommandBuilder>())
@@ -45,7 +45,7 @@ namespace Pepper.Frontends.Osu.Structures
                 }
             }
 
-            base.MutateModule(moduleBuilder);
+            base.MutateTopLevelModule(moduleBuilder);
         }
 
         protected override ValueTask AddTypeParsers(DefaultTypeParserProvider typeParserProvider, CancellationToken cancellationToken)
