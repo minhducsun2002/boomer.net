@@ -4,6 +4,7 @@ using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using Pepper.Commons.Osu;
 using Pepper.Commons.Osu.API;
@@ -51,6 +52,49 @@ namespace Pepper.Frontends.Osu.Commands
             var modFilters = ModParserService.ResolveMods(ruleset, modStrings);
 
             var scores = await apiClient.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
+
+            return InternalBestList(ruleset, user, scores, modFilters);
+        }
+
+        [TextCommand("toprecent", "bestrecent")]
+        [Description("Show top plays of a player, sorted by recency.")]
+        public async Task<IDiscordCommandResult> BestRecent(
+            [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
+            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            [Description("Username to check. Default to your username, if set.")] Username username,
+            [Flag("/mod=", "/mod:")][Description("Mods to filter top plays with.")] string mods = "",
+            [Flag("#")][Description("Index from the best play. 1 indicates the best play.")] int pos = -1
+        )
+        {
+            var apiClient = APIClientStore.GetClient(server);
+            var user = await apiClient.GetUser(username.GetUsername(server)!, ruleset.RulesetInfo);
+            var scores = await apiClient.GetUserScores(user.Id, ScoreType.Best, ruleset.RulesetInfo);
+
+            scores = scores.OrderByDescending(s => s.Date).ToArray();
+
+            if (pos > 0)
+            {
+                var s = scores.ElementAtOrDefault(pos - 1);
+                if (s == null)
+                {
+                    return Reply(new LocalEmbed()
+                        .WithDescription(
+                            $"No top play found for player [{user.Username}]({user.PublicUrl}) at position {pos}."));
+                }
+                return await SingleScore(s);
+            }
+
+            IEnumerable<string> modStrings = mods.Chunk(2).Select(chunk => new string(chunk.ToArray()));
+            var modFilters = ModParserService.ResolveMods(ruleset, modStrings);
+
+            return InternalBestList(ruleset, user, scores, modFilters, footerPrefix: "Top recent plays");
+        }
+
+        private IDiscordCommandResult InternalBestList(
+            Ruleset ruleset, APIUser user, IEnumerable<APIScore> scores, Mod[] modFilters,
+            string footerPrefix = "Top plays"
+        )
+        {
             var filtered = scores
                 .Where(score =>
                 {
@@ -76,7 +120,7 @@ namespace Pepper.Frontends.Osu.Commands
                 (_, chunk) => new Page().WithEmbeds(
                     SerializeScoreset(chunk, scoreLink: false)
                         .WithFooter(
-                            $"Top plays (all times are UTC){modText}"
+                            $"{footerPrefix} {modText}".Trim()
                         )
                         .WithAuthor(SerializeAuthorBuilder(user))
                 ),
