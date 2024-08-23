@@ -26,7 +26,7 @@ namespace Pepper.Frontends.Osu.Commands
         [Description("Show top plays of a player.")]
         public async Task<IDiscordCommandResult> Best(
             [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
-            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            // [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Description("Username to check. Default to your username, if set.")] Username username,
             [Flag("/mod=", "/mod:")][Description("Mods to filter top plays with.")] string mods = "",
             [Flag("#")][Description("Index from the best play. 1 indicates the best play.")] int pos = -1
@@ -60,7 +60,7 @@ namespace Pepper.Frontends.Osu.Commands
         [Description("Show top plays of a player, sorted by recency.")]
         public async Task<IDiscordCommandResult> BestRecent(
             [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
-            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            // [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Description("Username to check. Default to your username, if set.")] Username username,
             [Flag("/mod=", "/mod:")][Description("Mods to filter top plays with.")] string mods = "",
             [Flag("#")][Description("Index from the best play. 1 indicates the best play.")] int pos = -1

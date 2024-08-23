@@ -18,8 +18,8 @@ namespace Pepper.Frontends.Osu.Commands
         [TextCommand("user", "u")]
         [Description("Show statistics of an osu! player.")]
         public async Task<IDiscordCommandResult> Exec(
-            [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
-            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            [Flag("/")][Description("Game mode to check. Default to your preset game mode on the website.")] Ruleset ruleset,
+            // [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Remainder][Description("Username to check. Default to your username, if set.")] Username username)
         {
             var apiClient = APIClientStore.GetClient(server);

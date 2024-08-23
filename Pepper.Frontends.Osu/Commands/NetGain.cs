@@ -28,8 +28,7 @@ namespace Pepper.Frontends.Osu.Commands
         [TextCommand("whatif", "if", "netgain")]
         [Description("What if you set a score with a certain pp amount?")]
         public async Task<IDiscordCommandResult> Exec(
-            [Flag("/")][Description("Game mode to check. Default to osu!.")] Ruleset ruleset,
-            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            [Flag("/")][Description("Game mode to check. Default to your preset game mode on the website.")] Ruleset ruleset,
             [Description("The amount of pp to check.")] int ppToCheck,
             [Description("Username to check. Default to your username, if set.")] Username username
         )

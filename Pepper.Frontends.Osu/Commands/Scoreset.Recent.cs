@@ -19,7 +19,7 @@ namespace Pepper.Frontends.Osu.Commands
         [Description("Show recent plays of a player.")]
         public async Task<IDiscordCommandResult> Recent(
             [Flag("/")][Description("Game mode to check. Defaults to osu!.")] Ruleset ruleset,
-            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            // [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Description("Username to check. Default to your username, if set.")] Username username
         )
         {
@@ -54,7 +54,7 @@ namespace Pepper.Frontends.Osu.Commands
         [Description("Show the most recent play of a player.")]
         public async Task<IDiscordCommandResult> MostRecent(
             [Flag("/")][Description("Game mode to check. Defaults to osu!.")] Ruleset ruleset,
-            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            // [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Description("Username to check. Default to your username, if set.")] Username username,
             [Flag("#")][Description("Index from the latest play. 1 indicates the latest.")] int pos = 1)
         {

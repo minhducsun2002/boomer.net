@@ -21,6 +21,8 @@ namespace Pepper.Frontends.Osu.Commands
         protected OsuCommand(APIClientStore apiClientStore) => APIClientStore = apiClientStore;
         protected readonly APIClientStore APIClientStore;
         protected static Ruleset[] Rulesets => RulesetTypeParser.SupportedRulesets;
+        // ReSharper disable once InconsistentNaming
+        protected const GameServer server = GameServer.Osu;
 
         private static readonly LocalEmoji Hourglass = new("⏳");
         public override async ValueTask OnBeforeExecuted()
@@ -62,7 +64,7 @@ namespace Pepper.Frontends.Osu.Commands
 
         public static string SerializeTimestamp(DateTimeOffset? timestamp)
             => $"<t:{(timestamp ?? DateTimeOffset.UnixEpoch).ToUnixTimeSeconds()}:R>";
-        
+
 
         public static LocalEmbedAuthor SerializeAuthorBuilder(APIUser user)
         {
@@ -92,7 +94,7 @@ namespace Pepper.Frontends.Osu.Commands
             var m = mods.Where(m => m.Acronym != "CL");
             return mods.Count != 0 ? "+" + string.Join("", m.Select(mod => mod.Acronym)) : "";
         }
-        
+
         protected static string SerializeMods(IReadOnlyList<Mod> mods)
         {
             if (mods.Count == 1 && mods.ElementAtOrDefault(0) is ModClassic)

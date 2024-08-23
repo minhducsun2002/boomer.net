@@ -22,7 +22,7 @@ namespace Pepper.Frontends.Osu.Commands
         [OverloadPriority(2)]
         public async Task<IDiscordCommandResult> BeatmapBased(
             [Description("A score URL, a beatmap URL, or a beatmap ID.")][DoNotFill] IBeatmapResolvable beatmapResolvable,
-            [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            // [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Remainder][Description("Username to check. Default to your username, if set.")] Username username
         )
         {
@@ -109,7 +109,7 @@ namespace Pepper.Frontends.Osu.Commands
         [Description("View/list scores on the latest map posted in the current channel")]
         [OverloadPriority(1)]
         public async Task<IDiscordCommandResult> UserOnly(
-            // [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
+            // // [Flag("-")][Description("Game server to check. Default to osu! official servers.")] GameServer server,
             [Remainder][Description("Username to check. Default to your username, if set.")] Username username
         )
         {
@@ -120,7 +120,7 @@ namespace Pepper.Frontends.Osu.Commands
                     "No beatmap was ever sent in this channel. Please use `o!map` with the relevant map link/ID first.");
             }
 
-            return await BeatmapBased(new BeatmapResolvable(beatmap.Value), GameServer.Osu, username);
+            return await BeatmapBased(new BeatmapResolvable(beatmap.Value), username);
         }
 
         // [TextCommand("sc", "score", "scores", "c", "check")]
