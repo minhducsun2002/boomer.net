@@ -5,6 +5,7 @@ using Disqord.Rest;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -48,14 +49,35 @@ namespace Pepper.Frontends.Osu.Commands
             };
         }
 
-        protected static string SerializeHitStats(Dictionary<HitResult, int> statistics, RulesetInfo rulesetInfo)
+        protected static string SerializeHitStats(Dictionary<HitResult, int> statistics, RulesetInfo rulesetInfo, Dictionary<HitResult, int>? maximumStatistics = null)
         {
             var sc = new ScoreInfo
             {
                 Ruleset = rulesetInfo,
                 Statistics = statistics
             };
-            var displayStats = sc.GetStatisticsForDisplay()
+
+            var stats = sc.GetStatisticsForDisplay().ToList();
+            if (rulesetInfo.OnlineID == 2) // osu!catch
+            {
+                var great = statistics.GetValueOrDefault(HitResult.Great, 0);
+                var ticks = statistics.GetValueOrDefault(HitResult.LargeTickHit, 0);
+                
+                var maximumTicks = maximumStatistics?.GetValueOrDefault(HitResult.LargeTickHit, 0);
+                
+                var tickMiss = statistics.GetValueOrDefault(HitResult.SmallTickMiss, 0);
+                var miss = statistics.GetValueOrDefault(HitResult.Miss, 0);
+                
+                stats = new List<HitResultDisplayStatistic>
+                {
+                    new(HitResult.Great, great, new int?(), nameof(HitResult.Great)),
+                    new(HitResult.LargeTickHit, ticks, maximumTicks, nameof(HitResult.LargeTickHit)),
+                    new(HitResult.SmallTickMiss, tickMiss, new int?(), nameof(HitResult.SmallTickMiss)),
+                    new(HitResult.Miss, miss, new int?(), nameof(HitResult.Miss)),
+                };
+            }
+            
+            var displayStats = stats
                 .Select(s => s.Result)
                 .Where(r => !r.IsBonus())
                 .Select(hitResult => $"**{(sc.Statistics.TryGetValue(hitResult, out var value) ? value : 0)}**");

@@ -97,7 +97,7 @@ namespace Pepper.Frontends.Osu.Commands
                     {
                         Name = "Statistics",
                         Value =
-                            $"**{sc.MaxCombo}**x/**{difficulty.MaxCombo}**x • [{SerializeHitStats(sc.Statistics, ruleset.RulesetInfo)}] • **{sc.Accuracy * 100:F3}**%"
+                            $"**{sc.MaxCombo}**x/**{difficulty.MaxCombo}**x • [{SerializeHitStats(sc.Statistics, ruleset.RulesetInfo, sc.MaximumStatistics)}] • **{sc.Accuracy * 100:F3}**%"
                             + $"\n**{pp:F2}**pp {(calculated ? " (?)" : "")}"
                             + (sc.Perfect ? "" : $" / **{fullComboPP:F3}**pp (?)")
                             + (ShowScore(mods, sc.RulesetID) ? $" • **`{sc.TotalScore:n0}`**" : "")
