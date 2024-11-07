@@ -28,12 +28,12 @@ namespace Pepper.Frontends.Osu.Commands
         private static readonly LocalEmoji Hourglass = new("⏳");
         public override async ValueTask OnBeforeExecuted()
         {
-            await Context.Message.AddReactionAsync(Hourglass);
+            // await Context.Message.AddReactionAsync(Hourglass);
         }
 
         public override async ValueTask OnAfterExecuted()
         {
-            await Context.Message.RemoveOwnReactionAsync(Hourglass);
+            // await Context.Message.RemoveOwnReactionAsync(Hourglass);
         }
 
         protected static string ResolveEarthEmoji(string countryCode)
