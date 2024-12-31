@@ -2,7 +2,7 @@ using Disqord;
 using Disqord.Bot.Commands;
 using osu.Game.Scoring;
 using Pepper.Commons.Osu;
-using Pepper.Commons.Structures;
+using Pepper.Commons.Osu.API;
 using Pepper.Frontends.Database.OsuUsernameProviders;
 using Pepper.Frontends.Osu.Services;
 using Pepper.Frontends.Osu.Structures;
@@ -47,7 +47,9 @@ namespace Pepper.Frontends.Osu.Commands
                                          $"[**{map.Metadata.Title}** [**{map.BeatmapInfo.DifficultyName}**]](https://osu.ppy.sh/b/{mapId}).")
                 );
             }
-
+            
+            // TODO: figure out a better way to display all scores
+            scores = GroupScore(scores);
 
             var difficulty = map.CalculateDifficulty(ruleset.RulesetInfo.OnlineID);
             HitStatisticsSynthesizer? synthesizer = null;
@@ -100,7 +102,7 @@ namespace Pepper.Frontends.Osu.Commands
                 Timestamp = DateTimeOffset.Now,
                 Footer = new LocalEmbedFooter
                 {
-                    Text = "All times are in UTC"
+                    Text = "Scores are grouped, the best (by PP/score) ones are shown"
                 }
             });
         }
@@ -121,6 +123,31 @@ namespace Pepper.Frontends.Osu.Commands
             }
 
             return await BeatmapBased(new BeatmapResolvable(beatmap.Value), username);
+        }
+
+        private static APIScore[] GroupScore(APIScore[] scores)
+        {
+            var comparer = Comparer<APIScore>.Create((p1, p2) =>
+            {
+                int p1S = p1.LegacyTotalScore ?? 0, p2S = p2.LegacyTotalScore ?? 0;
+                double p1PP = p1.PP ?? 0, p2PP = p2.PP ?? 0;
+
+                if (p1PP == 0 && p2PP == 0)
+                {
+                    return p1S.CompareTo(p2S);
+                }
+
+                return p1PP.CompareTo(p2PP);
+            });
+            
+            var grouped = scores.GroupBy(score => string.Join("-", score.Mods.Select(r => r.Acronym)));
+            var mapped = grouped.Select(group =>
+            {
+                var sort = group.OrderByDescending(sc => sc, comparer);
+                return sort.First();
+            });
+            
+            return mapped.OrderByDescending(sc => sc, comparer).ToArray();
         }
 
         // [TextCommand("sc", "score", "scores", "c", "check")]
