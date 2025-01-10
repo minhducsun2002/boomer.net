@@ -17,6 +17,7 @@ namespace Pepper.Commons.Structures.Configuration.Loader
                     Console.WriteLine("Trying to download from {0}", uri);
                     HttpClient.Timeout = TimeSpan.FromSeconds(15);
                     f = await HttpClient.GetStringAsync(uri);
+                    Console.WriteLine("Downloaded configuration");
                 }
                 else
                 {
