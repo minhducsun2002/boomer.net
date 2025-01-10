@@ -15,6 +15,7 @@ namespace Pepper.Commons.Structures.Configuration.Loader
                 if (uri.Scheme.ToLowerInvariant() is "http" or "https")
                 {
                     Console.WriteLine("Trying to download from {0}", uri);
+                    HttpClient.Timeout = TimeSpan.FromSeconds(15);
                     f = await HttpClient.GetStringAsync(uri);
                 }
                 else
