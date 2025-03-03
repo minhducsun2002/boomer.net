@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0.413-alpine3.17 as build
+FROM mcr.microsoft.com/dotnet/sdk:8.0.406-alpine3.21 as build
 WORKDIR /app
 
 COPY . . 
@@ -7,7 +7,7 @@ RUN echo $BUILD_HASH
 RUN dotnet restore
 RUN dotnet publish Pepper.Frontends.Osu -c release -o dist/ 
 
-FROM mcr.microsoft.com/dotnet/runtime:6.0.4-alpine3.14
+FROM mcr.microsoft.com/dotnet/runtime:8.0.13-alpine3.21
 RUN apk add --no-cache icu-libs
 
 # Disable the invariant mode
