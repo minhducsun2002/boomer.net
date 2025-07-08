@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'Pepper.Commons.Osu/**'
+      - 'Pepper.Commons/**'
       - '.github/workflows/osu-commons-nuget-publish.yml'
     branches:
       - master
@@ -21,7 +22,9 @@ jobs:
         with:
           dotnet-version: 6.0.101
       - name: Package
-        run: dotnet pack Pepper.Commons.Osu -o dist/ --version-suffix "$(date +%Y%m%d-%H%M)";
+        run: |
+          dotnet build
+          NUGET_ENABLE_LEGACY_CSPROJ_PACK=true nuget pack Pepper.Commons.Osu -OutputDirectory dist/ -Suffix "$(date +%Y%m%d-%H%M)" -IncludeReferencedProjects;
       - name: Publish
         env:
           API_KEY: ${{ secrets.NUGET_API_KEY }}
