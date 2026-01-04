@@ -33,7 +33,7 @@ namespace Pepper.Commons.Osu.APIClients.Default
                 .FallbackAsync(async cancellationToken =>
                 {
                     var type = userId.HasValue ? "id" : "username";
-                    var encodedUser = HttpUtility.UrlEncode(userId.HasValue ? userId.Value.ToString() : username!);
+                    var encodedUser = userId.HasValue ? userId.Value.ToString() : username!;
 
                     return (await restClient.GetJsonAsync<APIUser>(
                         @$"users/{encodedUser}?key=${type}",
