@@ -62,12 +62,12 @@ namespace Pepper.Frontends.Osu.Commands
             {
                 var great = statistics.GetValueOrDefault(HitResult.Great, 0);
                 var ticks = statistics.GetValueOrDefault(HitResult.LargeTickHit, 0);
-                
+
                 var maximumTicks = maximumStatistics?.GetValueOrDefault(HitResult.LargeTickHit, 0);
-                
+
                 var tickMiss = statistics.GetValueOrDefault(HitResult.SmallTickMiss, 0);
                 var miss = statistics.GetValueOrDefault(HitResult.Miss, 0);
-                
+
                 stats = new List<HitResultDisplayStatistic>
                 {
                     new(HitResult.Great, great, new int?(), nameof(HitResult.Great)),
@@ -76,7 +76,7 @@ namespace Pepper.Frontends.Osu.Commands
                     new(HitResult.Miss, miss, new int?(), nameof(HitResult.Miss)),
                 };
             }
-            
+
             var displayStats = stats
                 .Select(s => s.Result)
                 .Where(r => !r.IsBonus())

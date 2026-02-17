@@ -17,7 +17,7 @@ namespace Pepper.Commons.Osu
     /// <br />
     /// It stays on the optimistic side - if there are multiple possibilities, the one with the higher number of better hits will almost always be returned.
     /// </summary>
-    public class HitStatisticsSynthesizer
+    public partial class HitStatisticsSynthesizer
     {
         private readonly Beatmap<HitObject> beatmap;
         private const int MitigationMultiplier = 1000;
@@ -31,7 +31,7 @@ namespace Pepper.Commons.Osu
             };
         }
 
-        private class NextScoreProcessor : ScoreProcessor
+        private partial class NextScoreProcessor : ScoreProcessor
         {
             public NextScoreProcessor(Ruleset ruleset) : base(ruleset) { }
             public void Reset() => base.Reset(true);
@@ -136,8 +136,7 @@ namespace Pepper.Commons.Osu
             var scoreProcessor = new NextScoreProcessor(ruleset);
             scoreProcessor.ApplyBeatmap(beatmap);
             var validHitResults = ruleset
-                .GetHitResults()
-                .Select(r => r.result)
+                .GetValidHitResults()
                 .Where(r => !r.IsBonus() && r.IsBasic());
 
             var resultContribution = validHitResults

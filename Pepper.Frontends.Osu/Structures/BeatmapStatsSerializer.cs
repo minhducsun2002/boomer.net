@@ -85,20 +85,6 @@ namespace Pepper.Frontends.Osu.Structures
                     }
                 }
 
-                switch (DifficultyOverwrite)
-                {
-                    case OsuDifficultyAttributes osuDifficulty:
-                        difficulty.ApproachRate = (float) Math.Round(osuDifficulty.ApproachRate, 2);
-                        difficulty.OverallDifficulty = (float) Math.Round(osuDifficulty.OverallDifficulty, 2);
-                        break;
-                    case TaikoDifficultyAttributes taikoDifficulty:
-                        // difficulty.ApproachRate = (float) Math.Round(taikoDifficulty, 2);
-                        break;
-                    case CatchDifficultyAttributes catchDifficulty:
-                        difficulty.ApproachRate = (float) Math.Round(catchDifficulty.ApproachRate, 2);
-                        break;
-                }
-
                 var final = new List<(string stat, float value)>();
                 var ruleset = RulesetTypeParser.SupportedRulesets[beatmapInfo.Ruleset.OnlineID];
 
